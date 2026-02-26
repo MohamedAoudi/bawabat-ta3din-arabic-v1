@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Menu from "../layouts/Menu";
+import Footer from "../layouts/Footer";
 import i7 from "../assets/i-7.png";
 
 const countries = [
@@ -97,7 +98,7 @@ const Home = () => {
       <Menu />
 
       {/* Hero */}
-      <header className="relative overflow-hidden bg-gradient-to-br from-sky-900 to-sky-700 text-white pb-24 pt-12">
+      <header className="relative overflow-hidden bg-gradient-to-br from-[#005A8D] to-[#005A8D] text-white pb-24 pt-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="mb-3 text-4xl sm:text-5xl md:text-6xl font-extrabold">
             بوابة المؤشرات التعدينية العربية
@@ -122,7 +123,7 @@ const Home = () => {
             />
             <button
               type="button"
-              className="rounded-full bg-sky-900 px-7 py-2 text-sm sm:text-lg font-semibold text-white hover:bg-sky-800"
+              className="rounded-full bg-[#005A8D] px-7 py-2 text-sm sm:text-lg font-semibold text-white hover:bg-[#00466B]"
             >
               بحث ذكي
             </button>
@@ -132,7 +133,7 @@ const Home = () => {
         {/* KPIs */}
         <section className="mt-8 grid gap-4 md:grid-cols-3">
           <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#792E28]">
-            <i className="fas fa-chart-line absolute left-5 top-4 text-4xl text-sky-900/15" />
+            <i className="fas fa-chart-line absolute left-5 top-4 text-4xl text-[#005A8D]/15" />
             <p className="text-lg text-[#792E28] mb-1">
               المنتجات التعدينية العربية
             </p>
@@ -142,7 +143,7 @@ const Home = () => {
                 معلومة تعدينية
               </span>
             </h2>
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-sky-50 px-4 py-1.5 text-lg s font-semibold text-sky-900">
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#005A8D]/5 px-4 py-1.5 text-lg s font-semibold text-[#005A8D]">
               <i className="fas fa-caret-up" />
               <span>منتجات وخامات</span>
             </div>
@@ -171,6 +172,63 @@ const Home = () => {
           </div>
         </section>
 
+        {/* Project idea / vision */}
+        <section className="mt-10">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
+              <h3 className="text-xl font-extrabold text-slate-900 mb-2">
+                ما هي بوابة المؤشرات التعدينية العربية؟
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                منصة عربية متخصصة في تجميع، توحيد، وتحليل بيانات الإنتاج التعديني
+                في الدول العربية، لتمكين متخذي القرار والباحثين من متابعة أداء
+                القطاع، رصد الفرص، ودعم التكامل العربي في مجال الثروات المعدنية.
+              </p>
+              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                <li className="flex items-start gap-2">
+                  <i className="mt-1 fa-solid fa-check text-emerald-500" />
+                  <span>قاعدة بيانات موحّدة لمؤشرات الإنتاج التعديني العربي.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <i className="mt-1 fa-solid fa-check text-emerald-500" />
+                  <span>مقارنات تفاعلية بين الدول والخامات والفترات الزمنية.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <i className="mt-1 fa-solid fa-check text-emerald-500" />
+                  <span>تقارير ولوحات معلومات جاهزة للاستخدام وصالحة للتنزيل.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="rounded-3xl bg-[#005A8D] p-6 text-white shadow-lg shadow-slate-900/20 ring-1 ring-[#004366]">
+              <h3 className="text-xl font-extrabold mb-2">لمن هذه البوابة؟</h3>
+              <p className="text-sm text-sky-50/90 leading-relaxed">
+                تستهدف البوابة الجهات الحكومية العربية، أجهزة الإحصاء، الهيئات
+                التعدينية، الباحثين، والمستثمرين المهتمين بفهم ديناميات الإنتاج
+                التعديني العربي.
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 text-sm">
+                <div className="rounded-2xl bg-[#004366]/40 px-4 py-3">
+                  <p className="font-semibold mb-1">استخدامات رئيسية</p>
+                  <ul className="space-y-1 text-sky-50/90">
+                    <li>متابعة تطور الإنتاج حسب الدولة أو الخام.</li>
+                    <li>رصد حصة الدول العربية من الإنتاج العالمي.</li>
+                    <li>اكتشاف فرص التكامل والتعاون الإقليمي.</li>
+                  </ul>
+                </div>
+                <div className="rounded-2xl bg-[#004366]/40 px-4 py-3">
+                  <p className="font-semibold mb-1">الخطوات القادمة</p>
+                  <ul className="space-y-1 text-sky-50/90">
+                    <li>دمج مزيد من السنوات والبيانات التفصيلية.</li>
+                    <li>إطلاق تقارير تفاعلية قابلة للتخصيص.</li>
+                    <li>إضافة طبقات خرائط جيولوجية (لاحقًا).</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Indicators entrance */}
         <section className="mt-10">
           <div className="flex flex-wrap items-end justify-between gap-3">
@@ -182,7 +240,7 @@ const Home = () => {
             </div>
             <a
               href="m1.html"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-sky-900 shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#005A8D] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
             >
               <i className="fa-solid fa-arrow-up-right-from-square" />
               <span>الانتقال للمؤشرات</span>
@@ -193,7 +251,7 @@ const Home = () => {
             {/* Card 1 */}
             <div className="flex h-full flex-col justify-between rounded-2xl bg-white p-4 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-900/10 text-sky-900">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
                   <i className="fa-solid fa-chart-column" />
                 </div>
                 <div>
@@ -210,7 +268,7 @@ const Home = () => {
                 <a href="m1.html" aria-label="Go to m1" className="sr-only">
                   حجم الإنتاج التعديني
                 </a>
-                <button className="rounded-lg bg-sky-900 px-3 py-1 text-white">
+                <button className="rounded-lg bg-[#005A8D] px-3 py-1 text-white">
                   المزيد
                 </button>
               </div>
@@ -219,7 +277,7 @@ const Home = () => {
             {/* Card 2 */}
             <div className="flex h-full flex-col justify-between rounded-2xl bg-white p-4 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-900/10 text-sky-900">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
                   <i className="fa-solid fa-chart-line" />
                 </div>
                 <div>
@@ -234,7 +292,7 @@ const Home = () => {
                 <a href="m2.html" aria-label="Go to m2" className="sr-only">
                   تطور الإنتاج التعديني
                 </a>
-                <button className="rounded-lg bg-sky-900 px-3 py-1 text-white">
+                <button className="rounded-lg bg-[#005A8D] px-3 py-1 text-white">
                   المزيد
                 </button>
               </div>
@@ -243,7 +301,7 @@ const Home = () => {
             {/* Card 3 */}
             <div className="flex h-full flex-col justify-between rounded-2xl bg-white p-4 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-900/10 text-sky-900">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
                   <i className="fa-solid fa-layer-group" />
                 </div>
                 <div>
@@ -260,7 +318,7 @@ const Home = () => {
                 <a href="m3.html" aria-label="Go to m3" className="sr-only">
                   تطور الإنتاج التعديني العربي
                 </a>
-                <button className="rounded-lg bg-sky-900 px-3 py-1 text-white">
+                <button className="rounded-lg bg-[#005A8D] px-3 py-1 text-white">
                   المزيد
                 </button>
               </div>
@@ -269,7 +327,7 @@ const Home = () => {
             {/* Card 4 */}
             <div className="flex h-full flex-col justify-between rounded-2xl bg-white p-4 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-900/10 text-sky-900">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
                   <i className="fa-solid fa-circle-notch" />
                 </div>
                 <div>
@@ -294,6 +352,60 @@ const Home = () => {
           </div>
         </section>
 
+        {/* How it works */}
+        <section className="mt-10">
+          <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h3 className="text-xl font-extrabold text-slate-900">
+                  كيف تشتغل البوابة؟
+                </h3>
+                <p className="text-sm text-slate-500">
+                  ثلاث طبقات متكاملة: بيانات، تحليل، ومؤشرات تفاعلية.
+                </p>
+              </div>
+            </div>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200/80 bg-slate-50/60 px-4 py-5">
+                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sky-900/10 text-[#005A8D]">
+                  <i className="fa-solid fa-database" />
+                </div>
+                <h4 className="text-base font-bold text-slate-900 mb-1">
+                  1. جمع وتوحيد البيانات
+                </h4>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  تجميع بيانات الإنتاج التعديني من الدول العربية، وتنقيتها، وتوحيد
+                  التصنيفات والوحدات لخلق قاعدة بيانات عربية متجانسة.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-slate-200/80 bg-slate-50/60 px-4 py-5">
+                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-900/10 text-emerald-700">
+                  <i className="fa-solid fa-microchip" />
+                </div>
+                <h4 className="text-base font-bold text-slate-900 mb-1">
+                  2. المعالجة والتحليل الذكي
+                </h4>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  تطبيق مؤشرات وتحليلات إحصائية (نسب نمو، مساهمة عربية، اتجاهات
+                  زمنية) لقراءة ديناميات القطاع واستخراج الأنماط الرئيسية.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-slate-200/80 bg-slate-50/60 px-4 py-5">
+                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-900/10 text-amber-600">
+                  <i className="fa-solid fa-chart-pie" />
+                </div>
+                <h4 className="text-base font-bold text-slate-900 mb-1">
+                  3. لوحات ومؤشرات تفاعلية
+                </h4>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  تقديم المؤشرات عبر لوحات تفاعلية، خرائط، وتقارير قابلة للتنزيل،
+                  مع إمكانيات التصفية حسب الدولة، الخام، والفترة الزمنية.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Countries strip */}
         <section className="mt-10">
           <div className="rounded-2xl bg-white p-5 shadow-lg shadow-slate-900/10">
@@ -306,9 +418,9 @@ const Home = () => {
                   اختر دولة بسرعة للوصول إلى ملفها (واجهة تجريبية)
                 </p>
               </div>
-              <a
-                href="countries.html"
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-sky-900 shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
+            <a
+              href="countries.html"
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#005A8D] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
               >
                 <i className="fa-solid fa-arrow-left" />
                 <span>المزيد</span>
@@ -331,7 +443,7 @@ const Home = () => {
                       }}
                     />
                   </div>
-                  <p className="mt-2 text-base font-bold text-sky-900">
+                  <p className="mt-2 text-base font-bold text-[#005A8D]">
                     {c.name}
                   </p>
                 </button>
@@ -340,10 +452,55 @@ const Home = () => {
 
             <p className="mt-4 text-sm text-slate-500">
               الدولة المختارة:{" "}
-              <span className="font-bold text-sky-900">
+              <span className="font-bold text-[#005A8D]">
                 {selectedCountry}
               </span>
             </p>
+          </div>
+        </section>
+
+        {/* Use cases */}
+        <section className="mt-10">
+          <div className="rounded-3xl bg-[#005A8D] text-white/95 p-6 shadow-xl shadow-slate-900/30 ring-1 ring-[#004366] ">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-extrabold text-white">
+                  سيناريوهات استخدام فعلية
+                </h2>
+                <p className="text-sm text-slate-200/80">
+                  كيف يمكن لبوابة المؤشرات التعدينية العربية أن تساعد مختلف
+                  الفاعلين؟
+                </p>
+              </div>
+            </div>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl bg-[#004366]/80 px-4 py-4 ">
+                <p className="text-sm font-bold mb-1">
+                  صانع قرار في وزارة التعدين
+                </p>
+                <p className="text-xs sm:text-sm text-slate-100/90 leading-relaxed">
+                  يتابع تطور الإنتاج الوطني مقارنة بدول عربية أخرى، يحدد نقاط
+                  القوة والضعف، ويستخدم التقارير لدعم خطط الاستثمار أو تحديث
+                  الإستراتيجيات الوطنية للقطاع.
+                </p>
+              </div>
+              <div className="rounded-2xl bg-[#004366]/80 px-4 py-4 ">
+                <p className="text-sm font-bold mb-1">باحث أو طالب دراسات عليا</p>
+                <p className="text-xs sm:text-sm text-slate-100/90 leading-relaxed">
+                  يحلّل اتجاهات الإنتاج حسب نوع الخام أو الفترة الزمنية، ويستخرج
+                  جداول ورسومًا بيانية جاهزة للإدراج في الدراسات والأبحاث
+                  الأكاديمية.
+                </p>
+              </div>
+              <div className="rounded-2xl bg-[#004366]/80 px-4 py-4 ">
+                <p className="text-sm font-bold mb-1">مستثمر أو مؤسسة إقليمية</p>
+                <p className="text-xs sm:text-sm text-slate-100/90 leading-relaxed">
+                  يستكشف الدول والخامات ذات النمو المتسارع، يقارن مساهمة كل دولة
+                  في الإنتاج العربي والعالمي، ويحدد أولويات الشراكات أو المشاريع
+                  المشتركة.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -352,7 +509,7 @@ const Home = () => {
           <div className="rounded-3xl bg-white/95 p-5 shadow-xl shadow-slate-900/10 ring-1 ring-slate-200/70">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 className="text-lg font-extrabold text-sky-900">
+                <h2 className="text-lg font-extrabold text-[#005A8D]">
                   المراجع والمصادر
                 </h2>
                 <p className="text-sm text-slate-500">
@@ -388,7 +545,7 @@ const Home = () => {
                           />
                           <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/95 px-3 text-center opacity-0 transition-opacity group-hover:opacity-100">
                             <div>
-                              <p className="mb-1 text-base font-extrabold text-sky-900">
+                              <p className="mb-1 text-base font-extrabold text-[#005A8D]">
                                 {s.title}
                               </p>
                               <p className="text-sm text-slate-500">
@@ -406,65 +563,10 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="mt-10 border-t border-slate-200 pt-6 text-sm text-slate-500">
-          <div className="grid gap-4 md:grid-cols-3">
-            <div>
-              <p className="mb-1 text-sm font-bold text-slate-700">
-                عن البوابة
-              </p>
-              <p className="text-sm leading-relaxed">
-                بوابة تحليلية لبيانات الإنتاج التعديني العربي: مؤشرات، مقارنات،
-                تنزيل بيانات وتقارير.
-              </p>
-            </div>
-            <div>
-              <p className="mb-1 text-sm font-bold text-slate-700">
-                خريطة البوابة
-              </p>
-              <div className="flex flex-col gap-1 text-sm">
-                <a href="index.html" className="hover:text-sky-800">
-                  الرئيسية
-                </a>
-                <a href="m1.html" className="hover:text-sky-800">
-                  المؤشرات التعدينية
-                </a>
-                <a href="countries.html" className="hover:text-sky-800">
-                  الدول العربية
-                </a>
-                <a href="sources.html" className="hover:text-sky-800">
-                  المصادر
-                </a>
-                <a href="reports.html" className="hover:text-sky-800">
-                  التقارير
-                </a>
-                <a href="about.html" className="hover:text-sky-800">
-                  عن البوابة
-                </a>
-              </div>
-            </div>
-            <div>
-              <p className="mb-1 text-sm font-bold text-slate-700">
-                روابط ذات صلة
-              </p>
-              <div className="flex flex-col gap-1 text-sm">
-                <a href="#" className="hover:text-sky-800">
-                  APFM (لاحقًا)
-                </a>
-                <a href="#" className="hover:text-sky-800">
-                  المكتبة (لاحقًا)
-                </a>
-                <a href="#" className="hover:text-sky-800">
-                  تواصل معنا (لاحقًا)
-                </a>
-              </div>
-            </div>
-          </div>
-          <p className="mt-4 text-sm text-slate-500">
-            © AIDSMO — V1 Prototype
-          </p>
-        </footer>
+    
       </main>
+
+      <Footer />
 
       {/* Floating chatbot button */}
       <button
@@ -474,11 +576,11 @@ const Home = () => {
         className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full bg-white/90 px-3 py-2 text-right shadow-xl shadow-slate-900/25 backdrop-blur-md transition hover:-translate-y-1 hover:shadow-2xl"
       >
         <span className="absolute right-3 top-2 h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_0_4px] shadow-emerald-500/30" />
-        <span className="grid h-11 w-11 place-items-center rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-sky-900 to-sky-700 text-white">
+        <span className="grid h-11 w-11 place-items-center rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-[#005A8D] to-[#005A8D] text-white">
           <i className="fa-solid fa-robot" />
         </span>
         <span className="hidden flex-col text-sm leading-tight text-slate-700 sm:flex">
-          <span className="font-extrabold text-sky-900">Chat Bote</span>
+          <span className="font-extrabold text-[#005A8D]">Chat Bote</span>
           <span className="text-sm text-slate-500">
             محلّل البيانات الذكي
           </span>
