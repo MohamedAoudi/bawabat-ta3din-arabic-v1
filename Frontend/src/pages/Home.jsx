@@ -420,7 +420,7 @@ const Home = () => {
               </div>
             <a
               href="countries.html"
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#005A8D] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#005A8D] shadow-sm shadow-slate-900/10 ring-1 ring-[#005A8D]/40 hover:bg-slate-50"
               >
                 <i className="fa-solid fa-arrow-left" />
                 <span>المزيد</span>
@@ -435,7 +435,7 @@ const Home = () => {
                   className="group flex flex-col items-center text-center transition-transform hover:-translate-y-1"
                   onClick={() => setSelectedCountry(c.name)}
                 >
-                  <div className="relative flex h-24 w-24 items-center justify-center rounded-lg border-4 border-emerald-500 shadow-[0_0_0_4px] shadow-red-500/80 bg-white">
+                  <div className="relative flex h-24 w-24 items-center justify-center rounded-lg border-4 border-[#005A8D] shadow-[0_0_0_4px] shadow-[#005A8D]/40 bg-white">
                     <div
                       className="h-[78px] w-[78px] bg-cover bg-center shadow-[inset_0_0_0_2px_rgba(255,255,255,0.95),0_10px_18px_rgba(0,0,0,0.12)]"
                       style={{
@@ -500,6 +500,123 @@ const Home = () => {
                   المشتركة.
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Additional content: benefits & roadmap */}
+        <section className="mt-10">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
+              <h3 className="text-xl font-extrabold text-slate-900 mb-2">
+                ماذا تقدّم لك البوابة اليوم؟
+              </h3>
+              <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                <li className="flex items-start gap-2">
+                  <i className="mt-1 fa-solid fa-circle-check text-[#005A8D]" />
+                  <span>لوحات جاهزة لمتابعة حجم وتطور الإنتاج التعديني العربي.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <i className="mt-1 fa-solid fa-circle-check text-[#005A8D]" />
+                  <span>مقارنات سريعة بين الدول والخامات والفترات الزمنية.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <i className="mt-1 fa-solid fa-circle-check text-[#005A8D]" />
+                  <span>مصادر موثوقة للبيانات يمكن الرجوع إليها في الدراسات والتقارير.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="rounded-3xl bg-slate-50/80 p-6 shadow-lg shadow-slate-900/5 ring-1 ring-slate-200/80">
+              <h3 className="text-xl font-extrabold text-slate-900 mb-2">
+                خريطة الطريق للنسخ القادمة
+              </h3>
+              <div className="mt-3 grid gap-3 sm:grid-cols-3 text-sm">
+                <div className="rounded-2xl bg-white px-3 py-3 shadow-sm shadow-slate-900/5 border border-slate-200/80">
+                  <p className="text-xs font-semibold text-slate-500 mb-1">قريبًا</p>
+                  <p className="font-bold text-slate-900 mb-1">مؤشرات إضافية</p>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    إضافة مؤشرات حول الاستهلاك المحلي والقيمة المضافة.
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-white px-3 py-3 shadow-sm shadow-slate-900/5 border border-slate-200/80">
+                  <p className="text-xs font-semibold text-slate-500 mb-1">مرحلة 2</p>
+                  <p className="font-bold text-slate-900 mb-1">لوحات تفاعلية</p>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    تخصيص اللوحات حسب نوع المستخدم وقطاع الاهتمام.
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-white px-3 py-3 shadow-sm shadow-slate-900/5 border border-slate-200/80">
+                  <p className="text-xs font-semibold text-slate-500 mb-1">مرحلة 3</p>
+                  <p className="font-bold text-slate-900 mb-1">تكاملات خارجية</p>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    ربط البوابة مع أنظمة إحصائية ومنصات بيانات عربية أخرى.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ / guidance section */}
+        <section className="mt-10">
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
+              <h3 className="text-lg font-extrabold text-slate-900 mb-2">
+                كيف أبدأ باستخدام البوابة؟
+              </h3>
+              <ol className="mt-3 list-decimal pr-5 space-y-1 text-sm text-slate-700">
+                <li>اختر الدولة أو الخام الذي يهمك من الصفحة الرئيسية.</li>
+                <li>انتقل إلى لوحة المؤشرات المناسبة من قسم المؤشرات.</li>
+                <li>حمّل الجداول أو الرسوم البيانية التي تحتاجها للتقرير أو الدراسة.</li>
+              </ol>
+            </div>
+
+            <div className="rounded-3xl bg-slate-50/90 p-6 shadow-lg shadow-slate-900/5 ring-1 ring-slate-200/80">
+              <h3 className="text-lg font-extrabold text-slate-900 mb-2">
+                أسئلة شائعة سريعة
+              </h3>
+              <details className="group mb-2">
+                <summary className="cursor-pointer text-sm font-semibold text-slate-800 flex items-center justify-between">
+                  ما مصدر البيانات المستعملة؟
+                  <i className="fa-solid fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition-transform" />
+                </summary>
+                <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                  تعتمد النسخة التجريبية على بيانات منشورة من منظمات دولية وإقليمية،
+                  مع توحيد أولي للتصنيفات والوحدات.
+                </p>
+              </details>
+              <details className="group mb-2">
+                <summary className="cursor-pointer text-sm font-semibold text-slate-800 flex items-center justify-between">
+                  هل يمكن تنزيل البيانات الخام؟
+                  <i className="fa-solid fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition-transform" />
+                </summary>
+                <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                  في النسخة الحالية، يمكن تنزيل جداول وتلخيصات جاهزة، مع خطة لإتاحة
+                  واجهات برمجة تطبيقات (APIs) لاحقًا.
+                </p>
+              </details>
+              <details className="group">
+                <summary className="cursor-pointer text-sm font-semibold text-slate-800 flex items-center justify-between">
+                  لمن تُوجَّه هذه البوابة؟
+                  <i className="fa-solid fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition-transform" />
+                </summary>
+                <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                  لصنّاع القرار في وزارات التعدين، والهيئات الإحصائية، والباحثين،
+                  والمؤسسات الإقليمية المهتمة بالثروات المعدنية العربية.
+                </p>
+              </details>
+            </div>
+
+            <div className="rounded-3xl bg-[#005A8D]/5 p-6 shadow-inner ring-1 ring-[#005A8D]/20">
+              <h3 className="text-lg font-extrabold text-[#005A8D] mb-2">
+                ملاحظات على النسخة التجريبية
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                هذه النسخة تمثّل نموذجًا أوليًا لبوابة المؤشرات التعدينية العربية.
+                سيتم توسيع النطاق الزمني، إضافة مؤشرات نوعية جديدة، وتحسين تجربة
+                الاستخدام بناءً على ملاحظات المستخدمين والشركاء في الدول العربية.
+              </p>
             </div>
           </div>
         </section>
