@@ -1,5 +1,6 @@
 import React from "react";
 import Menu from "../layouts/Menu";
+import Footer from "../layouts/Footer";
 
 const About = () => {
   return (
@@ -180,6 +181,8 @@ const About = () => {
           </div>
         </section>
       </main>
+
+      <Footer />
     </div>
   );
 };

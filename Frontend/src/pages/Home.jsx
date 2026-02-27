@@ -162,8 +162,8 @@ const Home = () => {
           <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-amber-400">
             <i className="fas fa-database absolute left-5 top-4 text-4xl text-amber-900/15" />
             <p className="text-sm text-slate-500 mb-1">الفترة الزمنية</p>
-            <h2 className="text-3xl font-extrabold text-amber-500">
-              2025 → 2010
+            <h2 className="text-3xl font-extrabold text-amber-500"  >
+              2010 ← 2025
             </h2>
             <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-1.5 text-sm font-semibold text-amber-800">
               <i className="fa-solid fa-calendar-days" />
@@ -174,13 +174,25 @@ const Home = () => {
 
         {/* Project idea / vision */}
         <section className="mt-10">
+        <h3 className="text-xl font-extrabold text-slate-900 mb-2">
+               عن البوابة
+              </h3>
+          <div className="mb-6 text-left">
+            <a
+              href="/about"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#005A8D] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
+            >
+              <i className="fa-solid fa-arrow-up-right-from-square" />
+              <span>معرفة المزيد عن البوابة</span>
+            </a>
+          </div>
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
               <h3 className="text-xl font-extrabold text-slate-900 mb-2">
                 ما هي بوابة المؤشرات التعدينية العربية؟
               </h3>
               <p className="text-sm text-slate-600 leading-relaxed">
-                منصة عربية متخصصة في تجميع، توحيد، وتحليل بيانات الإنتاج التعديني
+                بوابة عربية متخصصة في تجميع، توحيد، وتحليل بيانات الإنتاج التعديني
                 في الدول العربية، لتمكين متخذي القرار والباحثين من متابعة أداء
                 القطاع، رصد الفرص، ودعم التكامل العربي في مجال الثروات المعدنية.
               </p>
@@ -225,6 +237,51 @@ const Home = () => {
                   </ul>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Platform features */}
+        <section className="mt-10">
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
+              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#005A8D]/10 text-[#005A8D]">
+                <i className="fa-solid fa-database" />
+              </div>
+              <h3 className="text-base font-extrabold text-slate-900 mb-1">
+                منصة بيانات موحّدة
+              </h3>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                تجمع البوابة البيانات من مصادر عربية ودولية في واجهة واحدة، مع توحيد
+                أولي للتصنيفات والوحدات لتسهيل المقارنة بين الدول والخامات.
+              </p>
+            </div>
+
+            <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
+              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#005A8D]/10 text-[#005A8D]">
+                <i className="fa-solid fa-chart-pie" />
+              </div>
+              <h3 className="text-base font-extrabold text-slate-900 mb-1">
+                مؤشرات ولوحات تفاعلية
+              </h3>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                توفّر البوابة لوحات رسومية حديثة لقراءة الاتجاهات الزمنية، مقارنة
+                مساهمة الدول، واستكشاف الفرص في قطاع الثروات المعدنية العربية.
+              </p>
+            </div>
+
+            <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
+              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#005A8D]/10 text-[#005A8D]">
+                <i className="fa-solid fa-handshake-angle" />
+              </div>
+              <h3 className="text-base font-extrabold text-slate-900 mb-1">
+                دعم القرار والتعاون العربي
+              </h3>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                تساعد المنصة صُنّاع القرار، والباحثين، والمؤسسات الإقليمية على بناء
+                صورة أوضح عن الواقع التعديني العربي، بما يسهّل مبادرات التعاون
+                والاستثمار المشترك.
+              </p>
             </div>
           </div>
         </section>
@@ -606,6 +663,13 @@ const Home = () => {
                   والمؤسسات الإقليمية المهتمة بالثروات المعدنية العربية.
                 </p>
               </details>
+              <button
+                type="button"
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#005A8D] px-4 py-1.5 text-xs sm:text-sm font-semibold text-white shadow-sm shadow-slate-900/20 hover:bg-[#004366]"
+              >
+                <span>المزيد من الأسئلة</span>
+                <i className="fa-solid fa-arrow-left text-[10px]" />
+              </button>
             </div>
 
             <div className="rounded-3xl bg-[#005A8D]/5 p-6 shadow-inner ring-1 ring-[#005A8D]/20">

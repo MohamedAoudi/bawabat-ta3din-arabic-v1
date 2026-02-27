@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Menu from "../layouts/Menu";
+import Footer from "../layouts/Footer";
 
 const COUNTRIES = [
   { name: "الأردن", code: "jo" },
@@ -130,6 +131,8 @@ const Countries = () => {
           </div>
         </section>
       </main>
+
+      <Footer />
     </div>
   );
 };
