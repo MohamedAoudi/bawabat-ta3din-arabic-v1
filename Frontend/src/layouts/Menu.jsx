@@ -50,47 +50,32 @@ const Menu = () => {
                   {/* عنصر مع sous-menu */}
                   <div className="relative group/sub px-1">
                     <a
-                      href="m1.html"
+                      href="/m1"
                       className="flex items-center justify-between rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40"
                     >
                       <span>حجم الإنتاج التعديني</span>
-                      <i className="fa-solid fa-chevron-left text-[10px] text-slate-500 transition group-hover/sub:text-sky-700" />
                     </a>
 
-                    {/* sous-menu لعنصر حجم الإنتاج التعديني */}
-                    <div className="absolute top-0 end-full w-64 rounded-2xl bg-white py-2 text-right text-sm text-slate-800 shadow-xl ring-1 ring-slate-200 opacity-0 pointer-events-none group-hover/sub:opacity-100 group-hover/sub:pointer-events-auto transition-opacity duration-150">
-                      <a
-                        href="m1-1.html"
-                        className="mx-1 block rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900"
-                      >
-                        حسب الدولة
-                      </a>
-                      <a
-                        href="m1-2.html"
-                        className="mx-1 block rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900"
-                      >
-                        حسب الخام
-                      </a>
-                    </div>
+                    
                   </div>
 
                   <div className="my-1 h-px bg-slate-200/70" />
 
                   {/* باقي العناصر كما هي */}
                   <a
-                    href="m2.html"
+                    href="/m2"
                     className="mx-1 block rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900"
                   >
                     تطور الإنتاج التعديني
                   </a>
                   <a
-                    href="m3.html"
+                    href="/m3"
                     className="mx-1 block rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900"
                   >
                     تطور الإنتاج التعديني العربي
                   </a>
                   <a
-                    href="m4.html"
+                    href="/m4"
                     className="mx-1 block rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900"
                   >
                     نسبة الإنتاج التعديني العربي من الإنتاج العالمي
@@ -199,25 +184,25 @@ const Menu = () => {
                 </summary>
                 <div className="mt-1 space-y-1 rounded-lg bg-sky-950/40 px-3 py-2">
                   <a
-                    href="m1.html"
+                    href="/m1"
                     className="block rounded px-2 py-1 hover:bg-white/10"
                   >
                     حجم الإنتاج التعديني
                   </a>
                   <a
-                    href="m2.html"
+                    href="/m2"
                     className="block rounded px-2 py-1 hover:bg-white/10"
                   >
                     تطور الإنتاج التعديني
                   </a>
                   <a
-                    href="m3.html"
+                    href="/m3"
                     className="block rounded px-2 py-1 hover:bg-white/10"
                   >
                     تطور الإنتاج التعديني العربي
                   </a>
                   <a
-                    href="m4.html"
+                    href="/m4"
                     className="block rounded px-2 py-1 hover:bg-white/10"
                   >
                     نسبة الإنتاج التعديني العربي من الإنتاج العالمي

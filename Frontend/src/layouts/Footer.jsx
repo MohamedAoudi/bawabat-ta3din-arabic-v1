@@ -29,13 +29,13 @@ const Footer = () => {
           <div>
             <h4 className="mb-3 text-sm font-bold text-slate-100">خريطة البوابة</h4>
             <div className="grid grid-cols-2 gap-2 text-sm">
-              <a href="index.html" className="transition hover:text-white">
+              <a href="/" className="transition hover:text-white">
                 الرئيسية
               </a>
-              <a href="m1.html" className="transition hover:text-white">
+              <a href="/m1" className="transition hover:text-white">
                 المؤشرات التعدينية
               </a>
-              <a href="countries.html" className="transition hover:text-white">
+              <a href="/countries" className="transition hover:text-white">
                 الدول العربية
               </a>
               <a href="sources.html" className="transition hover:text-white">
@@ -44,7 +44,7 @@ const Footer = () => {
               <a href="reports.html" className="transition hover:text-white">
                 التقارير
               </a>
-              <a href="about.html" className="transition hover:text-white">
+              <a href="/about" className="transition hover:text-white">
                 عن البوابة
               </a>
             </div>

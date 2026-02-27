@@ -296,7 +296,7 @@ const Home = () => {
               <p className="text-sm text-slate-500">الإنتاج التعديني</p>
             </div>
             <a
-              href="m1.html"
+              href="/m1"
               className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#005A8D] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
             >
               <i className="fa-solid fa-arrow-up-right-from-square" />
@@ -304,9 +304,9 @@ const Home = () => {
             </a>
           </div>
 
-          <div className="mt-3 grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+          <div className="mt-3 grid gap-5 md:grid-cols-2 lg:grid-cols-2">
             {/* Card 1 */}
-            <div className="flex h-full flex-col justify-between rounded-2xl bg-white p-4 shadow-md shadow-slate-900/10">
+            <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
                   <i className="fa-solid fa-chart-column" />
@@ -316,8 +316,13 @@ const Home = () => {
                     حجم الإنتاج التعديني
                   </p>
                   <p className="text-sm text-slate-500">
-                    مخطط أعمدة + فلاتر + جدول جانبي
+                    لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة
+                    الزمنية، مع إمكانية تطبيق أكثر من فلتر في آنٍ واحد.
                   </p>
+                  <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
+                    <li>مخطط أعمدة ديناميكي بحسب اختيار المستخدم.</li>
+                    <li>جدول جانبي يعرض القيم التفصيلية وقابلة للتنزيل.</li>
+                  </ul>
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
@@ -332,7 +337,7 @@ const Home = () => {
             </div>
 
             {/* Card 2 */}
-            <div className="flex h-full flex-col justify-between rounded-2xl bg-white p-4 shadow-md shadow-slate-900/10">
+            <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
                   <i className="fa-solid fa-chart-line" />
@@ -340,13 +345,18 @@ const Home = () => {
                 <div>
                   <p className="text-base font-bold">تطور الإنتاج التعديني</p>
                   <p className="text-sm text-slate-500">
-                    مخطط خطّي + اتجاهات + ملخص سنوي
+                    تتبّع تطور الإنتاج التعديني عبر السنوات مع إبراز الاتجاهات
+                    الصعودية أو التراجعية وإظهار أهم التغيرات السنوية.
                   </p>
+                  <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
+                    <li>مخطط خطّي تفاعلي مع تحريك المؤشر على السنوات.</li>
+                    <li>ملخص سنوي لأبرز التغيرات في الإنتاج لكل دولة أو خام.</li>
+                  </ul>
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
                 <span className="text-slate-500">PowerBI</span>
-                <a href="m2.html" aria-label="Go to m2" className="sr-only">
+                <a href="/m2" aria-label="Go to m2" className="sr-only">
                   تطور الإنتاج التعديني
                 </a>
                 <button className="rounded-lg bg-[#005A8D] px-3 py-1 text-white">
@@ -356,7 +366,7 @@ const Home = () => {
             </div>
 
             {/* Card 3 */}
-            <div className="flex h-full flex-col justify-between rounded-2xl bg-white p-4 shadow-md shadow-slate-900/10">
+            <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
                   <i className="fa-solid fa-layer-group" />
@@ -366,13 +376,18 @@ const Home = () => {
                     تطور الإنتاج التعديني العربي
                   </p>
                   <p className="text-sm text-slate-500">
-                    مقارنات متعددة + اختيار خامات
+                    مقارنة أداء الدول العربية في الإنتاج التعديني عبر أكثر من خام
+                    وفي فترات زمنية مختلفة ضمن واجهة تفاعلية واحدة.
                   </p>
+                  <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
+                    <li>اختيار عدة دول وعدة خامات في نفس الوقت.</li>
+                    <li>عرض ترتيب الدول العربية وفق حجم الإنتاج المختار.</li>
+                  </ul>
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
                 <span className="text-slate-500">PowerBI</span>
-                <a href="m3.html" aria-label="Go to m3" className="sr-only">
+                <a href="/m3" aria-label="Go to m3" className="sr-only">
                   تطور الإنتاج التعديني العربي
                 </a>
                 <button className="rounded-lg bg-[#005A8D] px-3 py-1 text-white">
@@ -382,7 +397,7 @@ const Home = () => {
             </div>
 
             {/* Card 4 */}
-            <div className="flex h-full flex-col justify-between rounded-2xl bg-white p-4 shadow-md shadow-slate-900/10">
+            <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
                   <i className="fa-solid fa-circle-notch" />
@@ -392,13 +407,18 @@ const Home = () => {
                     نسبة الإنتاج العربي من العالمي
                   </p>
                   <p className="text-sm text-slate-500">
-                    Donut + نسب + تبديل السنوات
+                    قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري
+                    يوضح توزيع النسب بين الدول والفترات الزمنية المختلفة.
                   </p>
+                  <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
+                    <li>مخطط Donut يوضح نسبة كل دولة من الإجمالي العربي.</li>
+                    <li>زر لتبديل السنوات واستكشاف تغير الحصة عبر الزمن.</li>
+                  </ul>
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
                 <span className="text-slate-500">PowerBI</span>
-                <a href="m4.html" aria-label="Go to m4" className="sr-only">
+                <a href="/m4" aria-label="Go to m4" className="sr-only">
                   نسبة الإنتاج العربي من العالمي
                 </a>
                 <button className="rounded-lg bg-sky-900 px-3 py-1 text-white">
