@@ -327,12 +327,12 @@ const Home = () => {
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
                 <span className="text-slate-500">PowerBI</span>
-                <a href="m1.html" aria-label="Go to m1" className="sr-only">
-                  حجم الإنتاج التعديني
-                </a>
-                <button className="rounded-lg bg-[#005A8D] px-3 py-1 text-white">
+                <a
+                  href="/m1"
+                  className="rounded-lg bg-[#005A8D] px-3 py-1 text-white hover:bg-[#004366]"
+                >
                   المزيد
-                </button>
+                </a>
               </div>
             </div>
 
@@ -356,12 +356,12 @@ const Home = () => {
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
                 <span className="text-slate-500">PowerBI</span>
-                <a href="/m2" aria-label="Go to m2" className="sr-only">
-                  تطور الإنتاج التعديني
-                </a>
-                <button className="rounded-lg bg-[#005A8D] px-3 py-1 text-white">
+                <a
+                  href="/m2"
+                  className="rounded-lg bg-[#005A8D] px-3 py-1 text-white hover:bg-[#004366]"
+                >
                   المزيد
-                </button>
+                </a>
               </div>
             </div>
 
@@ -387,12 +387,12 @@ const Home = () => {
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
                 <span className="text-slate-500">PowerBI</span>
-                <a href="/m3" aria-label="Go to m3" className="sr-only">
-                  تطور الإنتاج التعديني العربي
-                </a>
-                <button className="rounded-lg bg-[#005A8D] px-3 py-1 text-white">
+                <a
+                  href="/m3"
+                  className="rounded-lg bg-[#005A8D] px-3 py-1 text-white hover:bg-[#004366]"
+                >
                   المزيد
-                </button>
+                </a>
               </div>
             </div>
 
@@ -418,12 +418,12 @@ const Home = () => {
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
                 <span className="text-slate-500">PowerBI</span>
-                <a href="/m4" aria-label="Go to m4" className="sr-only">
-                  نسبة الإنتاج العربي من العالمي
-                </a>
-                <button className="rounded-lg bg-sky-900 px-3 py-1 text-white">
+                <a
+                  href="/m4"
+                  className="rounded-lg bg-sky-900 px-3 py-1 text-white hover:bg-sky-800"
+                >
                   المزيد
-                </button>
+                </a>
               </div>
             </div>
           </div>
