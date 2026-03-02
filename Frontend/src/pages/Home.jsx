@@ -163,7 +163,7 @@ const Home = () => {
             <i className="fas fa-database absolute left-5 top-4 text-4xl text-amber-900/15" />
             <p className="text-sm text-slate-500 mb-1">الفترة الزمنية</p>
             <h2 className="text-3xl font-extrabold text-amber-500"  >
-              2010 ← 2025
+              2010 ← 2024
             </h2>
             <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-1.5 text-sm font-semibold text-amber-800">
               <i className="fa-solid fa-calendar-days" />
@@ -172,77 +172,10 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Project idea / vision */}
-        <section className="mt-10">
-        <h3 className="text-xl font-extrabold text-slate-900 mb-2">
-               عن البوابة
-              </h3>
-          <div className="mb-6 text-left">
-            <a
-              href="/about"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#005A8D] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
-            >
-              <i className="fa-solid fa-arrow-up-right-from-square" />
-              <span>معرفة المزيد عن البوابة</span>
-            </a>
-          </div>
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
-              <h3 className="text-xl font-extrabold text-slate-900 mb-2">
-                ما هي بوابة المؤشرات التعدينية العربية؟
-              </h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                بوابة عربية متخصصة في تجميع، توحيد، وتحليل بيانات الإنتاج التعديني
-                في الدول العربية، لتمكين متخذي القرار والباحثين من متابعة أداء
-                القطاع، رصد الفرص، ودعم التكامل العربي في مجال الثروات المعدنية.
-              </p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-700">
-                <li className="flex items-start gap-2">
-                  <i className="mt-1 fa-solid fa-check text-emerald-500" />
-                  <span>قاعدة بيانات موحّدة لمؤشرات الإنتاج التعديني العربي.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <i className="mt-1 fa-solid fa-check text-emerald-500" />
-                  <span>مقارنات تفاعلية بين الدول والخامات والفترات الزمنية.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <i className="mt-1 fa-solid fa-check text-emerald-500" />
-                  <span>تقارير ولوحات معلومات جاهزة للاستخدام وصالحة للتنزيل.</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-3xl bg-[#005A8D] p-6 text-white shadow-lg shadow-slate-900/20 ring-1 ring-[#004366]">
-              <h3 className="text-xl font-extrabold mb-2">لمن هذه البوابة؟</h3>
-              <p className="text-sm text-sky-50/90 leading-relaxed">
-                تستهدف البوابة الجهات الحكومية العربية، أجهزة الإحصاء، الهيئات
-                التعدينية، الباحثين، والمستثمرين المهتمين بفهم ديناميات الإنتاج
-                التعديني العربي.
-              </p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2 text-sm">
-                <div className="rounded-2xl bg-[#004366]/40 px-4 py-3">
-                  <p className="font-semibold mb-1">استخدامات رئيسية</p>
-                  <ul className="space-y-1 text-sky-50/90">
-                    <li>متابعة تطور الإنتاج حسب الدولة أو الخام.</li>
-                    <li>رصد حصة الدول العربية من الإنتاج العالمي.</li>
-                    <li>اكتشاف فرص التكامل والتعاون الإقليمي.</li>
-                  </ul>
-                </div>
-                <div className="rounded-2xl bg-[#004366]/40 px-4 py-3">
-                  <p className="font-semibold mb-1">الخطوات القادمة</p>
-                  <ul className="space-y-1 text-sky-50/90">
-                    <li>دمج مزيد من السنوات والبيانات التفصيلية.</li>
-                    <li>إطلاق تقارير تفاعلية قابلة للتخصيص.</li>
-                    <li>إضافة طبقات خرائط جيولوجية (لاحقًا).</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+    
 
         {/* Platform features */}
-        <section className="mt-10">
+        {/* <section className="mt-10">
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
               <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#005A8D]/10 text-[#005A8D]">
@@ -284,7 +217,7 @@ const Home = () => {
               </p>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Indicators entrance */}
         <section className="mt-10">
@@ -429,8 +362,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* How it works */}
-        <section className="mt-10">
+        {/* <section className="mt-10">
           <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
@@ -481,7 +413,7 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Countries strip */}
         <section className="mt-10">
@@ -537,7 +469,7 @@ const Home = () => {
         </section>
 
         {/* Use cases */}
-        <section className="mt-10">
+        {/* <section className="mt-10">
           <div className="rounded-3xl bg-[#005A8D] text-white/95 p-6 shadow-xl shadow-slate-900/30 ring-1 ring-[#004366] ">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
@@ -579,10 +511,10 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Additional content: benefits & roadmap */}
-        <section className="mt-10">
+        {/* <section className="mt-10">
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
               <h3 className="text-xl font-extrabold text-slate-900 mb-2">
@@ -633,10 +565,10 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* FAQ / guidance section */}
-        <section className="mt-10">
+        {/* <section className="mt-10">
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
               <h3 className="text-lg font-extrabold text-slate-900 mb-2">
@@ -703,7 +635,7 @@ const Home = () => {
               </p>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Sources / sponsors */}
         <section className="mt-10" aria-label="المراجع والمصادر">
@@ -763,7 +695,74 @@ const Home = () => {
             </div>
           </div>
         </section>
+    {/* Project idea / vision */}
+    {/* <section className="mt-10">
+        <h3 className="text-xl font-extrabold text-slate-900 mb-2">
+               عن البوابة
+              </h3>
+          <div className="mb-6 text-left">
+            <a
+              href="/about"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#005A8D] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
+            >
+              <i className="fa-solid fa-arrow-up-right-from-square" />
+              <span>معرفة المزيد عن البوابة</span>
+            </a>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
+              <h3 className="text-xl font-extrabold text-slate-900 mb-2">
+                ما هي بوابة المؤشرات التعدينية العربية؟
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                بوابة عربية متخصصة في تجميع، توحيد، وتحليل بيانات الإنتاج التعديني
+                في الدول العربية، لتمكين متخذي القرار والباحثين من متابعة أداء
+                القطاع، رصد الفرص، ودعم التكامل العربي في مجال الثروات المعدنية.
+              </p>
+              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                <li className="flex items-start gap-2">
+                  <i className="mt-1 fa-solid fa-check text-emerald-500" />
+                  <span>قاعدة بيانات موحّدة لمؤشرات الإنتاج التعديني العربي.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <i className="mt-1 fa-solid fa-check text-emerald-500" />
+                  <span>مقارنات تفاعلية بين الدول والخامات والفترات الزمنية.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <i className="mt-1 fa-solid fa-check text-emerald-500" />
+                  <span>تقارير ولوحات معلومات جاهزة للاستخدام وصالحة للتنزيل.</span>
+                </li>
+              </ul>
+            </div>
 
+            <div className="rounded-3xl bg-[#005A8D] p-6 text-white shadow-lg shadow-slate-900/20 ring-1 ring-[#004366]">
+              <h3 className="text-xl font-extrabold mb-2">لمن هذه البوابة؟</h3>
+              <p className="text-sm text-sky-50/90 leading-relaxed">
+                تستهدف البوابة الجهات الحكومية العربية، أجهزة الإحصاء، الهيئات
+                التعدينية، الباحثين، والمستثمرين المهتمين بفهم ديناميات الإنتاج
+                التعديني العربي.
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 text-sm">
+                <div className="rounded-2xl bg-[#004366]/40 px-4 py-3">
+                  <p className="font-semibold mb-1">استخدامات رئيسية</p>
+                  <ul className="space-y-1 text-sky-50/90">
+                    <li>متابعة تطور الإنتاج حسب الدولة أو الخام.</li>
+                    <li>رصد حصة الدول العربية من الإنتاج العالمي.</li>
+                    <li>اكتشاف فرص التكامل والتعاون الإقليمي.</li>
+                  </ul>
+                </div>
+                <div className="rounded-2xl bg-[#004366]/40 px-4 py-3">
+                  <p className="font-semibold mb-1">الخطوات القادمة</p>
+                  <ul className="space-y-1 text-sky-50/90">
+                    <li>دمج مزيد من السنوات والبيانات التفصيلية.</li>
+                    <li>إطلاق تقارير تفاعلية قابلة للتخصيص.</li>
+                    <li>إضافة طبقات خرائط جيولوجية (لاحقًا).</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section> */}
     
       </main>
 

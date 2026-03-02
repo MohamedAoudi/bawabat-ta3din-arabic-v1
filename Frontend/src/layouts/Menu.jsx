@@ -1,5 +1,5 @@
 import { useState } from "react";
-import logoAmip from "../assets/logo 500x190 sans bg.png";
+import logoAmip from "../assets/LOGO_ARAB MINING grand.svg";
 import logoAidsmo from "../assets/aidsmo logo sans bg 800x 800.png";
 
 const Menu = () => {
@@ -22,7 +22,7 @@ const Menu = () => {
             <img
               src={logoAmip}
               alt="AMIP - بوابة المؤشرات التعدينية العربية"
-              className="h-15 w-auto bg-white rounded-full"
+              className="h-18 w-auto bg-white rounded-full px-6"
             />
           </a>
 
