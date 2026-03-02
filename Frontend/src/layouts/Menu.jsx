@@ -47,21 +47,17 @@ const Menu = () => {
                   <i className="fa-solid fa-chevron-down text-[10px]" />
                 </button>
                 <div className="absolute end-0  w-72 rounded-2xl bg-white py-2 text-right text-sm text-slate-800 shadow-xl ring-1 ring-slate-200 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-150">
-                  {/* عنصر مع sous-menu */}
-                  <div className="relative group/sub px-1">
-                    <a
+                  
+                 
+
+
+                  {/* باقي العناصر كما هي */}
+                  <a
                       href="/m1"
-                      className="flex items-center justify-between rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40"
+                      className="mx-1 block rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900 "
                     >
                       <span>حجم الإنتاج التعديني</span>
                     </a>
-
-                    
-                  </div>
-
-                  <div className="my-1 h-px bg-slate-200/70" />
-
-                  {/* باقي العناصر كما هي */}
                   <a
                     href="/m2"
                     className="mx-1 block rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900"
