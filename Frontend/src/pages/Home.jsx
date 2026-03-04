@@ -135,12 +135,76 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [sponsorSlides.length]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const els = Array.from(document.querySelectorAll(".reveal"));
+    if (els.length === 0) return;
+
+    const prefersReduced =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+
+    // If user prefers reduced motion, just show everything.
+    if (prefersReduced) {
+      els.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-visible");
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { root: null, threshold: 0.12, rootMargin: "0px 0px -10% 0px" }
+    );
+
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div
-      className="min-h-screen bg-slate-100 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] text-slate-800 text-xl sm:text-2xl md:text-3xl"
+      className="min-h-screen  text-slate-800 text-xl sm:text-2xl md:text-3xl"
       dir="rtl"
       lang="ar"
     >
+      <style>{`
+        @keyframes popIn {
+          0% {
+            opacity: 0;
+            transform: translateY(26px) scale(0.96);
+            filter: blur(8px);
+          }
+          65% {
+            opacity: 1;
+            transform: translateY(-4px) scale(1.01);
+            filter: blur(0px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0px);
+          }
+        }
+        .reveal {
+          opacity: 0;
+          transform: translateY(26px) scale(0.96);
+          filter: blur(8px);
+          will-change: transform, opacity, filter;
+        }
+        .reveal.is-visible {
+          animation: popIn 850ms cubic-bezier(.2,.9,.2,1) both;
+        }
+        .reveal.is-visible.d1 { animation-delay: 80ms; }
+        .reveal.is-visible.d2 { animation-delay: 160ms; }
+        .reveal.is-visible.d3 { animation-delay: 240ms; }
+        .reveal.is-visible.d4 { animation-delay: 320ms; }
+        .reveal.is-visible.d5 { animation-delay: 400ms; }
+      `}</style>
       <Menu />
 
       {/* Hero */}
@@ -155,10 +219,10 @@ const Home = () => {
         />
         <div className="absolute " />
         <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="mb-3 text-4xl sm:text-5xl md:text-6xl font-extrabold mt-[100px]">
+          <h1 className="reveal d1 mb-3 text-4xl sm:text-5xl md:text-6xl font-extrabold mt-[100px]">
             بوابة المؤشرات التعدينية العربية
           </h1>
-          <p className="mx-auto max-w-4xl text-lg sm:text-xl text-white/80">
+          <p className="reveal d2 mx-auto max-w-4xl text-lg sm:text-xl text-white/80">
             منصة تحليلية ذكية لمتابعة الإنتاج التعديني العربي، المقارنات، الخرائط،
             والتقارير المتقدمة.
           </p>
@@ -168,7 +232,7 @@ const Home = () => {
 
       <main className="relative -mt-16 mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 pb-16">
         {/* Search */}
-        <section className="mx-auto max-w-3xl mb-[220px]">
+        <section className="reveal d2 mx-auto max-w-3xl mb-[220px]">
           <div className="flex items-center gap-3 rounded-full bg-white px-5 py-3 shadow-xl shadow-slate-900/10">
             <i className="fas fa-search text-slate-400" />
             <input
@@ -178,7 +242,7 @@ const Home = () => {
             />
             <button
               type="button"
-              className="rounded-full bg-[#082721] px-7 py-2 text-sm sm:text-lg font-semibold text-white hover:bg-[#061b17] "
+              className="rounded-full bg-[#082721] px-7 py-2 text-sm sm:text-lg font-semibold text-white transition-all duration-200 hover:bg-[#061b17] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]"
             >
               بحث ذكي
             </button>
@@ -186,8 +250,8 @@ const Home = () => {
         </section>
 
         {/* KPIs */}
-        <section className="mt-8 grid gap-4 md:grid-cols-3">
-          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#082721] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20">
+        <section className="reveal d3 mt-8 grid gap-4 md:grid-cols-3">
+          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#082721] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20 hover:scale-[1.01]">
             <i className="fas fa-chart-line absolute left-5 top-4 text-4xl text-[#082721]/15" />
             <p className="text-lg text-[#082721] mb-1">
               المنتجات التعدينية العربية
@@ -204,7 +268,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#ddbc6b] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20">
+          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#ddbc6b] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20 hover:scale-[1.01]">
             <i className="fas fa-globe absolute left-5 top-4 text-4xl text-[#ddbc6b]/30" />
             <p className="text-lg text-[#ddbc6b] mb-1">عدد الدول العربية</p>
             <h2 className="text-3xl font-extrabold text-[#ddbc6b]">21</h2>
@@ -214,7 +278,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#6d2824] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20">
+          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#6d2824] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20 hover:scale-[1.01]">
             <i className="fas fa-database absolute left-5 top-4 text-4xl text-[#6d2824]/30" />
             <p className="text-sm text-[#6d2824] mb-1">الفترة الزمنية</p>
             <h2 className="text-3xl font-extrabold text-[#6d2824]">
@@ -275,13 +339,15 @@ const Home = () => {
         </section> */}
 
         {/* Indicators entrance */}
-        <section className="mt-10">
+        <section className="reveal d4 mt-10">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h3 className="text-2xl font-extrabold text-[#082721]">
                 المؤشرات التعدينية
               </h3>
-              <p className="text-sm text-slate-500">الإنتاج التعديني</p>
+              <br />
+              
+              <p className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50">الإنتاج التعديني</p>
             </div>
             <a
               href="/m1"
@@ -416,7 +482,122 @@ const Home = () => {
             </div>
           </div>
         </section>
+        <section className="reveal d4 mt-16">
+  <div className="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      
+      <p className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50">        التبادلات التجارية الخارجية
+      </p>
+    </div>
+    <a
+      href="/trade-indicators"
+      className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
+    >
+      <i className="fa-solid fa-right-left" />
+      <span>جميع مؤشرات التجارة</span>
+    </a>
+  </div>
 
+  <div className="mt-3 grid gap-5 md:grid-cols-3 lg:grid-cols-2">
+    {/* مؤشرات التصدير */}
+    <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10">
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#ddbc6b]/15 text-[#082721]">
+          <i className="fa-solid fa-ship" />
+        </div>
+        <div>
+          <p className="text-base font-bold">الصادرات التعدينية</p>
+          <p className="text-sm text-slate-500">
+            تحليل تدفقات الصادرات التعدينية حسب الدولة والوجهة والقيمة المالية.
+          </p>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between text-sm">
+        <span className="text-slate-500">PowerBI</span>
+        <a href="/exports" className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]">المزيد</a>
+      </div>
+    </div>
+
+    {/* مؤشرات الواردات */}
+    <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10">
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#ddbc6b]/15 text-[#082721]">
+          <i className="fa-solid fa-truck-ramp-box" />
+        </div>
+        <div>
+          <p className="text-base font-bold"> الواردات التعدينية</p>
+          <p className="text-sm text-slate-500">
+            رصد حجم وقيمة الواردات من المواد الخام والمنتجات التعدينية المعالجة.
+          </p>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between text-sm">
+        <span className="text-slate-500">PowerBI</span>
+        <a href="/imports" className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]">المزيد</a>
+      </div>
+    </div>
+
+    {/* الميزان التجاري */}
+  
+  </div>
+</section>
+<section className="reveal d4 mt-16 mb-10">
+  <div className="flex flex-wrap items-end justify-between gap-3">
+    <div>
+    
+      <p className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50">احتياطيات الخام
+      </p>
+    </div>
+  </div>
+
+  <div className="mt-3 grid gap-5 md:grid-cols-2 lg:grid-cols-2">
+  {/* احتياطي الخام حسب الدولة */}
+  <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10 border-r-4 border-[#ddbc6b]">
+    <div className="flex items-start gap-3">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#ddbc6b]/15 text-[#082721]">
+          <i className="fa-solid fa-gem" />
+        </div>
+        <div>
+          <p className="text-base font-bold">احتياطي الخام حسب الدولة</p>
+          <p className="text-sm text-slate-500">
+            توزيع احتياطيات أهم الخامات المعدنية (ذهب، فوسفات، نحاس...) على الخريطة العربية.
+          </p>
+          <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
+            <li>مقارنة كميات الاحتياطي بين الدول العربية.</li>
+            <li>نسبة تركيز الخام وجودته بحسب التقارير الجيولوجية.</li>
+          </ul>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between text-sm">
+        <span className="text-slate-500">PowerBI</span>
+        <a href="/reserves-country" className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]">المزيد</a>
+      </div>
+    </div>
+
+    {/* الاحتياطي المؤكد / المحتمل */}
+    <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10 border-r-4 border-[#082721]">
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#082721]/10 text-[#082721]">
+          <i className="fa-solid fa-microscope" />
+        </div>
+        <div>
+          <p className="text-base font-bold">الاحتياطي المؤكد والمحتمل</p>
+          <p className="text-sm text-slate-500">
+            تصنيف الاحتياطيات وفق درجة الموثوقية الجيولوجية والجدوى الاقتصادية للاستخراج.
+          </p>
+          <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
+            <li>الاحتياطي المؤكد (Proven) القابل للاستغلال حالياً.</li>
+            <li>الاحتياطي المحتمل (Probable) بناءً على دراسات الاستكشاف.</li>
+          </ul>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between text-sm">
+        <span className="text-slate-500">PowerBI</span>
+        <a href="/reserves-types" className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]">المزيد</a>
+      </div>
+    </div>
+  </div>
+</section>
         {/* <section className="mt-10">
           <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
             <div className="flex flex-wrap items-end justify-between gap-3">
@@ -471,7 +652,7 @@ const Home = () => {
         </section> */}
 
         {/* Countries strip */}
-        <section className="mt-10">
+        <section className="reveal d4 mt-10">
           <div className="rounded-2xl bg-white p-5 shadow-lg shadow-slate-900/10">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -693,7 +874,7 @@ const Home = () => {
         </section> */}
 
         {/* Sources / sponsors */}
-        <section className="mt-10" aria-label="المراجع والمصادر">
+        <section className="reveal d5 mt-10" aria-label="المراجع والمصادر">
           <div className="rounded-3xl bg-white/95 p-5 shadow-xl shadow-slate-900/10 ring-1 ring-slate-200/70">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
@@ -821,14 +1002,16 @@ const Home = () => {
     
       </main>
 
-      <Footer />
+      <div className="reveal d5">
+        <Footer />
+      </div>
 
       {/* Floating chatbot button */}
       <button
         type="button"
         onClick={handleChatbotClick}
         title="محلّل البيانات الذكي"
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full bg-white/90 px-3 py-2 text-right shadow-xl shadow-slate-900/25 backdrop-blur-md transition hover:-translate-y-1 hover:shadow-2xl"
+        className="reveal d5 fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full bg-white/90 px-3 py-2 text-right shadow-xl shadow-slate-900/25 backdrop-blur-md transition hover:-translate-y-1 hover:shadow-2xl"
       >
         <span className="absolute right-3 top-2 h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_0_4px] shadow-emerald-500/30" />
         <span className="grid h-11 w-11 place-items-center rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-[#082721] to-[#082721] text-white">

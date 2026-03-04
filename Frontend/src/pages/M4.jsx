@@ -159,7 +159,7 @@ export default function M4Page() {
   }, [pack]);
 
   return (
-    <div className="bg-slate-100/80" dir="rtl">
+    <div className="" dir="rtl">
       <Menu />
       <main className="min-h-screen py-6 sm:py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">

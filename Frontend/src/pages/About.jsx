@@ -6,12 +6,10 @@ const About = () => {
   return (
     <div
       dir="rtl"
-      className="min-h-screen bg-slate-100 text-slate-800"
+      className="min-h-screen text-slate-800"
       style={{
         fontFamily:
           "'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        backgroundImage:
-          "url('https://www.transparenttextures.com/patterns/cubes.png')",
       }}
     >
       <Menu />

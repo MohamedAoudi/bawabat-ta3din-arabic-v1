@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../assets/logo 500x190 sans bg.png";
+import logo from "../assets/LOGO_ARAB MINING grand.svg";
 
 const Footer = () => {
   return (
@@ -12,7 +12,7 @@ const Footer = () => {
           <img
             src={logo}
             alt="Arab Mining Indicators Portal"
-            className="h-10 sm:h-12 w-auto object-contain rounded-full bg-white p-1 shadow-sm"
+            className="h-18 w-auto object-contain rounded-full bg-white px-2 shadow-sm"
           />
         </div>
         <div className="grid gap-8 md:grid-cols-3">

@@ -129,20 +129,15 @@ const Menu = () => {
                           href="#"
                           className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
                         >
-                          مؤشرات التصدير
+                          الصادرات التعدينية
                         </a>
                         <a
                           href="#"
                           className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
                         >
-                          مؤشرات الواردات
+                          الواردات التعدينية
                         </a>
-                        <a
-                          href="#"
-                          className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
-                        >
-                          الميزان التجاري
-                        </a>
+                       
                       </div>
                     </details>
 
