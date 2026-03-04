@@ -3,7 +3,10 @@ import logo from "../assets/logo 500x190 sans bg.png";
 
 const Footer = () => {
   return (
-    <footer className="mt-16 border-t-4 border-amber-400 bg-[#005A8D] text-slate-100" dir="rtl">
+    <footer
+      className="mt-16 border-t-4 border-[#ddbc6b] bg-[#082721] text-slate-100"
+      dir="rtl"
+    >
       <div className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
         <div className="mb-6 flex items-center justify-center sm:justify-start">
           <img
@@ -29,22 +32,22 @@ const Footer = () => {
           <div>
             <h4 className="mb-3 text-sm font-bold text-slate-100">خريطة البوابة</h4>
             <div className="grid grid-cols-2 gap-2 text-sm">
-              <a href="/" className="transition hover:text-white">
+              <a href="/" className="transition hover:text-[#ddbc6b]">
                 الرئيسية
               </a>
-              <a href="/m1" className="transition hover:text-white">
+              <a href="/m1" className="transition hover:text-[#ddbc6b]">
                 المؤشرات التعدينية
               </a>
-              <a href="/countries" className="transition hover:text-white">
+              <a href="/countries" className="transition hover:text-[#ddbc6b]">
                 الدول العربية
               </a>
-              <a href="sources.html" className="transition hover:text-white">
+              <a href="sources.html" className="transition hover:text-[#ddbc6b]">
                 المصادر
               </a>
-              <a href="reports.html" className="transition hover:text-white">
+              <a href="reports.html" className="transition hover:text-[#ddbc6b]">
                 التقارير
               </a>
-              <a href="/about" className="transition hover:text-white">
+              <a href="/about" className="transition hover:text-[#ddbc6b]">
                 عن البوابة
               </a>
             </div>
@@ -54,28 +57,29 @@ const Footer = () => {
           <div>
             <h4 className="mb-3 text-sm font-bold text-slate-100">روابط ذات صلة</h4>
             <div className="space-y-2 text-sm">
-              <a href="#" className="block transition hover:text-white">
+              <a href="#" className="block transition hover:text-[#ddbc6b]">
                 APFM (لاحقًا)
               </a>
-              <a href="#" className="block transition hover:text-white">
+              <a href="#" className="block transition hover:text-[#ddbc6b]">
                 المكتبة (لاحقًا)
               </a>
-              <a href="#" className="block transition hover:text-white">
+              <a href="#" className="block transition hover:text-[#ddbc6b]">
                 تواصل معنا (لاحقًا)
               </a>
               <div className="mt-4 flex items-center gap-3 text-xs text-slate-200/90">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#004366] text-amber-300">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#051712] text-[#ddbc6b]">
                   <i className="fa-solid fa-chart-column" />
                 </span>
                 <p>
-                  نسخة أولية تجريبية <span className="text-amber-300">V1 Prototype</span>
+                  نسخة أولية تجريبية{" "}
+                  <span className="text-[#ddbc6b]">V1 Prototype</span>
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t border-[#004366] pt-4 text-xs text-slate-200/80 sm:flex-row">
+        <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t border-[#ddbc6b]/30 pt-4 text-xs text-slate-200/80 sm:flex-row">
           <p>© AIDSMO — جميع الحقوق محفوظة</p>
           <p className="text-[11px]">
             تم تطوير هذه النسخة لأغراض العرض والتجربة الأولية للبوابة.

@@ -2,6 +2,52 @@ import { useState, useEffect } from "react";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import i7 from "../assets/i-7.png";
+import bgHeaderVideo from "../assets/bg header.mp4";
+import flagJordan from "../assets/flags/jordan.webp";
+import flagUae from "../assets/flags/uae.webp";
+import flagBahrain from "../assets/flags/bahrain.webp";
+import flagTunisia from "../assets/flags/tunisia.webp";
+import flagAlgeria from "../assets/flags/algeria.webp";
+import flagDjibouti from "../assets/flags/djibouti.webp";
+import flagSaudi from "../assets/flags/saudiarabe.webp";
+import flagSudan from "../assets/flags/sudan.webp";
+import flagSyria from "../assets/flags/syria.webp";
+import flagSomalia from "../assets/flags/somalia.webp";
+import flagIraq from "../assets/flags/iraq.webp";
+import flagOman from "../assets/flags/oman.webp";
+import flagPalestine from "../assets/flags/palestine.webp";
+import flagQatar from "../assets/flags/qatar.webp";
+import flagKuwait from "../assets/flags/kuwait.webp";
+import flagLebanon from "../assets/flags/lebanon.webp";
+import flagLibya from "../assets/flags/libya.webp";
+import flagEgypt from "../assets/flags/egypt.webp";
+import flagMorocco from "../assets/flags/morocco.webp";
+import flagMauritania from "../assets/flags/mauritania.webp";
+import flagYemen from "../assets/flags/yemen.webp";
+
+const countryFlags = {
+  jo: flagJordan,
+  ae: flagUae,
+  bh: flagBahrain,
+  tn: flagTunisia,
+  dz: flagAlgeria,
+  dj: flagDjibouti,
+  sa: flagSaudi,
+  sd: flagSudan,
+  sy: flagSyria,
+  so: flagSomalia,
+  iq: flagIraq,
+  om: flagOman,
+  ps: flagPalestine,
+  qa: flagQatar,
+  kw: flagKuwait,
+  lb: flagLebanon,
+  ly: flagLibya,
+  eg: flagEgypt,
+  ma: flagMorocco,
+  mr: flagMauritania,
+  ye: flagYemen,
+};
 
 const countries = [
   { name: "الأردن", code: "jo" },
@@ -35,37 +81,37 @@ const Home = () => {
     {
       href: "https://procedures.gov.mr/ar/",
       img: i7,
-      title: "1وزارة المعادن و الصناعة",
+      title: "1 وزارة المعادن و الصناع العربية",
       subtitle: "الجمهورية الإسلامية الموريتانية",
     },
     {
       href: "https://www.mim.gov.sa/ar",
       img: i7,
-      title: "وزارة الصناعة والثروة المعدنية",
+      title: "2 وزارة الصناعة والثروة المعدنية",
       subtitle: "المملكة العربية السعودية",
     },
     {
       href: "https://procedures.gov.mr/ar/",
       img: i7,
-      title: "2وزارة المعادن و الصناعة",
+      title: "3 وزارة المعادن و الصناعة",
       subtitle: "الجمهورية الإسلامية الموريتانية",
     },
     {
       href: "https://www.mim.gov.sa/ar",
       img: i7,
-      title: "3وزارة الصناعة والثروة المعدنية",
+      title: "4 وزارة الصناعة والثروة المعدنية",
       subtitle: "المملكة العربية السعودية",
     },
     {
       href: "https://procedures.gov.mr/ar/",
       img: i7,
-      title: "4وزارة المعادن و الصناعة",
+      title: "5 وزارة المعادن و الصناعة",
       subtitle: "الجمهورية الإسلامية الموريتانية",
     },
     {
       href: "https://www.mim.gov.sa/ar",
       img: i7,
-      title: "5وزارة الصناعة والثروة المعدنية",
+      title: "6 وزارة الصناعة والثروة المعدنية",
       subtitle: "المملكة العربية السعودية",
     },
   ];
@@ -98,9 +144,18 @@ const Home = () => {
       <Menu />
 
       {/* Hero */}
-      <header className="relative overflow-hidden bg-gradient-to-br from-[#005A8D] to-[#005A8D] text-white pb-24 pt-12">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="mb-3 text-4xl sm:text-5xl md:text-6xl font-extrabold">
+      <header className="relative overflow-hidden text-white h-[680px] pt-12 mb-[-350px]  mt-[-90px]">
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          src={bgHeaderVideo}
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+        <div className="absolute " />
+        <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="mb-3 text-4xl sm:text-5xl md:text-6xl font-extrabold mt-[100px]">
             بوابة المؤشرات التعدينية العربية
           </h1>
           <p className="mx-auto max-w-4xl text-lg sm:text-xl text-white/80">
@@ -108,12 +163,12 @@ const Home = () => {
             والتقارير المتقدمة.
           </p>
         </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-[-60px] h-24 bg-slate-100" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-transparent" />
       </header>
 
       <main className="relative -mt-16 mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 pb-16">
         {/* Search */}
-        <section className="mx-auto max-w-3xl">
+        <section className="mx-auto max-w-3xl mb-[220px]">
           <div className="flex items-center gap-3 rounded-full bg-white px-5 py-3 shadow-xl shadow-slate-900/10">
             <i className="fas fa-search text-slate-400" />
             <input
@@ -123,7 +178,7 @@ const Home = () => {
             />
             <button
               type="button"
-              className="rounded-full bg-[#005A8D] px-7 py-2 text-sm sm:text-lg font-semibold text-white hover:bg-[#00466B]"
+              className="rounded-full bg-[#082721] px-7 py-2 text-sm sm:text-lg font-semibold text-white hover:bg-[#061b17] "
             >
               بحث ذكي
             </button>
@@ -132,40 +187,40 @@ const Home = () => {
 
         {/* KPIs */}
         <section className="mt-8 grid gap-4 md:grid-cols-3">
-          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#792E28]">
-            <i className="fas fa-chart-line absolute left-5 top-4 text-4xl text-[#005A8D]/15" />
-            <p className="text-lg text-[#792E28] mb-1">
+          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#082721] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20">
+            <i className="fas fa-chart-line absolute left-5 top-4 text-4xl text-[#082721]/15" />
+            <p className="text-lg text-[#082721] mb-1">
               المنتجات التعدينية العربية
             </p>
-            <h2 className="text-3xl font-extrabold text-[#792E28]">
+            <h2 className="text-3xl font-extrabold text-[#082721]">
               3000{" "}
-              <span className="text-lg font-semibold text-[#792E28]">
+              <span className="text-lg font-semibold text-[#082721]">
                 معلومة تعدينية
               </span>
             </h2>
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#005A8D]/5 px-4 py-1.5 text-lg s font-semibold text-[#005A8D]">
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#082721]/5 px-4 py-1.5 text-lg s font-semibold text-[#082721]">
               <i className="fas fa-caret-up" />
               <span>منتجات وخامات</span>
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-emerald-500">
-            <i className="fas fa-globe absolute left-5 top-4 text-4xl text-emerald-900/15" />
-            <p className="text-lg  text-slate-500 mb-1">عدد الدول العربية</p>
-            <h2 className="text-3xl font-extrabold text-emerald-600">21</h2>
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-800">
+          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#ddbc6b] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20">
+            <i className="fas fa-globe absolute left-5 top-4 text-4xl text-[#ddbc6b]/30" />
+            <p className="text-lg text-[#ddbc6b] mb-1">عدد الدول العربية</p>
+            <h2 className="text-3xl font-extrabold text-[#ddbc6b]">21</h2>
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/10 px-4 py-1.5 text-sm font-semibold text-[#ddbc6b]">
               <i className="fa-solid fa-check" />
               <span>نطاق عربي</span>
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-amber-400">
-            <i className="fas fa-database absolute left-5 top-4 text-4xl text-amber-900/15" />
-            <p className="text-sm text-slate-500 mb-1">الفترة الزمنية</p>
-            <h2 className="text-3xl font-extrabold text-amber-500"  >
+          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#6d2824] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20">
+            <i className="fas fa-database absolute left-5 top-4 text-4xl text-[#6d2824]/30" />
+            <p className="text-sm text-[#6d2824] mb-1">الفترة الزمنية</p>
+            <h2 className="text-3xl font-extrabold text-[#6d2824]">
               2010 ← 2024
             </h2>
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-1.5 text-sm font-semibold text-amber-800">
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#6d2824]/10 px-4 py-1.5 text-sm font-semibold text-[#6d2824]">
               <i className="fa-solid fa-calendar-days" />
               <span>قابلة للتحديث</span>
             </div>
@@ -178,7 +233,7 @@ const Home = () => {
         {/* <section className="mt-10">
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#005A8D]/10 text-[#005A8D]">
+              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#082721]/10 text-[#082721]">
                 <i className="fa-solid fa-database" />
               </div>
               <h3 className="text-base font-extrabold text-slate-900 mb-1">
@@ -191,7 +246,7 @@ const Home = () => {
             </div>
 
             <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#005A8D]/10 text-[#005A8D]">
+              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#082721]/10 text-[#082721]">
                 <i className="fa-solid fa-chart-pie" />
               </div>
               <h3 className="text-base font-extrabold text-slate-900 mb-1">
@@ -204,7 +259,7 @@ const Home = () => {
             </div>
 
             <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/80">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#005A8D]/10 text-[#005A8D]">
+              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#082721]/10 text-[#082721]">
                 <i className="fa-solid fa-handshake-angle" />
               </div>
               <h3 className="text-base font-extrabold text-slate-900 mb-1">
@@ -223,14 +278,14 @@ const Home = () => {
         <section className="mt-10">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h3 className="text-2xl font-extrabold text-slate-800">
+              <h3 className="text-2xl font-extrabold text-[#082721]">
                 المؤشرات التعدينية
               </h3>
               <p className="text-sm text-slate-500">الإنتاج التعديني</p>
             </div>
             <a
               href="/m1"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#005A8D] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] shadow-sm shadow-slate-900/10 ring-1 ring-slate-200 hover:bg-slate-50"
             >
               <i className="fa-solid fa-arrow-up-right-from-square" />
               <span>الانتقال للمؤشرات</span>
@@ -241,7 +296,7 @@ const Home = () => {
             {/* Card 1 */}
             <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#082721]/10 text-[#082721]">
                   <i className="fa-solid fa-chart-column" />
                 </div>
                 <div>
@@ -262,7 +317,7 @@ const Home = () => {
                 <span className="text-slate-500">PowerBI</span>
                 <a
                   href="/m1"
-                  className="rounded-lg bg-[#005A8D] px-3 py-1 text-white hover:bg-[#004366]"
+                  className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]"
                 >
                   المزيد
                 </a>
@@ -272,7 +327,7 @@ const Home = () => {
             {/* Card 2 */}
             <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#082721]/10 text-[#082721]">
                   <i className="fa-solid fa-chart-line" />
                 </div>
                 <div>
@@ -291,7 +346,7 @@ const Home = () => {
                 <span className="text-slate-500">PowerBI</span>
                 <a
                   href="/m2"
-                  className="rounded-lg bg-[#005A8D] px-3 py-1 text-white hover:bg-[#004366]"
+                  className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]"
                 >
                   المزيد
                 </a>
@@ -301,7 +356,7 @@ const Home = () => {
             {/* Card 3 */}
             <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#082721]/10 text-[#082721]">
                   <i className="fa-solid fa-layer-group" />
                 </div>
                 <div>
@@ -322,7 +377,7 @@ const Home = () => {
                 <span className="text-slate-500">PowerBI</span>
                 <a
                   href="/m3"
-                  className="rounded-lg bg-[#005A8D] px-3 py-1 text-white hover:bg-[#004366]"
+                  className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]"
                 >
                   المزيد
                 </a>
@@ -332,7 +387,7 @@ const Home = () => {
             {/* Card 4 */}
             <div className="flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 shadow-md shadow-slate-900/10">
               <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#005A8D]/10 text-[#005A8D]">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#082721]/10 text-[#082721]">
                   <i className="fa-solid fa-circle-notch" />
                 </div>
                 <div>
@@ -353,7 +408,7 @@ const Home = () => {
                 <span className="text-slate-500">PowerBI</span>
                 <a
                   href="/m4"
-                  className="rounded-lg bg-sky-900 px-3 py-1 text-white hover:bg-sky-800"
+                  className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]"
                 >
                   المزيد
                 </a>
@@ -429,7 +484,7 @@ const Home = () => {
               </div>
             <a
               href="countries.html"
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#005A8D] shadow-sm shadow-slate-900/10 ring-1 ring-[#005A8D]/40 hover:bg-slate-50"
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] shadow-sm shadow-slate-900/10 ring-1 ring-[#082721]/40 hover:bg-slate-50"
               >
                 <i className="fa-solid fa-arrow-left" />
                 <span>المزيد</span>
@@ -444,15 +499,15 @@ const Home = () => {
                   className="group flex flex-col items-center text-center transition-transform hover:-translate-y-1"
                   onClick={() => setSelectedCountry(c.name)}
                 >
-                  <div className="relative flex h-24 w-24 items-center justify-center rounded-lg border-4 border-[#005A8D] shadow-[0_0_0_4px] shadow-[#005A8D]/40 bg-white">
-                    <div
-                      className="h-[78px] w-[78px] bg-cover bg-center shadow-[inset_0_0_0_2px_rgba(255,255,255,0.95),0_10px_18px_rgba(0,0,0,0.12)]"
-                      style={{
-                        backgroundImage: `url(https://flagcdn.com/w80/${c.code}.png)`,
-                      }}
+                  <div className="relative flex h-16 w-28 items-center justify-center overflow-hidden rounded-none bg-white">
+                    <img
+                      src={countryFlags[c.code]}
+                      alt={c.name}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
                     />
                   </div>
-                  <p className="mt-2 text-base font-bold text-[#005A8D]">
+                  <p className="mt-2 text-base font-bold text-[#082721]">
                     {c.name}
                   </p>
                 </button>
@@ -461,7 +516,7 @@ const Home = () => {
 
             <p className="mt-4 text-sm text-slate-500">
               الدولة المختارة:{" "}
-              <span className="font-bold text-[#005A8D]">
+              <span className="font-bold text-[#082721]">
                 {selectedCountry}
               </span>
             </p>
@@ -522,15 +577,15 @@ const Home = () => {
               </h3>
               <ul className="mt-3 space-y-2 text-sm text-slate-700">
                 <li className="flex items-start gap-2">
-                  <i className="mt-1 fa-solid fa-circle-check text-[#005A8D]" />
+                  <i className="mt-1 fa-solid fa-circle-check text-[#082721]" />
                   <span>لوحات جاهزة لمتابعة حجم وتطور الإنتاج التعديني العربي.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <i className="mt-1 fa-solid fa-circle-check text-[#005A8D]" />
+                  <i className="mt-1 fa-solid fa-circle-check text-[#082721]" />
                   <span>مقارنات سريعة بين الدول والخامات والفترات الزمنية.</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <i className="mt-1 fa-solid fa-circle-check text-[#005A8D]" />
+                  <i className="mt-1 fa-solid fa-circle-check text-[#082721]" />
                   <span>مصادر موثوقة للبيانات يمكن الرجوع إليها في الدراسات والتقارير.</span>
                 </li>
               </ul>
@@ -617,15 +672,15 @@ const Home = () => {
               </details>
               <button
                 type="button"
-                className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#005A8D] px-4 py-1.5 text-xs sm:text-sm font-semibold text-white shadow-sm shadow-slate-900/20 hover:bg-[#004366]"
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#082721] px-4 py-1.5 text-xs sm:text-sm font-semibold text-white shadow-sm shadow-slate-900/20 hover:bg-[#051712]"
               >
                 <span>المزيد من الأسئلة</span>
                 <i className="fa-solid fa-arrow-left text-[10px]" />
               </button>
             </div>
 
-            <div className="rounded-3xl bg-[#005A8D]/5 p-6 shadow-inner ring-1 ring-[#005A8D]/20">
-              <h3 className="text-lg font-extrabold text-[#005A8D] mb-2">
+            <div className="rounded-3xl bg-[#082721]/5 p-6 shadow-inner ring-1 ring-[#082721]/20">
+              <h3 className="text-lg font-extrabold text-[#082721] mb-2">
                 ملاحظات على النسخة التجريبية
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
@@ -642,7 +697,7 @@ const Home = () => {
           <div className="rounded-3xl bg-white/95 p-5 shadow-xl shadow-slate-900/10 ring-1 ring-slate-200/70">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 className="text-lg font-extrabold text-[#005A8D]">
+                <h2 className="text-lg font-extrabold text-[#082721]">
                   المراجع والمصادر
                 </h2>
                 <p className="text-sm text-slate-500">
@@ -678,7 +733,7 @@ const Home = () => {
                           />
                           <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/95 px-3 text-center opacity-0 transition-opacity group-hover:opacity-100">
                             <div>
-                              <p className="mb-1 text-base font-extrabold text-[#005A8D]">
+                              <p className="mb-1 text-base font-extrabold text-[#082721]">
                                 {s.title}
                               </p>
                               <p className="text-sm text-slate-500">
@@ -735,25 +790,25 @@ const Home = () => {
               </ul>
             </div>
 
-            <div className="rounded-3xl bg-[#005A8D] p-6 text-white shadow-lg shadow-slate-900/20 ring-1 ring-[#004366]">
+            <div className="rounded-3xl bg-[#082721] p-6 text-white shadow-lg shadow-slate-900/20 ring-1 ring-[#051712]">
               <h3 className="text-xl font-extrabold mb-2">لمن هذه البوابة؟</h3>
-              <p className="text-sm text-sky-50/90 leading-relaxed">
+              <p className="text-sm text-slate-50/90 leading-relaxed">
                 تستهدف البوابة الجهات الحكومية العربية، أجهزة الإحصاء، الهيئات
                 التعدينية، الباحثين، والمستثمرين المهتمين بفهم ديناميات الإنتاج
                 التعديني العربي.
               </p>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 text-sm">
-                <div className="rounded-2xl bg-[#004366]/40 px-4 py-3">
+                <div className="rounded-2xl bg-[#051712]/40 px-4 py-3">
                   <p className="font-semibold mb-1">استخدامات رئيسية</p>
-                  <ul className="space-y-1 text-sky-50/90">
+                  <ul className="space-y-1 text-slate-50/90">
                     <li>متابعة تطور الإنتاج حسب الدولة أو الخام.</li>
                     <li>رصد حصة الدول العربية من الإنتاج العالمي.</li>
                     <li>اكتشاف فرص التكامل والتعاون الإقليمي.</li>
                   </ul>
                 </div>
-                <div className="rounded-2xl bg-[#004366]/40 px-4 py-3">
+                <div className="rounded-2xl bg-[#051712]/40 px-4 py-3">
                   <p className="font-semibold mb-1">الخطوات القادمة</p>
-                  <ul className="space-y-1 text-sky-50/90">
+                  <ul className="space-y-1 text-slate-50/90">
                     <li>دمج مزيد من السنوات والبيانات التفصيلية.</li>
                     <li>إطلاق تقارير تفاعلية قابلة للتخصيص.</li>
                     <li>إضافة طبقات خرائط جيولوجية (لاحقًا).</li>
@@ -776,11 +831,11 @@ const Home = () => {
         className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full bg-white/90 px-3 py-2 text-right shadow-xl shadow-slate-900/25 backdrop-blur-md transition hover:-translate-y-1 hover:shadow-2xl"
       >
         <span className="absolute right-3 top-2 h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_0_4px] shadow-emerald-500/30" />
-        <span className="grid h-11 w-11 place-items-center rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-[#005A8D] to-[#005A8D] text-white">
+        <span className="grid h-11 w-11 place-items-center rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-[#082721] to-[#082721] text-white">
           <i className="fa-solid fa-robot" />
         </span>
         <span className="hidden flex-col text-sm leading-tight text-slate-700 sm:flex">
-          <span className="font-extrabold text-[#005A8D]">Chat Bote</span>
+          <span className="font-extrabold text-[#082721]">Chat Bote</span>
           <span className="text-sm text-slate-500">
             محلّل البيانات الذكي
           </span>

@@ -1,16 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import logoAmip from "../assets/LOGO_ARAB MINING grand.svg";
 import logoAidsmo from "../assets/aidsmo logo sans bg 800x 800.png";
 
 const Menu = () => {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLangClick = () => {
     alert("FR (AR/EN لاحقًا) — زر تجريبي فقط.");
   };
 
   return (
-    <nav className=" py-3  sticky top-0 z-40 bg-gradient-to-r from-sky-900 to-sky-700 border-b-4 border-amber-400 ">
+  <nav
+    className={`py-3 sticky top-0 z-40 transition-colors duration-300 ${
+      scrolled ? "bg-[#082721]/95 backdrop-blur border-b border-amber-400/60" : "bg-transparent"
+    }`}
+  >
       <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-10" dir="rtl">
         <div className=" gap-2 flex h-16 items-center justify-between">
           {/* Brand */}
@@ -46,36 +62,108 @@ const Menu = () => {
                   <span>المؤشرات التعدينية</span>
                   <i className="fa-solid fa-chevron-down text-[10px]" />
                 </button>
-                <div className="absolute end-0  w-72 rounded-2xl bg-white py-2 text-right text-sm text-slate-800 shadow-xl ring-1 ring-slate-200 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-150">
-                  
-                 
+                <div className="absolute top-full  end-0 w-[320px] rounded-2xl bg-white py-3 text-right text-sm text-slate-800 shadow-xl ring-1 ring-slate-200 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-150 z-50">
+                  <div className="px-2 space-y-2">
+                    {/* الانتاج التعديني */}
+                    <details className="group mx-1 rounded-2xl bg-slate-50/80 p-2">
+                      <summary className="flex cursor-pointer items-center justify-between">
+                        <span className="text-[13px] font-extrabold text-slate-900">
+                          الانتاج التعديني
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] text-slate-500">
+                          لوحات فرعية
+                          <i className="fa-solid fa-chevron-down text-[8px]" />
+                        </span>
+                      </summary>
+                      <div className="mt-2 space-y-1 text-[13px]">
+                        <a
+                          href="/m1"
+                          className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
+                        >
+                          حجم الإنتاج التعديني
+                        </a>
+                        <a
+                          href="/m2"
+                          className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
+                        >
+                          تطور الإنتاج التعديني
+                        </a>
+                        <a
+                          href="/m3"
+                          className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
+                        >
+                          تطور الإنتاج التعديني العربي
+                        </a>
+                        <a
+                          href="/m4"
+                          className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
+                        >
+                          نسبة الإنتاج التعديني العربي من الإنتاج العالمي
+                        </a>
+                      </div>
+                    </details>
 
+                    {/* التبادلات التجارية الخارجية */}
+                    <details className="group mx-1 rounded-2xl bg-slate-50/60 p-2">
+                      <summary className="flex cursor-pointer items-center justify-between">
+                        <span className="text-[13px] font-extrabold text-slate-900">
+                          التبادلات التجارية الخارجية
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] text-slate-500">
+                          (نماذج قيد التطوير)
+                          <i className="fa-solid fa-chevron-down text-[8px]" />
+                        </span>
+                      </summary>
+                      <div className="mt-2 space-y-1 text-[13px]">
+                        <a
+                          href="#"
+                          className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
+                        >
+                          مؤشرات التصدير
+                        </a>
+                        <a
+                          href="#"
+                          className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
+                        >
+                          مؤشرات الواردات
+                        </a>
+                        <a
+                          href="#"
+                          className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
+                        >
+                          الميزان التجاري
+                        </a>
+                      </div>
+                    </details>
 
-                  {/* باقي العناصر كما هي */}
-                  <a
-                      href="/m1"
-                      className="mx-1 block rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900 "
-                    >
-                      <span>حجم الإنتاج التعديني</span>
-                    </a>
-                  <a
-                    href="/m2"
-                    className="mx-1 block rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900"
-                  >
-                    تطور الإنتاج التعديني
-                  </a>
-                  <a
-                    href="/m3"
-                    className="mx-1 block rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900"
-                  >
-                    تطور الإنتاج التعديني العربي
-                  </a>
-                  <a
-                    href="/m4"
-                    className="mx-1 block rounded-xl px-3 py-2 font-semibold hover:bg-sky-50 hover:text-sky-900"
-                  >
-                    نسبة الإنتاج التعديني العربي من الإنتاج العالمي
-                  </a>
+                    {/* الاحتياطي */}
+                    <details className="group mx-1 rounded-2xl bg-slate-50/60 p-2">
+                      <summary className="flex cursor-pointer items-center justify-between">
+                        <span className="text-[13px] font-extrabold text-slate-900">
+                          الاحتياطي
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] text-slate-500">
+                          (قيد الإعداد)
+                          <i className="fa-solid fa-chevron-down text-[8px]" />
+                        </span>
+                      </summary>
+                      <div className="mt-2 space-y-1 text-[13px]">
+                        <a
+                          href="#"
+                          className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
+                        >
+                          احتياطي الخام حسب الدولة
+                        </a>
+                        <a
+                          href="#"
+                          className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
+                        >
+                          الاحتياطي المؤكد / المحتمل
+                        </a>
+                        
+                      </div>
+                    </details>
+                  </div>
                 </div>
               </li>
 
@@ -114,8 +202,8 @@ const Menu = () => {
               </button>
 
               <a
-                href="reports.html"
-                className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-sky-900 hover:bg-slate-100 text-base font-semibold"
+              href="reports.html"
+              className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-[#082721] hover:bg-slate-100 text-base font-semibold"
               >
                 <i className="fa-regular fa-file-lines" />
                 <span>التقارير الذكية</span>
@@ -178,31 +266,96 @@ const Menu = () => {
                   <span>المؤشرات التعدينية</span>
                   <i className="fa-solid fa-chevron-down text-[10px]" />
                 </summary>
-                <div className="mt-1 space-y-1 rounded-lg bg-sky-950/40 px-3 py-2">
-                  <a
-                    href="/m1"
-                    className="block rounded px-2 py-1 hover:bg-white/10"
-                  >
-                    حجم الإنتاج التعديني
-                  </a>
-                  <a
-                    href="/m2"
-                    className="block rounded px-2 py-1 hover:bg-white/10"
-                  >
-                    تطور الإنتاج التعديني
-                  </a>
-                  <a
-                    href="/m3"
-                    className="block rounded px-2 py-1 hover:bg-white/10"
-                  >
-                    تطور الإنتاج التعديني العربي
-                  </a>
-                  <a
-                    href="/m4"
-                    className="block rounded px-2 py-1 hover:bg-white/10"
-                  >
-                    نسبة الإنتاج التعديني العربي من الإنتاج العالمي
-                  </a>
+                <div className="mt-1 space-y-2 rounded-lg bg-[#082721]/80 px-3 py-3 text-sm">
+                  {/* الانتاج التعديني */}
+                  <details className="group">
+                    <summary className="flex cursor-pointer items-center justify-between rounded-lg px-2 py-2 hover:bg-white/5 font-semibold">
+                      <span>الانتاج التعديني</span>
+                      <i className="fa-solid fa-chevron-down text-[9px]" />
+                    </summary>
+                    <div className="mt-1 space-y-1 rounded-lg bg-[#082721]/60 px-2 py-2">
+                      <a
+                        href="/m1"
+                        className="block rounded px-2 py-1 hover:bg-white/10"
+                      >
+                        حجم الإنتاج التعديني
+                      </a>
+                      <a
+                        href="/m2"
+                        className="block rounded px-2 py-1 hover:bg-white/10"
+                      >
+                        تطور الإنتاج التعديني
+                      </a>
+                      <a
+                        href="/m3"
+                        className="block rounded px-2 py-1 hover:bg-white/10"
+                      >
+                        تطور الإنتاج التعديني العربي
+                      </a>
+                      <a
+                        href="/m4"
+                        className="block rounded px-2 py-1 hover:bg-white/10"
+                      >
+                        نسبة الإنتاج التعديني العربي من الإنتاج العالمي
+                      </a>
+                    </div>
+                  </details>
+
+                  {/* التبادلات التجارية الخارجية */}
+                  <details className="group">
+                    <summary className="flex cursor-pointer items-center justify-between rounded-lg px-2 py-2 hover:bg-white/5 font-semibold">
+                      <span>التبادلات التجارية الخارجية</span>
+                      <i className="fa-solid fa-chevron-down text-[9px]" />
+                    </summary>
+                    <div className="mt-1 space-y-1 rounded-lg bg-[#082721]/60 px-2 py-2">
+                      <a
+                        href="#"
+                        className="block rounded px-2 py-1 hover:bg-white/10"
+                      >
+                        مؤشرات التصدير
+                      </a>
+                      <a
+                        href="#"
+                        className="block rounded px-2 py-1 hover:bg-white/10"
+                      >
+                        مؤشرات الواردات
+                      </a>
+                      <a
+                        href="#"
+                        className="block rounded px-2 py-1 hover:bg-white/10"
+                      >
+                        الميزان التجاري
+                      </a>
+                    </div>
+                  </details>
+
+                  {/* الاحتياطي */}
+                  <details className="group">
+                    <summary className="flex cursor-pointer items-center justify-between rounded-lg px-2 py-2 hover:bg-white/5 font-semibold">
+                      <span>الاحتياطي</span>
+                      <i className="fa-solid fa-chevron-down text-[9px]" />
+                    </summary>
+                    <div className="mt-1 space-y-1 rounded-lg bg-[#082721]/60 px-2 py-2">
+                      <a
+                        href="#"
+                        className="block rounded px-2 py-1 hover:bg-white/10"
+                      >
+                        احتياطي الخام حسب الدولة
+                      </a>
+                      <a
+                        href="#"
+                        className="block rounded px-2 py-1 hover:bg-white/10"
+                      >
+                        الاحتياطي المؤكد / المحتمل
+                      </a>
+                      <a
+                        href="#"
+                        className="block rounded px-2 py-1 hover:bg-white/10"
+                      >
+                        توزيع الاحتياطي على الخامات
+                      </a>
+                    </div>
+                  </details>
                 </div>
               </details>
               <a
@@ -234,7 +387,7 @@ const Menu = () => {
 
                 <a
                   href="reports.html"
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-3 text-sky-900 hover:bg-slate-100"
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-3 text-[#082721] hover:bg-slate-100"
                 >
                   <i className="fa-regular fa-file-lines" />
                   <span>التقارير الذكية</span>
