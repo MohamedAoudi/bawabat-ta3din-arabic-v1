@@ -77,13 +77,13 @@ export default function M3Page() {
     }
 
     const palette = [
-      "rgba(37, 99, 235, .85)", // blue
+      "rgba(8, 39, 33, .85)", // primary
       "rgba(16, 185, 129, .85)", // emerald
       "rgba(245, 158, 11, .85)", // amber
       "rgba(168, 85, 247, .85)", // violet
       "rgba(239, 68, 68, .85)", // red
       "rgba(20, 184, 166, .85)", // teal
-      "rgba(59, 130, 246, .65)", // light blue
+      "rgba(8, 39, 33, .55)", // primary (light)
     ];
 
     const datasets = selectedKeys.map((k, idx) => ({
@@ -151,7 +151,7 @@ export default function M3Page() {
       <main className="min-h-screen py-6 sm:py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <header className="mb-6 rounded-3xl bg-gradient-to-l from-sky-900 to-sky-600 px-6 py-8 text-center text-white shadow-lg">
+        <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
           <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
             تطور الإنتاج التعديني العربي
           </h1>
@@ -169,7 +169,7 @@ export default function M3Page() {
                 <div className="text-base font-extrabold text-slate-800">
                   الإنتاج عبر السنوات (مقارنة العناصر المختارة)
                 </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-bold text-sky-900">
+                <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
                   <i className="fa-solid fa-scale-balanced" />
                   وحدة الإنتاج:{" "}
                   <span className="font-extrabold">{unitLabelFor(unit)}</span>
@@ -233,14 +233,14 @@ export default function M3Page() {
                   {selectedKeys.map((k) => (
                     <span
                       key={k}
-                      className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-extrabold text-sky-900"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-extrabold text-[#082721]"
                     >
                       <i className="fa-solid fa-check" />
                       {seriesMap[k].name}
                       <button
                         type="button"
                         onClick={() => removeSel(k)}
-                        className="ms-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-sky-900/10 text-sky-900 hover:bg-sky-900/20"
+                        className="ms-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#082721]/10 text-[#082721] hover:bg-[#082721]/20"
                         aria-label={`Remove ${seriesMap[k].name}`}
                       >
                         ×

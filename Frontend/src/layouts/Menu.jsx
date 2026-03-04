@@ -5,8 +5,14 @@ import logoAidsmo from "../assets/aidsmo logo sans bg 800x 800.png";
 const Menu = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isHome, setIsHome] = useState(true);
 
   useEffect(() => {
+    // Detect if we are on the home page (path "/")
+    if (typeof window !== "undefined") {
+      setIsHome(window.location.pathname === "/");
+    }
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 0);
     };
@@ -24,7 +30,11 @@ const Menu = () => {
   return (
   <nav
     className={`py-3 sticky top-0 z-40 transition-colors duration-300 ${
-      scrolled ? "bg-[#082721]/95 backdrop-blur border-b border-amber-400/60" : "bg-transparent"
+      isHome
+        ? scrolled
+          ? "bg-[#082721]/95 backdrop-blur border-b border-amber-400/60"
+          : "bg-transparent"
+        : "bg-[#082721] border-b border-amber-400/60"
     }`}
   >
       <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-10" dir="rtl">

@@ -75,7 +75,7 @@ export default function M1Page() {
           {
             label: "الإنتاج",
             data: values,
-            backgroundColor: "rgba(37, 99, 235, 0.8)",
+            backgroundColor: "rgba(8, 39, 33, 0.82)",
             borderRadius: 10,
           },
         ],
@@ -137,7 +137,7 @@ export default function M1Page() {
       <main className="min-h-screen py-6 sm:py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <header className="mb-6 rounded-3xl bg-gradient-to-l from-sky-900 to-sky-600 px-6 py-8 text-center text-white shadow-lg">
+        <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
           <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
             حجم الإنتاج التعديني
           </h1>
@@ -157,8 +157,8 @@ export default function M1Page() {
                 onClick={() => setActiveYear(y)}
                 className={`yearbtn inline-flex items-center rounded-2xl border px-3 py-1 text-xs font-extrabold transition ${
                   y === activeYear
-                    ? "border-sky-900 bg-sky-900 text-white shadow-sm"
-                    : "border-transparent bg-white text-sky-900 hover:border-slate-200 hover:bg-slate-50"
+                    ? "border-[#082721] bg-[#082721] text-white shadow-sm"
+                    : "border-transparent bg-white text-[#082721] hover:border-slate-200 hover:bg-slate-50"
                 }`}
               >
                 {y}
@@ -168,7 +168,7 @@ export default function M1Page() {
 
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-[260px] flex-1 items-center gap-2 rounded-2xl border border-slate-100 bg-white px-3 py-2 shadow-sm">
-              <i className="fa-solid fa-cubes-stacked text-sky-900" />
+              <i className="fa-solid fa-cubes-stacked text-[#082721]" />
               <select className="w-full border-none bg-transparent text-sm font-bold text-slate-700 outline-none focus:ring-0">
                 <option value="phosphate">صخر الفوسفات</option>
                 <option value="gold">الذهب</option>
@@ -178,7 +178,7 @@ export default function M1Page() {
             </div>
 
             <div className="flex min-w-[260px] flex-1 items-center gap-2 rounded-2xl border border-slate-100 bg-white px-3 py-2 shadow-sm">
-              <i className="fa-solid fa-scale-balanced text-sky-900" />
+              <i className="fa-solid fa-scale-balanced text-[#082721]" />
               <select className="w-full border-none bg-transparent text-sm font-bold text-slate-700 outline-none focus:ring-0">
                 <option value="ton">وحدة الإنتاج: طن</option>
                 <option value="kton">وحدة الإنتاج: ألف طن</option>
@@ -189,7 +189,7 @@ export default function M1Page() {
             <button
               type="button"
               onClick={handleRefresh}
-              className="inline-flex items-center gap-2 rounded-xl bg-sky-900 px-4 py-2 text-sm font-extrabold text-white shadow-sm hover:bg-amber-500"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#082721] px-4 py-2 text-sm font-extrabold text-white shadow-sm hover:bg-[#ddbc6b] hover:text-[#082721]"
             >
               <i className="fa-solid fa-rotate" />
               تحديث
@@ -206,7 +206,7 @@ export default function M1Page() {
                 <h3 className="text-base font-extrabold text-slate-800">
                   الإنتاج حسب الدولة
                 </h3>
-                <div className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-bold text-sky-900">
+                <div className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
                   <i className="fa-solid fa-calendar-days" />
                   <span>السنة: {activeYear}</span>
                 </div>
@@ -245,7 +245,7 @@ export default function M1Page() {
 
                 <div className="max-h-72 overflow-y-auto rounded-xl bg-white">
                   <table className="min-w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-[11px] font-extrabold text-sky-900">
+                    <thead className="bg-slate-50 text-[11px] font-extrabold text-[#082721]">
                       <tr>
                         <th className="px-3 py-2">الدولة</th>
                         <th className="px-3 py-2">الإنتاج</th>
@@ -286,7 +286,7 @@ export default function M1Page() {
               </h3>
               <div className="space-y-2 rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
                 <div className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 text-xs">
-                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-sky-900" />
+                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-[#082721]" />
                   <div>
                     <div className="font-bold">المملكة المغربية</div>
                     <div className="text-[11px] text-slate-500">
@@ -294,7 +294,7 @@ export default function M1Page() {
                     </div>
                     <button
                       type="button"
-                      className="mt-1 text-[11px] font-bold text-sky-800 underline"
+                      className="mt-1 text-[11px] font-bold text-[#082721] underline"
                     >
                       رابط المصدر
                     </button>
@@ -310,7 +310,7 @@ export default function M1Page() {
                     </div>
                     <button
                       type="button"
-                      className="mt-1 text-[11px] font-bold text-sky-800 underline"
+                      className="mt-1 text-[11px] font-bold text-[#082721] underline"
                     >
                       رابط المصدر
                     </button>

@@ -18,7 +18,7 @@ const About = () => {
 
       {/* Hero */}
       <header
-        className="bg-gradient-to-r from-[#005A8D] to-[#005A8D] text-white pt-16 pb-24 -mb-12 text-center"
+        className="bg-gradient-to-r from-[#082721] to-[#051712] text-white pt-16 pb-24 -mb-12 text-center"
         style={{
           clipPath: "polygon(0 0, 100% 0, 100% 85%, 0% 100%)",
         }}
@@ -54,22 +54,22 @@ const About = () => {
           </h2>
           <ul className="mt-2 space-y-2 text-sm sm:text-base text-slate-700">
             <li className="flex items-start gap-2">
-              <i className="mt-1 fa-solid fa-circle-check text-[#005A8D]" />
+              <i className="mt-1 fa-solid fa-circle-check text-[#082721]" />
               <span>تجميع وتوحيد بيانات الإنتاج التعديني العربي في قاعدة موحّدة.</span>
             </li>
             <li className="flex items-start gap-2">
-              <i className="mt-1 fa-solid fa-circle-check text-[#005A8D]" />
+              <i className="mt-1 fa-solid fa-circle-check text-[#082721]" />
               <span>
                 تمكين صُنّاع القرار والهيئات الإحصائية من متابعة التطورات والاتجاهات
                 الرئيسة في القطاع.
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <i className="mt-1 fa-solid fa-circle-check text-[#005A8D]" />
+              <i className="mt-1 fa-solid fa-circle-check text-[#082721]" />
               <span>تسهيل إعداد التقارير والدراسات والبحوث الأكاديمية المتخصصة.</span>
             </li>
             <li className="flex items-start gap-2">
-              <i className="mt-1 fa-solid fa-circle-check text-[#005A8D]" />
+              <i className="mt-1 fa-solid fa-circle-check text-[#082721]" />
               <span>
                 دعم مبادرات التكامل والتعاون العربي في مجال الثروات المعدنية والاستثمارات
                 المشتركة.
@@ -97,8 +97,8 @@ const About = () => {
         </section>
 
         {/* ملاحظات حول النسخة V1 */}
-        <section className="rounded-3xl bg-[#005A8D]/5 p-6 sm:p-7 shadow-inner ring-1 ring-[#005A8D]/20">
-          <h2 className="text-xl sm:text-2xl font-extrabold text-[#005A8D] mb-2">
+        <section className="rounded-3xl bg-[#082721]/5 p-6 sm:p-7 shadow-inner ring-1 ring-[#082721]/20">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-[#082721] mb-2">
             عن النسخة الأولية (V1 Prototype)
           </h2>
           <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
@@ -156,7 +156,7 @@ const About = () => {
         </section>
 
         {/* نظرة مستقبلية */}
-        <section className="rounded-3xl bg-gradient-to-r from-[#005A8D] to-[#004366] p-6 sm:p-7 text-white shadow-xl shadow-slate-900/30 ring-1 ring-[#00324D]">
+        <section className="rounded-3xl bg-gradient-to-r from-[#082721] to-[#051712] p-6 sm:p-7 text-white shadow-xl shadow-slate-900/30 ring-1 ring-[#ddbc6b]/30">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="sm:max-w-md">
               <h2 className="text-xl sm:text-2xl font-extrabold mb-2">

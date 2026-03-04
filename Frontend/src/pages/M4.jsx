@@ -125,7 +125,7 @@ export default function M4Page() {
             data: [arab, world],
             borderWidth: 0,
             cutout: "68%",
-            backgroundColor: ["rgba(37, 99, 235, .9)", "rgba(148, 163, 184, .8)"],
+            backgroundColor: ["rgba(8, 39, 33, .92)", "rgba(221, 188, 107, .85)"],
           },
         ],
       },
@@ -164,7 +164,7 @@ export default function M4Page() {
       <main className="min-h-screen py-6 sm:py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <header className="mb-6 rounded-3xl bg-gradient-to-l from-sky-900 to-sky-600 px-6 py-8 text-center text-white shadow-lg">
+        <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
           <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
             نسبة الإنتاج التعديني العربي من الإنتاج العالمي
           </h1>
@@ -181,7 +181,7 @@ export default function M4Page() {
                 <div className="text-base font-extrabold text-slate-800">
                   المقارنة: الإنتاج العربي مقابل العالمي
                 </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-bold text-sky-900">
+                <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
                   <i className="fa-solid fa-weight-hanging" />
                   وحدة: ألف طن
                 </span>
@@ -207,7 +207,7 @@ export default function M4Page() {
                   الخامة / المنتج
                 </div>
                 <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-cubes-stacked text-sky-900" />
+                  <i className="fa-solid fa-cubes-stacked text-[#082721]" />
                   <select
                     value={product}
                     onChange={(e) => {
@@ -233,8 +233,8 @@ export default function M4Page() {
                     onClick={() => setActiveYear(y)}
                     className={`min-w-[56px] rounded-2xl border px-3 py-1 text-xs font-extrabold transition ${
                       y === activeYear
-                        ? "border-sky-900 bg-sky-900 text-white"
-                        : "border-transparent bg-white text-sky-900 hover:border-slate-200 hover:bg-slate-50"
+                        ? "border-[#082721] bg-[#082721] text-white"
+                        : "border-transparent bg-white text-[#082721] hover:border-slate-200 hover:bg-slate-50"
                     }`}
                   >
                     {y}
@@ -248,7 +248,7 @@ export default function M4Page() {
 
               <div className="max-h-[330px] overflow-y-auto rounded-2xl border border-slate-100 bg-white">
                 <table className="min-w-full text-xs">
-                  <thead className="sticky top-0 bg-slate-50 text-[11px] font-extrabold text-sky-900">
+                  <thead className="sticky top-0 bg-slate-50 text-[11px] font-extrabold text-[#082721]">
                     <tr>
                       <th className="px-3 py-2">الدولة</th>
                       <th className="px-3 py-2">Somme de الإنتاج</th>

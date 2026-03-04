@@ -63,8 +63,8 @@ export default function M2Page() {
             pointRadius: 4,
             pointHoverRadius: 6,
             fill: false,
-            borderColor: "rgba(37, 99, 235, 0.95)",
-            pointBackgroundColor: "rgba(37, 99, 235, 0.95)",
+            borderColor: "rgba(8, 39, 33, 0.95)",
+            pointBackgroundColor: "rgba(8, 39, 33, 0.95)",
             pointBorderColor: "#fff",
           },
         ],
@@ -100,7 +100,7 @@ export default function M2Page() {
       <main className="min-h-screen py-6 sm:py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <header className="mb-6 rounded-3xl bg-gradient-to-l from-sky-900 to-sky-600 px-6 py-8 text-center text-white shadow-lg">
+        <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
           <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
             تطور الانتاج التعديني
           </h1>
@@ -117,7 +117,7 @@ export default function M2Page() {
                 الدولة
               </div>
               <div className="flex items-center gap-2">
-                <i className="fa-solid fa-flag text-sky-900" />
+                <i className="fa-solid fa-flag text-[#082721]" />
                 <select
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
@@ -137,7 +137,7 @@ export default function M2Page() {
                 الخامة / المنتج
               </div>
               <div className="flex items-center gap-2">
-                <i className="fa-solid fa-cubes-stacked text-sky-900" />
+                <i className="fa-solid fa-cubes-stacked text-[#082721]" />
                 <select
                   value={product}
                   onChange={(e) => setProduct(e.target.value)}
@@ -167,7 +167,7 @@ export default function M2Page() {
                 <div className="text-base font-extrabold text-slate-800">
                   منحنى التطور عبر الزمن
                 </div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-bold text-sky-900">
+                <div className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
                   <i className="fa-solid fa-chart-line" />
                   <span>وحدة الإنتاج: {unitLabel}</span>
                 </div>
@@ -187,7 +187,7 @@ export default function M2Page() {
               </div>
               <div className="max-h-[260px] overflow-y-auto rounded-2xl border border-slate-100 bg-white">
                 <table className="min-w-full text-xs">
-                  <thead className="sticky top-0 bg-slate-50 text-[11px] font-extrabold text-sky-900">
+                  <thead className="sticky top-0 bg-slate-50 text-[11px] font-extrabold text-[#082721]">
                     <tr>
                       <th className="px-3 py-2">الإنتاج</th>
                       <th className="px-3 py-2">السنة</th>
@@ -216,7 +216,7 @@ export default function M2Page() {
               </div>
               <div className="space-y-2 rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
                 <div className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 text-xs">
-                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-sky-900" />
+                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-[#082721]" />
                   <div>
                     <div className="font-bold">وزارة الصناعة</div>
                     <div className="text-[11px] text-slate-500">
@@ -224,7 +224,7 @@ export default function M2Page() {
                     </div>
                     <button
                       type="button"
-                      className="mt-1 text-[11px] font-bold text-sky-800 underline"
+                      className="mt-1 text-[11px] font-bold text-[#082721] underline"
                     >
                       رابط المصدر
                     </button>
@@ -240,7 +240,7 @@ export default function M2Page() {
                     </div>
                     <button
                       type="button"
-                      className="mt-1 text-[11px] font-bold text-sky-800 underline"
+                      className="mt-1 text-[11px] font-bold text-[#082721] underline"
                     >
                       رابط المصدر
                     </button>
