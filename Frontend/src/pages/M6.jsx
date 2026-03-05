@@ -153,10 +153,12 @@ function buildSeriesFromCsv(csvText) {
   }
 
   const seriesByKey = {};
+  const timeSeriesByKey = {};
   const allYearsSet = new Set();
 
   Object.keys(commodityConfig).forEach((key) => {
     seriesByKey[key] = {};
+    timeSeriesByKey[key] = { arab: {}, world: {} };
   });
 
   for (let i = 1; i < lines.length; i += 1) {
@@ -201,6 +203,7 @@ function buildSeriesFromCsv(csvText) {
 
     if (!commodityKey) continue;
 
+    const country = cols[countryIdx];
     allYearsSet.add(yearNumber);
 
     if (!seriesByKey[commodityKey][yearNumber]) {
@@ -208,6 +211,20 @@ function buildSeriesFromCsv(csvText) {
     }
 
     seriesByKey[commodityKey][yearNumber] += tonnes / 1000;
+
+    // Track time series (world total)
+    if (!timeSeriesByKey[commodityKey].world[yearNumber]) {
+      timeSeriesByKey[commodityKey].world[yearNumber] = 0;
+    }
+    timeSeriesByKey[commodityKey].world[yearNumber] += tonnes / 1000;
+
+    // Track time series (arab subset)
+    if (arabCountries.has(country)) {
+      if (!timeSeriesByKey[commodityKey].arab[yearNumber]) {
+        timeSeriesByKey[commodityKey].arab[yearNumber] = 0;
+      }
+      timeSeriesByKey[commodityKey].arab[yearNumber] += tonnes / 1000;
+    }
   }
 
   if (!allYearsSet.size) return null;
@@ -215,6 +232,7 @@ function buildSeriesFromCsv(csvText) {
   const years = Array.from(allYearsSet).sort((a, b) => a - b);
 
   const seriesMap = {};
+  const timeSeriesMap = {};
   Object.keys(commodityConfig).forEach((key) => {
     const yearToValue = seriesByKey[key];
     const values = years.map((y) => {
@@ -226,9 +244,18 @@ function buildSeriesFromCsv(csvText) {
       name: commodityConfig[key].label,
       values,
     };
+
+    // Build time series for each commodity
+    const timeSeries = [];
+    years.forEach((y) => {
+      const arab = Number((timeSeriesByKey[key].arab[y] || 0).toFixed(2));
+      const world = Number((timeSeriesByKey[key].world[y] || 0).toFixed(2));
+      timeSeries.push({ year: y, arab, world });
+    });
+    timeSeriesMap[key] = timeSeries;
   });
 
-  return { years, seriesMap };
+  return { years, seriesMap, timeSeriesMap };
 }
 
 function buildImportCountryDataFromCsv(csvText) {
@@ -357,6 +384,20 @@ function unitLabelFor(unit) {
   return "ألف طن";
 }
 
+function scaleValueByUnit(valueInKton, unit) {
+  if (valueInKton == null) return 0;
+  if (unit === "kg") {
+    // ألف طن -> كجم
+    return valueInKton * 1_000_000;
+  }
+  if (unit === "ton") {
+    // ألف طن -> طن
+    return valueInKton * 1_000;
+  }
+  // القيمة الأصلية: ألف طن
+  return valueInKton;
+}
+
 function scaleValuesByUnit(valuesInKton, unit) {
   if (unit === "kg") {
     // ألف طن -> كجم
@@ -381,6 +422,7 @@ export default function M6Page() {
 
   const years = dynamicData?.years || fallbackYears;
   const seriesMap = dynamicData?.seriesMap || fallbackSeriesMap;
+  const timeSeriesMap = dynamicData?.timeSeriesMap || {};
 
   useEffect(() => {
     const csvUrl = new URL(
