@@ -6,6 +6,10 @@ import M1Page from "./pages/m1";
 import M2Page from "./pages/M2";
 import M3Page from "./pages/M3";
 import M4Page from "./pages/M4";
+import M5Page from "./pages/M5";
+import M6Page from "./pages/M6";
+import M7Page from "./pages/M7";
+import M8Page from "./pages/M8";
 
 export default function App() {
   return (
@@ -18,6 +22,10 @@ export default function App() {
         <Route path="/m2" element={<M2Page />} />
         <Route path="/m3" element={<M3Page />} />
         <Route path="/m4" element={<M4Page />} />
+        <Route path="/m5" element={<M5Page />} />
+        <Route path="/m6" element={<M6Page />} />
+        <Route path="/m7" element={<M7Page />} />
+        <Route path="/m8" element={<M8Page />} />
 
 
       </Routes>

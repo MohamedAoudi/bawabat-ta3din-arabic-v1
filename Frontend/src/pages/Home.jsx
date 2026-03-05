@@ -232,17 +232,17 @@ const Home = () => {
 
       <main className="relative -mt-16 mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 pb-16">
         {/* Search */}
-        <section className="reveal d2 mx-auto max-w-3xl mb-[220px]">
-          <div className="flex items-center gap-3 rounded-full bg-white px-5 py-3 shadow-xl shadow-slate-900/10">
-            <i className="fas fa-search text-slate-400" />
+        <section className="reveal d2 mx-auto max-w-3xl mb-[250px]">
+          <div className="flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-lg shadow-slate-900/10">
+            <i className="fas fa-search text-slate-400 text-sm sm:text-base" />
             <input
               type="text"
               placeholder="ابحث عن معدن، دولة، أو إحصائية محددة..."
-              className="w-full border-none bg-transparent text-base outline-none placeholder:text-slate-400"
+              className="w-full border-none bg-transparent text-sm sm:text-base outline-none placeholder:text-slate-400"
             />
             <button
               type="button"
-              className="rounded-full bg-[#082721] px-7 py-2 text-sm sm:text-lg font-semibold text-white transition-all duration-200 hover:bg-[#061b17] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]"
+              className="rounded-full bg-[#082721] px-7 py-2 text-sm sm:text-lg font-semibold text-white whitespace-nowrap transition-all duration-200 hover:bg-[#061b17] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]"
             >
               بحث ذكي
             </button>

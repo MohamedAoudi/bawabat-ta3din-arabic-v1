@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import logoAmip from "../assets/LOGO_ARAB MINING grand.svg";
+import logoAmip from "../assets/logo n v.png";
 import logoAidsmo from "../assets/aidsmo logo sans bg 800x 800.png";
 
 const Menu = () => {
@@ -48,7 +48,7 @@ const Menu = () => {
             <img
               src={logoAmip}
               alt="AMIP - بوابة المؤشرات التعدينية العربية"
-              className="h-18 w-auto bg-white rounded-full px-6"
+              className="h-20 w-auto bg-white rounded-full px-8 py-1"
             />
           </a>
 
@@ -67,25 +67,29 @@ const Menu = () => {
               <li className="relative group">
                 <button
                   type="button"
+                  dir="ltr"
                   className="inline-flex items-center gap-1 rounded-full px-4 py-2 text-white/90 hover:text-white hover:bg-white/10 text-lg font-semibold"
                 >
-                  <span>المؤشرات التعدينية</span>
                   <i className="fa-solid fa-chevron-down text-[10px]" />
+                  <span dir="rtl">المؤشرات التعدينية</span>
                 </button>
                 <div className="absolute top-full  end-0 w-[320px] rounded-2xl bg-white py-3 text-right text-sm text-slate-800 shadow-xl ring-1 ring-slate-200 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-150 z-50">
                   <div className="px-2 space-y-2">
                     {/* الانتاج التعديني */}
-                    <details className="group mx-1 rounded-2xl bg-slate-50/80 p-2">
-                      <summary className="flex cursor-pointer items-center justify-between">
-                        <span className="text-[13px] font-extrabold text-slate-900">
+                    <div className="relative mx-1 rounded-2xl bg-slate-50/80 p-2 group/production">
+                      <button
+                        type="button"
+                        dir="ltr"
+                        className="flex w-full cursor-pointer items-center justify-between"
+                      >
+                        <span className="flex items-center gap-1 text-[10px] text-slate-500">
+                          <i className="fa-solid fa-chevron-left text-[8px]" />
+                        </span>
+                        <span dir="rtl" className="text-[13px] font-extrabold text-slate-900">
                           الانتاج التعديني
                         </span>
-                        <span className="flex items-center gap-1 text-[10px] text-slate-500">
-                          لوحات فرعية
-                          <i className="fa-solid fa-chevron-down text-[8px]" />
-                        </span>
-                      </summary>
-                      <div className="mt-2 space-y-1 text-[13px]">
+                      </button>
+                      <div className="absolute top-0 start-full w-[260px] rounded-2xl bg-white py-2 text-[13px] shadow-xl ring-1 ring-slate-200 opacity-0 pointer-events-none group-hover/production:opacity-100 group-hover/production:pointer-events-auto">
                         <a
                           href="/m1"
                           className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
@@ -111,63 +115,67 @@ const Menu = () => {
                           نسبة الإنتاج التعديني العربي من الإنتاج العالمي
                         </a>
                       </div>
-                    </details>
+                    </div>
 
                     {/* التبادلات التجارية الخارجية */}
-                    <details className="group mx-1 rounded-2xl bg-slate-50/60 p-2">
-                      <summary className="flex cursor-pointer items-center justify-between">
-                        <span className="text-[13px] font-extrabold text-slate-900">
+                    <div className="relative mx-1 rounded-2xl bg-slate-50/60 p-2 group/trade">
+                      <button
+                        type="button"
+                        dir="ltr"
+                        className="flex w-full cursor-pointer items-center justify-between"
+                      >
+                        <span className="flex items-center gap-1 text-[10px] text-slate-500">
+                          <i className="fa-solid fa-chevron-left text-[8px]" />
+                        </span>
+                        <span dir="rtl" className="text-[13px] font-extrabold text-slate-900">
                           التبادلات التجارية الخارجية
                         </span>
-                        <span className="flex items-center gap-1 text-[10px] text-slate-500">
-                          (نماذج قيد التطوير)
-                          <i className="fa-solid fa-chevron-down text-[8px]" />
-                        </span>
-                      </summary>
-                      <div className="mt-2 space-y-1 text-[13px]">
+                      </button>
+                      <div className="absolute top-0 start-full w-[260px] rounded-2xl bg-white py-2 text-[13px] shadow-xl ring-1 ring-slate-200 opacity-0 pointer-events-none group-hover/trade:opacity-100 group-hover/trade:pointer-events-auto">
                         <a
-                          href="#"
+                          href="/m5"
                           className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
                         >
                           الصادرات التعدينية
                         </a>
                         <a
-                          href="#"
+                          href="/m6"
                           className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
                         >
                           الواردات التعدينية
                         </a>
-                       
                       </div>
-                    </details>
+                    </div>
 
                     {/* الاحتياطي */}
-                    <details className="group mx-1 rounded-2xl bg-slate-50/60 p-2">
-                      <summary className="flex cursor-pointer items-center justify-between">
-                        <span className="text-[13px] font-extrabold text-slate-900">
+                    <div className="relative mx-1 rounded-2xl bg-slate-50/60 p-2 group/reserve">
+                      <button
+                        type="button"
+                        dir="ltr"
+                        className="flex w-full cursor-pointer items-center justify-between"
+                      >
+                        <span className="flex items-center gap-1 text-[10px] text-slate-500">
+                          <i className="fa-solid fa-chevron-left text-[8px]" />
+                        </span>
+                        <span dir="rtl" className="text-[13px] font-extrabold text-slate-900">
                           الاحتياطي
                         </span>
-                        <span className="flex items-center gap-1 text-[10px] text-slate-500">
-                          (قيد الإعداد)
-                          <i className="fa-solid fa-chevron-down text-[8px]" />
-                        </span>
-                      </summary>
-                      <div className="mt-2 space-y-1 text-[13px]">
+                      </button>
+                      <div className="absolute top-0 start-full w-[260px] rounded-2xl bg-white py-2 text-[13px] shadow-xl ring-1 ring-slate-200 opacity-0 pointer-events-none group-hover/reserve:opacity-100 group-hover/reserve:pointer-events-auto">
                         <a
-                          href="#"
+                          href="/m7"
                           className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
                         >
                           احتياطي الخام حسب الدولة
                         </a>
                         <a
-                          href="#"
+                          href="/m8"
                           className="block rounded-xl px-3 py-1.5 font-semibold hover:bg-[#082721]/5 hover:text-[#082721]"
                         >
                           الاحتياطي المؤكد / المحتمل
                         </a>
-                        
                       </div>
-                    </details>
+                    </div>
                   </div>
                 </div>
               </li>
