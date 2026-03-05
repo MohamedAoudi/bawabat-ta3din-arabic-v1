@@ -52,6 +52,56 @@ const commodityConfig = {
   aluminum: { csvName: "aluminium", label: "الألمنيوم" },
 };
 
+const countryNameAr = {
+  Algeria: "الجزائر",
+  Bahrain: "البحرين",
+  Comoros: "جزر القمر",
+  Djibouti: "جيبوتي",
+  Egypt: "مصر",
+  Iraq: "العراق",
+  Jordan: "الأردن",
+  Kuwait: "الكويت",
+  Lebanon: "لبنان",
+  Libya: "ليبيا",
+  Mauritania: "موريتانيا",
+  Morocco: "المغرب",
+  Oman: "عُمان",
+  Palestine: "فلسطين",
+  Qatar: "قطر",
+  "Saudi Arabia": "السعودية",
+  Somalia: "الصومال",
+  Sudan: "السودان",
+  Syria: "سوريا",
+  Tunisia: "تونس",
+  "United Arab Emirates": "الإمارات",
+  Yemen: "اليمن",
+};
+
+const arabCountries = new Set([
+  "Algeria",
+  "Bahrain",
+  "Comoros",
+  "Djibouti",
+  "Egypt",
+  "Iraq",
+  "Jordan",
+  "Kuwait",
+  "Lebanon",
+  "Libya",
+  "Mauritania",
+  "Morocco",
+  "Oman",
+  "Palestine",
+  "Qatar",
+  "Saudi Arabia",
+  "Somalia",
+  "Sudan",
+  "Syria",
+  "Tunisia",
+  "United Arab Emirates",
+  "Yemen",
+]);
+
 function parseCsvLine(line) {
   const result = [];
   let current = "";
@@ -181,6 +231,116 @@ function buildSeriesFromCsv(csvText) {
   return { years, seriesMap };
 }
 
+function buildImportCountryDataFromCsv(csvText) {
+  const lines = csvText.split(/\r?\n/);
+  if (lines.length < 2) return null;
+
+  const header = parseCsvLine(lines[0]);
+  const yearIdx = header.indexOf("year");
+  const qtyIdx = header.indexOf("quantity");
+  const unitsIdx = header.indexOf("units");
+  const typeIdx = header.indexOf("bgs_statistic_type_trans");
+  const commodityIdx = header.indexOf("bgs_commodity_trans");
+  const countryIdx = header.indexOf("country_trans");
+
+  if (
+    yearIdx === -1 ||
+    qtyIdx === -1 ||
+    unitsIdx === -1 ||
+    typeIdx === -1 ||
+    commodityIdx === -1 ||
+    countryIdx === -1
+  ) {
+    return null;
+  }
+
+  const byProductYearCountry = {};
+
+  Object.keys(commodityConfig).forEach((key) => {
+    byProductYearCountry[key] = {};
+  });
+
+  for (let i = 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+
+    const cols = parseCsvLine(line);
+    if (cols.length !== header.length) continue;
+
+    const statType = cols[typeIdx];
+    if (statType !== "Imports") continue;
+
+    const commodity = cols[commodityIdx].toLowerCase();
+    const yearValue = cols[yearIdx];
+    let yearNumber;
+
+    if (yearValue.includes("/")) {
+      const d = new Date(yearValue);
+      yearNumber = Number.isNaN(d.getTime()) ? null : d.getFullYear();
+    } else {
+      const parsed = parseInt(yearValue, 10);
+      yearNumber = Number.isNaN(parsed) ? null : parsed;
+    }
+
+    if (!yearNumber) continue;
+
+    const quantityRaw = cols[qtyIdx];
+    if (!quantityRaw) continue;
+    const quantity = parseFloat(quantityRaw);
+    if (Number.isNaN(quantity)) continue;
+
+    const units = cols[unitsIdx].toLowerCase();
+    let tonnes = quantity;
+    if (units.includes("kilograms")) {
+      tonnes = quantity / 1000;
+    }
+
+    const productKey = Object.keys(commodityConfig).find((key) => {
+      const csvName = commodityConfig[key].csvName.toLowerCase();
+      return commodity === csvName;
+    });
+
+    if (!productKey) continue;
+
+    const country = cols[countryIdx];
+    if (!arabCountries.has(country)) continue;
+
+    const store = byProductYearCountry[productKey];
+
+    if (!store[yearNumber]) {
+      store[yearNumber] = {};
+    }
+    if (!store[yearNumber][country]) {
+      store[yearNumber][country] = 0;
+    }
+    store[yearNumber][country] += tonnes / 1000;
+  }
+
+  const products = {};
+
+  Object.keys(byProductYearCountry).forEach((key) => {
+    const byYear = byProductYearCountry[key];
+    const yearSet = new Set(Object.keys(byYear).map(Number));
+    if (!yearSet.size) return;
+
+    const years = Array.from(yearSet).sort((a, b) => a - b);
+    const donutByYear = {};
+
+    years.forEach((y) => {
+      const countries = byYear[y] || {};
+      const rows = Object.entries(countries)
+        .map(([c, v]) => ({ c, v: Number(v.toFixed(2)) }))
+        .sort((a, b) => b.v - a.v);
+
+      donutByYear[y] = { table: rows };
+    });
+
+    products[key] = { years, donutByYear };
+  });
+
+  return { products };
+}
+
 const mineralOptions = [
   { value: "gold", label: "الذهب" },
   { value: "silver", label: "الفضة" },
@@ -197,10 +357,27 @@ function unitLabelFor(unit) {
   return "ألف طن";
 }
 
+function scaleValuesByUnit(valuesInKton, unit) {
+  if (unit === "kg") {
+    // ألف طن -> كجم
+    return valuesInKton.map((v) => v * 1_000_000);
+  }
+  if (unit === "ton") {
+    // ألف طن -> طن
+    return valuesInKton.map((v) => v * 1_000);
+  }
+  // القيمة الأصلية: ألف طن
+  return valuesInKton;
+}
+
 export default function M6Page() {
   const [unit, setUnit] = useState("kg");
   const [selected, setSelected] = useState(["gold", "silver"]);
   const [dynamicData, setDynamicData] = useState(null);
+  const [importCountryData, setImportCountryData] = useState(null);
+  const [countryProduct, setCountryProduct] = useState("gold");
+  const [countryYear, setCountryYear] = useState(null);
+  const [selectedCountry, setSelectedCountry] = useState("");
 
   const years = dynamicData?.years || fallbackYears;
   const seriesMap = dynamicData?.seriesMap || fallbackSeriesMap;
@@ -218,6 +395,10 @@ export default function M6Page() {
         if (built) {
           setDynamicData(built);
         }
+        const countryBuilt = buildImportCountryDataFromCsv(text);
+        if (countryBuilt) {
+          setImportCountryData(countryBuilt);
+        }
       })
       .catch(() => {
         // ignore, fallback data will be used
@@ -229,8 +410,42 @@ export default function M6Page() {
     return keys.length ? keys : ["gold"];
   }, [selected, seriesMap]);
 
+  const countryProductData =
+    importCountryData?.products?.[countryProduct] || null;
+
+  const countryYears = countryProductData?.years || [];
+  const countryDonutByYear = countryProductData?.donutByYear || {};
+
+  useEffect(() => {
+    if (!countryYears.length) return;
+    setCountryYear((prev) =>
+      prev && countryYears.includes(prev)
+        ? prev
+        : countryYears[countryYears.length - 1]
+    );
+  }, [countryYears]);
+
+  const countryPack = useMemo(() => {
+    if (!countryYear || !countryDonutByYear[countryYear]) {
+      return null;
+    }
+    return countryDonutByYear[countryYear];
+  }, [countryYear, countryDonutByYear]);
+
+  const availableCountries = useMemo(() => {
+    if (!countryPack?.table) return [];
+    return countryPack.table.map((r) => r.c);
+  }, [countryPack]);
+
+  const effectiveCountry =
+    selectedCountry && availableCountries.includes(selectedCountry)
+      ? selectedCountry
+      : availableCountries[0] || "";
+
   const canvasRef = useRef(null);
   const chartRef = useRef(null);
+  const donutCanvasRef = useRef(null);
+  const donutChartRef = useRef(null);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -253,7 +468,7 @@ export default function M6Page() {
 
     const datasets = selectedKeys.map((k, idx) => ({
       label: seriesMap[k].name,
-      data: seriesMap[k].values,
+      data: scaleValuesByUnit(seriesMap[k].values, unit),
       borderWidth: 0,
       borderRadius: 8,
       backgroundColor: palette[idx % palette.length],
@@ -272,7 +487,10 @@ export default function M6Page() {
           },
           tooltip: {
             callbacks: {
-              label: (c) => ` ${c.dataset.label}: ${c.parsed.y}K`,
+              label: (c) =>
+                ` ${c.dataset.label}: ${c.parsed.y.toLocaleString()} ${unitLabelFor(
+                  unit
+                )}`,
             },
           },
         },
@@ -286,7 +504,8 @@ export default function M6Page() {
             grid: { color: "rgba(0,0,0,.10)" },
             ticks: {
               font: { family: "Cairo" },
-              callback: (v) => (v === 0 ? "0" : `${v}K`),
+              callback: (v) =>
+                v === 0 ? "0" : v.toLocaleString("ar-EG", { maximumFractionDigits: 0 }),
             },
           },
         },
@@ -300,6 +519,86 @@ export default function M6Page() {
       }
     };
   }, [selectedKeys, unit]);
+
+  useEffect(() => {
+    const ctx = donutCanvasRef.current?.getContext("2d");
+    if (!ctx || !countryPack) return;
+
+    if (donutChartRef.current) {
+      donutChartRef.current.destroy();
+      donutChartRef.current = null;
+    }
+
+    const rows = countryPack.table || [];
+    if (!rows.length || !effectiveCountry) return;
+
+    const countryRow = rows.find((r) => r.c === effectiveCountry);
+    const countryInKton = countryRow ? countryRow.v : 0;
+
+    const totalArabInKton = rows.reduce((sum, r) => sum + r.v, 0);
+    const othersInKton = Math.max(totalArabInKton - countryInKton, 0);
+
+    const scaledCountry = scaleValuesByUnit([countryInKton], unit)[0];
+    const scaledOthers = scaleValuesByUnit([othersInKton], unit)[0];
+
+    const total = countryInKton + othersInKton;
+
+    donutChartRef.current = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: [
+          countryNameAr[effectiveCountry] || effectiveCountry,
+          "باقي الدول العربية",
+        ],
+        datasets: [
+          {
+            data: [scaledCountry, scaledOthers],
+            borderWidth: 0,
+            cutout: "68%",
+            backgroundColor: [
+              "rgba(8, 39, 33, .92)",
+              "rgba(16, 185, 129, .85)",
+              "rgba(245, 158, 11, .85)",
+              "rgba(168, 85, 247, .85)",
+              "rgba(239, 68, 68, .85)",
+              "rgba(20, 184, 166, .85)",
+              "rgba(8, 39, 33, .55)",
+            ],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "top",
+            labels: { font: { family: "Cairo", weight: "700" } },
+          },
+          tooltip: {
+            callbacks: {
+              label: (c) => {
+                const v = c.parsed;
+                const baseVal =
+                  c.dataIndex === 0 ? countryInKton : othersInKton;
+                const pct = total ? Math.round((baseVal / total) * 100) : 0;
+                return ` ${c.label}: ${v.toLocaleString()} ${unitLabelFor(
+                  unit
+                )} (${pct}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return () => {
+      if (donutChartRef.current) {
+        donutChartRef.current.destroy();
+        donutChartRef.current = null;
+      }
+    };
+  }, [countryPack, unit, effectiveCountry]);
 
   const onMultiChange = (e) => {
     const values = Array.from(e.target.selectedOptions).map((o) => o.value);
@@ -318,10 +617,11 @@ export default function M6Page() {
         {/* Header */}
         <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
           <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
-          الواردات التعدينية          </h1>
+            الواردات التعدينية
+          </h1>
           <p className="text-sm text-slate-100/80">
-            مقارنة زمنية (أعمدة) مع اختيار عدة خامات/منتجات + وحدة الإنتاج + مصادر
-            (Prototype)
+            مقارنة زمنية لواردات الخامات والمنتجات التعدينية، مع إمكانية اختيار عدة
+            عناصر ووحدة قياس مختلفة لكل السلسلة الزمنية.
           </p>
         </header>
 
@@ -331,7 +631,7 @@ export default function M6Page() {
             <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <div className="text-base font-extrabold text-slate-800">
-                  الإنتاج عبر السنوات (مقارنة العناصر المختارة)
+                  الواردات عبر السنوات (حسب العناصر المختارة)
                 </div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
                   <i className="fa-solid fa-scale-balanced" />
@@ -415,7 +715,129 @@ export default function M6Page() {
               </div>
             </div>
 
+            
+          </div>
+        </section>
+
+        {/* Country distribution donut (similar to M5) */}
+        <section className="mt-10 grid gap-4 lg:grid-cols-12">
+          <div className="lg:col-span-8">
             <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <div className="text-base font-extrabold text-slate-800">
+                  توزيع الواردات حسب الدولة العربية
+                </div>
+                <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
+                  <i className="fa-solid fa-weight-hanging" />
+                  وحدة:{" "}
+                  <span className="font-extrabold">{unitLabelFor(unit)}</span>
+                </span>
+              </div>
+
+              <div className="flex h-[320px] items-center justify-center sm:h-[420px]">
+                <div className="h-full w-full max-w-[520px]">
+                  <canvas ref={donutCanvasRef} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-4">
+            <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
+              <div className="mb-3 text-sm font-extrabold text-slate-800">
+                مقارنة دولة عربية مختارة مع باقي الدول العربية
+              </div>
+
+              <div className="mb-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
+                <div className="mb-2 text-xs font-extrabold text-slate-500">
+                  الخامة / المنتج
+                </div>
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-cubes-stacked text-[#082721]" />
+                  <select
+                    value={countryProduct}
+                    onChange={(e) => setCountryProduct(e.target.value)}
+                    className="w-full border-none bg-transparent text-sm font-bold text-slate-700 outline-none focus:ring-0"
+                  >
+                    {mineralOptions.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mb-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
+                <div className="mb-2 text-xs font-extrabold text-slate-500">
+                  الدولة
+                </div>
+                <select
+                  value={effectiveCountry}
+                  onChange={(e) => setSelectedCountry(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 outline-none"
+                >
+                  {availableCountries.map((c) => (
+                    <option key={c} value={c}>
+                      {countryNameAr[c] || c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mb-3 flex gap-2 overflow-x-auto rounded-2xl border border-slate-100 bg-slate-50 px-2 py-2 shadow-sm">
+                {countryYears.map((y) => (
+                  <button
+                    key={y}
+                    type="button"
+                    onClick={() => setCountryYear(y)}
+                    className={`min-w-[56px] rounded-2xl border px-3 py-1 text-xs font-extrabold transition ${
+                      y === countryYear
+                        ? "border-[#082721] bg-[#082721] text-white"
+                        : "border-transparent bg-white text-[#082721] hover:border-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    {y}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mb-2 text-sm font-extrabold text-slate-800">
+                مجموع الواردات حسب الدولة
+              </div>
+
+              <div className="max-h-[260px] overflow-y-auto rounded-2xl border border-slate-100 bg-white">
+                <table className="min-w-full text-xs">
+                  <thead className="sticky top-0 bg-slate-50 text-[11px] font-extrabold text-[#082721]">
+                    <tr>
+                      <th className="px-3 py-2">الدولة</th>
+                      <th className="px-3 py-2">
+                        مجموع الواردات ({unitLabelFor(unit)})
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {countryPack?.table?.map((r) => (
+                      <tr
+                        key={r.c}
+                        className="border-t border-slate-100 text-slate-700"
+                      >
+                        <td className="px-3 py-1.5 font-bold">
+                          {countryNameAr[r.c] || r.c}
+                        </td>
+                        <td className="px-3 py-1.5">
+                          {scaleValuesByUnit([r.v], unit)[0].toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+        </div>
+        <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
               <div className="mb-2 text-sm font-extrabold text-slate-800">
                 المصادر
               </div>
@@ -471,12 +893,8 @@ export default function M6Page() {
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-        </div>
       </main>
       <Footer />
     </div>
   );
 }
-

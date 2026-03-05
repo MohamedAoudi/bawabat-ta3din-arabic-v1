@@ -1,0 +1,1629 @@
+year,quantity,units,bgs_statistic_type_trans,bgs_commodity_trans,country_trans
+1/1/1971,40037,tonnes (metric),Exports,coal,Morocco
+1/1/1971,528895,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1971,15202,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1971,457029,tonnes (metric),Exports,iron ore,Morocco
+1/1/1971,11867653,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1971,30775,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1971,19456,tonnes (metric),Exports,zinc,Morocco
+1/1/1971,38604,tonnes (metric),Exports,salt,Egypt
+1/1/1971,83,tonnes (metric),Exports,sulphur and pyrites,Morocco
+1/1/1971,30863,tonnes (metric),Exports,barytes,Morocco
+1/1/1971,3814,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1971,16071,tonnes (metric),Exports,lead,Morocco
+1/1/1971,91788,tonnes (metric),Exports,manganese,Morocco
+1/1/1971,15333,kilograms,Exports,silver,Morocco
+1/1/1971,4750,tonnes (metric),Exports,cobalt,Morocco
+1/1/1971,12323,tonnes (metric),Exports,copper,Morocco
+1/1/1971,30863,tonnes (metric),Exports,barytes,Morocco
+1/1/1971,1043,tonnes (metric),Exports,copper,Morocco
+1/1/1971,1018,tonnes (metric),Exports,salt,Jordan
+1/1/1971,85014,tonnes (metric),Exports,lead,Morocco
+1/1/1971,220472000,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1971,4070,tonnes (metric),Exports,antimony,Morocco
+1/1/1971,160,tonnes (metric),Exports,salt,Morocco
+1/1/1971,105762,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1971,281970,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1971,647278,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1971,751,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1972,19185,tonnes (metric),Exports,coal,Morocco
+1/1/1972,5224871,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1972,131,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1972,1359,tonnes (metric),Exports,sulphur and pyrites,Morocco
+1/1/1972,12606,tonnes (metric),Exports,cobalt,Morocco
+1/1/1972,5690,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1972,269478000,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1972,13580780,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1972,1517,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1972,952371,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1972,34866,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1972,21649,tonnes (metric),Exports,zinc,Morocco
+1/1/1972,13598,tonnes (metric),Exports,copper,Morocco
+1/1/1972,84934,tonnes (metric),Exports,barytes,Morocco
+1/1/1972,16233,tonnes (metric),Exports,salt,Egypt
+1/1/1972,954,tonnes (metric),Exports,copper,Morocco
+1/1/1972,130587,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1972,308210,tonnes (metric),Exports,iron ore,Morocco
+1/1/1972,5752,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1972,0,tonnes (metric),Exports,salt,Jordan
+1/1/1972,138194,tonnes (metric),Exports,lead,Morocco
+1/1/1972,3302,tonnes (metric),Exports,antimony,Morocco
+1/1/1972,2099,kilograms,Exports,silver,Morocco
+1/1/1972,212372,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1972,117693,tonnes (metric),Exports,manganese,Morocco
+1/1/1973,14319,tonnes (metric),Exports,copper,Morocco
+1/1/1973,64,tonnes (metric),Exports,sulphur and pyrites,Morocco
+1/1/1973,1535,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1973,2183,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1973,10549,tonnes (metric),Exports,cobalt,Morocco
+1/1/1973,151108,tonnes (metric),Exports,manganese,Morocco
+1/1/1973,346272924,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1973,1088575,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1973,490085,tonnes (metric),Exports,iron ore,Morocco
+1/1/1973,5485,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1973,16101884,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1973,61015,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1973,10502,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1973,21249,tonnes (metric),Exports,coal,Morocco
+1/1/1973,205020,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1973,153201,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1973,968,tonnes (metric),Exports,copper,Morocco
+1/1/1973,9681436,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1973,2796,tonnes (metric),Exports,antimony,Morocco
+1/1/1973,27842,kilograms,Exports,silver,Morocco
+1/1/1973,5417,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1973,1288,tonnes (metric),Exports,salt,Jordan
+1/1/1973,30771,tonnes (metric),Exports,salt,Egypt
+1/1/1973,26195,tonnes (metric),Exports,zinc,Morocco
+1/1/1973,136144,tonnes (metric),Exports,lead,Morocco
+1/1/1973,94160,tonnes (metric),Exports,barytes,Morocco
+1/1/1974,391084528,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1974,26449,tonnes (metric),Exports,zinc,Morocco
+1/1/1974,75482,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1974,4084,tonnes (metric),Exports,antimony,Morocco
+1/1/1974,2158,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1974,14857,tonnes (metric),Exports,salt,Egypt
+1/1/1974,120260,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1974,748,tonnes (metric),Exports,salt,Jordan
+1/1/1974,14547,tonnes (metric),Exports,cobalt,Morocco
+1/1/1974,209,tonnes (metric),Exports,sulphur and pyrites,Morocco
+1/1/1974,940072,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1974,5500,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1974,32435,tonnes (metric),Exports,coal,Morocco
+1/1/1974,1468958,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1974,164940,tonnes (metric),Exports,manganese,Morocco
+1/1/1974,125905,tonnes (metric),Exports,lead,Morocco
+1/1/1974,18700096,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1974,79650,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1974,17956,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1974,17586,tonnes (metric),Exports,copper,Morocco
+1/1/1974,1389,tonnes (metric),Exports,copper,Morocco
+1/1/1974,8385,kilograms,Exports,silver,Morocco
+1/1/1974,2474,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1974,83307,tonnes (metric),Exports,barytes,Morocco
+1/1/1974,530297,tonnes (metric),Exports,iron ore,Morocco
+1/1/1974,179082,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1975,5737,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1975,2000,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1975,352,tonnes (metric),Exports,copper,Morocco
+1/1/1975,3406,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1975,195496,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1975,922747,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1975,304515700,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1975,1111877,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1975,104670,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1975,650,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1975,110960,tonnes (metric),Exports,manganese,Morocco
+1/1/1975,8511,tonnes (metric),Exports,copper,Morocco
+1/1/1975,125005,tonnes (metric),Exports,barytes,Morocco
+1/1/1975,3102,tonnes (metric),Exports,antimony,Morocco
+1/1/1975,5364,tonnes (metric),Exports,lead,Morocco
+1/1/1975,26499,tonnes (metric),Exports,zinc,Morocco
+1/1/1975,29122,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1975,19411,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1975,97420,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1975,13144,tonnes (metric),Exports,cobalt,Morocco
+1/1/1975,26778,kilograms,Exports,silver,Morocco
+1/1/1975,2460,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1975,18036,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1975,79745,tonnes (metric),Exports,iron ore,Morocco
+1/1/1975,10151,tonnes (metric),Exports,salt,Egypt
+1/1/1975,29295,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1975,955,tonnes (metric),Exports,sulphur and pyrites,Morocco
+1/1/1975,1000,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1975,19322,tonnes (metric),Exports,coal,Morocco
+1/1/1975,74762,tonnes (metric),Exports,lead,Morocco
+1/1/1975,13110058,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1976,71239,tonnes (metric),Exports,lead,Morocco
+1/1/1976,8550,tonnes (metric),Exports,cobalt,Morocco
+1/1/1976,2948,tonnes (metric),Exports,salt,Jordan
+1/1/1976,48954,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1976,22700,tonnes (metric),Exports,copper,Morocco
+1/1/1976,9523,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1976,1726,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1976,30030,tonnes (metric),Exports,coal,Morocco
+1/1/1976,0,tonnes (metric),Exports,copper,Morocco
+1/1/1976,1269,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1976,119383,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1976,0,tonnes (metric),Exports,copper,Morocco
+1/1/1976,468,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1976,10303,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1976,7006,tonnes (metric),Exports,salt,Egypt
+1/1/1976,1548,tonnes (metric),Exports,copper,Morocco
+1/1/1976,400604400,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1976,1,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1976,27548,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1976,38584,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1976,3140,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1976,19091,tonnes (metric),Exports,zinc,Morocco
+1/1/1976,120556,tonnes (metric),Exports,barytes,Morocco
+1/1/1976,3795,tonnes (metric),Exports,antimony,Morocco
+1/1/1976,26333,kilograms,Exports,silver,Morocco
+1/1/1976,146172,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1976,3922421,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1976,14684162,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1976,13,tonnes (metric),Exports,mica,Morocco
+1/1/1976,1653244,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1976,104438,tonnes (metric),Exports,manganese,Morocco
+1/1/1976,17547,tonnes (metric),Exports,lead,Morocco
+1/1/1976,238423,tonnes (metric),Exports,iron ore,Morocco
+1/1/1977,130663,tonnes (metric),Exports,manganese,Morocco
+1/1/1977,428189200,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1977,3990570,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1977,72102,tonnes (metric),Exports,salt,Egypt
+1/1/1977,11194,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1977,2037,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1977,9076,tonnes (metric),Exports,cobalt,Morocco
+1/1/1977,14671,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1977,18095,tonnes (metric),Exports,copper,Morocco
+1/1/1977,21115,tonnes (metric),Exports,zinc,Morocco
+1/1/1977,0,tonnes (metric),Exports,copper,Morocco
+1/1/1977,392,tonnes (metric),Exports,salt,Jordan
+1/1/1977,50,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1977,10380,tonnes (metric),Exports,coal,Morocco
+1/1/1977,78201,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1977,29942,tonnes (metric),Exports,lead,Morocco
+1/1/1977,3495,tonnes (metric),Exports,antimony,Morocco
+1/1/1977,1788414,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1977,49,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1977,22306,kilograms,Exports,silver,Morocco
+1/1/1977,25019,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1977,173520,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1977,2708,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1977,15783537,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1977,0,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1977,181244,tonnes (metric),Exports,barytes,Morocco
+1/1/1977,429342,tonnes (metric),Exports,iron ore,Morocco
+1/1/1977,18648,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1977,59166,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1977,1298,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1977,905,tonnes (metric),Exports,copper,Morocco
+1/1/1977,10,tonnes (metric),Exports,mica,Morocco
+1/1/1977,0,tonnes (metric),Exports,copper,Morocco
+1/1/1977,120571,tonnes (metric),Exports,lead,Morocco
+1/1/1978,119614,tonnes (metric),Exports,lead,Morocco
+1/1/1978,8922,tonnes (metric),Exports,cobalt,Morocco
+1/1/1978,4270009,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1978,54928,tonnes (metric),Exports,coal,Morocco
+1/1/1978,110,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1978,1439,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1978,17284372,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1978,44774,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1978,383306900,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1978,15409,tonnes (metric),Exports,zinc,Morocco
+1/1/1978,39935,tonnes (metric),Exports,iron ore,Morocco
+1/1/1978,21335,tonnes (metric),Exports,lead,Morocco
+1/1/1978,218073,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1978,0,tonnes (metric),Exports,copper,Morocco
+1/1/1978,224842,tonnes (metric),Exports,barytes,Morocco
+1/1/1978,0,tonnes (metric),Exports,copper,Morocco
+1/1/1978,1462,tonnes (metric),Exports,copper,Morocco
+1/1/1978,64093,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1978,812,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1978,98925,tonnes (metric),Exports,salt,Egypt
+1/1/1978,4160,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1978,10419,tonnes (metric),Exports,copper,Morocco
+1/1/1978,2159920,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1978,2267,tonnes (metric),Exports,antimony,Morocco
+1/1/1978,18036,kilograms,Exports,silver,Morocco
+1/1/1978,10965,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1978,69823,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1978,2912,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1978,18693,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1978,140623,tonnes (metric),Exports,manganese,Morocco
+1/1/1978,3597,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1978,69235,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1978,556,tonnes (metric),Exports,mica,Morocco
+1/1/1979,730,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1979,1219,tonnes (metric),Exports,copper,Morocco
+1/1/1979,440137000,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1979,41240,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1979,277346,tonnes (metric),Exports,barytes,Morocco
+1/1/1979,16317,tonnes (metric),Exports,zinc,Morocco
+1/1/1979,99686,tonnes (metric),Exports,iron ore,Morocco
+1/1/1979,84960,tonnes (metric),Exports,salt,Egypt
+1/1/1979,8010,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1979,39150,kilograms,Exports,silver,Morocco
+1/1/1979,7530,tonnes (metric),Exports,cobalt,Morocco
+1/1/1979,1966,tonnes (metric),Exports,antimony,Morocco
+1/1/1979,12634,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1979,7566,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1979,0,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1979,17856090,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1979,554,tonnes (metric),Exports,salt,Jordan
+1/1/1979,1902,tonnes (metric),Exports,copper,Morocco
+1/1/1979,77622,tonnes (metric),Exports,coal,Morocco
+1/1/1979,1,tonnes (metric),Exports,mica,Morocco
+1/1/1979,1970,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1979,5245837,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1979,139351,tonnes (metric),Exports,manganese,Morocco
+1/1/1979,9100,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1979,2754615,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1979,118540,tonnes (metric),Exports,lead,Morocco
+1/1/1979,21272,tonnes (metric),Exports,copper,Morocco
+1/1/1979,1219,tonnes (metric),Exports,copper,Morocco
+1/1/1979,88559,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1979,228871,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1979,34250,tonnes (metric),Exports,lead,Morocco
+1/1/1979,62997,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1979,876,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1980,34667,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1980,6127,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1980,3269,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1980,2882,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1980,1591,tonnes (metric),Exports,copper,Morocco
+1/1/1980,203140,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1980,111637,tonnes (metric),Exports,lead,Morocco
+1/1/1980,143503,tonnes (metric),Exports,iron ore,Morocco
+1/1/1980,1159,tonnes (metric),Exports,antimony,Morocco
+1/1/1980,32806,tonnes (metric),Exports,lead,Morocco
+1/1/1980,580,tonnes (metric),Exports,talc,Egypt
+1/1/1980,3623069,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1980,454661000,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1980,25945,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1980,8005645,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1980,33310,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1980,12948,tonnes (metric),Exports,zinc,Morocco
+1/1/1980,1743,tonnes (metric),Exports,copper,Morocco
+1/1/1980,112317,tonnes (metric),Exports,manganese,Morocco
+1/1/1980,16527145,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1980,24176,kilograms,Exports,silver,Morocco
+1/1/1980,17981,tonnes (metric),Exports,salt,Jordan
+1/1/1980,15931,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1980,1743,tonnes (metric),Exports,copper,Morocco
+1/1/1980,1055,tonnes (metric),Exports,talc,Jordan
+1/1/1980,333820,tonnes (metric),Exports,barytes,Morocco
+1/1/1980,7489,tonnes (metric),Exports,cobalt,Morocco
+1/1/1980,49407,tonnes (metric),Exports,salt,Egypt
+1/1/1980,17384,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1980,485,tonnes (metric),Exports,mica,Morocco
+1/1/1980,22274,tonnes (metric),Exports,copper,Morocco
+1/1/1980,1500,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1980,64070,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1980,81012,tonnes (metric),Exports,coal,Morocco
+1/1/1980,3357,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1981,89735,tonnes (metric),Exports,lead,Morocco
+1/1/1981,22207,tonnes (metric),Exports,copper,Morocco
+1/1/1981,20806,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1981,62935,tonnes (metric),Exports,coal,Morocco
+1/1/1981,1353,tonnes (metric),Exports,mica,Morocco
+1/1/1981,2818,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1981,55817,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1981,16476,tonnes (metric),Exports,zinc,Morocco
+1/1/1981,17143,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1981,2215,tonnes (metric),Exports,copper,Morocco
+1/1/1981,99668,tonnes (metric),Exports,manganese,Morocco
+1/1/1981,6646,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1981,452976,tonnes (metric),Exports,barytes,Morocco
+1/1/1981,64383,tonnes (metric),Exports,iron ore,Morocco
+1/1/1981,3529381,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1981,1260,tonnes (metric),Exports,antimony,Morocco
+1/1/1981,54180,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1981,31361,kilograms,Exports,silver,Morocco
+1/1/1981,19500,tonnes (metric),Exports,salt,Egypt
+1/1/1981,0,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1981,6333,tonnes (metric),Exports,cobalt,Morocco
+1/1/1981,6672,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1981,50945,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1981,856,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1981,218780,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1981,7187997,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1981,42488,tonnes (metric),Exports,lead,Morocco
+1/1/1981,660,tonnes (metric),Exports,talc,Egypt
+1/1/1981,451431337,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1981,2215,tonnes (metric),Exports,copper,Morocco
+1/1/1981,76466,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1981,0,tonnes (metric),Exports,potash,Jordan
+1/1/1981,7072,tonnes (metric),Exports,salt,Jordan
+1/1/1981,15635480,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1981,52193,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1981,1860,tonnes (metric),Exports,copper,Morocco
+1/1/1981,10439,tonnes (metric),Exports,kaolin,Jordan
+1/1/1981,1508,tonnes (metric),Exports,talc,Jordan
+1/1/1982,1815,tonnes (metric),Exports,copper,Morocco
+1/1/1982,1815,tonnes (metric),Exports,copper,Morocco
+1/1/1982,7863837,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1982,0,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1982,515946,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1982,3818,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1982,28680,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1982,38361,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1982,174320,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1982,4864,tonnes (metric),Exports,salt,Egypt
+1/1/1982,281943763,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1982,493,tonnes (metric),Exports,talc,Egypt
+1/1/1982,8013,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1982,15862,tonnes (metric),Exports,zinc,Morocco
+1/1/1982,51719,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1982,896,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1982,52029,kilograms,Exports,silver,Morocco
+1/1/1982,543,tonnes (metric),Exports,copper,Jordan
+1/1/1982,1132,kilograms,Exports,gold,Jordan
+1/1/1982,13976076,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1982,7756,tonnes (metric),Exports,kaolin,Jordan
+1/1/1982,1570,tonnes (metric),Exports,mica,Morocco
+1/1/1982,81594,tonnes (metric),Exports,manganese,Morocco
+1/1/1982,3569701,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1982,51908,tonnes (metric),Exports,lead,Morocco
+1/1/1982,0,tonnes (metric),Exports,potash,Jordan
+1/1/1982,61930,tonnes (metric),Exports,lead,Morocco
+1/1/1982,51942,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1982,1674,tonnes (metric),Exports,salt,Jordan
+1/1/1982,5347,tonnes (metric),Exports,talc,Jordan
+1/1/1982,237400,tonnes (metric),Exports,iron ore,Morocco
+1/1/1982,221792,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1982,2932,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1982,1796,tonnes (metric),Exports,antimony,Morocco
+1/1/1982,465340,tonnes (metric),Exports,barytes,Morocco
+1/1/1982,62024,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1982,2616,tonnes (metric),Exports,copper,Morocco
+1/1/1982,18350,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1982,60291,tonnes (metric),Exports,copper,Morocco
+1/1/1982,24755,tonnes (metric),Exports,coal,Morocco
+1/1/1982,5017,tonnes (metric),Exports,cobalt,Morocco
+1/1/1983,72119,tonnes (metric),Exports,lead,Morocco
+1/1/1983,1547418,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1983,2811,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1983,80591,kilograms,Exports,silver,Morocco
+1/1/1983,250,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1983,14094,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1983,56434,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1983,1765,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1983,5126,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1983,14149,tonnes (metric),Exports,zinc,Morocco
+1/1/1983,2555,tonnes (metric),Exports,potash,Jordan
+1/1/1983,372319,tonnes (metric),Exports,barytes,Morocco
+1/1/1983,106020,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1983,3270,tonnes (metric),Exports,copper,Morocco
+1/1/1983,55697,tonnes (metric),Exports,lead,Morocco
+1/1/1983,65512,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1983,5608,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1983,40200,tonnes (metric),Exports,coal,Morocco
+1/1/1983,306,tonnes (metric),Exports,salt,Jordan
+1/1/1983,3701053,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1983,57860,tonnes (metric),Exports,manganese,Morocco
+1/1/1983,62228,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1983,0,tonnes (metric),Exports,mica,Morocco
+1/1/1983,39976,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1983,2889,tonnes (metric),Exports,talc,Jordan
+1/1/1983,0,tonnes (metric),Exports,kaolin,Jordan
+1/1/1983,69531,tonnes (metric),Exports,copper,Morocco
+1/1/1983,13976192,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1983,3270,tonnes (metric),Exports,copper,Morocco
+1/1/1983,139637,tonnes (metric),Exports,iron ore,Morocco
+1/1/1983,200802,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1983,1333,kilograms,Exports,gold,Jordan
+1/1/1983,7800450,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1983,20737,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1983,3378,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1983,1852,tonnes (metric),Exports,cobalt,Morocco
+1/1/1983,196229411,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1983,1,tonnes (metric),Exports,salt,Morocco
+1/1/1983,12670,tonnes (metric),Exports,salt,Egypt
+1/1/1983,660,tonnes (metric),Exports,talc,Egypt
+1/1/1983,2539,tonnes (metric),Exports,copper,Morocco
+1/1/1983,1505,tonnes (metric),Exports,copper,Jordan
+1/1/1983,1105,tonnes (metric),Exports,antimony,Morocco
+1/1/1984,89836,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1984,1587,tonnes (metric),Exports,salt,Morocco
+1/1/1984,14951346,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1984,1434,tonnes (metric),Exports,mica,Morocco
+1/1/1984,0,tonnes (metric),Exports,salt,Jordan
+1/1/1984,2376,tonnes (metric),Exports,copper,Morocco
+1/1/1984,1723341,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1984,29517,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1984,1426,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1984,73723,kilograms,Exports,silver,Morocco
+1/1/1984,5222,tonnes (metric),Exports,talc,Jordan
+1/1/1984,214,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1984,1723341,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1984,16268,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1984,7126,tonnes (metric),Exports,kaolin,Jordan
+1/1/1984,7446667,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1984,458232,tonnes (metric),Exports,potash,Jordan
+1/1/1984,4304,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1984,2356,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1984,9539,tonnes (metric),Exports,salt,Egypt
+1/1/1984,116538,tonnes (metric),Exports,iron ore,Morocco
+1/1/1984,24072,tonnes (metric),Exports,zinc,Morocco
+1/1/1984,655,tonnes (metric),Exports,copper,Jordan
+1/1/1984,159340130,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1984,570973,tonnes (metric),Exports,barytes,Morocco
+1/1/1984,2152,tonnes (metric),Exports,antimony,Morocco
+1/1/1984,74200,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1984,18439,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1984,5609,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1984,91900,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1984,124750,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1984,552,tonnes (metric),Exports,talc,Egypt
+1/1/1984,72174,tonnes (metric),Exports,copper,Morocco
+1/1/1984,46107,tonnes (metric),Exports,lead,Morocco
+1/1/1984,0,tonnes (metric),Exports,cobalt,Morocco
+1/1/1984,5413,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1984,65940,tonnes (metric),Exports,coal,Morocco
+1/1/1984,30,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1984,77600,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1984,1363,tonnes (metric),Exports,copper,Morocco
+1/1/1984,38640,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1984,4695015,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1984,1363,tonnes (metric),Exports,copper,Morocco
+1/1/1984,3,kilograms,Exports,gold,Jordan
+1/1/1984,69665,tonnes (metric),Exports,manganese,Morocco
+1/1/1984,85272,tonnes (metric),Exports,lead,Morocco
+1/1/1985,6433,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1985,60366,tonnes (metric),Exports,lead,Morocco
+1/1/1985,2524,tonnes (metric),Exports,copper,Morocco
+1/1/1985,7310,tonnes (metric),Exports,talc,Jordan
+1/1/1985,9170,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1985,161673,tonnes (metric),Exports,iron ore,Morocco
+1/1/1985,844773,tonnes (metric),Exports,potash,Jordan
+1/1/1985,140350,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1985,55893,tonnes (metric),Exports,lead,Morocco
+1/1/1985,4609710,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1985,47012,tonnes (metric),Exports,manganese,Morocco
+1/1/1985,1330,tonnes (metric),Exports,mica,Morocco
+1/1/1985,0,tonnes (metric),Exports,kaolin,Jordan
+1/1/1985,171,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1985,939,kilograms,Exports,gold,Jordan
+1/1/1985,14789875,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1985,4506,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1985,26450,tonnes (metric),Exports,salt,Morocco
+1/1/1985,1224,tonnes (metric),Exports,copper,Jordan
+1/1/1985,1766,tonnes (metric),Exports,antimony,Morocco
+1/1/1985,86407,kilograms,Exports,silver,Morocco
+1/1/1985,3245,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1985,0,tonnes (metric),Exports,cobalt,Morocco
+1/1/1985,487982,tonnes (metric),Exports,barytes,Morocco
+1/1/1985,30816,tonnes (metric),Exports,zinc,Morocco
+1/1/1985,22828,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1985,64245,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1985,21437,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1985,889,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1985,2361,tonnes (metric),Exports,copper,Morocco
+1/1/1985,665,tonnes (metric),Exports,talc,Egypt
+1/1/1985,988240,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1985,9551,tonnes (metric),Exports,salt,Egypt
+1/1/1985,108390692,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1985,32720,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1985,141705,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1985,60615,tonnes (metric),Exports,copper,Morocco
+1/1/1985,2524,tonnes (metric),Exports,copper,Morocco
+1/1/1985,16085,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1985,129743,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1985,735,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1985,62433,tonnes (metric),Exports,coal,Morocco
+1/1/1985,985,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1985,10508550,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1985,222,tonnes (metric),Exports,salt,Jordan
+1/1/1985,80689,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1985,450,tonnes (metric),Exports,iron ore,Morocco
+1/1/1986,2277,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1986,7248746,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1986,1384,tonnes (metric),Exports,antimony,Morocco
+1/1/1986,1060,tonnes (metric),Exports,copper,Jordan
+1/1/1986,337,tonnes (metric),Exports,iron ore,Morocco
+1/1/1986,266,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1986,13013,tonnes (metric),Exports,salt,Egypt
+1/1/1986,35243,tonnes (metric),Exports,lead,Morocco
+1/1/1986,28400,tonnes (metric),Exports,salt,Morocco
+1/1/1986,13696128,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1986,1169,tonnes (metric),Exports,copper,Morocco
+1/1/1986,164060513,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1986,924676,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1986,1169,tonnes (metric),Exports,copper,Morocco
+1/1/1986,2636,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1986,1809,kilograms,Exports,gold,Jordan
+1/1/1986,11132,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1986,30495,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1986,71770,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1986,61509,tonnes (metric),Exports,copper,Morocco
+1/1/1986,187,tonnes (metric),Exports,salt,Jordan
+1/1/1986,0,tonnes (metric),Exports,kaolin,Jordan
+1/1/1986,1508,tonnes (metric),Exports,mica,Morocco
+1/1/1986,119701,tonnes (metric),Exports,iron ore,Morocco
+1/1/1986,14414,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1986,50738,tonnes (metric),Exports,manganese,Morocco
+1/1/1986,122511,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1986,10993,tonnes (metric),Exports,talc,Jordan
+1/1/1986,1653,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1986,5197665,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1986,49534,tonnes (metric),Exports,coal,Morocco
+1/1/1986,55679,tonnes (metric),Exports,lead,Morocco
+1/1/1986,183770,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1986,12298,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1986,1205056,tonnes (metric),Exports,potash,Jordan
+1/1/1986,52087,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1986,28789,tonnes (metric),Exports,zinc,Morocco
+1/1/1986,28,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1986,20603,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1986,79944,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1986,257381,tonnes (metric),Exports,barytes,Morocco
+1/1/1986,3240,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1986,19453,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1986,91079,kilograms,Exports,silver,Morocco
+1/1/1986,1934,tonnes (metric),Exports,copper,Morocco
+1/1/1986,843,tonnes (metric),Exports,talc,Egypt
+1/1/1987,3189,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1987,999,tonnes (metric),Exports,antimony,Morocco
+1/1/1987,345,tonnes (metric),Exports,talc,Egypt
+1/1/1987,0,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1987,18593,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1987,43927,tonnes (metric),Exports,manganese,Morocco
+1/1/1987,254463,tonnes (metric),Exports,barytes,Morocco
+1/1/1987,6357,tonnes (metric),Exports,talc,Jordan
+1/1/1987,2235,tonnes (metric),Exports,copper,Morocco
+1/1/1987,371948,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1987,238,tonnes (metric),Exports,copper,Jordan
+1/1/1987,69381,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1987,30556,tonnes (metric),Exports,lead,Morocco
+1/1/1987,180276,tonnes (metric),Exports,salt,Egypt
+1/1/1987,10023000,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1987,27552,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1987,60905,tonnes (metric),Exports,salt,Morocco
+1/1/1987,5346,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1987,13061333,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1987,87708,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1987,5543685,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1987,63410,tonnes (metric),Exports,lead,Morocco
+1/1/1987,121105806,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1987,108181,tonnes (metric),Exports,iron ore,Morocco
+1/1/1987,68650,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1987,23961,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1987,20070,tonnes (metric),Exports,coal,Morocco
+1/1/1987,480,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1987,146374,kilograms,Exports,silver,Morocco
+1/1/1987,130368,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1987,42002,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1987,2649,tonnes (metric),Exports,copper,Morocco
+1/1/1987,305,tonnes (metric),Exports,salt,Jordan
+1/1/1987,4630,kilograms,Exports,gold,Jordan
+1/1/1987,50854,tonnes (metric),Exports,copper,Morocco
+1/1/1987,6507,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1987,2235,tonnes (metric),Exports,copper,Morocco
+1/1/1987,1243928,tonnes (metric),Exports,potash,Jordan
+1/1/1987,2230,tonnes (metric),Exports,mica,Morocco
+1/1/1987,62799,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1987,7504,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1987,3133,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1987,169196,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1987,23797,tonnes (metric),Exports,zinc,Morocco
+1/1/1988,67600,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1988,7086378,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1988,122254,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1988,122017,tonnes (metric),Exports,salt,Egypt
+1/1/1988,528,tonnes (metric),Exports,talc,Egypt
+1/1/1988,7162,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1988,1529,tonnes (metric),Exports,copper,Jordan
+1/1/1988,3695,kilograms,Exports,gold,Jordan
+1/1/1988,5726740,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1988,1300411,tonnes (metric),Exports,potash,Jordan
+1/1/1988,0,tonnes (metric),Exports,salt,Jordan
+1/1/1988,70,tonnes (metric),Exports,talc,Jordan
+1/1/1988,465,tonnes (metric),Exports,antimony,Morocco
+1/1/1988,398090,tonnes (metric),Exports,barytes,Morocco
+1/1/1988,3000,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1988,75000,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1988,10655,tonnes (metric),Exports,coal,Morocco
+1/1/1988,2148,tonnes (metric),Exports,cobalt,Morocco
+1/1/1988,2738,tonnes (metric),Exports,copper,Morocco
+1/1/1988,2738,tonnes (metric),Exports,copper,Morocco
+1/1/1988,44675,tonnes (metric),Exports,copper,Morocco
+1/1/1988,3312,tonnes (metric),Exports,copper,Morocco
+1/1/1988,89694,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1988,662,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1988,203250,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1988,0,tonnes (metric),Exports,iron ore,Morocco
+1/1/1988,84484,tonnes (metric),Exports,iron ore,Morocco
+1/1/1988,91430,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1988,43487,tonnes (metric),Exports,lead,Morocco
+1/1/1988,62528,tonnes (metric),Exports,lead,Morocco
+1/1/1988,47371,tonnes (metric),Exports,manganese,Morocco
+1/1/1988,1862,tonnes (metric),Exports,mica,Morocco
+1/1/1988,14260343,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1988,17050,tonnes (metric),Exports,salt,Morocco
+1/1/1988,158154,kilograms,Exports,silver,Morocco
+1/1/1988,23098,tonnes (metric),Exports,zinc,Morocco
+1/1/1988,52266,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1988,23224,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1988,2911,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1988,153239867,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1988,25228,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1988,124161,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1988,17638,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1988,12189,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1988,9829,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1988,2637,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1988,148727,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1988,831785,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1989,285,tonnes (metric),Exports,talc,Egypt
+1/1/1989,358909,tonnes (metric),Exports,barytes,Morocco
+1/1/1989,580942,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1989,54544,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1989,5500,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1989,1257895,tonnes (metric),Exports,potash,Jordan
+1/1/1989,18338,tonnes (metric),Exports,salt,Jordan
+1/1/1989,20124,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1989,5323,tonnes (metric),Exports,copper,Morocco
+1/1/1989,96144,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1989,62004,tonnes (metric),Exports,lead,Morocco
+1/1/1989,0,tonnes (metric),Exports,iron ore,Morocco
+1/1/1989,1586,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1989,1121,tonnes (metric),Exports,mica,Morocco
+1/1/1989,0,tonnes (metric),Exports,talc,Jordan
+1/1/1989,2892,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1989,31663,tonnes (metric),Exports,lead,Morocco
+1/1/1989,2478,kilograms,Exports,gold,Jordan
+1/1/1989,139781,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1989,2831,tonnes (metric),Exports,copper,Jordan
+1/1/1989,2659,tonnes (metric),Exports,coal,Morocco
+1/1/1989,12426000,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1989,31394,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1989,246000,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1989,41,tonnes (metric),Exports,antimony,Morocco
+1/1/1989,2647,tonnes (metric),Exports,copper,Morocco
+1/1/1989,2647,tonnes (metric),Exports,copper,Morocco
+1/1/1989,186000,kilograms,Exports,silver,Morocco
+1/1/1989,6356840,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1989,45229,tonnes (metric),Exports,copper,Morocco
+1/1/1989,4241,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1989,410921,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1989,76200,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1989,102000,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1989,157880887,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1989,131775,tonnes (metric),Exports,salt,Egypt
+1/1/1989,108664,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1989,86909,tonnes (metric),Exports,iron ore,Morocco
+1/1/1989,45843,tonnes (metric),Exports,manganese,Morocco
+1/1/1989,35332,tonnes (metric),Exports,zinc,Morocco
+1/1/1989,22830,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1989,11653,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1989,5680,tonnes (metric),Exports,salt,Morocco
+1/1/1989,2606,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1989,236950,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1989,358909,tonnes (metric),Exports,barytes,Morocco
+1/1/1989,3192,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1989,5359525,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1990,59596,tonnes (metric),Exports,lead,Morocco
+1/1/1990,700,tonnes (metric),Exports,mica,Morocco
+1/1/1990,107600,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1990,84052,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1990,373857,tonnes (metric),Exports,barytes,Morocco
+1/1/1990,377,tonnes (metric),Exports,antimony,Morocco
+1/1/1990,,tonnes (metric),Exports,talc,Egypt
+1/1/1990,23023,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1990,649,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1990,44848,tonnes (metric),Exports,copper,Morocco
+1/1/1990,1012604,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1990,30432,tonnes (metric),Exports,lead,Morocco
+1/1/1990,49826,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1990,13090,tonnes (metric),Exports,salt,Jordan
+1/1/1990,147,kilograms,Exports,gold,Jordan
+1/1/1990,422,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1990,6500000,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1990,,tonnes (metric),Exports,coal,Morocco
+1/1/1990,11672000,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1990,89100,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1990,63266,tonnes (metric),Exports,iron ore,Morocco
+1/1/1990,3831,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1990,4959,tonnes (metric),Exports,salt,Morocco
+1/1/1990,1718,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1990,2057,tonnes (metric),Exports,copper,Morocco
+1/1/1990,1403358,tonnes (metric),Exports,potash,Jordan
+1/1/1990,17600,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1990,20407,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1990,4800,tonnes (metric),Exports,copper,Morocco
+1/1/1990,639395,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1990,0,tonnes (metric),Exports,iron ore,Morocco
+1/1/1990,2057,tonnes (metric),Exports,copper,Morocco
+1/1/1990,1483,tonnes (metric),Exports,copper,Jordan
+1/1/1990,1178,tonnes (metric),Exports,talc,Jordan
+1/1/1990,166379,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1990,25175,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1990,297200,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1990,44584,tonnes (metric),Exports,manganese,Morocco
+1/1/1990,201024,kilograms,Exports,silver,Morocco
+1/1/1990,1207,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1990,4871123,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1990,209413267,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1990,81748,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1990,3138,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1990,33325,tonnes (metric),Exports,zinc,Morocco
+1/1/1990,164202,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1990,,tonnes (metric),Exports,salt,Egypt
+1/1/1990,373857,tonnes (metric),Exports,barytes,Morocco
+1/1/1991,60690,tonnes (metric),Exports,lead,Morocco
+1/1/1991,452219,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1991,14908,tonnes (metric),Exports,lead,Morocco
+1/1/1991,1412000,tonnes (metric),Exports,potash,Jordan
+1/1/1991,911,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1991,47,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1991,43295,tonnes (metric),Exports,copper,Morocco
+1/1/1991,7500000,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1991,58074,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1991,1849,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1991,2562,tonnes (metric),Exports,copper,Morocco
+1/1/1991,4000,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1991,3689,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1991,7954,tonnes (metric),Exports,copper,Morocco
+1/1/1991,24486,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1991,28149,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1991,164000,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1991,309829937,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1991,76300,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1991,122316,tonnes (metric),Exports,salt,Egypt
+1/1/1991,2629,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1991,444939,tonnes (metric),Exports,barytes,Morocco
+1/1/1991,,tonnes (metric),Exports,antimony,Morocco
+1/1/1991,,tonnes (metric),Exports,talc,Egypt
+1/1/1991,8540,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1991,2152,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1991,1055731,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1991,23052,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1991,89700,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1991,942,tonnes (metric),Exports,mica,Morocco
+1/1/1991,444939,tonnes (metric),Exports,barytes,Morocco
+1/1/1991,144993,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1991,36082,tonnes (metric),Exports,zinc,Morocco
+1/1/1991,1440,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1991,199542,kilograms,Exports,silver,Morocco
+1/1/1991,2562,tonnes (metric),Exports,copper,Morocco
+1/1/1991,20,tonnes (metric),Exports,talc,Jordan
+1/1/1991,4918,tonnes (metric),Exports,copper,Jordan
+1/1/1991,1700,tonnes (metric),Exports,iron ore,Morocco
+1/1/1991,4002,tonnes (metric),Exports,salt,Morocco
+1/1/1991,65728,tonnes (metric),Exports,iron ore,Morocco
+1/1/1991,9143199,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1991,2800,kilograms,Exports,gold,Jordan
+1/1/1991,8633,tonnes (metric),Exports,salt,Jordan
+1/1/1991,52628,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1991,,tonnes (metric),Exports,coal,Morocco
+1/1/1991,44108,tonnes (metric),Exports,manganese,Morocco
+1/1/1991,4245700,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1992,5092,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1992,166638,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1992,39126,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1992,179900,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1992,46266,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1992,11246,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1992,62017,tonnes (metric),Exports,lead,Morocco
+1/1/1992,11120,tonnes (metric),Exports,copper,Morocco
+1/1/1992,2700,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1992,0,tonnes (metric),Exports,iron ore,Morocco
+1/1/1992,4000,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1992,2866,tonnes (metric),Exports,copper,Jordan
+1/1/1992,12388,tonnes (metric),Exports,salt,Morocco
+1/1/1992,742000,tonnes (metric),Exports,potash,Jordan
+1/1/1992,9682,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1992,3544,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1992,58523,tonnes (metric),Exports,iron ore,Morocco
+1/1/1992,2289000,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1992,9132000,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1992,19024,tonnes (metric),Exports,lead,Morocco
+1/1/1992,9952000,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1992,2100,tonnes (metric),Exports,copper,Morocco
+1/1/1992,6212,tonnes (metric),Exports,salt,Jordan
+1/1/1992,4263880,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1992,45867,tonnes (metric),Exports,copper,Morocco
+1/1/1992,5282,kilograms,Exports,gold,Jordan
+1/1/1992,1102,tonnes (metric),Exports,kaolin,Jordan
+1/1/1992,23085,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1992,1782,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1992,2100,tonnes (metric),Exports,copper,Morocco
+1/1/1992,8838,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1992,334172,tonnes (metric),Exports,barytes,Morocco
+1/1/1992,125700,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1992,1900,tonnes (metric),Exports,mica,Morocco
+1/1/1992,39821,tonnes (metric),Exports,manganese,Morocco
+1/1/1992,1298,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1992,208106,tonnes (metric),Exports,salt,Egypt
+1/1/1992,3000,tonnes (metric),Exports,cobalt,Morocco
+1/1/1992,38000,tonnes (metric),Exports,zinc,Morocco
+1/1/1992,78000,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1992,317156009,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1992,2370,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1992,8011000,kilograms,Exports,silver,Morocco
+1/1/1993,111780,tonnes (metric),Exports,zinc,Morocco
+1/1/1993,3100,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1993,4000,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1993,60000,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1993,886000,tonnes (metric),Exports,potash,Jordan
+1/1/1993,4106,kilograms,Exports,gold,Jordan
+1/1/1993,313661000,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1993,134400,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1993,3564950,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1993,1977,tonnes (metric),Exports,iron ore,Morocco
+1/1/1993,2487,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1993,306600,tonnes (metric),Exports,barytes,Morocco
+1/1/1993,35129,tonnes (metric),Exports,manganese,Morocco
+1/1/1993,153150,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1993,1703,tonnes (metric),Exports,copper,Morocco
+1/1/1993,1600,tonnes (metric),Exports,"bauxite, alumina and aluminium",Morocco
+1/1/1993,2299000,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1993,74900,tonnes (metric),Exports,lead,Morocco
+1/1/1993,13006000,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1993,3000,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1993,34164,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1993,106924,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1993,6900,tonnes (metric),Exports,copper,Morocco
+1/1/1993,32543,tonnes (metric),Exports,lead,Morocco
+1/1/1993,1500,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1993,48380,tonnes (metric),Exports,iron ore,Morocco
+1/1/1993,908,tonnes (metric),Exports,salt,Jordan
+1/1/1993,1703,tonnes (metric),Exports,copper,Morocco
+1/1/1993,2034,tonnes (metric),Exports,copper,Jordan
+1/1/1993,25500,tonnes (metric),Exports,salt,Morocco
+1/1/1993,522,tonnes (metric),Exports,kaolin,Jordan
+1/1/1993,44342,tonnes (metric),Exports,copper,Morocco
+1/1/1993,280431,tonnes (metric),Exports,salt,Egypt
+1/1/1993,10900,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1993,8398400,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1993,9900,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1994,1819,tonnes (metric),Exports,copper,Morocco
+1/1/1994,8542,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1994,41831,tonnes (metric),Exports,copper,Morocco
+1/1/1994,18478,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1994,6600,tonnes (metric),Exports,copper,Morocco
+1/1/1994,5100,tonnes (metric),Exports,"bauxite, alumina and aluminium",Morocco
+1/1/1994,102365,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1994,307649,tonnes (metric),Exports,barytes,Morocco
+1/1/1994,569,tonnes (metric),Exports,zinc,Jordan
+1/1/1994,29500,tonnes (metric),Exports,iron ore,Morocco
+1/1/1994,2761,tonnes (metric),Exports,iron ore,Morocco
+1/1/1994,793,tonnes (metric),Exports,salt,Jordan
+1/1/1994,108104,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1994,1516652,tonnes (metric),Exports,potash,Jordan
+1/1/1994,55423,tonnes (metric),Exports,lead,Morocco
+1/1/1994,56779,tonnes (metric),Exports,lead,Morocco
+1/1/1994,3829600,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1994,1449,tonnes (metric),Exports,lead,Jordan
+1/1/1994,30433,tonnes (metric),Exports,manganese,Morocco
+1/1/1994,1078,tonnes (metric),Exports,kaolin,Jordan
+1/1/1994,2800,tonnes (metric),Exports,"iron, steel and ferro-alloys",Jordan
+1/1/1994,1579,kilograms,Exports,gold,Jordan
+1/1/1994,9526800,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1994,54158,tonnes (metric),Exports,salt,Morocco
+1/1/1994,2157,tonnes (metric),Exports,copper,Jordan
+1/1/1994,4662,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1994,237000,kilograms,Exports,silver,Morocco
+1/1/1994,151161,tonnes (metric),Exports,zinc,Morocco
+1/1/1994,80700,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1994,12763,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1994,1475,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1994,840,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1994,446877,tonnes (metric),Exports,salt,Egypt
+1/1/1994,310700000,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1994,113800,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1994,43250,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1994,500,tonnes (metric),Exports,kaolin,Egypt
+1/1/1994,4440,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1994,30532,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1994,4325,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1994,200,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1994,48000,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1994,3629,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1994,7867128,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1994,2282800,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1994,4515,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1994,1819,tonnes (metric),Exports,copper,Morocco
+1/1/1994,4080,tonnes (metric),Exports,cobalt,Morocco
+1/1/1995,700,tonnes (metric),Exports,sulphur and pyrites,Egypt
+1/1/1995,8400,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1995,793,tonnes (metric),Exports,kaolin,Jordan
+1/1/1995,42000,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1995,10500,tonnes (metric),Exports,"iron, steel and ferro-alloys",Jordan
+1/1/1995,40800,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1995,2014,tonnes (metric),Exports,zinc,Jordan
+1/1/1995,49787,tonnes (metric),Exports,lead,Morocco
+1/1/1995,36905,tonnes (metric),Exports,lead,Morocco
+1/1/1995,1475,tonnes (metric),Exports,salt,Jordan
+1/1/1995,1561,tonnes (metric),Exports,copper,Morocco
+1/1/1995,2906,tonnes (metric),Exports,copper,Jordan
+1/1/1995,4300,tonnes (metric),Exports,"bauxite, alumina and aluminium",Morocco
+1/1/1995,5500,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1995,313600000,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1995,266400,tonnes (metric),Exports,salt,Egypt
+1/1/1995,6200,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1995,26891,tonnes (metric),Exports,iron ore,Morocco
+1/1/1995,27916,tonnes (metric),Exports,manganese,Morocco
+1/1/1995,48000,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1995,1531,tonnes (metric),Exports,iron ore,Morocco
+1/1/1995,7242853,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1995,9420400,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1995,600,tonnes (metric),Exports,kaolin,Egypt
+1/1/1995,120,tonnes (metric),Exports,tin,Jordan
+1/1/1995,120747,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1995,1561,tonnes (metric),Exports,copper,Morocco
+1/1/1995,4813,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1995,1764371,tonnes (metric),Exports,potash,Jordan
+1/1/1995,,tonnes (metric),Exports,sulphur and pyrites,Jordan
+1/1/1995,0,tonnes (metric),Exports,copper,Egypt
+1/1/1995,350682,tonnes (metric),Exports,barytes,Morocco
+1/1/1995,40080,tonnes (metric),Exports,copper,Morocco
+1/1/1995,12450,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1995,977,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1995,4200,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1995,28174,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1995,171466,tonnes (metric),Exports,zinc,Morocco
+1/1/1995,11900,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1995,7158,tonnes (metric),Exports,copper,Morocco
+1/1/1995,4591,tonnes (metric),Exports,cobalt,Morocco
+1/1/1995,268600,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1995,1510600,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1995,54796,tonnes (metric),Exports,salt,Morocco
+1/1/1995,242000,kilograms,Exports,silver,Morocco
+1/1/1995,107846,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1995,1259,tonnes (metric),Exports,lead,Jordan
+1/1/1995,81900,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1995,2200,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1995,3878500,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1996,,tonnes (metric),Exports,sulphur and pyrites,Jordan
+1/1/1996,40650,tonnes (metric),Exports,copper,Morocco
+1/1/1996,178175,tonnes (metric),Exports,zinc,Morocco
+1/1/1996,127,tonnes (metric),Exports,copper,Egypt
+1/1/1996,2017,tonnes (metric),Exports,bentonite and fuller's earth,Egypt
+1/1/1996,900,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1996,100,tonnes (metric),Exports,cobalt,Morocco
+1/1/1996,1894,tonnes (metric),Exports,copper,Morocco
+1/1/1996,216613,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1996,64601,tonnes (metric),Exports,salt,Morocco
+1/1/1996,7870,tonnes (metric),Exports,potash,Jordan
+1/1/1996,3440,tonnes (metric),Exports,copper,Jordan
+1/1/1996,96880,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1996,12400,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1996,13140,tonnes (metric),Exports,iron ore,Morocco
+1/1/1996,682,tonnes (metric),Exports,lead,Jordan
+1/1/1996,1192,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1996,11530,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1996,205000,kilograms,Exports,silver,Morocco
+1/1/1996,4309,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1996,1894,tonnes (metric),Exports,copper,Morocco
+1/1/1996,1071,tonnes (metric),Exports,tin,Jordan
+1/1/1996,3203,tonnes (metric),Exports,zinc,Jordan
+1/1/1996,94156,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1996,298527,tonnes (metric),Exports,salt,Egypt
+1/1/1996,11082,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1996,744,tonnes (metric),Exports,kaolin,Jordan
+1/1/1996,3250,tonnes (metric),Exports,kaolin,Egypt
+1/1/1996,1889,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1996,980,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1996,3000,tonnes (metric),Exports,"bauxite, alumina and aluminium",Morocco
+1/1/1996,32898,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1996,54057,tonnes (metric),Exports,lead,Morocco
+1/1/1996,24100,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/1996,6684826,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1996,4610,tonnes (metric),Exports,talc,Egypt
+1/1/1996,5527,tonnes (metric),Exports,copper,Morocco
+1/1/1996,4893,tonnes (metric),Exports,cobalt,Morocco
+1/1/1996,6000,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1996,3976,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1996,27775,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1996,14794,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1996,1878,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1996,4307726,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1996,64800,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1996,1300,tonnes (metric),Exports,sulphur and pyrites,Egypt
+1/1/1996,23000,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1996,11000,tonnes (metric),Exports,"iron, steel and ferro-alloys",Jordan
+1/1/1996,1800900,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1996,45720,tonnes (metric),Exports,lead,Morocco
+1/1/1996,2064,tonnes (metric),Exports,salt,Jordan
+1/1/1996,2056,tonnes (metric),Exports,diatomite,Saudi Arabia
+1/1/1996,164,tonnes (metric),Exports,cobalt,Saudi Arabia
+1/1/1996,304500000,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1996,28770,tonnes (metric),Exports,manganese,Morocco
+1/1/1996,50625,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1996,45200,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/1996,11294,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1996,1753702,tonnes (metric),Exports,potash,Jordan
+1/1/1996,10139919,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1996,297932,tonnes (metric),Exports,barytes,Morocco
+1/1/1996,52753,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1997,6147800,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1997,15000,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1997,0,tonnes (metric),Exports,cobalt,Morocco
+1/1/1997,2654,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1997,4085,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1997,32512,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1997,7062,tonnes (metric),Exports,copper,Morocco
+1/1/1997,3898,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1997,47500,tonnes (metric),Exports,lead,Morocco
+1/1/1997,16065,tonnes (metric),Exports,"iron, steel and ferro-alloys",Jordan
+1/1/1997,218,tonnes (metric),Exports,cobalt,Morocco
+1/1/1997,18333,tonnes (metric),Exports,salt,Jordan
+1/1/1997,1419101,tonnes (metric),Exports,potash,Jordan
+1/1/1997,4367215,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1997,2092,tonnes (metric),Exports,bentonite and fuller's earth,Egypt
+1/1/1997,11669340,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1997,3297,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1997,2804,tonnes (metric),Exports,copper,Jordan
+1/1/1997,11189,tonnes (metric),Exports,salt,Morocco
+1/1/1997,2143,tonnes (metric),Exports,copper,Egypt
+1/1/1997,892,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1997,4475,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1997,1720,tonnes (metric),Exports,tin,Jordan
+1/1/1997,270741,kilograms,Exports,silver,Morocco
+1/1/1997,2603,tonnes (metric),Exports,zinc,Jordan
+1/1/1997,6440,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1997,1670,tonnes (metric),Exports,lead,Jordan
+1/1/1997,2514,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1997,2744,tonnes (metric),Exports,copper,Morocco
+1/1/1997,89400,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1997,225089,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1997,191172,tonnes (metric),Exports,zinc,Morocco
+1/1/1997,15206,tonnes (metric),Exports,potash,Jordan
+1/1/1997,40827,tonnes (metric),Exports,copper,Morocco
+1/1/1997,320454,tonnes (metric),Exports,barytes,Morocco
+1/1/1997,93448,tonnes (metric),Exports,sulphur and pyrites,Jordan
+1/1/1997,6709,tonnes (metric),Exports,sulphur and pyrites,Morocco
+1/1/1997,168209,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1997,45000,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/1997,2794,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1997,39148,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1997,1634800,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1997,0,tonnes (metric),Exports,cobalt,Saudi Arabia
+1/1/1997,31063,tonnes (metric),Exports,manganese,Morocco
+1/1/1997,1679,tonnes (metric),Exports,sulphur and pyrites,Egypt
+1/1/1997,16694,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1997,5887,tonnes (metric),Exports,talc,Egypt
+1/1/1997,2744,tonnes (metric),Exports,copper,Morocco
+1/1/1997,10062,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1997,269661,tonnes (metric),Exports,salt,Egypt
+1/1/1997,114419,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1997,9000,kilograms,Exports,mercury,Morocco
+1/1/1997,25000,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/1997,320454,tonnes (metric),Exports,barytes,Morocco
+1/1/1997,314406535,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1997,50758,tonnes (metric),Exports,lead,Morocco
+1/1/1997,40238,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1997,2678,tonnes (metric),Exports,diatomite,Saudi Arabia
+1/1/1997,3015,tonnes (metric),Exports,lead,Morocco
+1/1/1997,57865,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1997,180700,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1997,6314,tonnes (metric),Exports,"bauxite, alumina and aluminium",Morocco
+1/1/1997,1155,tonnes (metric),Exports,kaolin,Jordan
+1/1/1997,64456,tonnes (metric),Exports,kaolin,Egypt
+1/1/1997,62762,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1998,8504,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1998,1063,tonnes (metric),Exports,nickel,Saudi Arabia
+1/1/1998,4205,tonnes (metric),Exports,lead,Morocco
+1/1/1998,12294,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1998,1137000,kilograms,Exports,iodine,Saudi Arabia
+1/1/1998,4424,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1998,240,tonnes (metric),Exports,cobalt,Morocco
+1/1/1998,294096,tonnes (metric),Exports,salt,Egypt
+1/1/1998,2933,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1998,1312,tonnes (metric),Exports,sulphur and pyrites,Egypt
+1/1/1998,4563421,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1998,1211,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1998,135302,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1998,16332,tonnes (metric),Exports,"iron, steel and ferro-alloys",Jordan
+1/1/1998,11730653,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1998,35725,tonnes (metric),Exports,copper,Morocco
+1/1/1998,2250,tonnes (metric),Exports,copper,Morocco
+1/1/1998,2493,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/1998,33428,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1998,288,tonnes (metric),Exports,potash,Saudi Arabia
+1/1/1998,8481,tonnes (metric),Exports,talc,Egypt
+1/1/1998,222000,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1998,2500,tonnes (metric),Exports,cobalt,Morocco
+1/1/1998,7731,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1998,1807,tonnes (metric),Exports,potash,Jordan
+1/1/1998,18797,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1998,362340,tonnes (metric),Exports,barytes,Morocco
+1/1/1998,1934,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1998,9000,kilograms,Exports,mercury,Morocco
+1/1/1998,10008,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1998,48195,tonnes (metric),Exports,lead,Morocco
+1/1/1998,46205,tonnes (metric),Exports,kaolin,Egypt
+1/1/1998,318291013,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1998,208,kilograms,Exports,gold,Saudi Arabia
+1/1/1998,160,tonnes (metric),Exports,graphite,Saudi Arabia
+1/1/1998,15850,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1998,8608,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1998,4567,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1998,144749,tonnes (metric),Exports,salt,Jordan
+1/1/1998,14203,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/1998,458,tonnes (metric),Exports,zinc,Jordan
+1/1/1998,768,tonnes (metric),Exports,kaolin,Jordan
+1/1/1998,13002,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1998,937,tonnes (metric),Exports,lead,Jordan
+1/1/1998,4807,tonnes (metric),Exports,diatomite,Saudi Arabia
+1/1/1998,25118,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/1998,23485,tonnes (metric),Exports,manganese,Morocco
+1/1/1998,2692,tonnes (metric),Exports,bentonite and fuller's earth,Saudi Arabia
+1/1/1998,2330,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1998,5178,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1998,3174,tonnes (metric),Exports,"bauxite, alumina and aluminium",Morocco
+1/1/1998,2791380,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1998,8781,tonnes (metric),Exports,potash,Jordan
+1/1/1998,116,tonnes (metric),Exports,copper,Egypt
+1/1/1998,5140,tonnes (metric),Exports,copper,Morocco
+1/1/1998,63778,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1998,157254,tonnes (metric),Exports,sulphur and pyrites,Jordan
+1/1/1998,1043,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1998,1854400,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1998,2737,tonnes (metric),Exports,salt,Morocco
+1/1/1998,32003,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1998,192017,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1998,9348,kilograms,Exports,gold,Saudi Arabia
+1/1/1998,2040,tonnes (metric),Exports,bentonite and fuller's earth,Egypt
+1/1/1998,56141,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1998,105631,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1998,7053,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1998,2166,tonnes (metric),Exports,copper,Jordan
+1/1/1998,1486194,tonnes (metric),Exports,potash,Jordan
+1/1/1998,242270,tonnes (metric),Exports,zinc,Morocco
+1/1/1998,2246,tonnes (metric),Exports,nickel,Saudi Arabia
+1/1/1998,5696,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1998,305,tonnes (metric),Exports,cobalt,Saudi Arabia
+1/1/1998,328,tonnes (metric),Exports,zinc,Morocco
+1/1/1998,41312,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1998,59017,tonnes (metric),Exports,lead,Morocco
+1/1/1998,5902,tonnes (metric),Exports,barytes,Saudi Arabia
+1/1/1998,2250,tonnes (metric),Exports,copper,Morocco
+1/1/1998,2138,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1999,230540,tonnes (metric),Exports,zinc,Morocco
+1/1/1999,2071,tonnes (metric),Exports,copper,Jordan
+1/1/1999,914,tonnes (metric),Exports,zinc,Morocco
+1/1/1999,1664886,tonnes (metric),Exports,potash,Jordan
+1/1/1999,20190,tonnes (metric),Exports,salt,Morocco
+1/1/1999,3505,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1999,5206,kilograms,Exports,gold,Saudi Arabia
+1/1/1999,249135,tonnes (metric),Exports,sulphur and pyrites,Jordan
+1/1/1999,3635,tonnes (metric),Exports,bentonite and fuller's earth,Egypt
+1/1/1999,7631,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1999,11382500,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/1999,29480,tonnes (metric),Exports,copper,Morocco
+1/1/1999,5364,tonnes (metric),Exports,barytes,Saudi Arabia
+1/1/1999,3548,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/1999,11478,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/1999,464,tonnes (metric),Exports,cobalt,Morocco
+1/1/1999,362,tonnes (metric),Exports,graphite,Saudi Arabia
+1/1/1999,6964,tonnes (metric),Exports,potash,Jordan
+1/1/1999,4715,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1999,11526,tonnes (metric),Exports,kaolin,Jordan
+1/1/1999,2412,tonnes (metric),Exports,lead,Morocco
+1/1/1999,376,tonnes (metric),Exports,potash,Jordan
+1/1/1999,6394,tonnes (metric),Exports,"bauxite, alumina and aluminium",Morocco
+1/1/1999,27060,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1999,256126,tonnes (metric),Exports,salt,Jordan
+1/1/1999,2025600,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/1999,728,tonnes (metric),Exports,bentonite and fuller's earth,Saudi Arabia
+1/1/1999,400,tonnes (metric),Exports,fluorspar,Jordan
+1/1/1999,,tonnes (metric),Exports,cobalt,Saudi Arabia
+1/1/1999,480,tonnes (metric),Exports,cobalt,Saudi Arabia
+1/1/1999,1552,tonnes (metric),Exports,sulphur and pyrites,Egypt
+1/1/1999,5343,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/1999,20411,tonnes (metric),Exports,"iron, steel and ferro-alloys",Jordan
+1/1/1999,110,tonnes (metric),Exports,nickel,Morocco
+1/1/1999,4233,tonnes (metric),Exports,talc,Egypt
+1/1/1999,32861,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1999,2560,tonnes (metric),Exports,cobalt,Morocco
+1/1/1999,1752,tonnes (metric),Exports,copper,Morocco
+1/1/1999,3417,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1999,12266,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1999,1752,tonnes (metric),Exports,copper,Morocco
+1/1/1999,14508,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/1999,22512,tonnes (metric),Exports,manganese,Morocco
+1/1/1999,7732,tonnes (metric),Exports,copper,Morocco
+1/1/1999,12024,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/1999,5301,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/1999,83446,tonnes (metric),Exports,fluorspar,Morocco
+1/1/1999,299000,kilograms,Exports,iodine,Saudi Arabia
+1/1/1999,33060,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1999,11181,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/1999,268218,tonnes (metric),Exports,salt,Egypt
+1/1/1999,584,tonnes (metric),Exports,nickel,Saudi Arabia
+1/1/1999,13168,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/1999,47803,tonnes (metric),Exports,lead,Morocco
+1/1/1999,266,tonnes (metric),Exports,potash,Saudi Arabia
+1/1/1999,4681,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/1999,53588,tonnes (metric),Exports,lead,Morocco
+1/1/1999,8879,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1999,31275,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1999,206000,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/1999,,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1999,2806,tonnes (metric),Exports,kaolin,Egypt
+1/1/1999,212206,tonnes (metric),Exports,barytes,Morocco
+1/1/1999,14,tonnes (metric),Exports,rare earths,Jordan
+1/1/1999,284885017,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/1999,53825,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/1999,3154,tonnes (metric),Exports,nickel,Saudi Arabia
+1/1/1999,4261,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/1999,1527,tonnes (metric),Exports,lead,Jordan
+1/1/1999,551,tonnes (metric),Exports,zinc,Jordan
+1/1/1999,5534,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1999,17970,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/1999,1080,tonnes (metric),Exports,diatomite,Saudi Arabia
+1/1/1999,6713,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/1999,1037,tonnes (metric),Exports,copper,Egypt
+1/1/1999,69868,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/1999,2819200,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/1999,6812,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/1999,157044,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/1999,3632679,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/1999,1170,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/1999,92837,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/1999,417059,kilograms,Exports,gold,Saudi Arabia
+1/1/2000,2087,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/2000,55079,tonnes (metric),Exports,lead,Morocco
+1/1/2000,3427,tonnes (metric),Exports,potash,Jordan
+1/1/2000,145780,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/2000,2359,tonnes (metric),Exports,lead,Jordan
+1/1/2000,16876,tonnes (metric),Exports,manganese,Morocco
+1/1/2000,10000,kilograms,Exports,mercury,Morocco
+1/1/2000,15018,tonnes (metric),Exports,kaolin,Jordan
+1/1/2000,82,tonnes (metric),Exports,rare earths,Jordan
+1/1/2000,,tonnes (metric),Exports,nickel,Morocco
+1/1/2000,123,tonnes (metric),Exports,nickel,Morocco
+1/1/2000,16749,tonnes (metric),Exports,"iron, steel and ferro-alloys",Jordan
+1/1/2000,5046,tonnes (metric),Exports,fluorspar,Jordan
+1/1/2000,,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/2000,10487498,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/2000,2838,tonnes (metric),Exports,copper,Jordan
+1/1/2000,112226,tonnes (metric),Exports,salt,Jordan
+1/1/2000,49755,tonnes (metric),Exports,sulphur and pyrites,Jordan
+1/1/2000,1238,tonnes (metric),Exports,cobalt,Morocco
+1/1/2000,37747,tonnes (metric),Exports,salt,Morocco
+1/1/2000,5172,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/2000,,tonnes (metric),Exports,titanium,Morocco
+1/1/2000,246,tonnes (metric),Exports,zinc,Jordan
+1/1/2000,44,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/2000,70000,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/2000,214901,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/2000,190333,tonnes (metric),Exports,zinc,Morocco
+1/1/2000,3724,tonnes (metric),Exports,zinc,Morocco
+1/1/2000,,tonnes (metric),Exports,sulphur and pyrites,Jordan
+1/1/2000,,tonnes (metric),Exports,titanium,Morocco
+1/1/2000,,tonnes (metric),Exports,"bauxite, alumina and aluminium",Morocco
+1/1/2000,638,tonnes (metric),Exports,barytes,Saudi Arabia
+1/1/2000,1600,tonnes (metric),Exports,sulphur and pyrites,Egypt
+1/1/2000,5487,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/2000,,tonnes (metric),Exports,copper,Morocco
+1/1/2000,24646,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/2000,633,tonnes (metric),Exports,bentonite and fuller's earth,Saudi Arabia
+1/1/2000,164,tonnes (metric),Exports,cobalt,Saudi Arabia
+1/1/2000,21817,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/2000,78151,tonnes (metric),Exports,fluorspar,Morocco
+1/1/2000,2961,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/2000,315800,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/2000,2072,tonnes (metric),Exports,cobalt,Morocco
+1/1/2000,313300000,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/2000,945,tonnes (metric),Exports,diatomite,Saudi Arabia
+1/1/2000,425527,kilograms,Exports,gold,Saudi Arabia
+1/1/2000,169,tonnes (metric),Exports,graphite,Saudi Arabia
+1/1/2000,327154,tonnes (metric),Exports,barytes,Morocco
+1/1/2000,3000,tonnes (metric),Exports,kaolin,Egypt
+1/1/2000,,tonnes (metric),Exports,copper,Morocco
+1/1/2000,40272,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/2000,44000,kilograms,Exports,iodine,Saudi Arabia
+1/1/2000,2163,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2000,704,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2000,15000,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/2000,12800,tonnes (metric),Exports,copper,Morocco
+1/1/2000,1198,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2000,8938,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2000,8445,tonnes (metric),Exports,"bauxite, alumina and aluminium",Morocco
+1/1/2000,2482,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/2000,5895,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/2000,5047,tonnes (metric),Exports,nickel,Saudi Arabia
+1/1/2000,69,tonnes (metric),Exports,nickel,Saudi Arabia
+1/1/2000,251,tonnes (metric),Exports,potash,Saudi Arabia
+1/1/2000,6168,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/2000,25007,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/2000,,tonnes (metric),Exports,copper,Morocco
+1/1/2000,11904,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/2000,2189300,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/2000,57486,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/2000,25200,tonnes (metric),Exports,copper,Morocco
+1/1/2000,9727,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/2000,1373,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/2000,1063,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/2000,2888,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/2000,39196,tonnes (metric),Exports,lead,Morocco
+1/1/2000,0,tonnes (metric),Exports,lead,Morocco
+1/1/2000,21443,tonnes (metric),Exports,potash,Jordan
+1/1/2000,3196398,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/2000,1881049,tonnes (metric),Exports,potash,Jordan
+1/1/2001,264800,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/2001,1843,tonnes (metric),Exports,copper,Morocco
+1/1/2001,5593,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/2001,41837,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/2001,1024,tonnes (metric),Exports,cobalt,Morocco
+1/1/2001,518492,tonnes (metric),Exports,salt,Egypt
+1/1/2001,5765,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/2001,93963,tonnes (metric),Exports,fluorspar,Morocco
+1/1/2001,0,tonnes (metric),Exports,potash,Jordan
+1/1/2001,11996,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/2001,25696,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/2001,20869,tonnes (metric),Exports,copper,Morocco
+1/1/2001,17185,tonnes (metric),Exports,talc,Egypt
+1/1/2001,707,tonnes (metric),Exports,bentonite and fuller's earth,Saudi Arabia
+1/1/2001,2057200,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/2001,41109,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/2001,7212,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/2001,1428,tonnes (metric),Exports,sulphur and pyrites,Egypt
+1/1/2001,2612,tonnes (metric),Exports,lead,Jordan
+1/1/2001,54404,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/2001,564,tonnes (metric),Exports,barytes,Saudi Arabia
+1/1/2001,4040,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/2001,,tonnes (metric),Exports,sulphur and pyrites,Jordan
+1/1/2001,513,tonnes (metric),Exports,zinc,Jordan
+1/1/2001,3277,tonnes (metric),Exports,zinc,Morocco
+1/1/2001,243,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/2001,187381,tonnes (metric),Exports,zinc,Morocco
+1/1/2001,64097,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/2001,0,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/2001,212246,tonnes (metric),Exports,gypsum and plaster,Morocco
+1/1/2001,5764,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/2001,3536526,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/2001,4626,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/2001,5504,tonnes (metric),Exports,copper,Egypt
+1/1/2001,6136,tonnes (metric),Exports,bentonite and fuller's earth,Egypt
+1/1/2001,1264,tonnes (metric),Exports,cobalt,Morocco
+1/1/2001,1895847,tonnes (metric),Exports,potash,Jordan
+1/1/2001,111401,tonnes (metric),Exports,salt,Morocco
+1/1/2001,88450,tonnes (metric),Exports,sulphur and pyrites,Jordan
+1/1/2001,701,tonnes (metric),Exports,bentonite and fuller's earth,Morocco
+1/1/2001,69281,tonnes (metric),Exports,salt,Jordan
+1/1/2001,2463,tonnes (metric),Exports,copper,Jordan
+1/1/2001,10853155,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/2001,1509,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/2001,0,tonnes (metric),Exports,fluorspar,Jordan
+1/1/2001,166239,tonnes (metric),Exports,"iron, steel and ferro-alloys",Morocco
+1/1/2001,0,tonnes (metric),Exports,rare earths,Jordan
+1/1/2001,125,tonnes (metric),Exports,nickel,Morocco
+1/1/2001,13631,tonnes (metric),Exports,"iron, steel and ferro-alloys",Jordan
+1/1/2001,33726,tonnes (metric),Exports,lead,Morocco
+1/1/2001,,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2001,8895,tonnes (metric),Exports,kaolin,Jordan
+1/1/2001,7658,tonnes (metric),Exports,"bauxite, alumina and aluminium",Morocco
+1/1/2001,3910,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2001,323,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2001,50623,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/2001,19109,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/2001,24217,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/2001,15491,tonnes (metric),Exports,manganese,Morocco
+1/1/2001,1710,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/2001,1843,tonnes (metric),Exports,copper,Morocco
+1/1/2001,26577,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2001,1463,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2001,52274,tonnes (metric),Exports,lead,Morocco
+1/1/2001,3040,tonnes (metric),Exports,nickel,Saudi Arabia
+1/1/2001,29572,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/2001,9973,tonnes (metric),Exports,copper,Morocco
+1/1/2001,0,tonnes (metric),Exports,lead,Morocco
+1/1/2001,136,tonnes (metric),Exports,nickel,Saudi Arabia
+1/1/2001,4328,tonnes (metric),Exports,kaolin,Egypt
+1/1/2001,294,tonnes (metric),Exports,potash,Saudi Arabia
+1/1/2001,4380,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/2001,410867,tonnes (metric),Exports,barytes,Morocco
+1/1/2001,229,tonnes (metric),Exports,graphite,Saudi Arabia
+1/1/2001,13,kilograms,Exports,gold,Saudi Arabia
+1/1/2001,27275,tonnes (metric),Exports,potash,Jordan
+1/1/2001,1605,tonnes (metric),Exports,feldspar,Egypt
+1/1/2001,2408900,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/2001,2983,tonnes (metric),Exports,diatomite,Saudi Arabia
+1/1/2001,302400000,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/2001,2503,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/2002,6839,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/2002,40000,kilograms,Exports,iodine,Saudi Arabia
+1/1/2002,30179,tonnes (metric),Exports,gypsum and plaster,Saudi Arabia
+1/1/2002,49,tonnes (metric),Exports,rare earths,Jordan
+1/1/2002,,tonnes (metric),Exports,sulphur and pyrites,Jordan
+1/1/2002,2705,tonnes (metric),Exports,nickel,Saudi Arabia
+1/1/2002,8016,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2002,1970,tonnes (metric),Exports,lead,Saudi Arabia
+1/1/2002,86320,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/2002,2668,tonnes (metric),Exports,barytes,Saudi Arabia
+1/1/2002,19,tonnes (metric),Exports,nickel,Saudi Arabia
+1/1/2002,914,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2002,4000,tonnes (metric),Exports,kaolin,Egypt
+1/1/2002,28233,tonnes (metric),Exports,potash,Jordan
+1/1/2002,1917611,tonnes (metric),Exports,potash,Jordan
+1/1/2002,86,tonnes (metric),Exports,potash,Saudi Arabia
+1/1/2002,9650,tonnes (metric),Exports,"iron, steel and ferro-alloys",Jordan
+1/1/2002,3060,tonnes (metric),Exports,titanium,Saudi Arabia
+1/1/2002,8401,tonnes (metric),Exports,graphite,Saudi Arabia
+1/1/2002,4006139,tonnes (metric),Exports,phosphate rock,Jordan
+1/1/2002,,tonnes (metric),Exports,antimony,Saudi Arabia
+1/1/2002,967302,kilograms,Exports,gold,Saudi Arabia
+1/1/2002,2287,tonnes (metric),Exports,lead,Jordan
+1/1/2002,2245,kilograms,Exports,gold,Egypt
+1/1/2002,529,tonnes (metric),Exports,zinc,Jordan
+1/1/2002,2377000,tonnes (metric),Exports,"petroleum, crude",Egypt
+1/1/2002,3085,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/2002,2668,tonnes (metric),Exports,diatomite,Saudi Arabia
+1/1/2002,13300,tonnes (metric),Exports,bentonite and fuller's earth,Egypt
+1/1/2002,265300000,tonnes (metric),Exports,"petroleum, crude",Saudi Arabia
+1/1/2002,183276,tonnes (metric),Exports,salt,Jordan
+1/1/2002,,tonnes (metric),Exports,iron ore,Saudi Arabia
+1/1/2002,613900,tonnes (metric),Exports,phosphate rock,Egypt
+1/1/2002,41500,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/2002,913,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2002,3804,tonnes (metric),Exports,potash,Jordan
+1/1/2002,4133,tonnes (metric),Exports,copper,Jordan
+1/1/2002,66897,tonnes (metric),Exports,"bauxite, alumina and aluminium",Egypt
+1/1/2002,9639,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/2002,11140400,tonnes (metric),Exports,phosphate rock,Morocco
+1/1/2002,0,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/2002,3600,tonnes (metric),Exports,gypsum and plaster,Egypt
+1/1/2002,8944,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/2002,19883,tonnes (metric),Exports,salt,Saudi Arabia
+1/1/2002,808,tonnes (metric),Exports,"iron, steel and ferro-alloys",Saudi Arabia
+1/1/2002,24132,tonnes (metric),Exports,copper,Saudi Arabia
+1/1/2002,4414,tonnes (metric),Exports,zinc,Saudi Arabia
+1/1/2002,16300,tonnes (metric),Exports,copper,Morocco
+1/1/2002,25,tonnes (metric),Exports,fluorspar,Jordan
+1/1/2002,4594,tonnes (metric),Exports,"asbestos, unmanufactured",Saudi Arabia
+1/1/2002,17100,tonnes (metric),Exports,talc,Egypt
+1/1/2002,,tonnes (metric),Exports,cobalt,Saudi Arabia
+1/1/2002,915,tonnes (metric),Exports,bentonite and fuller's earth,Saudi Arabia
+1/1/2002,6477,tonnes (metric),Exports,"bauxite, alumina and aluminium",Jordan
+1/1/2002,44987,tonnes (metric),Exports,"bauxite, alumina and aluminium",Saudi Arabia
+1/1/2002,2261,tonnes (metric),Exports,kaolin,Jordan
+1/1/2002,9897,tonnes (metric),Exports,copper,Egypt
+1/1/2002,2179600,tonnes (metric),Exports,sulphur and pyrites,Saudi Arabia
+1/1/2002,42300,tonnes (metric),Exports,"iron, steel and ferro-alloys",Egypt
+1/1/2002,224141,tonnes (metric),Exports,sulphur and pyrites,Jordan
+1/1/1971,27300000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1972,56361700,tonnes (metric),Exports,,United Arab Emirates
+1/1/1973,71739300,tonnes (metric),Exports,,United Arab Emirates
+1/1/1974,81428799,tonnes (metric),Exports,,United Arab Emirates
+1/1/1975,81721085,tonnes (metric),Exports,,United Arab Emirates
+1/1/1976,94021000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1977,95891000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1978,87892000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1979,87484205,tonnes (metric),Exports,,United Arab Emirates
+1/1/1980,,tonnes (metric),Exports,,United Arab Emirates
+1/1/1980,,tonnes (metric),Exports,,United Arab Emirates
+1/1/1980,82557606,tonnes (metric),Exports,,United Arab Emirates
+1/1/1980,,tonnes (metric),Exports,,United Arab Emirates
+1/1/1980,,tonnes (metric),Exports,,United Arab Emirates
+1/1/1981,2785,tonnes (metric),Exports,,United Arab Emirates
+1/1/1981,70498723,tonnes (metric),Exports,,United Arab Emirates
+1/1/1981,20,tonnes (metric),Exports,,United Arab Emirates
+1/1/1982,1862,tonnes (metric),Exports,,United Arab Emirates
+1/1/1982,,tonnes (metric),Exports,,United Arab Emirates
+1/1/1982,2599,tonnes (metric),Exports,,United Arab Emirates
+1/1/1982,57008000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1983,52643000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1983,5285,tonnes (metric),Exports,,United Arab Emirates
+1/1/1983,9764,tonnes (metric),Exports,,United Arab Emirates
+1/1/1983,5890,tonnes (metric),Exports,,United Arab Emirates
+1/1/1983,2226,tonnes (metric),Exports,,United Arab Emirates
+1/1/1984,2063,tonnes (metric),Exports,,United Arab Emirates
+1/1/1984,30986,tonnes (metric),Exports,,United Arab Emirates
+1/1/1984,5111,tonnes (metric),Exports,,United Arab Emirates
+1/1/1984,48857000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1984,2780,tonnes (metric),Exports,,United Arab Emirates
+1/1/1984,140403,tonnes (metric),Exports,,United Arab Emirates
+1/1/1984,9986,tonnes (metric),Exports,,United Arab Emirates
+1/1/1985,48806000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1985,404,tonnes (metric),Exports,,United Arab Emirates
+1/1/1985,3037,tonnes (metric),Exports,,United Arab Emirates
+1/1/1985,148650,tonnes (metric),Exports,,United Arab Emirates
+1/1/1985,3168,tonnes (metric),Exports,,United Arab Emirates
+1/1/1985,4920,tonnes (metric),Exports,,United Arab Emirates
+1/1/1985,53219,tonnes (metric),Exports,,United Arab Emirates
+1/1/1986,56161000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1986,3635,tonnes (metric),Exports,,United Arab Emirates
+1/1/1986,5924,tonnes (metric),Exports,,United Arab Emirates
+1/1/1986,148841,tonnes (metric),Exports,,United Arab Emirates
+1/1/1986,56714,tonnes (metric),Exports,,United Arab Emirates
+1/1/1986,6025,tonnes (metric),Exports,,United Arab Emirates
+1/1/1986,546,tonnes (metric),Exports,,United Arab Emirates
+1/1/1987,3513,tonnes (metric),Exports,,United Arab Emirates
+1/1/1987,146000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1987,62375000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1988,154000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1988,2167,tonnes (metric),Exports,,United Arab Emirates
+1/1/1988,64681000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1989,79349000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1989,165100,tonnes (metric),Exports,,United Arab Emirates
+1/1/1990,171000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1990,85548000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1990,3048,tonnes (metric),Exports,,United Arab Emirates
+1/1/1990,430,tonnes (metric),Exports,,United Arab Emirates
+1/1/1991,3419,tonnes (metric),Exports,,United Arab Emirates
+1/1/1991,95430000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1991,235800,tonnes (metric),Exports,,United Arab Emirates
+1/1/1992,248600,tonnes (metric),Exports,,United Arab Emirates
+1/1/1992,2063,tonnes (metric),Exports,,United Arab Emirates
+1/1/1992,94502000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1993,242600,tonnes (metric),Exports,,United Arab Emirates
+1/1/1993,3062,tonnes (metric),Exports,,United Arab Emirates
+1/1/1993,18000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1993,90374000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1993,1197,tonnes (metric),Exports,,United Arab Emirates
+1/1/1994,93936000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1994,254800,tonnes (metric),Exports,,United Arab Emirates
+1/1/1994,54000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1994,0,tonnes (metric),Exports,,United Arab Emirates
+1/1/1995,37000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1995,247023,tonnes (metric),Exports,,United Arab Emirates
+1/1/1995,180,tonnes (metric),Exports,,United Arab Emirates
+1/1/1995,93900000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1996,,tonnes (metric),Exports,,United Arab Emirates
+1/1/1996,35000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1996,94800000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1996,150,tonnes (metric),Exports,,United Arab Emirates
+1/1/1996,,tonnes (metric),Exports,,United Arab Emirates
+1/1/1996,,tonnes (metric),Exports,,United Arab Emirates
+1/1/1996,264241,tonnes (metric),Exports,,United Arab Emirates
+1/1/1996,,Carats,Exports,,United Arab Emirates
+1/1/1997,200,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,273,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,198542,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,900000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,257,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,95100000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,44,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,13000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,17,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,66,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,96,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,6201,tonnes (metric),Exports,,United Arab Emirates
+1/1/1997,378488,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,3016,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,20,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,184056,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,206,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,2871,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,263,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,8138,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,23000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,274,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,910000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,16226,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,98100000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,64,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,374696,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,100,tonnes (metric),Exports,,United Arab Emirates
+1/1/1998,185000,Carats,Exports,,United Arab Emirates
+1/1/1999,2010000,Carats,Exports,,United Arab Emirates
+1/1/1999,323,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,1132200,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,92700000,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,23749,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,5886,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,346,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,238,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,33600,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,202329,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,441663,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,14786,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,64,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,6049,tonnes (metric),Exports,,United Arab Emirates
+1/1/1999,609,tonnes (metric),Exports,,United Arab Emirates
+1/1/2000,700,tonnes (metric),Exports,,United Arab Emirates
+1/1/2000,87700000,tonnes (metric),Exports,,United Arab Emirates
+1/1/2000,1056000,tonnes (metric),Exports,,United Arab Emirates
+1/1/2000,515873,tonnes (metric),Exports,,United Arab Emirates
+1/1/2000,,tonnes (metric),Exports,,United Arab Emirates
+1/1/2001,452754,tonnes (metric),Exports,,United Arab Emirates
+1/1/2001,1439700,tonnes (metric),Exports,,United Arab Emirates
+1/1/2001,86300000,tonnes (metric),Exports,,United Arab Emirates
+1/1/2002,377276,tonnes (metric),Exports,,United Arab Emirates
+1/1/2002,1857000,tonnes (metric),Exports,,United Arab Emirates
+1/1/2002,78000000,tonnes (metric),Exports,,United Arab Emirates
