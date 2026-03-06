@@ -530,7 +530,7 @@ export default function M6Page() {
           tooltip: {
             callbacks: {
               label: (c) =>
-                ` ${c.dataset.label}: ${c.parsed.y.toLocaleString()} ${unitLabelFor(
+                ` ${c.dataset.label}: ${c.parsed.y.toLocaleString("fr-FR")} ${unitLabelFor(
                   unit
                 )}`,
             },
@@ -547,7 +547,7 @@ export default function M6Page() {
             ticks: {
               font: { family: "Cairo" },
               callback: (v) =>
-                v === 0 ? "0" : v.toLocaleString("ar-EG", { maximumFractionDigits: 0 }),
+                v === 0 ? "0" : v.toLocaleString("fr-FR", { maximumFractionDigits: 0 }),
             },
           },
         },
@@ -624,7 +624,7 @@ export default function M6Page() {
                 const baseVal =
                   c.dataIndex === 0 ? countryInKton : othersInKton;
                 const pct = total ? Math.round((baseVal / total) * 100) : 0;
-                return ` ${c.label}: ${v.toLocaleString()} ${unitLabelFor(
+                return ` ${c.label}: ${v.toLocaleString("fr-FR")} ${unitLabelFor(
                   unit
                 )} (${pct}%)`;
               },
@@ -713,11 +713,6 @@ export default function M6Page() {
                     ))}
                   </select>
 
-                  <div className="mt-2 text-xs leading-relaxed text-slate-500">
-                    * Ctrl + كليك لاختيار عدة عناصر (Prototype).
-                    <br />
-                    لاحقًا يمكن استبدالها بـ Dropdown متعدد مثل Power BI.
-                  </div>
                 </div>
 
                 <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3">
@@ -868,7 +863,7 @@ export default function M6Page() {
                           {countryNameAr[r.c] || r.c}
                         </td>
                         <td className="px-3 py-1.5">
-                          {scaleValuesByUnit([r.v], unit)[0].toLocaleString()}
+                        {scaleValuesByUnit([r.v], unit)[0].toLocaleString("fr-FR")}
                         </td>
                       </tr>
                     ))}

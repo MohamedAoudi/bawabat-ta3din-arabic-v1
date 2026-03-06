@@ -50,27 +50,27 @@ const countryFlags = {
 };
 
 const countries = [
-  { name: "الأردن", code: "jo" },
-  { name: "الإمارات", code: "ae" },
-  { name: "البحرين", code: "bh" },
-  { name: "تونس", code: "tn" },
-  { name: "الجزائر", code: "dz" },
-  { name: "جيبوتي", code: "dj" },
-  { name: "السعودية", code: "sa" },
-  { name: "السودان", code: "sd" },
-  { name: "سوريا", code: "sy" },
-  { name: "الصومال", code: "so" },
-  { name: "العراق", code: "iq" },
-  { name: "عُمان", code: "om" },
-  { name: "فلسطين", code: "ps" },
-  { name: "قطر", code: "qa" },
-  { name: "الكويت", code: "kw" },
-  { name: "لبنان", code: "lb" },
-  { name: "ليبيا", code: "ly" },
-  { name: "مصر", code: "eg" },
-  { name: "المغرب", code: "ma" },
-  { name: "موريتانيا", code: "mr" },
-  { name: "اليمن", code: "ye" },
+  { name: 'المملكة الأردنية الهاشمية', code: "jo" },
+  { name: 'دولة الامارات العربية المتحدة', code: "ae" },
+  { name: 'مملكة البحرين', code: "bh" },
+  { name: 'الجمهورية التونسية', code: "tn" },
+  { name: 'الجمهورية الجزائرية الديمقراطية الشعبية', code: "dz" },
+  { name: 'دولة جيبوتي', code: "dj" },
+  { name: 'المملكة العربية السعودية', code: "sa" },
+  { name: 'جمهورية السودان', code: "sd" },
+  { name: 'الجمهورية العربية السورية', code: "sy" },
+  { name: 'جمهورية الصومال', code: "so" },
+  { name: 'جمهورية العراق', code: "iq" },
+  { name: 'سلطنة عمان', code: "om" },
+  { name: 'دولة فلسطين', code: "ps" },
+  { name: 'دولة قطر', code: "qa" },
+  { name: 'دولة الكويت', code: "kw" },
+  { name: 'الجمهورية اللبنانية', code: "lb" },
+  { name: 'دولة ليبيا', code: "ly" },
+  { name: 'جمهورية مصر العربية', code: "eg" },
+  { name: 'المملكة المغربية', code: "ma" },
+  { name: 'الجمهورية الإسلامية الموريتانية', code: "mr" },
+  { name: 'الجمهورية اليمنية', code: "ye" },
 ];
 
 const Home = () => {
@@ -251,7 +251,7 @@ const Home = () => {
 
         {/* KPIs */}
         <section className="reveal d3 mt-8 grid gap-4 md:grid-cols-3">
-          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#082721] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20 hover:scale-[1.01]">
+          <div className="relative overflow-hidden rounded-2xl bg-[#082721]/10 px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#082721] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20 hover:scale-[1.01]">
             <i className="fas fa-chart-line absolute left-5 top-4 text-4xl text-[#082721]/15" />
             <p className="text-lg text-[#082721] mb-1">
               المنتجات التعدينية العربية
@@ -268,7 +268,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#ddbc6b] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20 hover:scale-[1.01]">
+          <div className="relative overflow-hidden rounded-2xl bg-[#ddbc6b]/10 px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#ddbc6b] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20 hover:scale-[1.01]">
             <i className="fas fa-globe absolute left-5 top-4 text-4xl text-[#ddbc6b]/30" />
             <p className="text-lg text-[#ddbc6b] mb-1">عدد الدول العربية</p>
             <h2 className="text-3xl font-extrabold text-[#ddbc6b]">21</h2>
@@ -278,7 +278,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl bg-white px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#6d2824] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20 hover:scale-[1.01]">
+          <div className="relative overflow-hidden rounded-2xl bg-[#6d2824]/10 px-5 py-6 shadow-lg shadow-slate-900/10 border-r-4 border-[#6d2824] transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-900/20 hover:scale-[1.01]">
             <i className="fas fa-database absolute left-5 top-4 text-4xl text-[#6d2824]/30" />
             <p className="text-sm text-[#6d2824] mb-1">الفترة الزمنية</p>
             <h2 className="text-3xl font-extrabold text-[#6d2824]">
@@ -380,7 +380,6 @@ const Home = () => {
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
-                <span className="text-slate-500">PowerBI</span>
                 <a
                   href="/m1"
                   className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]"
@@ -409,7 +408,6 @@ const Home = () => {
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
-                <span className="text-slate-500">PowerBI</span>
                 <a
                   href="/m2"
                   className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]"
@@ -440,7 +438,6 @@ const Home = () => {
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
-                <span className="text-slate-500">PowerBI</span>
                 <a
                   href="/m3"
                   className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]"
@@ -471,7 +468,6 @@ const Home = () => {
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between text-sm">
-                <span className="text-slate-500">PowerBI</span>
                 <a
                   href="/m4"
                   className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]"
@@ -513,7 +509,6 @@ const Home = () => {
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between text-sm">
-        <span className="text-slate-500">PowerBI</span>
         <a href="/exports" className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]">المزيد</a>
       </div>
     </div>
@@ -532,7 +527,6 @@ const Home = () => {
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between text-sm">
-        <span className="text-slate-500">PowerBI</span>
         <a href="/imports" className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]">المزيد</a>
       </div>
     </div>
@@ -569,7 +563,6 @@ const Home = () => {
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between text-sm">
-        <span className="text-slate-500">PowerBI</span>
         <a href="/reserves-country" className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]">المزيد</a>
       </div>
     </div>
@@ -592,7 +585,6 @@ const Home = () => {
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between text-sm">
-        <span className="text-slate-500">PowerBI</span>
         <a href="/reserves-types" className="rounded-lg bg-[#082721] px-3 py-1 text-white hover:bg-[#051712]">المزيد</a>
       </div>
     </div>
@@ -999,7 +991,26 @@ const Home = () => {
             </div>
           </div>
         </section> */}
-    
+
+        <section className="mt-12">
+          <div className="rounded-3xl bg-white/95 p-6 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70 text-center">
+            <h2 className="text-xl font-extrabold text-[#082721] mb-2">
+              دردشة مع المساعد الذكي
+            </h2>
+            <p className="text-sm text-slate-600 mb-4">
+              يمكنك طرح أسئلة عن المؤشرات، البيانات، أو أي معلومات تعدينية، وسيجيبك
+              البوت فوراً.
+            </p>
+            <button
+              type="button"
+              onClick={handleChatbotClick}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#082721] px-6 py-3 text-sm font-semibold text-white shadow-md shadow-slate-900/20 hover:bg-[#051712] transition"
+            >
+              <i className="fa-solid fa-robot" />
+              <span>ابدأ المحادثة</span>
+            </button>
+          </div>
+        </section>
       </main>
 
       <div className="reveal d5">
@@ -1011,7 +1022,7 @@ const Home = () => {
         type="button"
         onClick={handleChatbotClick}
         title="محلّل البيانات الذكي"
-        className="reveal d5 fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full bg-white/90 px-3 py-2 text-right shadow-xl shadow-slate-900/25 backdrop-blur-md transition hover:-translate-y-1 hover:shadow-2xl"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full bg-white/90 px-3 py-2 text-right shadow-xl shadow-slate-900/25 backdrop-blur-md transition hover:-translate-y-1 hover:shadow-2xl"
       >
         <span className="absolute right-3 top-2 h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_0_4px] shadow-emerald-500/30" />
         <span className="grid h-11 w-11 place-items-center rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-[#082721] to-[#082721] text-white">
@@ -1029,4 +1040,3 @@ const Home = () => {
 };
 
 export default Home;
-
