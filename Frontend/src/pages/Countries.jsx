@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
@@ -101,7 +101,7 @@ const getCountryMineralData = (country) => {
 };
 
 
-const CountryModal = ({ country, onClose }) => {
+const CountryChart = ({ country }) => {
   const canvasRef = useRef(null);
   const chartRef = useRef(null);
 
@@ -185,28 +185,12 @@ const CountryModal = ({ country, onClose }) => {
   }, [country]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-3xl rounded-3xl bg-white shadow-xl">
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-4">
-          <div>
-            <h2 className="text-lg font-extrabold text-slate-800">
-              بيانات التعدين — {country}
-            </h2>
-            <p className="text-sm text-slate-500">
-              الرسم يظهر تطور البيانات لكل خام متوفر في قاعدة البيانات.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200"
-          >
-            إغلاق
-          </button>
-        </div>
-        <div className="h-[360px] p-4">
-          <canvas ref={canvasRef} />
-        </div>
+    <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
+      <h3 className="mb-2 text-base font-extrabold text-slate-800">
+        عرض البيانات — {country}
+      </h3>
+      <div className="h-[360px]">
+        <canvas ref={canvasRef} />
       </div>
     </div>
   );
@@ -214,11 +198,9 @@ const CountryModal = ({ country, onClose }) => {
 
 const Countries = () => {
   const [selected, setSelected] = useState("—");
-  const [modalCountry, setModalCountry] = useState(null);
 
   const handleSelect = (name) => {
     setSelected(name);
-    setModalCountry(name);
   };
 
   return (
@@ -238,14 +220,7 @@ const Countries = () => {
           clipPath: "polygon(0 0, 100% 0, 100% 85%, 0% 100%)",
         }}
       >
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="mb-3 text-4xl sm:text-5xl md:text-6xl font-extrabold">
-            الدول العربية
-          </h1>
-          <p className="mx-auto max-w-4xl text-lg sm:text-xl text-white/80">
-            واجهة الدول العربية (Prototype) — اختر دولة للوصول إلى ملفها
-          </p>
-        </div>
+       
       </header>
 
       {/* Content */}
@@ -329,41 +304,9 @@ const Countries = () => {
         </section>
 
         {/* Quick info panel (static prototype) */}
-        <section className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-          <div className="rounded-3xl bg-slate-50/90 p-6 shadow-lg shadow-slate-900/5 border border-slate-200/80">
-            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 mb-2">
-              كيف يمكن استخدام ملفات الدول؟
-            </h2>
-            <p className="text-sm text-slate-700 leading-relaxed mb-3">
-              تم تصميم ملفات الدول في البوابة لتكون مدخلًا سريعًا إلى أهم المؤشرات
-              المتعلقة بالإنتاج التعديني، مع روابط إلى اللوحات التفصيلية والجداول
-              القابلة للتنزيل في النسخ القادمة.
-            </p>
-            <ul className="mt-2 space-y-1 text-xs sm:text-sm text-slate-700 list-disc pr-5">
-              <li>متابعة التطور الزمني للإنتاج على مستوى كل دولة.</li>
-              <li>مقارنة مساهمة الدولة مع بقية الدول العربية في خام معيّن.</li>
-              <li>استخدام الجداول والرسوم البيانية في التقارير الوطنية أو الإقليمية.</li>
-            </ul>
-          </div>
+   
 
-          <div className="rounded-3xl bg-gradient-to-b from-[#082721] to-[#051712] p-5 text-white shadow-xl shadow-slate-900/30 ring-1 ring-[#ddbc6b]/30">
-            <h3 className="text-base sm:text-lg font-extrabold mb-2">
-              ملاحظة حول النسخة التجريبية
-            </h3>
-            <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
-              يتم عرض هذه الواجهة حاليًا بشكل تجريبي لعرض شكل ملفات الدول وإمكانيات
-              التصفية والتنقّل المقترحة. سيتم ربط كل دولة بلوحاتها ومؤشراتها التفصيلية
-              في النسخ التشغيلية القادمة.
-            </p>
-          </div>
-        </section>
-
-        {modalCountry && (
-          <CountryModal
-            country={modalCountry}
-            onClose={() => setModalCountry(null)}
-          />
-        )}
+        {selected !== "—" && <CountryChart country={selected} />}
       </main>
 
       <Footer />
