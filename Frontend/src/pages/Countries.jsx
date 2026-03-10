@@ -1,6 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
+import { dataByMineral, mineralUnits } from "./M1";
 
 // Import all flag files dynamically from the flags folder
 const flagModules = import.meta.glob("../assets/flags/*.webp", { eager: true });
@@ -70,8 +72,154 @@ const COUNTRIES = [
   { name: 'الجمهورية اليمنية', code: "ye" },
 ];
 
+const getCountryMineralData = (country) => {
+  const years = Array.from(
+    new Set(
+      Object.values(dataByMineral)
+        .flatMap((byYear) => Object.keys(byYear))
+        .map(Number)
+    )
+  ).sort((a, b) => a - b);
+
+  const minerals = Object.keys(dataByMineral);
+
+  const chartData = minerals.map((mineral) => {
+    const values = years.map((year) => {
+      const row = (dataByMineral[mineral][year] || []).find(
+        (r) => r.country === country
+      );
+      return row ? row.value : null;
+    });
+
+    return {
+      mineral,
+      values,
+    };
+  });
+
+  return { years, chartData };
+};
+
+
+const CountryModal = ({ country, onClose }) => {
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!ctx) return;
+    if (chartRef.current) chartRef.current.destroy();
+
+    const { years, chartData } = getCountryMineralData(country);
+
+    const palette = [
+      "#082721",
+      "#ddbc6b",
+      "#10b981",
+      "#3b82f6",
+      "#f59e0b",
+      "#8b5cf6",
+      "#ef4444",
+    ];
+
+    const datasets = chartData.map((entry, i) => ({
+      label: entry.mineral,
+      data: entry.values,
+      borderColor: palette[i % palette.length],
+      backgroundColor: palette[i % palette.length] + "22",
+      borderWidth: 2,
+      spanGaps: true,
+      tension: 0.35,
+      pointRadius: 3,
+    }));
+
+    chartRef.current = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: years,
+        datasets,
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { font: { family: "Cairo", size: 11 }, boxWidth: 12 },
+          },
+          tooltip: {
+            callbacks: {
+              label: (c) => {
+                const mineral = c.dataset.label;
+                const unit = mineralUnits[mineral] || "";
+                return ` ${mineral}: ${c.parsed.y ?? 0} ${unit}`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { font: { family: "Cairo", weight: "700" } },
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: "rgba(0,0,0,.08)" },
+            ticks: {
+              font: { family: "Cairo" },
+              callback: (v) => {
+                if (v >= 1_000_000) return `${v / 1_000_000}M`;
+                if (v >= 1_000) return `${v / 1_000}K`;
+                return v;
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return () => {
+      chartRef.current?.destroy();
+      chartRef.current = null;
+    };
+  }, [country]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-3xl rounded-3xl bg-white shadow-xl">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-4">
+          <div>
+            <h2 className="text-lg font-extrabold text-slate-800">
+              بيانات التعدين — {country}
+            </h2>
+            <p className="text-sm text-slate-500">
+              الرسم يظهر تطور البيانات لكل خام متوفر في قاعدة البيانات.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200"
+          >
+            إغلاق
+          </button>
+        </div>
+        <div className="h-[360px] p-4">
+          <canvas ref={canvasRef} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Countries = () => {
   const [selected, setSelected] = useState("—");
+  const [modalCountry, setModalCountry] = useState(null);
+
+  const handleSelect = (name) => {
+    setSelected(name);
+    setModalCountry(name);
+  };
 
   return (
     <div
@@ -83,7 +231,6 @@ const Countries = () => {
       }}
     >
       <Menu />
-
       {/* Hero */}
       <header
         className="bg-gradient-to-r from-[#082721] to-[#051712] text-white pt-12 pb-20 -mb-10 text-center"
@@ -147,7 +294,7 @@ const Countries = () => {
           key={c.code}
           type="button"
           className="group flex flex-col items-center text-center transition-transform hover:-translate-y-1 focus:outline-none"
-          onClick={() => setSelected(c.name)}
+          onClick={() => handleSelect(c.name)}
         >
           {/* Conteneur du drapeau (Format rectangulaire 28x16) */}
           <div className="relative flex h-16 w-28 items-center justify-center overflow-hidden rounded-md bg-slate-50 shadow-sm ring-1 ring-slate-200 group-hover:ring-[#082721]/30 transition-all">
@@ -210,6 +357,13 @@ const Countries = () => {
             </p>
           </div>
         </section>
+
+        {modalCountry && (
+          <CountryModal
+            country={modalCountry}
+            onClose={() => setModalCountry(null)}
+          />
+        )}
       </main>
 
       <Footer />
