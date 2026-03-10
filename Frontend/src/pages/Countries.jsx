@@ -75,26 +75,64 @@ const ALL_YEARS = Array.from(
   )
 ).sort((a, b) => a - b);
 
-const getCountryMineralData = (country) => {
-  const minerals = Object.keys(dataByMineral);
-  const chartData = minerals.map((mineral) => ({
-    mineral,
-    values: ALL_YEARS.map((year) => {
-      const row = (dataByMineral[mineral][year] || []).find((r) => r.country === country);
-      return row ? row.value : null;
-    }),
-  }));
+const UNIT_LABELS = {
+  ton: "ألف طن",
+  kg: "كجم",
+};
+
+const convertVolume = (value, fromUnit, toUnit) => {
+  if (value == null) return value;
+
+  const isThousandTon = fromUnit.includes("طن");
+  const isKg = fromUnit.includes("كجم");
+
+  if (isThousandTon) {
+    // Stored as "ألف طن" (thousand tonnes)
+    if (toUnit === "ton") return value;
+    if (toUnit === "kg") return value * 1_000_000;
+  }
+
+  if (isKg) {
+    if (toUnit === "kg") return value;
+    if (toUnit === "ton") return value / 1_000_000;
+  }
+
+  return value;
+};
+
+const getCountryMineralData = (country, mineralFilter = null, toUnit = "ton") => {
+  const minerals = Object.keys(dataByMineral).filter((mineral) =>
+    !mineralFilter || mineralFilter === "all" ? true : mineral === mineralFilter
+  );
+  const chartData = minerals.map((mineral) => {
+    const fromUnit = mineralUnits[mineral] || "";
+    return {
+      mineral,
+      values: ALL_YEARS.map((year) => {
+        const row = (dataByMineral[mineral][year] || []).find((r) => r.country === country);
+        const value = row ? row.value : null;
+        return value != null ? convertVolume(value, fromUnit, toUnit) : null;
+      }),
+    };
+  });
   return { years: ALL_YEARS, chartData };
 };
 
 // Returns minerals + their value for a given country + year (for pie)
-const getMineralShareForYear = (country, year) => {
-  const minerals = Object.keys(dataByMineral);
+const getMineralShareForYear = (country, year, mineralFilter = null, toUnit = "ton") => {
+  const minerals = Object.keys(dataByMineral).filter((mineral) =>
+    !mineralFilter || mineralFilter === "all" ? true : mineral === mineralFilter
+  );
   const results = [];
   minerals.forEach((mineral) => {
     const row = (dataByMineral[mineral][year] || []).find((r) => r.country === country);
     if (row && row.value > 0) {
-      results.push({ mineral, value: row.value, unit: mineralUnits[mineral] || "" });
+      const fromUnit = mineralUnits[mineral] || "";
+      results.push({
+        mineral,
+        value: convertVolume(row.value, fromUnit, toUnit),
+        unit: UNIT_LABELS[toUnit] || "",
+      });
     }
   });
   return results;
@@ -108,7 +146,7 @@ const PIE_PALETTE = [
 ];
 
 // ─── Line chart ───────────────────────────────────────────────────────────────
-const CountryLineChart = ({ country }) => {
+const CountryLineChart = ({ country, mineralFilter = null, unit = "ton" }) => {
   const canvasRef = useRef(null);
   const chartRef = useRef(null);
 
@@ -117,7 +155,7 @@ const CountryLineChart = ({ country }) => {
     if (!ctx) return;
     if (chartRef.current) chartRef.current.destroy();
 
-    const { years, chartData } = getCountryMineralData(country);
+    const { years, chartData } = getCountryMineralData(country, mineralFilter, unit);
     const palette = ["#082721", "#C9A84C", "#10b981", "#3b82f6", "#f59e0b", "#8b5cf6", "#ef4444"];
 
     const datasets = chartData.map((entry, i) => ({
@@ -146,8 +184,8 @@ const CountryLineChart = ({ country }) => {
             callbacks: {
               label: (c) => {
                 const mineral = c.dataset.label;
-                const unit = mineralUnits[mineral] || "";
-                return ` ${mineral}: ${c.parsed.y ?? 0} ${unit}`;
+                const unitLabel = UNIT_LABELS[unit] || "";
+                return ` ${mineral}: ${c.parsed.y ?? 0} ${unitLabel}`;
               },
             },
           },
@@ -174,7 +212,7 @@ const CountryLineChart = ({ country }) => {
     });
 
     return () => { chartRef.current?.destroy(); chartRef.current = null; };
-  }, [country]);
+  }, [country, mineralFilter, unit]);
 
   return (
     <div
@@ -203,7 +241,7 @@ const CountryLineChart = ({ country }) => {
 };
 
 // ─── Bar chart — minerals by volume for a selected year ──────────────────────
-const CountryBarChart = ({ country }) => {
+const CountryBarChart = ({ country, mineralFilter = null, unit = "ton" }) => {
   const canvasRef = useRef(null);
   const chartRef  = useRef(null);
   const [selectedYear, setSelectedYear] = useState(ALL_YEARS[ALL_YEARS.length - 1]);
@@ -214,7 +252,7 @@ const CountryBarChart = ({ country }) => {
     if (!ctx) return;
     if (chartRef.current) chartRef.current.destroy();
 
-    const data = getMineralShareForYear(country, selectedYear);
+    const data = getMineralShareForYear(country, selectedYear, mineralFilter, unit);
     if (data.length === 0) { setNoData(true); return; }
     setNoData(false);
 
@@ -234,15 +272,19 @@ const CountryBarChart = ({ country }) => {
       return `rgb(${r},${g},${b})`;
     });
 
+    const borderColors = colors.map((c) =>
+      c.replace("rgb", "rgba").replace(")", ",0.9)")
+    );
+
     chartRef.current = new Chart(ctx, {
       type: "bar",
       data: {
         labels,
         datasets: [{
-          label: `الإنتاج — ${selectedYear}`,
+          label: `الإنتاج — ${selectedYear} (${UNIT_LABELS[unit] || ""})`,
           data: values,
           backgroundColor: colors,
-          borderColor: colors.map((c) => c.replace("rgb", "rgba").replace(")", ",0.9)")),
+          borderColor: borderColors,
           borderWidth: 0,
           borderRadius: 6,
           borderSkipped: false,
@@ -299,9 +341,9 @@ const CountryBarChart = ({ country }) => {
     });
 
     return () => { chartRef.current?.destroy(); chartRef.current = null; };
-  }, [country, selectedYear]);
+  }, [country, selectedYear, mineralFilter, unit]);
 
-  const slices = getMineralShareForYear(country, selectedYear)
+  const slices = getMineralShareForYear(country, selectedYear, mineralFilter, unit)
     .sort((a, b) => b.value - a.value);
   const total = slices.reduce((s, d) => s + d.value, 0);
 
@@ -466,6 +508,8 @@ const CountryBarChart = ({ country }) => {
 // ─── Main page ────────────────────────────────────────────────────────────────
 const Countries = () => {
   const [selected, setSelected] = useState("—");
+  const [selectedMineral, setSelectedMineral] = useState("all");
+  const [volumeUnit, setVolumeUnit] = useState("ton");
 
   return (
     <div
@@ -487,16 +531,8 @@ const Countries = () => {
         {/* Country selector card */}
         <section className="bg-white/95 rounded-3xl shadow-xl shadow-slate-900/10 border border-slate-200/70 p-5 sm:p-7">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold mb-0">الدول العربية</h2>
-              <p className="text-slate-500 text-sm mt-1">
-                اختر دولة للاطلاع على ملخص سريع لبياناتها التعدينية (واجهة تجريبية).
-              </p>
-            </div>
-            <p className="text-slate-500 text-sm">
-              الدولة المختارة:{" "}
-              <span className="font-bold text-[#082721]">{selected}</span>
-            </p>
+            
+         
           </div>
 
           <div className="rounded-2xl bg-white p-5 shadow-lg shadow-slate-900/10 border border-slate-100">
@@ -568,11 +604,50 @@ const Countries = () => {
         {/* Charts — only shown when a country is selected */}
         {selected !== "—" && (
           <div className="space-y-6">
+            {/* Controls: mineral + unit filters */}
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-slate-700">المعدن:</span>
+                <select
+                  value={selectedMineral}
+                  onChange={(e) => setSelectedMineral(e.target.value)}
+                  className="rounded-md border border-slate-200 bg-white py-1 px-2 text-sm"
+                >
+                  <option value="all">الكل</option>
+                  <option value="الذهب">الذهب</option>
+                  {Object.keys(dataByMineral).map((mineral) => (
+                    <option key={mineral} value={mineral}>
+                      {mineral}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-slate-700">الوحدة:</span>
+                <select
+                  value={volumeUnit}
+                  onChange={(e) => setVolumeUnit(e.target.value)}
+                  className="rounded-md border border-slate-200 bg-white py-1 px-2 text-sm"
+                >
+                  <option value="ton">طن</option>
+                  <option value="kg">كجم</option>
+                </select>
+              </div>
+            </div>
+
             {/* Line chart */}
-            <CountryLineChart country={selected} />
+            <CountryLineChart
+              country={selected}
+              mineralFilter={selectedMineral}
+              unit={volumeUnit}
+            />
 
             {/* Bar chart — minerals by volume */}
-            <CountryBarChart country={selected} />
+            <CountryBarChart
+              country={selected}
+              mineralFilter={selectedMineral}
+              unit={volumeUnit}
+            />
           </div>
         )}
       </main>
