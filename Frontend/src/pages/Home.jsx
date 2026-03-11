@@ -554,17 +554,10 @@ border-radius:13px !important;
 
       {/* ═══════════════════════ HERO ═══════════════════════ */}
       <header className="relative overflow-hidden"
-        style={{
-          height: "100vh", minHeight: 600, maxHeight: 800, marginTop: -80,
-          backgroundImage: `url(${mapImg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}>
+        style={{ height:"100vh", minHeight:600, maxHeight:800, marginTop:-80 }}>
 
         <video
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ opacity: 0.25 }}
           src={bgHeaderVideo} autoPlay loop muted playsInline
         />
         <div className="hero-overlay absolute inset-0" />
