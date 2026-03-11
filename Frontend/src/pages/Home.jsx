@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import i7 from "../assets/i-7.png";
@@ -26,864 +26,972 @@ import flagMauritania from "../assets/flags/mauritania.webp";
 import flagYemen from "../assets/flags/yemen.webp";
 
 const countryFlags = {
-  jo: flagJordan,
-  ae: flagUae,
-  bh: flagBahrain,
-  tn: flagTunisia,
-  dz: flagAlgeria,
-  dj: flagDjibouti,
-  sa: flagSaudi,
-  sd: flagSudan,
-  sy: flagSyria,
-  so: flagSomalia,
-  iq: flagIraq,
-  om: flagOman,
-  ps: flagPalestine,
-  qa: flagQatar,
-  kw: flagKuwait,
-  lb: flagLebanon,
-  ly: flagLibya,
-  eg: flagEgypt,
-  ma: flagMorocco,
-  mr: flagMauritania,
-  ye: flagYemen,
+  jo: flagJordan, ae: flagUae, bh: flagBahrain, tn: flagTunisia,
+  dz: flagAlgeria, dj: flagDjibouti, sa: flagSaudi, sd: flagSudan,
+  sy: flagSyria, so: flagSomalia, iq: flagIraq, om: flagOman,
+  ps: flagPalestine, qa: flagQatar, kw: flagKuwait, lb: flagLebanon,
+  ly: flagLibya, eg: flagEgypt, ma: flagMorocco, mr: flagMauritania, ye: flagYemen,
 };
 
 const countries = [
-  { name: 'المملكة الأردنية الهاشمية', code: "jo" },
-  { name: 'دولة الامارات العربية المتحدة', code: "ae" },
-  { name: 'مملكة البحرين', code: "bh" },
-  { name: 'الجمهورية التونسية', code: "tn" },
-  { name: 'الجمهورية الجزائرية الديمقراطية الشعبية', code: "dz" },
-  { name: 'دولة جيبوتي', code: "dj" },
-  { name: 'المملكة العربية السعودية', code: "sa" },
-  { name: 'جمهورية السودان', code: "sd" },
-  { name: 'الجمهورية العربية السورية', code: "sy" },
-  { name: 'جمهورية الصومال', code: "so" },
-  { name: 'جمهورية العراق', code: "iq" },
-  { name: 'سلطنة عمان', code: "om" },
-  { name: 'دولة فلسطين', code: "ps" },
-  { name: 'دولة قطر', code: "qa" },
-  { name: 'دولة الكويت', code: "kw" },
-  { name: 'الجمهورية اللبنانية', code: "lb" },
-  { name: 'دولة ليبيا', code: "ly" },
-  { name: 'جمهورية مصر العربية', code: "eg" },
-  { name: 'المملكة المغربية', code: "ma" },
-  { name: 'الجمهورية الإسلامية الموريتانية', code: "mr" },
-  { name: 'الجمهورية اليمنية', code: "ye" },
+  { name: 'الأردن', code: "jo" }, { name: 'الإمارات', code: "ae" },
+  { name: 'البحرين', code: "bh" }, { name: 'تونس', code: "tn" },
+  { name: 'الجزائر', code: "dz" }, { name: 'جيبوتي', code: "dj" },
+  { name: 'السعودية', code: "sa" }, { name: 'السودان', code: "sd" },
+  { name: 'سوريا', code: "sy" }, { name: 'الصومال', code: "so" },
+  { name: 'العراق', code: "iq" }, { name: 'عُمان', code: "om" },
+  { name: 'فلسطين', code: "ps" }, { name: 'قطر', code: "qa" },
+  { name: 'الكويت', code: "kw" }, { name: 'لبنان', code: "lb" },
+  { name: 'ليبيا', code: "ly" }, { name: 'مصر', code: "eg" },
+  { name: 'المغرب', code: "ma" }, { name: 'موريتانيا', code: "mr" },
+  { name: 'اليمن', code: "ye" },
+];
+
+const sponsors = [
+  { href: "https://procedures.gov.mr/ar/", img: i7, title: "وزارة المعادن والصناعة", subtitle: "الجمهورية الإسلامية الموريتانية" },
+  { href: "https://www.mim.gov.sa/ar", img: i7, title: "وزارة الصناعة والثروة المعدنية", subtitle: "المملكة العربية السعودية" },
+  { href: "https://procedures.gov.mr/ar/", img: i7, title: "وزارة المعادن والصناعة", subtitle: "الجمهورية الإسلامية الموريتانية" },
+  { href: "https://www.mim.gov.sa/ar", img: i7, title: "وزارة الصناعة والثروة المعدنية", subtitle: "المملكة العربية السعودية" },
+  { href: "https://procedures.gov.mr/ar/", img: i7, title: "وزارة المعادن والصناعة", subtitle: "الجمهورية الإسلامية الموريتانية" },
+  { href: "https://www.mim.gov.sa/ar", img: i7, title: "وزارة الصناعة والثروة المعدنية", subtitle: "المملكة العربية السعودية" },
+];
+
+/* ── Mini Charts ── */
+const MiniBarChart = () => {
+  const data = [
+    { label: "المملكة الأردنية الهاشمية", v: 55 },
+    { label: "دولة الامارات العربية المتحدة", v: 72 },
+    { label: "مملكة البحرين", v: 38 },
+    { label: "الجمهورية التونسية", v: 63 },
+    { label: "الجمهورية الجزائرية الديمقراطية الشعبية", v: 78 },
+    { label: "دولة جيبوتي", v: 22 },
+    { label: "المملكة العربية السعودية", v: 95 },
+    { label: "جمهورية السودان", v: 48 },
+    { label: "الجمهورية العربية السورية", v: 41 },
+    { label: "جمهورية الصومال", v: 18 },
+    { label: "جمهورية العراق", v: 67 },
+    { label: "سلطنة عمان", v: 59 },
+    { label: "دولة فلسطين", v: 15 },
+    { label: "دولة قطر", v: 44 },
+    { label: "دولة الكويت", v: 36 },
+    { label: "الجمهورية اللبنانية", v: 29 },
+    { label: "دولة ليبيا", v: 52 },
+    { label: "جمهورية مصر العربية", v: 83 },
+    { label: "المملكة المغربية", v: 88 },
+    { label: "الجمهورية الإسلامية الموريتانية", v: 71 },
+    { label: "الجمهورية اليمنية", v: 33 },
+  ];
+  return (
+    <div style={{ height: 90, width: "100%", background: "rgba(8,39,33,0.06)", borderRadius: 8, padding: "10px 6px 4px", display: "flex", alignItems: "flex-end", gap: 2 }}>
+      {data.map((d, i) => (
+        <div
+          key={i}
+          title={d.label}
+          style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", height: "100%", cursor: "default" }}
+        >
+          <div className="mini-bar" style={{
+            width: "100%", borderRadius: "2px 2px 0 0",
+            background: "linear-gradient(to top, #c9a84c, #e8d08a)",
+            "--bar-h": `${d.v}%`, minHeight: 3,
+          }} />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const MiniLineChart = () => {
+  const pts = [[4,76],[18,72],[32,70],[46,67],[60,65],[74,63],[88,60],[102,56],[116,14],[130,40],[144,66],[158,42],[172,44],[186,38]];
+  const path = pts.map((p,i) => `${i===0?"M":"L"} ${p[0]} ${p[1]}`).join(" ");
+  return (
+    <div style={{ height: 90, width: "100%", background: "rgba(8,39,33,0.06)", borderRadius: 8, padding: 8 }}>
+      <svg viewBox="0 0 190 88" style={{ width: "100%", height: "100%" }}>
+        {[20,40,60,80].map(y => <line key={y} x1="0" y1={y} x2="190" y2={y} stroke="rgba(8,39,33,0.08)" strokeWidth="1"/>)}
+        <path d={path} fill="none" stroke="#7ee0c0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mini-line-draw" />
+        {pts.map((p,i) => <circle key={i} cx={p[0]} cy={p[1]} r="2.2" fill="#c9a84c" className="mini-dot-fade" style={{ animationDelay: `${400+i*60}ms` }} />)}
+      </svg>
+    </div>
+  );
+};
+
+const MiniGroupedBar = () => {
+  const a = [88,70,62,72,70,18,24,30,45,46,47,20,22,28,34];
+  const b = [18,22,24,34,36,40,45,52,46,46,47,30,29,21,23];
+  return (
+    <div style={{ height: 90, width: "100%", background: "rgba(8,39,33,0.06)", borderRadius: 8, padding: "10px 8px 4px", display: "flex", alignItems: "flex-end", gap: 2 }}>
+      {a.map((v,i) => (
+        <div key={i} style={{ flex: 1, display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 1, height: "100%" }}>
+          <div className="mini-bar" style={{ width: "45%", borderRadius: "2px 2px 0 0", background: "#082721", "--bar-h": `${v}%`, animationDelay: `${i*50}ms` }} />
+          <div className="mini-bar" style={{ width: "45%", borderRadius: "2px 2px 0 0", background: "#49c7a2", "--bar-h": `${b[i]}%`, animationDelay: `${i*50+100}ms` }} />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const MiniDonut = () => (
+  <div style={{ height: 90, width: "100%", background: "rgba(8,39,33,0.06)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 16 }}>
+    <div className="mini-donut-spin" style={{
+      width: 68, height: 68, borderRadius: "50%", flexShrink: 0,
+      background: "conic-gradient(#c9a84c 0deg 194deg, rgba(8,39,33,0.15) 194deg 360deg)",
+      position: "relative"
+    }}>
+      <div style={{ position: "absolute", inset: 14, borderRadius: "50%", background: "#f5f3ef", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#082721" }}>54%</span>
+      </div>
+    </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+      {[["#c9a84c","الإنتاج العربي"],["rgba(8,39,33,0.2)","العالم"]].map(([c,l],i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          <div style={{ width: 8, height: 8, borderRadius: 2, background: c, flexShrink: 0 }} />
+          <span style={{ fontSize: "0.65rem", color: "#7a7060" }}>{l}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const indicatorCards = [
+  {
+    icon: "fa-chart-column", tag: "KPI", tagColor: "#c9a84c",
+    title: "حجم الإنتاج التعديني",
+    desc: "لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة الزمنية.",
+    href: "/m1", Chart: MiniBarChart,
+  },
+  {
+    icon: "fa-chart-line", tag: "Trends", tagColor: "#7ee0c0",
+    title: "تطور الإنتاج التعديني",
+    desc: "تتبّع تطور الإنتاج عبر السنوات مع إبراز الاتجاهات وأهم التغيرات السنوية.",
+    href: "/m2", Chart: MiniLineChart,
+  },
+  {
+    icon: "fa-layer-group", tag: "Compare", tagColor: "#93c5fd",
+    title: "تطور الإنتاج التعديني العربي",
+    desc: "مقارنة أداء الدول العربية في الإنتاج عبر أكثر من خام وفترات زمنية مختلفة.",
+    href: "/m3", Chart: MiniGroupedBar,
+  },
+  {
+    icon: "fa-circle-notch", tag: "Global Share", tagColor: "#fbbf24",
+    title: "نسبة الإنتاج العربي من العالمي",
+    desc: "قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري تفاعلي.",
+    href: "/m4", Chart: MiniDonut,
+  },
 ];
 
 const Home = () => {
   const [selectedCountry, setSelectedCountry] = useState("—");
   const [sponsorSlide, setSponsorSlide] = useState(0);
-
-  const sponsors = [
-    {
-      href: "https://procedures.gov.mr/ar/",
-      img: i7,
-      title: "1 وزارة المعادن و الصناع العربية",
-      subtitle: "الجمهورية الإسلامية الموريتانية",
-    },
-    {
-      href: "https://www.mim.gov.sa/ar",
-      img: i7,
-      title: "2 وزارة الصناعة والثروة المعدنية",
-      subtitle: "المملكة العربية السعودية",
-    },
-    {
-      href: "https://procedures.gov.mr/ar/",
-      img: i7,
-      title: "3 وزارة المعادن و الصناعة",
-      subtitle: "الجمهورية الإسلامية الموريتانية",
-    },
-    {
-      href: "https://www.mim.gov.sa/ar",
-      img: i7,
-      title: "4 وزارة الصناعة والثروة المعدنية",
-      subtitle: "المملكة العربية السعودية",
-    },
-    {
-      href: "https://procedures.gov.mr/ar/",
-      img: i7,
-      title: "5 وزارة المعادن و الصناعة",
-      subtitle: "الجمهورية الإسلامية الموريتانية",
-    },
-    {
-      href: "https://www.mim.gov.sa/ar",
-      img: i7,
-      title: "6 وزارة الصناعة والثروة المعدنية",
-      subtitle: "المملكة العربية السعودية",
-    },
-  ];
-
+  const [searchFocused, setSearchFocused] = useState(false);
   const sponsorSlides = [];
-  for (let i = 0; i < sponsors.length; i += 3) {
-    sponsorSlides.push(sponsors.slice(i, i + 3));
-  }
-
-  const handleChatbotClick = () => {
-    alert("Chat Bote — محلل البيانات الذكي (واجهة تجريبية).");
-  };
+  for (let i = 0; i < sponsors.length; i += 3) sponsorSlides.push(sponsors.slice(i, i + 3));
 
   useEffect(() => {
     if (sponsorSlides.length <= 1) return;
-    const interval = setInterval(() => {
-      setSponsorSlide((prev) => (prev + 1) % sponsorSlides.length);
-    }, 4000);
-    return () => clearInterval(interval);
+    const t = setInterval(() => setSponsorSlide(p => (p + 1) % sponsorSlides.length), 4000);
+    return () => clearInterval(t);
   }, [sponsorSlides.length]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
     const els = Array.from(document.querySelectorAll(".reveal"));
-    if (els.length === 0) return;
-    const prefersReduced =
-      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
-    if (prefersReduced) {
-      els.forEach((el) => el.classList.add("is-visible"));
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-visible");
-            io.unobserve(e.target);
-          }
-        }
-      },
-      { root: null, threshold: 0.12, rootMargin: "0px 0px -10% 0px" }
-    );
-    els.forEach((el) => io.observe(el));
+    if (!els.length) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("is-visible"); io.unobserve(e.target); } });
+    }, { threshold: 0.1, rootMargin: "0px 0px -8% 0px" });
+    els.forEach(el => io.observe(el));
     return () => io.disconnect();
   }, []);
 
+  const handleChatbotClick = () => alert("Chat Bote — محلل البيانات الذكي (واجهة تجريبية).");
+
   return (
-    <div
-      className="min-h-screen text-slate-800 text-xl sm:text-2xl md:text-3xl"
-      dir="rtl"
-      lang="ar"
-    >
+    <div className="min-h-screen" dir="rtl" lang="ar" style={{ background: "#f5f3ef", fontFamily: "'Cairo', 'Amiri', Georgia, serif" }}>
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+
+        :root {
+          --forest: #082721;
+          --forest-mid: #0d3d34;
+          --gold: #c9a84c;
+          --gold-light: #e8d08a;
+          --gold-pale: #f7f0dc;
+          --cream: #f5f3ef;
+          --parchment: #ede9df;
+          --ink: #1a1510;
+          --muted: #7a7060;
+          --rust: #6d2824;
+        }
+
+        /* ── Noise texture overlay ── */
+        body::before {
+          content: '';
+          position: fixed;
+          inset: 0;
+          opacity: 0.025;
+          pointer-events: none;
+          z-index: 9999;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+          background-size: 180px;
+        }
+
         /* ── Keyframes ── */
-        @keyframes popIn {
-          0%   { opacity: 0; transform: translateY(28px) scale(0.95); filter: blur(8px); }
-          65%  { opacity: 1; transform: translateY(-4px) scale(1.01); filter: blur(0); }
-          100% { opacity: 1; transform: translateY(0)   scale(1);    filter: blur(0); }
+        @keyframes fadeUp {
+          from { opacity:0; transform: translateY(32px); }
+          to   { opacity:1; transform: translateY(0); }
         }
-        @keyframes fadeSlideUp {
-          0%   { opacity: 0; transform: translateY(20px); }
-          100% { opacity: 1; transform: translateY(0); }
+        @keyframes revealIn {
+          from { opacity:0; transform: translateY(24px) scale(0.97); filter: blur(6px); }
+          to   { opacity:1; transform: translateY(0) scale(1); filter: blur(0); }
         }
-        @keyframes shimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position:  200% center; }
+        @keyframes shimmerGold {
+          0%   { background-position: -300% center; }
+          100% { background-position: 300% center; }
         }
-        @keyframes pulseRing {
-          0%,100% { box-shadow: 0 0 0 0 rgba(8,39,33,0.18); }
-          50%      { box-shadow: 0 0 0 8px rgba(8,39,33,0); }
+        @keyframes floatSlow {
+          0%,100% { transform: translateY(0px); }
+          50%      { transform: translateY(-6px); }
         }
-        @keyframes floatBadge {
-          0%,100% { transform: translateY(0); }
-          50%      { transform: translateY(-4px); }
+        @keyframes borderBreath {
+          0%,100% { opacity:0.4; }
+          50%      { opacity:1; }
         }
-        @keyframes spinSlow {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
+        @keyframes pulseGlow {
+          0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.3); }
+          50%      { box-shadow: 0 0 0 10px rgba(201,168,76,0); }
         }
-        @keyframes glowPulse {
-          0%,100% { opacity: 0.15; }
-          50%      { opacity: 0.35; }
+        @keyframes dotBlink {
+          0%,100% { opacity:1; } 50% { opacity:0.3; }
         }
-        @keyframes scaleIn {
-          0%   { opacity: 0; transform: scale(0.88); }
-          100% { opacity: 1; transform: scale(1); }
-        }
-        @keyframes slideInRight {
-          0%   { opacity: 0; transform: translateX(30px); }
-          100% { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes borderGlow {
-          0%,100% { border-color: rgba(8,39,33,0.3); }
-          50%      { border-color: rgba(221,188,107,0.7); }
-        }
-        @keyframes countUp {
-          0%   { opacity: 0; transform: translateY(10px); }
-          100% { opacity: 1; transform: translateY(0); }
+        @keyframes lineGrow {
+          from { transform: scaleX(0); }
+          to   { transform: scaleX(1); }
         }
 
-        /* ── Reveal base ── */
-        .reveal {
-          opacity: 0;
-          transform: translateY(28px) scale(0.95);
-          filter: blur(8px);
-          will-change: transform, opacity, filter;
-        }
-        .reveal.is-visible {
-          animation: popIn 880ms cubic-bezier(.2,.9,.2,1) both;
-        }
-        .reveal.is-visible.d1 { animation-delay:  80ms; }
-        .reveal.is-visible.d2 { animation-delay: 160ms; }
-        .reveal.is-visible.d3 { animation-delay: 240ms; }
-        .reveal.is-visible.d4 { animation-delay: 320ms; }
-        .reveal.is-visible.d5 { animation-delay: 400ms; }
+        /* ── Reveal system ── */
+        .reveal { opacity:0; transform: translateY(24px) scale(0.97); filter:blur(6px); will-change:transform,opacity,filter; }
+        .reveal.is-visible { animation: revealIn 900ms cubic-bezier(.16,1,.3,1) forwards; }
+        .reveal.is-visible.d1 { animation-delay: 60ms; }
+        .reveal.is-visible.d2 { animation-delay: 130ms; }
+        .reveal.is-visible.d3 { animation-delay: 200ms; }
+        .reveal.is-visible.d4 { animation-delay: 280ms; }
+        .reveal.is-visible.d5 { animation-delay: 360ms; }
 
-        /* ── Hero text ── */
-        .hero-title {
-          animation: fadeSlideUp 900ms cubic-bezier(.2,.9,.2,1) both;
-          animation-delay: 200ms;
-        }
-        .hero-sub {
-          animation: fadeSlideUp 900ms cubic-bezier(.2,.9,.2,1) both;
-          animation-delay: 380ms;
+        /* ── Hero ── */
+        .hero-title { animation: fadeUp 1s cubic-bezier(.16,1,.3,1) both; animation-delay: 150ms; }
+        .hero-sub   { animation: fadeUp 1s cubic-bezier(.16,1,.3,1) both; animation-delay: 320ms; }
+        .hero-search { animation: fadeUp 1s cubic-bezier(.16,1,.3,1) both; animation-delay: 480ms; }
+
+        .hero-overlay {
+          background: linear-gradient(
+            to bottom,
+            rgba(8,39,33,0.72) 0%,
+            rgba(8,39,33,0.45) 55%,
+            rgba(245,243,239,0.0) 100%
+          );
         }
 
-        /* ── Search bar ── */
-        .search-bar {
-          animation: scaleIn 700ms cubic-bezier(.2,.9,.2,1) both;
-          animation-delay: 500ms;
-          box-shadow: 0 8px 32px rgba(8,39,33,0.13), 0 2px 8px rgba(8,39,33,0.08);
-          transition: box-shadow .3s, transform .3s;
+        /* ── Gold shimmer text ── */
+        .text-shimmer {
+          background: linear-gradient(120deg, #c9a84c 0%, #f0d98a 40%, #c9a84c 60%, #8a6a1e 100%);
+          background-size: 300% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: shimmerGold 6s linear infinite;
         }
-        .search-bar:focus-within {
-          box-shadow: 0 12px 40px rgba(8,39,33,0.2), 0 4px 16px rgba(221,188,107,0.2);
-          transform: translateY(-2px);
+
+        /* ── Gold divider ── */
+        .gold-divider {
+          height: 1px;
+          background: linear-gradient(to right, transparent, var(--gold), transparent);
+          opacity: 0.5;
+          transform-origin: center;
+          animation: lineGrow 1.2s cubic-bezier(.16,1,.3,1) both;
+        }
+
+        /* ── Search ── */
+        .search-container {
+          background: rgba(255, 255, 255, 0.83);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(201,168,76,0.35);
+          transition: all 0.4s cubic-bezier(.16,1,.3,1);
+        }
+        .search-container.focused {
+          background: rgb(255, 255, 255);
+          border-color: rgba(201,168,76,0.7);
+          box-shadow: 0 0 0 4px rgba(201,168,76,0.12), 0 20px 60px rgba(8,39,33,0.4);
         }
 
         /* ── KPI cards ── */
         .kpi-card {
-          transition: transform .35s cubic-bezier(.2,.9,.2,1), box-shadow .35s;
-          box-shadow: 0 4px 24px rgba(8,39,33,0.10), 0 1px 4px rgba(8,39,33,0.06);
+          background: var(--forest);
+          border: 1px solid rgba(201,168,76,0.2);
+          transition: transform 0.4s cubic-bezier(.16,1,.3,1), box-shadow 0.4s, border-color 0.4s;
         }
         .kpi-card:hover {
-          transform: translateY(-8px) scale(1.02);
-          box-shadow: 0 20px 48px rgba(8,39,33,0.18), 0 4px 12px rgba(8,39,33,0.10);
+          transform: translateY(-10px);
+          border-color: rgba(201,168,76,0.6);
+          box-shadow: 0 30px 60px rgba(8,39,33,0.35), 0 0 0 1px rgba(201,168,76,0.3);
         }
-        .kpi-card .kpi-icon {
-          animation: glowPulse 3s ease-in-out infinite;
+        .kpi-number {
+          font-size: 2.8rem;
+          font-weight: 900;
+          letter-spacing: -0.02em;
+          line-height: 1;
         }
-        .kpi-card h2 {
-          animation: countUp 600ms cubic-bezier(.2,.9,.2,1) both;
-        }
+        .kpi-accent { background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05)); border: 1px solid rgba(201,168,76,0.2); }
 
-        /* ── Section badges ── */
-        .section-badge {
-          animation: floatBadge 4s ease-in-out infinite;
-          box-shadow: 0 4px 16px rgba(8,39,33,0.12), 0 1px 4px rgba(8,39,33,0.06);
-          transition: box-shadow .3s, transform .3s;
-        }
-        .section-badge:hover {
-          box-shadow: 0 8px 24px rgba(8,39,33,0.18);
-          transform: translateY(-2px);
+        /* ── Section label ── */
+        .section-label {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 16px;
+          background: var(--forest);
+          color: var(--gold);
+          border-radius: 2px;
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
         }
 
         /* ── Indicator cards ── */
-        .indicator-card {
-          transition: transform .35s cubic-bezier(.2,.9,.2,1), box-shadow .35s;
-          box-shadow: 0 4px 20px rgba(8,39,33,0.08), 0 1px 4px rgba(8,39,33,0.05);
-          animation: fadeSlideUp 600ms cubic-bezier(.2,.9,.2,1) both;
+        .ind-card {
+          background: white;
+          border: 1px solid rgba(8,39,33,0.08);
+          border-top: 3px solid var(--gold);
+          transition: transform 0.35s cubic-bezier(.16,1,.3,1), box-shadow 0.35s, border-top-color 0.3s;
         }
-        .indicator-card:nth-child(1) { animation-delay: 100ms; }
-        .indicator-card:nth-child(2) { animation-delay: 200ms; }
-        .indicator-card:nth-child(3) { animation-delay: 300ms; }
-        .indicator-card:nth-child(4) { animation-delay: 400ms; }
-        .indicator-card:hover {
-          transform: translateY(-6px) scale(1.01);
-          box-shadow: 0 16px 48px rgba(8,39,33,0.16), 0 4px 12px rgba(8,39,33,0.08);
+        .ind-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 24px 48px rgba(8,39,33,0.12), 0 4px 12px rgba(8,39,33,0.06);
+          border-top-color: var(--forest);
         }
-        .indicator-card .icon-box {
-          transition: transform .3s, box-shadow .3s;
+        .ind-icon {
+          width: 44px; height: 44px;
+          background: linear-gradient(135deg, var(--forest), var(--forest-mid));
+          border-radius: 10px;
+          display: flex; align-items: center; justify-content: center;
+          color: var(--gold);
+          font-size: 1rem;
+          transition: transform 0.3s, box-shadow 0.3s;
+          flex-shrink: 0;
         }
-        .indicator-card:hover .icon-box {
-          transform: scale(1.15) rotate(-5deg);
-          box-shadow: 0 6px 18px rgba(8,39,33,0.18);
+        .ind-card:hover .ind-icon {
+          transform: scale(1.1) rotate(-5deg);
+          box-shadow: 0 8px 20px rgba(8,39,33,0.25);
+        }
+        .ind-link {
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 6px 18px;
+          border: 1px solid rgba(8,39,33,0.2);
+          border-radius: 2px;
+          font-size: 0.78rem; font-weight: 700;
+          color: var(--forest);
+          letter-spacing: 0.04em;
+          transition: background 0.25s, border-color 0.25s, color 0.25s;
+        }
+        .ind-link:hover {
+          background: var(--forest);
+          color: var(--gold);
+          border-color: var(--forest);
         }
 
-        /* ── "More" button ── */
-        .btn-more {
-          box-shadow: 0 2px 10px rgba(8,39,33,0.20);
-          transition: transform .25s, box-shadow .25s;
+        /* ── Trade cards ── */
+        .trade-card {
+          background: linear-gradient(135deg, var(--forest) 0%, #0d3d34 100%);
+          border: 1px solid rgba(201,168,76,0.2);
+          transition: transform 0.35s cubic-bezier(.16,1,.3,1), box-shadow 0.35s, border-color 0.35s;
         }
-        .btn-more:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(8,39,33,0.30);
-        }
-        .btn-more:active { transform: scale(0.97); }
-
-        /* ── Nav link pill ── */
-        .nav-pill {
-          box-shadow: 0 2px 10px rgba(8,39,33,0.08);
-          transition: transform .25s, box-shadow .25s, background .25s;
-        }
-        .nav-pill:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(8,39,33,0.14);
+        .trade-card:hover {
+          transform: translateY(-8px);
+          border-color: rgba(201,168,76,0.5);
+          box-shadow: 0 24px 48px rgba(8,39,33,0.3);
         }
 
-        /* ── Country button ── */
+        /* ── Reserve cards ── */
+        .reserve-card {
+          background: white;
+          transition: transform 0.35s cubic-bezier(.16,1,.3,1), box-shadow 0.35s;
+        }
+        .reserve-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 24px 48px rgba(8,39,33,0.12);
+        }
+
+        /* ── Country section ── */
+        .countries-wrap {
+          background: white;
+          border: 1px solid rgba(8,39,33,0.08);
+        }
         .country-btn {
-          transition: transform .3s cubic-bezier(.2,.9,.2,1), box-shadow .3s;
+          transition: transform 0.3s cubic-bezier(.16,1,.3,1);
         }
-        .country-btn:hover {
-          transform: translateY(-6px) scale(1.05);
-        }
-        .country-btn .flag-wrap {
-          box-shadow: 0 4px 16px rgba(8,39,33,0.14), 0 1px 4px rgba(8,39,33,0.08);
-          transition: box-shadow .3s;
+        .country-btn:hover { transform: translateY(-6px) scale(1.04); }
+        .flag-frame {
           border-radius: 6px;
           overflow: hidden;
+          box-shadow: 0 4px 16px rgba(8,39,33,0.12);
+          transition: box-shadow 0.3s;
+          border: 2px solid transparent;
+          transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .country-btn:hover .flag-wrap {
-          box-shadow: 0 10px 32px rgba(8,39,33,0.22), 0 2px 8px rgba(221,188,107,0.20);
-          animation: borderGlow 2s ease-in-out infinite;
+        .country-btn:hover .flag-frame {
+          border-color: var(--gold);
+          box-shadow: 0 10px 28px rgba(201,168,76,0.25);
         }
+        .country-name {
+          font-size: 0.78rem; font-weight: 700;
+          color: var(--forest);
+          transition: color 0.2s;
+        }
+        .country-btn:hover .country-name { color: var(--gold); }
 
-        /* ── Countries section wrapper ── */
-        .countries-section {
-          box-shadow: 0 8px 40px rgba(8,39,33,0.10), 0 2px 8px rgba(8,39,33,0.06);
-          transition: box-shadow .4s;
-        }
-        .countries-section:hover {
-          box-shadow: 0 16px 56px rgba(8,39,33,0.14), 0 4px 16px rgba(8,39,33,0.08);
-        }
-
-        /* ── Sponsor cards ── */
+        /* ── Sponsors ── */
         .sponsor-card {
-          box-shadow: 0 4px 20px rgba(8,39,33,0.10), 0 1px 4px rgba(8,39,33,0.06);
-          transition: transform .3s, box-shadow .3s;
+          border: 1px solid rgba(8,39,33,0.08);
+          background: white;
+          transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
         }
         .sponsor-card:hover {
-          transform: translateY(-4px) scale(1.02);
-          box-shadow: 0 14px 40px rgba(8,39,33,0.18);
+          transform: translateY(-4px);
+          border-color: var(--gold);
+          box-shadow: 0 16px 36px rgba(8,39,33,0.12);
         }
 
-        /* ── Sponsors section wrapper ── */
-        .sponsors-section {
-          box-shadow: 0 8px 40px rgba(8,39,33,0.10), 0 2px 8px rgba(8,39,33,0.06);
+        /* ── Chatbot CTA ── */
+        .chat-cta {
+          background: linear-gradient(135deg, var(--forest) 0%, #0d3d34 60%, #102e28 100%);
+          border: 1px solid rgba(201,168,76,0.25);
+          position: relative;
+          overflow: hidden;
+        }
+        .chat-cta::before {
+          content: '';
+          position: absolute;
+          top: -50%; left: -50%;
+          width: 200%; height: 200%;
+          background: radial-gradient(ellipse at 70% 50%, rgba(201,168,76,0.07) 0%, transparent 60%);
+          animation: floatSlow 8s ease-in-out infinite;
         }
 
-        /* ── Chatbot CTA section ── */
-        .chatbot-section {
-          box-shadow: 0 8px 40px rgba(8,39,33,0.10), 0 2px 8px rgba(8,39,33,0.06);
-          transition: box-shadow .4s, transform .4s;
+        /* ── Float button ── */
+        .float-btn {
+          background: var(--forest);
+          border: 1px solid rgba(201,168,76,0.3);
+          animation: pulseGlow 3s ease-in-out infinite;
+          transition: transform 0.3s, box-shadow 0.3s;
         }
-        .chatbot-section:hover {
-          box-shadow: 0 18px 56px rgba(8,39,33,0.16);
-          transform: translateY(-3px);
-        }
-
-        /* ── Floating chatbot button ── */
-        .chatbot-float {
-          animation: pulseRing 2.5s ease-in-out infinite;
-          box-shadow: 0 8px 32px rgba(8,39,33,0.25), 0 2px 8px rgba(8,39,33,0.15);
-          transition: transform .3s, box-shadow .3s;
-        }
-        .chatbot-float:hover {
-          transform: translateY(-4px) scale(1.04);
-          box-shadow: 0 16px 48px rgba(8,39,33,0.35), 0 4px 16px rgba(221,188,107,0.25);
+        .float-btn:hover {
+          transform: translateY(-4px) scale(1.03);
+          box-shadow: 0 20px 50px rgba(8,39,33,0.45), 0 0 0 1px rgba(201,168,76,0.5);
         }
 
-        /* ── Reserve cards border animation ── */
-        .reserve-card-gold {
-          animation: borderGlow 3s ease-in-out infinite;
-        }
+        /* ── Online dot ── */
+        .online-dot { animation: dotBlink 2s ease-in-out infinite; }
 
-        /* ── Shimmer on active search button ── */
-        .btn-smart-search {
-          background-size: 200% auto;
-          transition: background-position .5s, box-shadow .3s, transform .2s;
+        .search-container input::placeholder { color: rgba(0,0,0,0.45); }
+        .search-container input { color: black; }
+
+        /* ── Scroll indicator ── */
+        .scroll-hint { animation: floatSlow 3s ease-in-out infinite; }
+
+        /* ── Mini chart animations ── */
+        @keyframes growBar {
+          from { height: 0; opacity: 0.3; }
+          to   { height: var(--bar-h); opacity: 1; }
         }
-        .btn-smart-search:hover {
-          background-position: right center;
-          box-shadow: 0 6px 20px rgba(8,39,33,0.35);
-          transform: translateY(-1px);
+        @keyframes drawLine {
+          from { stroke-dashoffset: 500; }
+          to   { stroke-dashoffset: 0; }
+        }
+        @keyframes fadeDot {
+          from { opacity: 0; transform: scale(0.2); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes donutSpin {
+          from { transform: scale(0.6) rotate(-90deg); opacity: 0; }
+          to   { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .mini-bar { height: 0; opacity: 0.3; }
+        .ind-row-card:hover .mini-bar { animation: growBar 800ms cubic-bezier(.16,1,.3,1) forwards; }
+        .mini-line-draw { stroke-dasharray: 500; stroke-dashoffset: 500; }
+        .ind-row-card:hover .mini-line-draw { animation: drawLine 1.2s ease forwards; }
+        .mini-dot-fade { opacity: 0; }
+        .ind-row-card:hover .mini-dot-fade { animation: fadeDot 280ms ease forwards; }
+        .mini-donut-spin { opacity: 0.85; transform: scale(0.85); }
+        .ind-row-card:hover .mini-donut-spin { animation: donutSpin 800ms cubic-bezier(.16,1,.3,1) forwards; }
+
+        .ind-row-card {
+          background: white;
+          border: 1px solid rgba(8,39,33,0.07);
+          border-right: 3px solid var(--gold);
+          transition: transform 0.35s cubic-bezier(.16,1,.3,1), box-shadow 0.35s, border-right-color 0.3s;
+        }
+        .ind-row-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 48px rgba(8,39,33,0.11), 0 4px 12px rgba(8,39,33,0.06);
+          border-right-color: var(--forest);
+        }
+        .ind-row-card:hover .ind-icon {
+          transform: scale(1.12) rotate(-5deg);
+          box-shadow: 0 6px 18px rgba(8,39,33,0.2);
         }
       `}</style>
 
       <Menu />
 
-      {/* ── Hero ── */}
-      <header className="relative overflow-hidden text-white h-[680px] pt-12 mb-[-350px] mt-[-90px]">
+      {/* ══════════ HERO ══════════ */}
+      <header className="relative overflow-hidden" style={{ height: "100vh", minHeight: 600, maxHeight: 800 ,marginTop:-80 }}>
         <video
           className="absolute inset-0 h-full w-full object-cover"
-          src={bgHeaderVideo}
-          autoPlay
-          loop
-          muted
-          playsInline
+          src={bgHeaderVideo} autoPlay loop muted playsInline
         />
-        <div className="absolute" />
-        <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="hero-title mb-3 text-4xl sm:text-5xl md:text-6xl font-extrabold mt-[100px]"
-            style={{ textShadow: "0 4px 24px rgba(0,0,0,0.35)" }}>
-            بوابة المؤشرات التعدينية العربية
+        {/* Overlay */}
+        <div className="hero-overlay absolute inset-0" />
+        {/* Decorative geometric lines */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: "linear-gradient(rgba(201,168,76,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.06) 1px, transparent 1px)",
+          backgroundSize: "80px 80px"
+        }} />
+
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+          {/* Label */}
+          <div className="hero-title mb-6">
+            <span style={{
+              display: "inline-block",
+              background: "rgba(201,168,76,0.15)",
+              border: "1px solid rgba(201,168,76,0.4)",
+              color: "var(--gold-light)",
+              padding: "4px 20px",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              letterSpacing: "0.15em",
+              borderRadius: "2px",
+              marginBottom: 20,
+              textTransform: "uppercase"
+            }}>
+              ✦ المنظومة التعدينية العربية ✦
+            </span>
+          </div>
+
+          <h1 className="hero-title text-white" style={{
+            fontSize: "clamp(2rem, 5vw, 4rem)",
+            fontWeight: 900,
+            lineHeight: 1.15,
+            letterSpacing: "-0.02em",
+            textShadow: "0 4px 40px rgba(0,0,0,0.4)",
+            maxWidth: 800,
+            marginBottom: "1rem"
+          }}>
+            بوابة المؤشرات{" "}
+            <span className="text-shimmer">التعدينية العربية</span>
           </h1>
-          <p className="hero-sub mx-auto max-w-4xl text-lg sm:text-xl text-white/80"
-            style={{ textShadow: "0 2px 12px rgba(0,0,0,0.25)" }}>
-            منصة تحليلية ذكية لمتابعة الإنتاج التعديني العربي، المقارنات، الخرائط،
-            والتقارير المتقدمة.
+
+          <p className="hero-sub" style={{
+            color: "rgba(255,255,255,0.72)",
+            fontSize: "clamp(0.9rem, 1.8vw, 1.15rem)",
+            maxWidth: 560,
+            lineHeight: 1.8,
+            marginBottom: "2.5rem"
+          }}>
+            منصة تحليلية ذكية لمتابعة الإنتاج التعديني العربي،
+            المقارنات، الخرائط، والتقارير المتقدمة.
           </p>
+
+          {/* Search */}
+          <div className="hero-search w-full" style={{ maxWidth: 580 }}>
+            <div
+              className={`search-container flex items-center gap-3 rounded-sm px-5 py-3 ${searchFocused ? "focused" : ""}`}
+            >
+              <button type="button" style={{
+                background: "linear-gradient(135deg, #c9a84c, #e8d08a)",
+                color: "#ffffff",
+                padding: "8px 22px",
+                borderRadius: "2px",
+                fontSize: "0.82rem",
+                fontWeight: 800,
+                letterSpacing: "0.04em",
+                whiteSpace: "nowrap",
+                border: "none",
+                cursor: "pointer",
+                transition: "opacity 0.2s"
+              }}>
+                بحث ذكي
+              </button>
+              <input
+                type="text"
+                placeholder="ابحث عن معدن، دولة، أو إحصائية..."
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+                style={{
+                  flex: 1, background: "transparent", border: "none", outline: "none",
+                  color: "black", fontSize: "0.9rem", textAlign: "right",
+                  caretColor: "black"
+                }}
+              />
+              <i className="fas fa-search" style={{ color: "rgba(201,168,76,0.7)", fontSize: "1rem" }} />
+            </div>
+          </div>
+
+          {/* Scroll hint */}
+          <div className="scroll-hint absolute bottom-8" style={{ color: "rgba(201,168,76,0.5)", fontSize: "0.7rem", letterSpacing: "0.12em" }}>
+            <i className="fas fa-chevron-down" style={{ display: "block", textAlign: "center", marginBottom: 4 }} />
+            SCROLL
+          </div>
         </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-transparent" />
       </header>
 
-      <main className="relative -mt-16 mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 pb-16">
+      <main style={{ maxWidth: 1400, margin: "0 auto", padding: "0 24px 80px" }}>
 
-        {/* ── Search ── */}
-        <section className="reveal d2 mx-auto max-w-3xl mb-[250px]">
-          <div className="search-bar flex items-center gap-2 rounded-full bg-white px-4 py-2">
-            <i className="fas fa-search text-slate-400 text-sm sm:text-base" />
-            <input
-              type="text"
-              placeholder="ابحث عن معدن، دولة، أو إحصائية محددة..."
-              className="w-full border-none bg-transparent text-sm sm:text-base outline-none placeholder:text-slate-400"
-            />
-            <button
-              type="button"
-              className="btn-smart-search rounded-full bg-[#082721] px-7 py-2 text-sm sm:text-lg font-semibold text-white whitespace-nowrap"
-            >
-              بحث ذكي
-            </button>
+        {/* ══════════ KPIs ══════════ */}
+        <section className="reveal d2" style={{ marginTop: "-60px", position: "relative", zIndex: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
+
+            {[
+              { icon: "fa-mountain", num: "3٬000", unit: "معلومة تعدينية", label: "المنتجات التعدينية العربية", badge: "منتجات وخامات", color: "#c9a84c" },
+              { icon: "fa-earth-africa", num: "21", unit: "دولة", label: "عدد الدول العربية", badge: "نطاق عربي شامل", color: "#6fcba5" },
+              { icon: "fa-calendar-range", num: "2010 – 2024", unit: "", label: "الفترة الزمنية للبيانات", badge: "قابلة للتحديث", color: "#e8a87c" },
+            ].map((k, i) => (
+              <div key={i} className="kpi-card rounded-sm p-6" style={{ borderRadius: 4 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+                  <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 8, padding: "10px 12px", fontSize: "1.2rem", color: k.color }}>
+                    <i className={`fas ${k.icon}`} />
+                  </div>
+                  <span style={{ background: `${k.color}18`, color: k.color, fontSize: "0.72rem", fontWeight: 700, padding: "4px 12px", borderRadius: 2, border: `1px solid ${k.color}30` }}>
+                    {k.badge}
+                  </span>
+                </div>
+                <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.8rem", marginBottom: 6, letterSpacing: "0.04em" }}>{k.label}</p>
+                <div className="kpi-number text-shimmer">{k.num}</div>
+                {k.unit && <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.78rem", marginTop: 4 }}>{k.unit}</p>}
+              </div>
+            ))}
           </div>
         </section>
 
-        {/* ── KPIs ── */}
-        <section className="reveal d3 mt-8 grid gap-4 md:grid-cols-3">
-          <div className="kpi-card relative overflow-hidden rounded-2xl bg-[#082721]/10 px-5 py-6 border-r-4 border-[#082721]">
-            <i className="kpi-icon fas fa-chart-line absolute left-5 top-4 text-4xl text-[#082721]/15" />
-            <p className="text-lg text-[#082721] mb-1">المنتجات التعدينية العربية</p>
-            <h2 className="text-3xl font-extrabold text-[#082721]">
-              3000{" "}
-              <span className="text-lg font-semibold text-[#082721]">معلومة تعدينية</span>
-            </h2>
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#082721]/5 px-4 py-1.5 text-lg font-semibold text-[#082721]">
-              <i className="fas fa-caret-up" />
-              <span>منتجات وخامات</span>
-            </div>
-          </div>
-
-          <div className="kpi-card relative overflow-hidden rounded-2xl bg-[#ddbc6b]/10 px-5 py-6 border-r-4 border-[#ddbc6b]">
-            <i className="kpi-icon fas fa-globe absolute left-5 top-4 text-4xl text-[#ddbc6b]/30" />
-            <p className="text-lg text-[#ddbc6b] mb-1">عدد الدول العربية</p>
-            <h2 className="text-3xl font-extrabold text-[#ddbc6b]">21</h2>
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/10 px-4 py-1.5 text-sm font-semibold text-[#ddbc6b]">
-              <i className="fa-solid fa-check" />
-              <span>نطاق عربي</span>
-            </div>
-          </div>
-
-          <div className="kpi-card relative overflow-hidden rounded-2xl bg-[#6d2824]/10 px-5 py-6 border-r-4 border-[#6d2824]">
-            <i className="kpi-icon fas fa-database absolute left-5 top-4 text-4xl text-[#6d2824]/30" />
-            <p className="text-sm text-[#6d2824] mb-1">الفترة الزمنية</p>
-            <h2 className="text-3xl font-extrabold text-[#6d2824]">2010 ← 2024</h2>
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#6d2824]/10 px-4 py-1.5 text-sm font-semibold text-[#6d2824]">
-              <i className="fa-solid fa-calendar-days" />
-              <span>قابلة للتحديث</span>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Indicators entrance ── */}
-        <section className="reveal d4 mt-10">
-          <div className="flex flex-wrap items-end justify-between gap-3">
+        {/* ══════════ PRODUCTION INDICATORS ══════════ */}
+        <section className="reveal d3" style={{ marginTop: 72 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
             <div>
-              <h3 className="text-2xl font-extrabold text-[#082721]">المؤشرات التعدينية</h3>
-              <br />
-              <p className="section-badge inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721]">
-                الإنتاج التعديني
-              </p>
+              <span className="section-label"><i className="fas fa-pickaxe" /> الإنتاج التعديني</span>
+              <h3 style={{ fontSize: "1.6rem", fontWeight: 900, color: "var(--forest)", marginTop: 12, marginBottom: 0 }}>المؤشرات التعدينية</h3>
             </div>
-            <a
-              href="/m1"
-              className="nav-pill inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] ring-1 ring-slate-200 hover:bg-slate-50"
-            >
-              <i className="fa-solid fa-arrow-up-right-from-square" />
-              <span>الانتقال للمؤشرات</span>
+            <a href="/m1" className="ind-link">
+              <i className="fas fa-arrow-left" />
+              الانتقال للمؤشرات
             </a>
           </div>
 
-          <div className="mt-3 grid gap-5 md:grid-cols-2 lg:grid-cols-2">
-            {/* Card 1 */}
-            <div className="indicator-card flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6">
-              <div className="flex items-start gap-3">
-                <div className="icon-box flex h-11 w-11 items-center justify-center rounded-xl bg-[#082721]/10 text-[#082721]">
-                  <i className="fa-solid fa-chart-column" />
-                </div>
-                <div>
-                  <p className="text-base font-bold">حجم الإنتاج التعديني</p>
-                  <p className="text-sm text-slate-500">
-                    لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة
-                    الزمنية، مع إمكانية تطبيق أكثر من فلتر في آنٍ واحد.
-                  </p>
-                  <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
-                    <li>مخطط أعمدة ديناميكي بحسب اختيار المستخدم.</li>
-                    <li>جدول جانبي يعرض القيم التفصيلية وقابلة للتنزيل.</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between text-sm">
-                <a
-                  href="/m1"
-                  className="nav-pill inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] ring-1 ring-slate-200 hover:bg-slate-50"
-                >
-                  المزيد
-                </a>
-              </div>
-            </div>
+          <div className="gold-divider" style={{ marginBottom: 28 }} />
 
-            {/* Card 2 */}
-            <div className="indicator-card flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6">
-              <div className="flex items-start gap-3">
-                <div className="icon-box flex h-11 w-11 items-center justify-center rounded-xl bg-[#082721]/10 text-[#082721]">
-                  <i className="fa-solid fa-chart-line" />
-                </div>
-                <div>
-                  <p className="text-base font-bold">تطور الإنتاج التعديني</p>
-                  <p className="text-sm text-slate-500">
-                    تتبّع تطور الإنتاج التعديني عبر السنوات مع إبراز الاتجاهات
-                    الصعودية أو التراجعية وإظهار أهم التغيرات السنوية.
-                  </p>
-                  <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
-                    <li>مخطط خطّي تفاعلي مع تحريك المؤشر على السنوات.</li>
-                    <li>ملخص سنوي لأبرز التغيرات في الإنتاج لكل دولة أو خام.</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between text-sm">
-                <a
-                  href="/m2"
-                  className="nav-pill inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] ring-1 ring-slate-200 hover:bg-slate-50"
-                >
-                  المزيد
-                </a>
-              </div>
-            </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {indicatorCards.map((card, i) => {
+              const { Chart } = card;
+              return (
+                <div key={i} className="ind-row-card" style={{ borderRadius: 6, padding: "20px 24px", animationDelay: `${i * 70}ms` }}>
+                  <div style={{ display: "flex", gap: 20, alignItems: "stretch", flexWrap: "wrap" }}>
 
-            {/* Card 3 */}
-            <div className="indicator-card flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6">
-              <div className="flex items-start gap-3">
-                <div className="icon-box flex h-11 w-11 items-center justify-center rounded-xl bg-[#082721]/10 text-[#082721]">
-                  <i className="fa-solid fa-layer-group" />
-                </div>
-                <div>
-                  <p className="text-base font-bold">تطور الإنتاج التعديني العربي</p>
-                  <p className="text-sm text-slate-500">
-                    مقارنة أداء الدول العربية في الإنتاج التعديني عبر أكثر من خام
-                    وفي فترات زمنية مختلفة ضمن واجهة تفاعلية واحدة.
-                  </p>
-                  <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
-                    <li>اختيار عدة دول وعدة خامات في نفس الوقت.</li>
-                    <li>عرض ترتيب الدول العربية وفق حجم الإنتاج المختار.</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between text-sm">
-                <a
-                  href="/m3"
-                  className="nav-pill inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] ring-1 ring-slate-200 hover:bg-slate-50"
-                >
-                  المزيد
-                </a>
-              </div>
-            </div>
+                    {/* Left: icon + text + link */}
+                    <div style={{ flex: "1 1 280px", display: "flex", gap: 16, alignItems: "flex-start" }}>
+                      <div className="ind-icon" style={{ marginTop: 2 }}>
+                        <i className={`fas ${card.icon}`} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
+                          <p style={{ fontSize: "1rem", fontWeight: 800, color: "var(--forest)", margin: 0 }}>{card.title}</p>
+                          <span style={{
+                            fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.06em",
+                            padding: "2px 10px", borderRadius: 2,
+                            background: `${card.tagColor}18`, color: card.tagColor,
+                            border: `1px solid ${card.tagColor}40`
+                          }}>{card.tag}</span>
+                        </div>
+                        <p style={{ fontSize: "0.82rem", color: "var(--muted)", lineHeight: 1.75, margin: "0 0 14px" }}>{card.desc}</p>
+                        <a href={card.href} className="ind-link" style={{ fontSize: "0.76rem" }}>
+                          <i className="fas fa-arrow-left" /> المزيد
+                        </a>
+                      </div>
+                    </div>
 
-            {/* Card 4 */}
-            <div className="indicator-card flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6">
-              <div className="flex items-start gap-3">
-                <div className="icon-box flex h-11 w-11 items-center justify-center rounded-xl bg-[#082721]/10 text-[#082721]">
-                  <i className="fa-solid fa-circle-notch" />
+                    {/* Right: mini chart */}
+                    <div style={{ flex: "0 0 260px", minWidth: 200, alignSelf: "center" }}>
+                      <Chart />
+                    </div>
+
+                  </div>
                 </div>
-                <div>
-                  <p className="text-base font-bold">نسبة الإنتاج العربي من العالمي</p>
-                  <p className="text-sm text-slate-500">
-                    قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري
-                    يوضح توزيع النسب بين الدول والفترات الزمنية المختلفة.
-                  </p>
-                  <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
-                    <li>مخطط Donut يوضح نسبة كل دولة من الإجمالي العربي.</li>
-                    <li>زر لتبديل السنوات واستكشاف تغير الحصة عبر الزمن.</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between text-sm">
-                <a
-                  href="/m4"
-                  className="nav-pill inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] ring-1 ring-slate-200 hover:bg-slate-50"
-                >
-                  المزيد
-                </a>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </section>
 
-        {/* ── Trade indicators ── */}
-        <section className="reveal d4 mt-16">
-          <div className="flex flex-wrap items-end justify-between gap-3">
+        {/* ══════════ TRADE ══════════ */}
+        <section className="reveal d3" style={{ marginTop: 72 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
             <div>
-              <p className="section-badge inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721]">
-                التبادلات التجارية الخارجية
-              </p>
+              <span className="section-label"><i className="fas fa-right-left" /> التجارة الخارجية</span>
+              <h3 style={{ fontSize: "1.6rem", fontWeight: 900, color: "var(--forest)", marginTop: 12, marginBottom: 0 }}>التبادلات التجارية الخارجية</h3>
             </div>
-            <a
-              href="/trade-indicators"
-              className="nav-pill inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] ring-1 ring-slate-200 hover:bg-slate-50"
-            >
-              <i className="fa-solid fa-right-left" />
-              <span>جميع مؤشرات التجارة</span>
+            <a href="/trade-indicators" className="ind-link">
+              <i className="fas fa-arrow-left" /> جميع مؤشرات التجارة
             </a>
           </div>
 
-          <div className="mt-3 grid gap-5 md:grid-cols-3 lg:grid-cols-2">
-            <div className="indicator-card flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6">
-              <div className="flex items-start gap-3">
-                <div className="icon-box flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#ddbc6b]/15 text-[#082721]">
-                  <i className="fa-solid fa-ship" />
-                </div>
-                <div>
-                  <p className="text-base font-bold">الصادرات التعدينية</p>
-                  <p className="text-sm text-slate-500">
-                    تحليل تدفقات الصادرات التعدينية حسب الدولة والوجهة والقيمة المالية.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between text-sm">
-                <a
-                  href="/m5"
-                  className="nav-pill inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] ring-1 ring-slate-200 hover:bg-slate-50"
-                >
-                  المزيد
-                </a>
-              </div>
-            </div>
+          <div className="gold-divider" style={{ marginBottom: 28 }} />
 
-            <div className="indicator-card flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6">
-              <div className="flex items-start gap-3">
-                <div className="icon-box flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#ddbc6b]/15 text-[#082721]">
-                  <i className="fa-solid fa-truck-ramp-box" />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+            {[
+              { icon: "fa-ship", title: "الصادرات التعدينية", desc: "تحليل تدفقات الصادرات التعدينية حسب الدولة والوجهة والقيمة المالية.", href: "/m5" },
+              { icon: "fa-truck-ramp-box", title: "الواردات التعدينية", desc: "رصد حجم وقيمة الواردات من المواد الخام والمنتجات التعدينية المعالجة.", href: "/m6" },
+            ].map((card, i) => (
+              <div key={i} className="trade-card rounded-sm p-6" style={{ borderRadius: 4 }}>
+                <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 20 }}>
+                  <div style={{
+                    width: 44, height: 44, background: "rgba(201,168,76,0.12)",
+                    border: "1px solid rgba(201,168,76,0.25)", borderRadius: 10,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "var(--gold)", fontSize: "1.1rem", flexShrink: 0
+                  }}>
+                    <i className={`fas ${card.icon}`} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "0.95rem", fontWeight: 800, color: "white", marginBottom: 6 }}>{card.title}</p>
+                    <p style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>{card.desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-base font-bold">الواردات التعدينية</p>
-                  <p className="text-sm text-slate-500">
-                    رصد حجم وقيمة الواردات من المواد الخام والمنتجات التعدينية المعالجة.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between text-sm">
-                <a
-                  href="/m6"
-                  className="nav-pill inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] ring-1 ring-slate-200 hover:bg-slate-50"
-                >
-                  المزيد
+                <a href={card.href} style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  padding: "6px 18px", background: "rgba(201,168,76,0.12)",
+                  border: "1px solid rgba(201,168,76,0.3)", borderRadius: 2,
+                  fontSize: "0.78rem", fontWeight: 700, color: "var(--gold)",
+                  letterSpacing: "0.04em", textDecoration: "none"
+                }}>
+                  <i className="fas fa-arrow-left" /> المزيد
                 </a>
               </div>
-            </div>
+            ))}
           </div>
         </section>
 
-        {/* ── Reserves ── */}
-        <section className="reveal d4 mt-16 mb-10">
-          <div className="flex flex-wrap items-end justify-between gap-3">
+        {/* ══════════ RESERVES ══════════ */}
+        <section className="reveal d3" style={{ marginTop: 72 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
             <div>
-              <p className="section-badge inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721]">
-                احتياطيات الخام
-              </p>
+              <span className="section-label"><i className="fas fa-gem" /> احتياطيات الخام</span>
+              <h3 style={{ fontSize: "1.6rem", fontWeight: 900, color: "var(--forest)", marginTop: 12, marginBottom: 0 }}>احتياطيات الموارد التعدينية</h3>
             </div>
           </div>
 
-          <div className="mt-3 grid gap-5 md:grid-cols-2 lg:grid-cols-2">
-            <div className="indicator-card reserve-card-gold flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 border-r-4 border-[#ddbc6b]">
-              <div className="flex items-start gap-3">
-                <div className="icon-box flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#ddbc6b]/15 text-[#082721]">
-                  <i className="fa-solid fa-gem" />
-                </div>
-                <div>
-                  <p className="text-base font-bold">احتياطي الخام حسب الدولة</p>
-                  <p className="text-sm text-slate-500">
-                    توزيع احتياطيات أهم الخامات المعدنية (ذهب، فوسفات، نحاس...) على الخريطة العربية.
-                  </p>
-                  <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
-                    <li>مقارنة كميات الاحتياطي بين الدول العربية.</li>
-                    <li>نسبة تركيز الخام وجودته بحسب التقارير الجيولوجية.</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between text-sm">
-                <a
-                  href="/m7"
-                  className="nav-pill inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] ring-1 ring-slate-200 hover:bg-slate-50"
-                >
-                  المزيد
-                </a>
-              </div>
-            </div>
+          <div className="gold-divider" style={{ marginBottom: 28 }} />
 
-            <div className="indicator-card flex h-full min-h-[210px] flex-col justify-between rounded-2xl bg-white p-6 border-r-4 border-[#082721]">
-              <div className="flex items-start gap-3">
-                <div className="icon-box flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#082721]/10 text-[#082721]">
-                  <i className="fa-solid fa-microscope" />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+            {[
+              { icon: "fa-gem", title: "احتياطي الخام حسب الدولة", desc: "توزيع احتياطيات أهم الخامات المعدنية على الخريطة العربية.", bullets: ["مقارنة كميات الاحتياطي بين الدول العربية.", "نسبة تركيز الخام وجودته بحسب التقارير الجيولوجية."], href: "/m7", accent: "var(--gold)" },
+              { icon: "fa-microscope", title: "الاحتياطي المؤكد والمحتمل", desc: "تصنيف الاحتياطيات وفق درجة الموثوقية الجيولوجية والجدوى الاقتصادية.", bullets: ["الاحتياطي المؤكد (Proven) القابل للاستغلال حالياً.", "الاحتياطي المحتمل (Probable) بناءً على دراسات الاستكشاف."], href: "/m8", accent: "var(--forest)" },
+            ].map((card, i) => (
+              <div key={i} className="reserve-card rounded-sm p-6" style={{ borderRadius: 4, borderTop: `3px solid ${card.accent}` }}>
+                <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 16 }}>
+                  <div style={{
+                    width: 44, height: 44,
+                    background: i === 0 ? "rgba(201,168,76,0.1)" : "rgba(8,39,33,0.08)",
+                    borderRadius: 10,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: card.accent, fontSize: "1rem", flexShrink: 0
+                  }}>
+                    <i className={`fas ${card.icon}`} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--forest)", marginBottom: 6 }}>{card.title}</p>
+                    <p style={{ fontSize: "0.8rem", color: "var(--muted)", lineHeight: 1.7 }}>{card.desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-base font-bold">الاحتياطي المؤكد والمحتمل</p>
-                  <p className="text-sm text-slate-500">
-                    تصنيف الاحتياطيات وفق درجة الموثوقية الجيولوجية والجدوى الاقتصادية للاستخراج.
-                  </p>
-                  <ul className="mt-2 list-disc pr-5 text-xs text-slate-500 space-y-1">
-                    <li>الاحتياطي المؤكد (Proven) القابل للاستغلال حالياً.</li>
-                    <li>الاحتياطي المحتمل (Probable) بناءً على دراسات الاستكشاف.</li>
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between text-sm">
-                <a
-                  href="/m8"
-                  className="nav-pill inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] ring-1 ring-slate-200 hover:bg-slate-50"
-                >
-                  المزيد
+                <ul style={{ paddingRight: 18, margin: "0 0 16px", listStyle: "none" }}>
+                  {card.bullets.map((b, j) => (
+                    <li key={j} style={{ fontSize: "0.76rem", color: "var(--muted)", marginBottom: 4, display: "flex", gap: 8 }}>
+                      <span style={{ color: card.accent }}>◆</span>{b}
+                    </li>
+                  ))}
+                </ul>
+                <a href={card.href} className="ind-link">
+                  <i className="fas fa-arrow-left" /> المزيد
                 </a>
               </div>
-            </div>
+            ))}
           </div>
         </section>
 
-        {/* ── Countries strip ── */}
-        <section className="reveal d4 mt-10">
-          <div className="countries-section rounded-2xl bg-white p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* ══════════ COUNTRIES ══════════ */}
+        <section className="reveal d4" style={{ marginTop: 72 }}>
+          <div className="countries-wrap rounded-sm p-8" style={{ borderRadius: 4 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 8, flexWrap: "wrap", gap: 12 }}>
               <div>
-                <h5 className="m-0 text-base font-bold text-slate-800">الدول العربية</h5>
-                <p className="mt-1 text-sm text-slate-500">
-                  اختر دولة بسرعة للوصول إلى ملفها (واجهة تجريبية)
-                </p>
+                <span className="section-label"><i className="fas fa-flag" /> الدول الأعضاء</span>
+                <h5 style={{ fontSize: "1.2rem", fontWeight: 900, color: "var(--forest)", marginTop: 10, marginBottom: 4 }}>الدول العربية</h5>
+                <p style={{ fontSize: "0.8rem", color: "var(--muted)" }}>اختر دولة للوصول إلى ملفها التعديني</p>
               </div>
-              <a
-                href="/countries"
-                className="nav-pill inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] ring-1 ring-[#082721]/40 hover:bg-slate-50"
-              >
-                <i className="fa-solid fa-arrow-left" />
-                <span>المزيد</span>
+              <a href="/countries" className="ind-link">
+                <i className="fas fa-arrow-left" /> عرض الكل
               </a>
             </div>
 
-            <div className="mt-4 grid gap-y-6 gap-x-4 sm:gap-x-5 md:gap-x-6 lg:gap-x-8 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
+            <div className="gold-divider" style={{ marginBottom: 28 }} />
+
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))",
+              gap: "20px 16px"
+            }}>
               {countries.map((c, i) => (
                 <button
                   key={c.code}
                   type="button"
-                  className="country-btn group flex flex-col items-center text-center"
-                  style={{ animationDelay: `${i * 40}ms` }}
+                  className="country-btn"
+                  style={{ background: "none", border: "none", cursor: "pointer", textAlign: "center", animationDelay: `${i * 30}ms` }}
                   onClick={() => setSelectedCountry(c.name)}
                 >
-                  <div className="flag-wrap relative flex h-16 w-28 items-center justify-center bg-white">
-                    <img
-                      src={countryFlags[c.code]}
-                      alt={c.name}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
+                  <div className="flag-frame" style={{ width: "100%", aspectRatio: "3/2", overflow: "hidden" }}>
+                    <img src={countryFlags[c.code]} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} loading="lazy" />
                   </div>
-                  <p className="mt-2 text-base font-bold text-[#082721] transition-colors group-hover:text-[#ddbc6b]">
-                    {c.name}
-                  </p>
+                  <p className="country-name" style={{ marginTop: 8 }}>{c.name}</p>
                 </button>
               ))}
             </div>
 
-            <p className="mt-4 text-sm text-slate-500">
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(8,39,33,0.08)", fontSize: "0.8rem", color: "var(--muted)" }}>
               الدولة المختارة:{" "}
-              <span className="font-bold text-[#082721]">{selectedCountry}</span>
-            </p>
+              <span style={{ fontWeight: 800, color: "var(--forest)" }}>{selectedCountry}</span>
+            </div>
           </div>
         </section>
 
-        {/* ── Sponsors ── */}
-        <section className="reveal d5 mt-10" aria-label="المراجع والمصادر">
-          <div className="sponsors-section rounded-3xl bg-white/95 p-5">
-            <div className="flex flex-wrap items-end justify-between gap-3">
+        {/* ══════════ SOURCES ══════════ */}
+        <section className="reveal d4" style={{ marginTop: 56 }}>
+          <div style={{ background: "white", border: "1px solid rgba(8,39,33,0.08)", borderRadius: 4, padding: 32 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
               <div>
-                <h2 className="text-lg font-extrabold text-[#082721]">المراجع والمصادر</h2>
-                <p className="text-sm text-slate-500">عرض لجميع المصادر الموثوقة</p>
+                <span className="section-label"><i className="fas fa-books" /> المراجع</span>
+                <h2 style={{ fontSize: "1.2rem", fontWeight: 900, color: "var(--forest)", marginTop: 10, marginBottom: 0 }}>المراجع والمصادر</h2>
               </div>
             </div>
 
-            <div className="mt-4">
-              <div className="relative h-32">
-                {sponsorSlides.map((slide, index) => (
-                  <div
-                    key={index}
-                    className={`absolute inset-0 transition-opacity duration-700 ${
-                      index === sponsorSlide ? "opacity-100" : "opacity-0 pointer-events-none"
-                    }`}
-                  >
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-                      {slide.map((s) => (
-                        <a
-                          key={s.href + s.title + index}
-                          href={s.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="sponsor-card group relative flex h-28 w-full items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white"
-                        >
-                          <img src={s.img} alt={s.title} className="h-full w-full object-contain p-3" />
-                          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/95 px-3 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                            <div>
-                              <p className="mb-1 text-base font-extrabold text-[#082721]">{s.title}</p>
-                              <p className="text-sm text-slate-500">{s.subtitle}</p>
-                            </div>
-                          </div>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div style={{ position: "relative", height: 130 }}>
+              {sponsorSlides.map((slide, idx) => (
+                <div key={idx} style={{
+                  position: "absolute", inset: 0,
+                  opacity: idx === sponsorSlide ? 1 : 0,
+                  pointerEvents: idx === sponsorSlide ? "auto" : "none",
+                  transition: "opacity 0.7s ease",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, 1fr)",
+                  gap: 12
+                }}>
+                  {slide.map((s, si) => (
+                    <a key={si} href={s.href} target="_blank" rel="noopener noreferrer"
+                      className="sponsor-card group"
+                      style={{ height: 110, borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", position: "relative" }}>
+                      <img src={s.img} alt={s.title} style={{ width: "100%", height: "100%", objectFit: "contain", padding: 12 }} />
+                      <div style={{
+                        position: "absolute", inset: 0, background: "rgba(255,255,255,0.97)",
+                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                        opacity: 0, transition: "opacity 0.3s", padding: 12, textAlign: "center"
+                      }} className="sponsor-hover">
+                        <p style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--forest)", marginBottom: 4 }}>{s.title}</p>
+                        <p style={{ fontSize: "0.72rem", color: "var(--muted)" }}>{s.subtitle}</p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* Dots */}
+            <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 16 }}>
+              {sponsorSlides.map((_, i) => (
+                <button key={i} onClick={() => setSponsorSlide(i)} style={{
+                  width: i === sponsorSlide ? 20 : 6, height: 6,
+                  borderRadius: 3, border: "none", cursor: "pointer",
+                  background: i === sponsorSlide ? "var(--gold)" : "rgba(8,39,33,0.15)",
+                  transition: "all 0.3s"
+                }} />
+              ))}
             </div>
           </div>
         </section>
 
-        {/* ── Chatbot CTA ── */}
-        <section className="mt-12">
-          <div className="chatbot-section rounded-3xl bg-white/95 p-6 ring-1 ring-slate-200/70 text-center">
-            <h2 className="text-xl font-extrabold text-[#082721] mb-2">
-              دردشة مع المساعد الذكي
-            </h2>
-            <p className="text-sm text-slate-600 mb-4">
-              يمكنك طرح أسئلة عن المؤشرات، البيانات، أو أي معلومات تعدينية، وسيجيبك
-              البوت فوراً.
-            </p>
-            <button
-              type="button"
-              onClick={handleChatbotClick}
-              className="btn-more inline-flex items-center justify-center gap-2 rounded-full bg-[#082721] px-6 py-3 text-sm font-semibold text-white transition"
-            >
-              <i className="fa-solid fa-robot" />
-              <span>ابدأ المحادثة</span>
-            </button>
+        {/* ══════════ CHATBOT CTA ══════════ */}
+        <section style={{ marginTop: 56 }}>
+          <div className="chat-cta rounded-sm p-10 text-center" style={{ borderRadius: 4 }}>
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)",
+                color: "var(--gold)", padding: "4px 16px", borderRadius: 2,
+                fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", marginBottom: 20
+              }}>
+                <span className="online-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", display: "inline-block" }} />
+                مساعد ذكي متاح الآن
+              </div>
+              <h2 style={{ fontSize: "1.8rem", fontWeight: 900, color: "white", marginBottom: 12 }}>
+                دردشة مع{" "}
+                <span className="text-shimmer">المساعد الذكي</span>
+              </h2>
+              <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.88rem", maxWidth: 460, margin: "0 auto 28px", lineHeight: 1.8 }}>
+                اطرح أسئلتك عن المؤشرات والبيانات والمعلومات التعدينية وسيجيبك فوراً
+              </p>
+              <button type="button" onClick={handleChatbotClick} style={{
+                display: "inline-flex", alignItems: "center", gap: 10,
+                background: "linear-gradient(135deg, #c9a84c, #e8d08a)",
+                color: "var(--forest)", padding: "12px 32px",
+                borderRadius: 2, border: "none", cursor: "pointer",
+                fontSize: "0.88rem", fontWeight: 800, letterSpacing: "0.04em",
+                boxShadow: "0 8px 24px rgba(201,168,76,0.3)",
+                transition: "opacity 0.2s, transform 0.2s"
+              }}>
+                <i className="fas fa-robot" />
+                ابدأ المحادثة
+              </button>
+            </div>
           </div>
         </section>
       </main>
 
-      <div className="reveal d5">
-        <Footer />
-      </div>
+      <div className="reveal d5"><Footer /></div>
 
-      {/* ── Floating chatbot button ── */}
-      <button
-        type="button"
-        onClick={handleChatbotClick}
-        title="محلّل البيانات الذكي"
-        className="chatbot-float fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full bg-white/90 px-3 py-2 text-right backdrop-blur-md"
-      >
-        <span className="absolute right-3 top-2 h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_0_4px] shadow-emerald-500/30" />
-        <span className="grid h-11 w-11 place-items-center rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-[#082721] to-[#082721] text-white"
-          style={{ boxShadow: "0 4px 16px rgba(8,39,33,0.35)" }}>
-          <i className="fa-solid fa-robot" />
-        </span>
-        <span className="hidden flex-col text-sm leading-tight text-slate-700 sm:flex">
-          <span className="font-extrabold text-[#082721]">Chat Bote</span>
-          <span className="text-sm text-slate-500">محلّل البيانات الذكي</span>
-        </span>
+      {/* ══════════ FLOATING BOT ══════════ */}
+      <button type="button" onClick={handleChatbotClick} title="محلّل البيانات الذكي"
+        className="float-btn"
+        style={{
+          position: "fixed", bottom: 24, right: 24, zIndex: 50,
+          display: "flex", alignItems: "center", gap: 12,
+          padding: "10px 16px 10px 12px",
+          borderRadius: 4, cursor: "pointer"
+        }}>
+        {/* Status dot */}
+        <span className="online-dot" style={{
+          position: "absolute", top: 8, right: 8,
+          width: 8, height: 8, borderRadius: "50%", background: "#4ade80",
+          boxShadow: "0 0 0 3px rgba(74,222,128,0.25)"
+        }} />
+        <div style={{
+          width: 42, height: 42, borderRadius: 8,
+          background: "linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.08))",
+          border: "1px solid rgba(201,168,76,0.4)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "var(--gold)", fontSize: "1.1rem"
+        }}>
+          <i className="fas fa-robot" />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", textAlign: "right" }}>
+          <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--gold)", lineHeight: 1 }}>Chat Bote</span>
+          <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>محلّل البيانات الذكي</span>
+        </div>
       </button>
+
+      <style>{`
+        a { text-decoration: none; }
+        .sponsor-card:hover .sponsor-hover { opacity: 1 !important; }
+      `}</style>
     </div>
   );
 };
