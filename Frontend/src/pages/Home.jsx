@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import i7 from "../assets/i-7.png";
-import bgHeaderVideo from "../assets/bg header.mp4";
+import bgHeaderVideo from "../assets/2.mp4";
+import mapImg from "../assets/map.png";
 import flagJordan from "../assets/flags/jordan.webp";
 import flagUae from "../assets/flags/uae.webp";
 import flagBahrain from "../assets/flags/bahrain.webp";
@@ -72,10 +73,10 @@ const sponsors = [
 
 const KPI_DATA = [
   {
-    icon: "fa-mountain",
+    icon: "fa-cubes",
     num: "3٬000",
     unit: "معلومة تعدينية",
-    label: "المنتجات التعدينية العربية",
+    label: "المعلومات التعدينية العربية",
     badge: "منتجات وخامات",
     color: "#c9a84c",
   },
@@ -88,13 +89,20 @@ const KPI_DATA = [
     color: "#6fcba5",
   },
   {
-    // fa-calendar-range doesn't exist in FA Free → use fa-calendar-days
     icon: "fa-calendar-days",
     num: "2010 – 2024",
     unit: "",
     label: "الفترة الزمنية للبيانات",
     badge: "قابلة للتحديث",
     color: "#e8a87c",
+  },
+  {
+    icon: "fa-gem",
+    num: "111",
+    unit: "منتجات تعدينية",
+    label: "خام/منتج تعديني",
+    badge: "تنوع معدني",
+    color: "#93c5fd",
   },
 ];
 
@@ -438,7 +446,9 @@ const Home = () => {
           --ink:        #1a1510;
           --muted:      #7a7060;
         }
-
+.divf9{
+border-radius:13px !important;
+}
         /* Noise overlay */
         body::before {
           content:''; position:fixed; inset:0; opacity:0.025;
@@ -489,7 +499,7 @@ const Home = () => {
         .ind-link {
           display:inline-flex; align-items:center; gap:6px;
           padding:6px 18px; border:1px solid rgba(8,39,33,0.2);
-          border-radius:2px; font-size:0.78rem; font-weight:700;
+          border-radius:13px; font-size:0.78rem; font-weight:700;
           color:var(--forest); letter-spacing:0.04em;
           transition:background 0.25s,border-color 0.25s,color 0.25s;
           text-decoration:none;
@@ -501,7 +511,7 @@ const Home = () => {
           background:linear-gradient(135deg,var(--forest) 0%,#0d3d34 100%);
           border:1px solid rgba(201,168,76,0.2);
           transition:transform 0.35s cubic-bezier(.16,1,.3,1),box-shadow 0.35s,border-color 0.35s;
-          border-radius:4px;
+          border-radius:13px;
         }
         .trade-card:hover { transform:translateY(-8px); border-color:rgba(201,168,76,0.5); box-shadow:0 24px 48px rgba(8,39,33,0.3); }
 
@@ -509,14 +519,14 @@ const Home = () => {
         .reserve-card {
           background:white;
           transition:transform 0.35s cubic-bezier(.16,1,.3,1),box-shadow 0.35s;
-          border-radius:4px;
+          border-radius:13px;
         }
         .reserve-card:hover { transform:translateY(-8px); box-shadow:0 24px 48px rgba(8,39,33,0.12); }
 
         /* Country grid */
         .country-btn { transition:transform 0.3s cubic-bezier(.16,1,.3,1); }
         .country-btn:hover { transform:translateY(-6px) scale(1.04); }
-        .flag-frame { border-radius:6px; overflow:hidden; box-shadow:0 4px 16px rgba(8,39,33,0.12); border:2px solid transparent; transition:border-color 0.3s,box-shadow 0.3s; }
+        .flag-frame { border-radius:13px; overflow:hidden; box-shadow:0 4px 16px rgba(8,39,33,0.12); border:2px solid transparent; transition:border-color 0.3s,box-shadow 0.3s; }
         .country-btn:hover .flag-frame { border-color:var(--gold); box-shadow:0 10px 28px rgba(201,168,76,0.25); }
         .country-name { font-size:0.78rem; font-weight:700; color:var(--forest); transition:color 0.2s; }
         .country-btn:hover .country-name { color:var(--gold); }
@@ -544,10 +554,17 @@ const Home = () => {
 
       {/* ═══════════════════════ HERO ═══════════════════════ */}
       <header className="relative overflow-hidden"
-        style={{ height:"100vh", minHeight:600, maxHeight:800, marginTop:-80 }}>
+        style={{
+          height: "100vh", minHeight: 600, maxHeight: 800, marginTop: -80,
+          backgroundImage: `url(${mapImg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}>
 
         <video
           className="absolute inset-0 h-full w-full object-cover"
+          style={{ opacity: 0.25 }}
           src={bgHeaderVideo} autoPlay loop muted playsInline
         />
         <div className="hero-overlay absolute inset-0" />
@@ -579,14 +596,14 @@ const Home = () => {
           {/* Sub */}
           <p className="hero-sub"
             style={{ color:"rgba(255,255,255,0.72)", fontSize:"clamp(0.9rem,1.8vw,1.15rem)", maxWidth:560, lineHeight:1.8, margin:"0 0 2.5rem" }}>
-            منصة تحليلية ذكية لمتابعة الإنتاج التعديني العربي، المقارنات، الخرائط، والتقارير المتقدمة.
+              نافذتك الاو لى البيانات قطاع التعدين العربي.
           </p>
 
           {/* Search */}
           <div className="hero-search w-full" style={{ maxWidth:580 }}>
             <div className={`search-box flex items-center gap-3 rounded-sm px-5 py-3 ${searchFocused?"focused":""}`}
-              style={{ borderRadius:4 }}>
-              <button type="button" style={{ background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:"#fff", padding:"8px 22px", borderRadius:2, fontSize:"0.82rem", fontWeight:800, letterSpacing:"0.04em", whiteSpace:"nowrap", border:"none", cursor:"pointer" }}>
+              style={{ borderRadius:13 }}>
+              <button type="button" style={{ background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:"#fff", padding:"8px 22px", borderRadius:13, fontSize:"0.82rem", fontWeight:800, letterSpacing:"0.04em", whiteSpace:"nowrap", border:"none", cursor:"pointer" }}>
                 بحث ذكي
               </button>
               <input
@@ -613,18 +630,18 @@ const Home = () => {
       <main style={{ maxWidth:1400, margin:"0 auto", padding:"0 24px 80px" }}>
 
         {/* ── KPIs ── */}
-        <section className="reveal d2" style={{ marginTop:"-60px", position:"relative", zIndex:10 }}>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:16 }}>
-            {KPI_DATA.map((k, i) => <KpiCard key={i} k={k} />)}
-          </div>
-        </section>
+     <section className="reveal d2" style={{ marginTop:"-60px", position:"relative", zIndex:10,borderRadius: 13}}>
+  <div className="divf9" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:16,borderRadius: 13 }}>
+    {KPI_DATA.map((k, i) => <KpiCard key={i} k={k} />)}
+  </div>
+</section>
 
         {/* ── PRODUCTION INDICATORS ── */}
         <section className="reveal d3" style={{ marginTop:72 }}>
           <div style={{
             background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)",
             border:"1px solid rgba(201,168,76,0.22)",
-            borderRadius:12, padding:"40px 36px",
+            borderRadius:13, padding:"40px 36px",
             position:"relative", overflow:"hidden",
             boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)",
           }}>
@@ -637,7 +654,7 @@ const Home = () => {
             {/* Header */}
             <div style={{ position:"relative", zIndex:1, display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:32, flexWrap:"wrap", gap:12 }}>
               <div>
-                <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 16px", background:"rgba(201,168,76,0.12)", color:"white", border:"1px solid rgba(201,168,76,0.3)", borderRadius:2, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
+                <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 16px", background:"rgba(201,168,76,0.12)", color:"white", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
                   <i className="fas fa-pickaxe" /> الإنتاج التعديني
                 </span>
                 <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white", margin:"12px 0 4px" }}>
@@ -647,7 +664,7 @@ const Home = () => {
                 </h3>
                 <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", margin:0 }}>4 مؤشرات تفاعلية شاملة للإنتاج العربي</p>
               </div>
-              <a href="/m1" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:2, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
+              <a href="/m1" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
                 <i className="fas fa-arrow-left" /> الانتقال للمؤشرات
               </a>
             </div>
@@ -676,7 +693,7 @@ const Home = () => {
             {TRADE_CARDS.map((card, i) => (
               <div key={i} className="trade-card" style={{ padding:24 }}>
                 <div style={{ display:"flex", gap:14, alignItems:"flex-start", marginBottom:20 }}>
-                  <div style={{ width:44, height:44, background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--gold)", fontSize:"1.1rem", flexShrink:0 }}>
+                  <div style={{ width:44, height:44, background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--gold)", fontSize:"1.1rem", flexShrink:0 }}>
                     <i className={`fas ${card.icon}`} />
                   </div>
                   <div>
@@ -684,7 +701,7 @@ const Home = () => {
                     <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.55)", lineHeight:1.7, margin:0 }}>{card.desc}</p>
                   </div>
                 </div>
-                <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 18px", background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.3)", borderRadius:2, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em" }}>
+                <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 18px", background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em" }}>
                   <i className="fas fa-arrow-left" /> المزيد
                 </a>
               </div>
@@ -700,7 +717,7 @@ const Home = () => {
             {RESERVE_CARDS.map((card, i) => (
               <div key={i} className="reserve-card" style={{ padding:24, borderTop:`3px solid ${card.accent}` }}>
                 <div style={{ display:"flex", gap:14, alignItems:"flex-start", marginBottom:16 }}>
-                  <div style={{ width:44, height:44, background:card.bg, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:card.accent, fontSize:"1rem", flexShrink:0 }}>
+                  <div style={{ width:44, height:44, background:card.bg, borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", color:card.accent, fontSize:"1rem", flexShrink:0 }}>
                     <i className={`fas ${card.icon}`} />
                   </div>
                   <div>
@@ -723,10 +740,10 @@ const Home = () => {
 
         {/* ── COUNTRIES ── */}
         <section className="reveal d4" style={{ marginTop:72 }}>
-          <div style={{ background:"white", border:"1px solid rgba(8,39,33,0.08)", borderRadius:4, padding:32 }}>
+          <div style={{ background:"white", border:"1px solid rgba(8,39,33,0.08)", borderRadius:13, padding:32 }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:8, flexWrap:"wrap", gap:12 }}>
               <div>
-                <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:2, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
+                <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
                   <i className="fas fa-flag" /> الدول الأعضاء
                 </span>
                 <h5 style={{ fontSize:"1.2rem", fontWeight:900, color:"var(--forest)", margin:"10px 0 4px" }}>الدول العربية</h5>
@@ -761,10 +778,10 @@ const Home = () => {
 
         {/* ── SOURCES / SPONSORS ── */}
         <section className="reveal d4" style={{ marginTop:56 }}>
-          <div style={{ background:"white", border:"1px solid rgba(8,39,33,0.08)", borderRadius:4, padding:32 }}>
+          <div style={{ background:"white", border:"1px solid rgba(8,39,33,0.08)", borderRadius:13, padding:32 }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12 }}>
               <div>
-                <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:2, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
+                <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
                   <i className="fas fa-books" /> المراجع
                 </span>
                 <h2 style={{ fontSize:"1.2rem", fontWeight:900, color:"var(--forest)", margin:"10px 0 0" }}>المراجع والمصادر</h2>
@@ -777,7 +794,7 @@ const Home = () => {
                 <div key={idx} style={{ position:"absolute", inset:0, opacity:idx===sponsorSlide?1:0, pointerEvents:idx===sponsorSlide?"auto":"none", transition:"opacity 0.7s ease", display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12 }}>
                   {slide.map((s, si) => (
                     <a key={si} href={s.href} target="_blank" rel="noopener noreferrer" className="sponsor-card"
-                      style={{ height:110, borderRadius:4, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden", position:"relative" }}>
+                      style={{ height:110, borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden", position:"relative" }}>
                       <img src={s.img} alt={s.title} style={{ width:"100%", height:"100%", objectFit:"contain", padding:12 }} />
                       <div className="sponsor-hover" style={{ position:"absolute", inset:0, background:"rgba(255,255,255,0.97)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", opacity:0, transition:"opacity 0.3s", padding:12, textAlign:"center" }}>
                         <p style={{ fontSize:"0.82rem", fontWeight:800, color:"var(--forest)", margin:"0 0 4px" }}>{s.title}</p>
@@ -793,7 +810,7 @@ const Home = () => {
             <div style={{ display:"flex", justifyContent:"center", gap:6, marginTop:16 }}>
               {sponsorSlides.map((_, i) => (
                 <button key={i} type="button" onClick={() => setSponsorSlide(i)}
-                  style={{ width:i===sponsorSlide?20:6, height:6, borderRadius:3, border:"none", cursor:"pointer", background:i===sponsorSlide?"var(--gold)":"rgba(8,39,33,0.15)", transition:"all 0.3s", padding:0 }} />
+                  style={{ width:i===sponsorSlide?20:6, height:6, borderRadius:13, border:"none", cursor:"pointer", background:i===sponsorSlide?"var(--gold)":"rgba(8,39,33,0.15)", transition:"all 0.3s", padding:0 }} />
               ))}
             </div>
           </div>
@@ -801,9 +818,9 @@ const Home = () => {
 
         {/* ── CHATBOT CTA ── */}
         <section style={{ marginTop:56 }}>
-          <div className="chat-cta" style={{ borderRadius:4, padding:"40px 24px", textAlign:"center" }}>
+          <div className="chat-cta" style={{ borderRadius:13, padding:"40px 24px", textAlign:"center" }}>
             <div style={{ position:"relative", zIndex:1 }}>
-              <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.3)", color:"var(--gold)", padding:"4px 16px", borderRadius:2, fontSize:"0.72rem", fontWeight:700, letterSpacing:"0.1em", marginBottom:20 }}>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.3)", color:"var(--gold)", padding:"4px 16px", borderRadius:13, fontSize:"0.72rem", fontWeight:700, letterSpacing:"0.1em", marginBottom:20 }}>
                 <span className="online-dot" style={{ width:6, height:6, borderRadius:"50%", background:"#4ade80", display:"inline-block" }} />
                 مساعد ذكي متاح الآن
               </div>
@@ -817,7 +834,7 @@ const Home = () => {
                 اطرح أسئلتك عن المؤشرات والبيانات والمعلومات التعدينية وسيجيبك فوراً
               </p>
               <button type="button" onClick={handleChatbotClick}
-                style={{ display:"inline-flex", alignItems:"center", gap:10, background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:"var(--forest)", padding:"12px 32px", borderRadius:2, border:"none", cursor:"pointer", fontSize:"0.88rem", fontWeight:800, letterSpacing:"0.04em", boxShadow:"0 8px 24px rgba(201,168,76,0.3)" }}>
+                style={{ display:"inline-flex", alignItems:"center", gap:10, background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:"var(--forest)", padding:"12px 32px", borderRadius:13, border:"none", cursor:"pointer", fontSize:"0.88rem", fontWeight:800, letterSpacing:"0.04em", boxShadow:"0 8px 24px rgba(201,168,76,0.3)" }}>
                 <i className="fas fa-robot" /> ابدأ المحادثة
               </button>
             </div>
@@ -831,9 +848,9 @@ const Home = () => {
 
       {/* ── FLOATING BOT BUTTON ── */}
       <button type="button" onClick={handleChatbotClick} title="محلّل البيانات الذكي" className="float-btn"
-        style={{ position:"fixed", bottom:24, right:24, zIndex:50, display:"flex", alignItems:"center", gap:12, padding:"10px 16px 10px 12px", borderRadius:4, cursor:"pointer" }}>
+        style={{ position:"fixed", bottom:24, right:24, zIndex:50, display:"flex", alignItems:"center", gap:12, padding:"10px 16px 10px 12px", borderRadius:13, cursor:"pointer" }}>
         <span className="online-dot" style={{ position:"absolute", top:8, right:8, width:8, height:8, borderRadius:"50%", background:"#4ade80", boxShadow:"0 0 0 3px rgba(74,222,128,0.25)" }} />
-        <div style={{ width:42, height:42, borderRadius:8, background:"linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08))", border:"1px solid rgba(201,168,76,0.4)", display:"flex", alignItems:"center", justifyContent:"center", color:"var(--gold)", fontSize:"1.1rem" }}>
+        <div style={{ width:42, height:42, borderRadius:13, background:"linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08))", border:"1px solid rgba(201,168,76,0.4)", display:"flex", alignItems:"center", justifyContent:"center", color:"var(--gold)", fontSize:"1.1rem" }}>
           <i className="fas fa-robot" />
         </div>
         <div style={{ display:"flex", flexDirection:"column", textAlign:"right" }}>
