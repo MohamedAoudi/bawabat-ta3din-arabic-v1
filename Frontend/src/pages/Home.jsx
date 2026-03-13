@@ -154,7 +154,7 @@ const RESERVE_CARDS = [
 const MiniBarChart = ({ active }) => {
   const bars = [55,72,38,63,78,22,95,48,41,18,67,59,15,44,36,29,52,83,88,71,33];
   return (
-    <div style={{ height:90, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:"10px 6px 4px", display:"flex", alignItems:"flex-end", gap:2 }}>
+    <div style={{ height:140, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:"10px 6px 4px", display:"flex", alignItems:"flex-end", gap:2 }}>
       {bars.map((v, i) => (
         <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", height:"100%" }}>
           <div style={{
@@ -177,7 +177,7 @@ const MiniLineChart = ({ active }) => {
   const pts = [[4,76],[18,72],[32,70],[46,67],[60,65],[74,63],[88,60],[102,56],[116,14],[130,40],[144,66],[158,42],[172,44],[186,38]];
   const path = pts.map((p,i) => `${i===0?"M":"L"} ${p[0]} ${p[1]}`).join(" ");
   return (
-    <div style={{ height:90, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:8 }}>
+    <div style={{ height:140, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:8 }}>
       <svg viewBox="0 0 190 88" style={{ width:"100%", height:"100%", overflow:"visible" }}>
         {[20,40,60,80].map(y => <line key={y} x1="0" y1={y} x2="190" y2={y} stroke="rgba(255,255,255,0.07)" strokeWidth="1" />)}
         <path d={path} fill="none" stroke="#7ee0c0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
@@ -204,7 +204,7 @@ const MiniGroupedBar = ({ active }) => {
   const a = [88,70,62,72,70,18,24,30,45,46,47,20,22,28,34];
   const b = [18,22,24,34,36,40,45,52,46,46,47,30,29,21,23];
   return (
-    <div style={{ height:90, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:"10px 8px 4px", display:"flex", alignItems:"flex-end", gap:2 }}>
+    <div style={{ height:140, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:"10px 8px 4px", display:"flex", alignItems:"flex-end", gap:2 }}>
       {a.map((v,i) => (
         <div key={i} style={{ flex:1, display:"flex", alignItems:"flex-end", justifyContent:"center", gap:1, height:"100%" }}>
           <div style={{ width:"45%", borderRadius:"2px 2px 0 0", background:"rgba(255,255,255,0.55)",
@@ -220,7 +220,7 @@ const MiniGroupedBar = ({ active }) => {
 };
 
 const MiniDonut = ({ active }) => (
-  <div style={{ height:90, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", gap:16 }}>
+  <div style={{ height:140, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", gap:16 }}>
     <div style={{
       width:68, height:68, borderRadius:"50%", flexShrink:0,
       background:"conic-gradient(#c9a84c 0deg 194deg,rgba(255,255,255,0.1) 194deg 360deg)",
@@ -291,20 +291,20 @@ const IndicatorRowCard = ({ card }) => {
           </div>
           <div style={{ flex:1 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6, flexWrap:"wrap" }}>
-              <p style={{ fontSize:"1rem", fontWeight:800, color:"white", margin:0 }}>{card.title}</p>
-              <span style={{ fontSize:"0.65rem", fontWeight:700, letterSpacing:"0.06em", padding:"2px 10px", borderRadius:2, background:`${card.tagColor}18`, color:card.tagColor, border:`1px solid ${card.tagColor}40` }}>
+              <p style={{ fontSize:"1.15rem", fontWeight:800, color:"white", margin:0 }}>{card.title}</p>
+              <span style={{ fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.06em", padding:"4px 12px", borderRadius:2, background:`${card.tagColor}18`, color:card.tagColor, border:`1px solid ${card.tagColor}40` }}>
                 {card.tag}
               </span>
             </div>
-            <p style={{ fontSize:"0.82rem", color:"rgba(255,255,255,0.5)", lineHeight:1.75, margin:"0 0 14px" }}>{card.desc}</p>
-            <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 18px", border:`1px solid ${card.tagColor}40`, borderRadius:2, fontSize:"0.76rem", fontWeight:700, color:card.tagColor, letterSpacing:"0.04em", textDecoration:"none", background:`${card.tagColor}12` }}>
+            <p style={{ fontSize:"0.9rem", color:"rgba(255,255,255,0.5)", lineHeight:1.75, margin:"0 0 14px" }}>{card.desc}</p>
+            <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${card.tagColor}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:card.tagColor, letterSpacing:"0.04em", textDecoration:"none", background:`${card.tagColor}12` }}>
               <i className="fas fa-arrow-left" /> المزيد
             </a>
           </div>
         </div>
 
         {/* Right — chart */}
-        <div style={{ flex:"0 0 260px", minWidth:200, alignSelf:"center" }}>
+        <div style={{ flex:"0 0 320px", minWidth:260, alignSelf:"center", height:140 }}>
           <Chart active={hovered} />
         </div>
 
@@ -325,7 +325,7 @@ const KpiCard = ({ k }) => {
       style={{
         background:"var(--forest)",
         border:`1px solid ${hovered?"rgba(201,168,76,0.6)":"rgba(201,168,76,0.2)"}`,
-        borderRadius:4, padding:"24px",
+        borderRadius:13, padding:"24px",
         transform: hovered?"translateY(-10px)":"translateY(0)",
         boxShadow: hovered?"0 30px 60px rgba(8,39,33,0.35),0 0 0 1px rgba(201,168,76,0.3)":"none",
         transition:"transform 0.4s cubic-bezier(.16,1,.3,1),box-shadow 0.4s,border-color 0.4s",
@@ -703,7 +703,7 @@ border-radius:13px !important;
         </section>
 
         {/* ── RESERVES ── */}
-        <section className="reveal d3" style={{ marginTop:72 }}>
+        {/* <section className="reveal d3" style={{ marginTop:72 }}>
           <SectionHeader icon="fa-gem" tag="احتياطيات الخام" title="احتياطيات الموارد التعدينية" />
           <GoldDivider />
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))", gap:20 }}>
@@ -729,7 +729,7 @@ border-radius:13px !important;
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* ── COUNTRIES ── */}
         <section className="reveal d4" style={{ marginTop:72 }}>
