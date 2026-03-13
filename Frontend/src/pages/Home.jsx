@@ -749,16 +749,15 @@ border-radius:13px !important;
 
             <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:"24px 12px" }}>
               {countries.map(c => (
-                <button key={c.code} type="button" className="country-btn"
-                  style={{ background:"none", border:"none", cursor:"pointer", textAlign:"center", padding:0 }}
-                  onClick={() => setSelectedCountry(c.name)}>
+                <a key={c.code} href={`/countries?country=${c.code}`} className="country-btn"
+                  style={{ background:"none", border:"none", cursor:"pointer", textAlign:"center", padding:0 }}>
                   <div className="flag-frame" style={{ width:"100%", aspectRatio:"3/2" }}>
                     <img src={countryFlags[c.code]} alt={c.name}
                       style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
                       loading="lazy" />
                   </div>
                   <p className="country-name" style={{ margin:"8px 0 0", fontSize:"0.68rem", lineHeight:1.4 }}>{c.name}</p>
-                </button>
+                </a>
               ))}
             </div>
 

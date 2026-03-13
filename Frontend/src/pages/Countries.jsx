@@ -680,7 +680,11 @@ const MineralTreemap = ({ country, year, unit="ton" }) => {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 const Countries = () => {
-  const [selected, setSelected]         = useState("—");
+  const query = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
+  const initialCountryCode = query.get("country");
+  const initialSelected = initialCountryCode ? (COUNTRIES.find(c => c.code === initialCountryCode)?.name ?? "—") : "—";
+
+  const [selected, setSelected]         = useState(initialSelected);
   const [selectedMineral, setSelectedMineral] = useState("all");
   const [volumeUnit, setVolumeUnit]     = useState("ton");
   const [selectedYear, setSelectedYear] = useState(ALL_YEARS[ALL_YEARS.length - 1]);
