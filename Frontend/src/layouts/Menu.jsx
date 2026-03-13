@@ -72,16 +72,16 @@ const GlobeIcon = ({ className = "" }) => (
 const DesktopSubMenu = ({ section }) => (
   <div className="dd-sub-trigger relative">
     <div
-      dir="ltr"
+      dir="rtl"
       className="flex items-center justify-between rounded-xl px-4 py-2.5 cursor-pointer
                  hover:bg-[#C9A84C]/10 transition-colors group/row"
     >
-      <ChevronLeft className="w-3 h-3 text-[#C9A84C]/40 group-hover/row:text-[#C9A84C] transition-colors flex-shrink-0" />
       <span dir="rtl" className="text-[14px] font-bold text-white/90">{section.label}</span>
+      <ChevronLeft className="w-3 h-3 text-[#C9A84C]/40 group-hover/row:text-[#C9A84C] transition-colors flex-shrink-0" />
     </div>
     {/* Sub-panel — positioned to the END (left in RTL) */}
     <div
-      className="dd-sub-panel absolute top-0 end-full me-2 w-[256px] rounded-2xl overflow-hidden z-50"
+      className="dd-sub-panel absolute top-0 right-full mr-2 w-[256px] rounded-2xl overflow-hidden z-50"
       style={{
         background: "linear-gradient(145deg,#0f4035 0%,#082721 100%)",
         border: "1px solid rgba(201,168,76,0.25)",
@@ -169,6 +169,21 @@ const Menu = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled,   setScrolled]   = useState(false);
   const [isHome,     setIsHome]     = useState(true);
+  const [menuOpen,   setMenuOpen]   = useState(false);
+  const closeTimeoutRef = useRef(null);
+
+  const openMenu = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setMenuOpen(true);
+  };
+
+  const closeMenu = () => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    closeTimeoutRef.current = setTimeout(() => setMenuOpen(false), 150);
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") setIsHome(window.location.pathname === "/");
@@ -207,7 +222,8 @@ const Menu = () => {
           transition: opacity .2s ease, transform .2s ease;
         }
         .dd-trigger:hover .dd-panel,
-        .dd-trigger:focus-within .dd-panel {
+        .dd-trigger:focus-within .dd-panel,
+        .dd-trigger.dd-open .dd-panel {
           opacity: 1; pointer-events: auto;
           transform: translateY(0) scale(1);
         }
@@ -282,7 +298,11 @@ const Menu = () => {
                 </li>
 
                 {/* Dropdown */}
-                <li className="nav-sep dd-trigger">
+                <li
+                  className={`nav-sep dd-trigger ${menuOpen ? "dd-open" : ""}`}
+                  onMouseEnter={openMenu}
+                  onMouseLeave={closeMenu}
+                >
                   <button
                     type="button"
                     dir="ltr"
@@ -293,7 +313,9 @@ const Menu = () => {
                   </button>
 
                   <div
-                    className="dd-panel absolute top-[calc(100%+10px)] end-0 w-[284px] rounded-2xl overflow-hidden z-50"
+                    className="dd-panel absolute top-[calc(100%+10px)] end-0 w-[284px] rounded-2xl overflow-visible z-50"
+                    onMouseEnter={() => setMenuOpen(true)}
+                    onMouseLeave={() => setMenuOpen(false)}
                     style={{
                       background: "linear-gradient(145deg,#0d3b33,#082721)",
                       border: "1px solid rgba(201,168,76,0.25)",
