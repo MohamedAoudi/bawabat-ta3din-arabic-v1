@@ -239,9 +239,9 @@ const CountryHeroBanner = ({ country, countryCode }) => {
         <div
           className="relative flex-shrink-0 overflow-hidden"
           style={{
-            width: 120,
-            height: 80,
-            borderRadius: 10,
+            width: 160,
+            height: 110,
+            borderRadius: 14,
             boxShadow: "0 6px 20px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.3)",
           }}
         >
@@ -255,7 +255,7 @@ const CountryHeroBanner = ({ country, countryCode }) => {
             style={{
               position: "absolute", inset: 0,
               background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 60%)",
-              borderRadius: 10,
+              borderRadius: 14,
             }}
           />
         </div>
@@ -683,7 +683,7 @@ const Countries = () => {
               <button key={c.code} type="button" onClick={() => setSelected(c.name)}
                       className="group flex flex-col items-center text-center transition-transform hover:-translate-y-1 focus:outline-none">
                 <div
-                  className="relative flex h-14 w-full items-center justify-center overflow-hidden rounded-lg bg-slate-50 transition-all"
+                  className="relative flex h-25 w-full items-center justify-center overflow-hidden rounded-lg bg-slate-50 transition-all"
                   style={{
                     boxShadow: selected === c.name
                       ? "0 0 0 2px #C9A84C, 0 4px 12px rgba(201,168,76,0.25)"
