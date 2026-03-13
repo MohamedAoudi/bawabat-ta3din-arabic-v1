@@ -16,14 +16,14 @@ const About = () => {
 
       {/* Hero */}
       <header
-        className="bg-gradient-to-r from-[#082721] to-[#051712] text-white pt-16 pb-24 -mb-12 text-center"
+        className="bg-[#082721] text-white pt-16 pb-24 -mb-12 text-center"
         style={{
           clipPath: "polygon(0 0, 100% 0, 100% 85%, 0% 100%)",
         }}
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl sm:text-4xl font-bold mb-2mb-3 text-4xl sm:text-5xl md:text-6xl font-extrabold">عن البوابة</h1>
-          <p className="mx-auto max-w-4xl text-lg sm:text-xl text-white/80">
+          <p className="mx-auto max-w-4xl text-lg sm:text-xl text-slate-600">
             تعريف + أهداف + منهجية (ستضيفها لاحقًا)
           </p>
         </div>
