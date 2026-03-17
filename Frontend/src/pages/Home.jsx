@@ -554,7 +554,7 @@ border-radius:13px !important;
 
       {/* ═══════════════════════ HERO ═══════════════════════ */}
       <header className="relative overflow-hidden"
-        style={{ height:"100vh", minHeight:600, maxHeight:800, marginTop:-80 }}>
+        style={{ height:"100vh", minHeight:600, maxHeight:800, marginTop:-90 }}>
 
         <video
           className="absolute inset-0 h-full w-full object-cover"
@@ -630,6 +630,16 @@ border-radius:13px !important;
 </section>
 
         {/* ── PRODUCTION INDICATORS ── */}
+        <section className="reveal d3"  style={{textAlign:"center",
+          marginTop:72,
+            background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)",
+            borderRadius:13, padding:"40px 36px",
+            boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)",
+          }}> <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white" }}>
+                  <span style={{  background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
+                    المؤشرات التعدينية
+                  </span>
+                </h3></section>
         <section className="reveal d3" style={{ marginTop:72 }}>
           <div style={{
             background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)",
@@ -650,11 +660,7 @@ border-radius:13px !important;
                 <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 16px", background:"rgba(201,168,76,0.12)", color:"white", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
                   <i className="fas fa-pickaxe" /> الإنتاج التعديني
                 </span>
-                <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white", margin:"12px 0 4px" }}>
-                  <span style={{ background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
-                    المؤشرات التعدينية
-                  </span>
-                </h3>
+               <br />
                 <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", margin:0 }}>4 مؤشرات تفاعلية شاملة للإنتاج العربي</p>
               </div>
               <a href="/m1" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
