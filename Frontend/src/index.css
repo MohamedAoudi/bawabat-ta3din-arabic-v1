@@ -1,5 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap");
 @import "tailwindcss";
 @import "@fortawesome/fontawesome-free/css/all.min.css";
 *{
-    font-family: 'Lama Sans', sans-serif;
-}
+    font-family: 'Cairo', sans-serif;}
