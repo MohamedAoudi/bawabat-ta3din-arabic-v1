@@ -228,6 +228,34 @@ const YearPills = ({ selectedYear, onYearChange }) => (
   </div>
 );
 
+const ChartSectionTitle = ({ title }) => (
+  <section
+    style={{
+      textAlign: "center",
+      marginTop: 32,
+      background: "linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)",
+      borderRadius: 13,
+      padding: "28px 24px",
+      boxShadow: "0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)",
+    }}
+  >
+    <h3 style={{ fontSize: "1.35rem", fontWeight: 900, color: "white", margin: 0 }}>
+      <span
+        style={{
+          background: "linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)",
+          backgroundSize: "300% auto",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+          animation: "shimmerGold 6s linear infinite",
+        }}
+      >
+        {title}
+      </span>
+    </h3>
+  </section>
+);
+
 // ── Country Hero Banner ────────────────────────────────────────────────────────
 const CountryHeroBanner = ({ country, countryCode }) => {
   const flagSrc = countryFlags[countryCode];
@@ -521,10 +549,14 @@ const Countries = () => {
   const initialCountryCode = query.get("country");
   const initialSelected    = initialCountryCode ? (COUNTRIES.find(c=>c.code===initialCountryCode)?.name??"—") : "—";
 
+  const lastAvailableYear = ALL_YEARS[ALL_YEARS.length - 1];
+
   const [selected, setSelected]               = useState(initialSelected);
   const [selectedMineral, setSelectedMineral] = useState("all");
   const [volumeUnit, setVolumeUnit]           = useState("ton");
-  const [selectedYear, setSelectedYear]       = useState(ALL_YEARS[ALL_YEARS.length-1]);
+  const [donutYear, setDonutYear]             = useState(lastAvailableYear);
+  const [barYear, setBarYear]                 = useState(lastAvailableYear);
+  const [treemapYear, setTreemapYear]         = useState(lastAvailableYear);
 
   const mineralList        = Object.keys(dataByMineral);
   const selectedCountryObj = COUNTRIES.find(c=>c.name===selected);
@@ -612,10 +644,17 @@ const Countries = () => {
               </div>
             </div>
 
-            <CountryComparisonDonut key={`donut-${selected}`} selectedCountry={selected} year={selectedYear} mineralFilter={selectedMineral} unit={volumeUnit} onYearChange={setSelectedYear} />
-            <CountryLineChart       key={`line-${selected}`}  country={selected} mineralFilter={selectedMineral} unit={volumeUnit} />
-            <CountryBarChart        key={`bar-${selected}`}   country={selected} mineralFilter={selectedMineral} unit={volumeUnit} selectedYear={selectedYear} onYearChange={setSelectedYear} />
-            <MineralTreemap         key={`tree-${selected}`}  country={selected} year={selectedYear} unit={volumeUnit} onYearChange={setSelectedYear} />
+            <ChartSectionTitle title="مقارنة الإنتاج" />
+            <CountryComparisonDonut key={`donut-${selected}`} selectedCountry={selected} year={donutYear} mineralFilter={selectedMineral} unit={volumeUnit} onYearChange={setDonutYear} />
+
+            <ChartSectionTitle title="تطور الإنتاج التعديني" />
+            <CountryLineChart key={`line-${selected}`} country={selected} mineralFilter={selectedMineral} unit={volumeUnit} />
+
+            <ChartSectionTitle title="حصص الخامات حسب الحجم" />
+            <CountryBarChart key={`bar-${selected}`} country={selected} mineralFilter={selectedMineral} unit={volumeUnit} selectedYear={barYear} onYearChange={setBarYear} />
+
+            <ChartSectionTitle title="توزيع المعادن حسب النسبة" />
+            <MineralTreemap key={`tree-${selected}`} country={selected} year={treemapYear} unit={volumeUnit} onYearChange={setTreemapYear} />
           </div>
         )}
       </main>
