@@ -683,28 +683,99 @@ border-radius:13px !important;
             </div>
           </div>
         </section>
-
+        <section className="reveal d3"  style={{textAlign:"center",
+          marginTop:72,
+            background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)",
+            borderRadius:13, padding:"40px 36px",
+            boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)",
+          }}> <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white" }}>
+                  <span style={{  background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
+                    التجارة الدولية الخارجية
+                  </span>
+                </h3></section>
         {/* ── TRADE ── */}
         <section className="reveal d3" style={{ marginTop:72 }}>
-          <SectionHeader icon="fa-right-left" tag="التجارة الخارجية" title="التبادلات التجارية الخارجية" action={{ href:"/trade-indicators", label:"جميع مؤشرات التجارة" }} />
-          <GoldDivider />
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))", gap:20 }}>
-            {TRADE_CARDS.map((card, i) => (
-              <div key={i} className="trade-card" style={{ padding:24 }}>
-                <div style={{ display:"flex", gap:14, alignItems:"flex-start", marginBottom:20 }}>
-                  <div style={{ width:44, height:44, background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.25)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--gold)", fontSize:"1.1rem", flexShrink:0 }}>
-                    <i className={`fas ${card.icon}`} />
-                  </div>
-                  <div>
-                    <p style={{ fontSize:"0.95rem", fontWeight:800, color:"white", margin:"0 0 6px" }}>{card.title}</p>
-                    <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.55)", lineHeight:1.7, margin:0 }}>{card.desc}</p>
-                  </div>
-                </div>
-                <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 18px", background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em" }}>
-                  <i className="fas fa-arrow-left" /> المزيد
-                </a>
+          <div style={{
+            background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)",
+            border:"1px solid rgba(201,168,76,0.22)",
+            borderRadius:13, padding:"40px 36px",
+            position:"relative", overflow:"hidden",
+            boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)",
+          }}>
+            {/* Glow blobs */}
+            <div style={{ position:"absolute", top:-80, right:-80, width:360, height:360, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(201,168,76,0.07) 0%,transparent 70%)", pointerEvents:"none" }} />
+            <div style={{ position:"absolute", bottom:-60, left:-60, width:280, height:280, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(78,199,162,0.05) 0%,transparent 70%)", pointerEvents:"none" }} />
+            {/* Grid lines */}
+            <div style={{ position:"absolute", inset:0, pointerEvents:"none", backgroundImage:"linear-gradient(rgba(201,168,76,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.03) 1px,transparent 1px)", backgroundSize:"60px 60px" }} />
+
+            {/* Header */}
+            
+            <div style={{ position:"relative", zIndex:1, display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:32, flexWrap:"wrap", gap:12 }}>
+              <div>
+                <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 16px", background:"rgba(201,168,76,0.12)", color:"white", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
+                  <i className="fas fa-right-left" />
+                </span>
+                <br />
+                <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", margin:0 }}>مؤشرات تفاعلية لتتبع الصادرات والواردات التعدينية العربية</p>
               </div>
-            ))}
+              <a href="/trade-indicators" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
+                <i className="fas fa-arrow-left" /> جميع مؤشرات التجارة
+              </a>
+            </div>
+
+            {/* Divider */}
+            <div style={{ height:1, background:"linear-gradient(to right,transparent,rgba(201,168,76,0.4),transparent)", marginBottom:28, position:"relative", zIndex:1 }} />
+
+            {/* Cards */}
+            <div style={{ display:"flex", flexDirection:"column", gap:14, position:"relative", zIndex:1 }}>
+              {TRADE_CARDS.map((card, i) => {
+                const accent = i === 0 ? "#c9a84c" : "#7ee0c0";
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      borderRadius:8,
+                      padding:"20px 24px",
+                      background:"rgba(255,255,255,0.04)",
+                      border:"1px solid rgba(255,255,255,0.07)",
+                      borderRight:`3px solid ${accent}`,
+                      transition:"transform 0.35s cubic-bezier(.16,1,.3,1), box-shadow 0.35s, background 0.3s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-5px)";
+                      e.currentTarget.style.background = "rgba(255,255,255,0.075)";
+                      e.currentTarget.style.boxShadow = "0 22px 50px rgba(0,0,0,0.38)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:16, flexWrap:"wrap" }}>
+                      <div style={{ flex:"1 1 320px", display:"flex", gap:14, alignItems:"flex-start" }}>
+                        <div style={{ width:44, height:44, background:`${accent}20`, border:`1px solid ${accent}50`, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:accent, fontSize:"1rem", flexShrink:0 }}>
+                          <i className={`fas ${card.icon}`} />
+                        </div>
+                        <div>
+                          <p style={{ fontSize:"1.05rem", fontWeight:800, color:"white", margin:"0 0 6px" }}>{card.title}</p>
+                          <p style={{ fontSize:"0.86rem", color:"rgba(255,255,255,0.55)", lineHeight:1.75, margin:0 }}>{card.desc}</p>
+                        </div>
+                      </div>
+                      <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${accent}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:accent, letterSpacing:"0.04em", textDecoration:"none", background:`${accent}12`, whiteSpace:"nowrap" }}>
+                        <i className="fas fa-arrow-left" /> المزيد
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Footer */}
+            <div style={{ position:"relative", zIndex:1, marginTop:28, paddingTop:20, borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", gap:10 }}>
+              <span style={{ width:8, height:8, borderRadius:"50%", background:"#4ade80", display:"inline-block", boxShadow:"0 0 8px rgba(74,222,128,0.5)" }} />
+              <span style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>تحليل حي لحركة التجارة الخارجية في القطاع التعديني العربي</span>
+            </div>
           </div>
         </section>
 
