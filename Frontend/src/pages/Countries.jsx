@@ -468,7 +468,7 @@ const CountryBarChart = ({ country, mineralFilter=null, unit="ton", selectedYear
 };
 
 // ── Treemap ────────────────────────────────────────────────────────────────────
-const MineralTreemap = ({ country, year, unit="ton" }) => {
+const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
   const [noData, setNoData] = useState(false);
 
   const canvasRef = useChartInit((canvas) => {
@@ -499,7 +499,9 @@ const MineralTreemap = ({ country, year, unit="ton" }) => {
 
   return (
     <Card>
-      <CardHeader title="توزيع المعادن حسب النسبة" subtitle={`${country} — ${year}`} />
+      <CardHeader title="توزيع المعادن حسب النسبة" subtitle={`${country} — ${year}`}>
+        <YearPills selectedYear={year} onYearChange={onYearChange} />
+      </CardHeader>
       {noData ? (
         <div className="h-[320px] flex items-center justify-center">
           <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>لا توجد بيانات</p>
@@ -613,7 +615,7 @@ const Countries = () => {
             <CountryComparisonDonut key={`donut-${selected}`} selectedCountry={selected} year={selectedYear} mineralFilter={selectedMineral} unit={volumeUnit} onYearChange={setSelectedYear} />
             <CountryLineChart       key={`line-${selected}`}  country={selected} mineralFilter={selectedMineral} unit={volumeUnit} />
             <CountryBarChart        key={`bar-${selected}`}   country={selected} mineralFilter={selectedMineral} unit={volumeUnit} selectedYear={selectedYear} onYearChange={setSelectedYear} />
-            <MineralTreemap         key={`tree-${selected}`}  country={selected} year={selectedYear} unit={volumeUnit} />
+            <MineralTreemap         key={`tree-${selected}`}  country={selected} year={selectedYear} unit={volumeUnit} onYearChange={setSelectedYear} />
           </div>
         )}
       </main>
