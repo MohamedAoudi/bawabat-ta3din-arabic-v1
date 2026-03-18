@@ -128,18 +128,69 @@ const KPI_DATA = [
   },
 ];
 
+const MiniTradeLine = ({ active, color = "#c9a84c" }) => {
+  const pts = [[4,82],[18,76],[34,72],[50,68],[66,60],[82,54],[98,46],[114,50],[130,36],[146,28],[162,20],[178,14]];
+  const path = pts.map((p,i) => `${i===0?"M":"L"} ${p[0]} ${p[1]}`).join(" ");
+  return (
+    <div style={{ height:110, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:8 }}>
+      <svg viewBox="0 0 190 88" style={{ width:"100%", height:"100%", overflow:"visible" }}>
+        {[20,40,60,80].map(y => <line key={y} x1="0" y1={y} x2="190" y2={y} stroke="rgba(255,255,255,0.07)" strokeWidth="1" />)}
+        <path d={path} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+          strokeDasharray="560" strokeDashoffset={active?"0":"560"}
+          style={{ transition: active?"stroke-dashoffset 1.2s ease 80ms":"stroke-dashoffset 0.25s ease" }}
+        />
+        {pts.map((p,i) => (
+          <circle key={i} cx={p[0]} cy={p[1]} r="2.5" fill={color} opacity={active?1:0}
+            style={{
+              transform: active?"scale(1)":"scale(0)",
+              transformOrigin:`${p[0]}px ${p[1]}px`,
+              transition: active
+                ? `opacity 250ms ease ${420+i*55}ms, transform 250ms ease ${420+i*55}ms`
+                : "opacity 200ms ease, transform 200ms ease",
+            }}
+          />
+        ))}
+      </svg>
+    </div>
+  );
+};
+
+const MiniTradeBar = ({ active, color = "#7ee0c0" }) => {
+  const bars = [28,42,36,50,58,46,68,63,52,70,78,66,72,80,88];
+  return (
+    <div style={{ height:110, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:"8px 6px 4px", display:"flex", alignItems:"flex-end", gap:2 }}>
+      {bars.map((v, i) => (
+        <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", height:"100%" }}>
+          <div style={{
+            width:"100%", borderRadius:"2px 2px 0 0",
+            background:`linear-gradient(to top,${color}88,${color})`,
+            minHeight:3,
+            height: active ? `${v}%` : "0%",
+            opacity: active ? 1 : 0.2,
+            transition: active
+              ? `height 700ms cubic-bezier(.16,1,.3,1) ${i*40}ms, opacity 350ms ease ${i*40}ms`
+              : "height 250ms ease, opacity 250ms ease",
+          }} />
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const TRADE_CARDS = [
   {
     icon: "fa-ship",
     title: "الصادرات التعدينية",
     desc: "تحليل تدفقات الصادرات التعدينية حسب الدولة والوجهة والقيمة المالية.",
     href: "/m5",
+    Chart: MiniTradeLine,
   },
   {
     icon: "fa-truck-ramp-box",
     title: "الواردات التعدينية",
     desc: "رصد حجم وقيمة الواردات من المواد الخام والمنتجات التعدينية المعالجة.",
     href: "/m6",
+    Chart: MiniTradeBar,
   },
 ];
 
@@ -430,6 +481,68 @@ const KpiCard = ({ k }) => {
 
       {/* Unit */}
       {k.unit && <p style={{ color:"rgba(255,255,255,0.4)", fontSize:"0.78rem", margin:"4px 0 0" }}>{k.unit}</p>}
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────────
+   TRADE CARD  (self-contained hover + mini chart)
+───────────────────────────────────────────── */
+const TradeCard = ({ card, accent }) => {
+  const [hovered, setHovered] = useState(false);
+  const [inView, setInView] = useState(false);
+  const ref = useRef(null);
+  const { Chart } = card;
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach(e => { if (e.isIntersecting) { setInView(true); io.unobserve(e.target); } }),
+      { threshold: 0.2 }
+    );
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, []);
+
+  const chartActive = hovered || inView;
+
+  return (
+    <div
+      ref={ref}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        borderRadius:8, padding:"20px 24px",
+        background: hovered?"rgba(255,255,255,0.075)":"rgba(255,255,255,0.04)",
+        border:"1px solid rgba(255,255,255,0.07)",
+        borderRight:`3px solid ${accent}`,
+        transform: hovered?"translateY(-5px)":"translateY(0)",
+        boxShadow: hovered?"0 22px 50px rgba(0,0,0,0.38)":"none",
+        transition:"transform 0.35s cubic-bezier(.16,1,.3,1), box-shadow 0.35s, background 0.3s",
+      }}
+    >
+      <div style={{ display:"flex", gap:20, alignItems:"center", flexWrap:"wrap" }}>
+        {/* Info */}
+        <div style={{ flex:"1 1 240px", display:"flex", gap:14, alignItems:"flex-start" }}>
+          <div style={{ width:44, height:44, background:`${accent}20`, border:`1px solid ${accent}50`, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:accent, flexShrink:0 }}>
+            <AppIcon name={card.icon} size={18} strokeWidth={2.2} />
+          </div>
+          <div>
+            <p style={{ fontSize:"1.05rem", fontWeight:800, color:"white", margin:"0 0 6px" }}>{card.title}</p>
+            <p style={{ fontSize:"0.86rem", color:"rgba(255,255,255,0.55)", lineHeight:1.75, margin:0 }}>{card.desc}</p>
+          </div>
+        </div>
+        {/* Mini chart */}
+        <div style={{ flex:"0 0 260px", minWidth:200, alignSelf:"center" }}>
+          <Chart active={chartActive} color={accent} />
+        </div>
+        {/* CTA */}
+        <div style={{ display:"flex", alignItems:"center", marginRight:"auto" }}>
+          <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${accent}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:accent, letterSpacing:"0.04em", textDecoration:"none", background:`${accent}12`, whiteSpace:"nowrap" }}>
+            <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> المزيد
+          </a>
+        </div>
+      </div>
     </div>
   );
 };
@@ -787,7 +900,7 @@ border-radius:13px !important;
                   <AppIcon name="fa-right-left" size={15} strokeWidth={2.2} />
                 </span>
                 <br />
-                <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", margin:0 }}>مؤشرات تفاعلية لتتبع الصادرات والواردات التعدينية العربية</p>
+                <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", marginTop:"20px" }}>مؤشرات تفاعلية لتتبع الصادرات والواردات التعدينية العربية</p>
               </div>
               <a href="/trade-indicators" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
                 <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> جميع مؤشرات التجارة
@@ -801,44 +914,7 @@ border-radius:13px !important;
             <div style={{ display:"flex", flexDirection:"column", gap:14, position:"relative", zIndex:1 }}>
               {TRADE_CARDS.map((card, i) => {
                 const accent = i === 0 ? "#c9a84c" : "#7ee0c0";
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      borderRadius:8,
-                      padding:"20px 24px",
-                      background:"rgba(255,255,255,0.04)",
-                      border:"1px solid rgba(255,255,255,0.07)",
-                      borderRight:`3px solid ${accent}`,
-                      transition:"transform 0.35s cubic-bezier(.16,1,.3,1), box-shadow 0.35s, background 0.3s",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "translateY(-5px)";
-                      e.currentTarget.style.background = "rgba(255,255,255,0.075)";
-                      e.currentTarget.style.boxShadow = "0 22px 50px rgba(0,0,0,0.38)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:16, flexWrap:"wrap" }}>
-                      <div style={{ flex:"1 1 320px", display:"flex", gap:14, alignItems:"flex-start" }}>
-                        <div style={{ width:44, height:44, background:`${accent}20`, border:`1px solid ${accent}50`, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:accent, fontSize:"1rem", flexShrink:0 }}>
-                          <AppIcon name={card.icon} size={18} strokeWidth={2.2} />
-                        </div>
-                        <div>
-                          <p style={{ fontSize:"1.05rem", fontWeight:800, color:"white", margin:"0 0 6px" }}>{card.title}</p>
-                          <p style={{ fontSize:"0.86rem", color:"rgba(255,255,255,0.55)", lineHeight:1.75, margin:0 }}>{card.desc}</p>
-                        </div>
-                      </div>
-                      <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${accent}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:accent, letterSpacing:"0.04em", textDecoration:"none", background:`${accent}12`, whiteSpace:"nowrap" }}>
-                        <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> المزيد
-                      </a>
-                    </div>
-                  </div>
-                );
+                return <TradeCard key={i} card={card} accent={accent} />;
               })}
             </div>
 
