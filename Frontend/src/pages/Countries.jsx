@@ -572,13 +572,10 @@ const Countries = () => {
   const lastAvailableYear = ALL_YEARS[ALL_YEARS.length - 1];
 
   const [selected, setSelected]               = useState(initialSelected);
-  const [selectedMineral, setSelectedMineral] = useState("all");
-  const [volumeUnit, setVolumeUnit]           = useState("ton");
   const [donutYear, setDonutYear]             = useState(lastAvailableYear);
   const [barYear, setBarYear]                 = useState(lastAvailableYear);
   const [treemapYear, setTreemapYear]         = useState(lastAvailableYear);
 
-  const mineralList        = Object.keys(dataByMineral);
   const selectedCountryObj = COUNTRIES.find(c=>c.name===selected);
 
   return (
@@ -642,39 +639,14 @@ const Countries = () => {
           <div className="space-y-5">
             {selectedCountryObj&&<CountryHeroBanner country={selected} countryCode={selectedCountryObj.code} />}
 
-            <div className="rounded-2xl px-5 py-4 flex flex-wrap items-center gap-5"
-              style={{ background:"linear-gradient(160deg,#0e4238,#082c23)", border:"1px solid rgba(201,168,76,0.18)", fontFamily:"'Cairo','Tajawal',sans-serif" }}>
-              <div className="flex items-center gap-2.5">
-                <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color:"rgba(201,168,76,0.6)" }}>المعدن</span>
-                <select value={selectedMineral} onChange={e=>setSelectedMineral(e.target.value)}
-                  className="rounded-lg py-1.5 px-3 text-sm font-semibold focus:outline-none"
-                  style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(201,168,76,0.2)", color:"rgba(255,255,255,0.8)" }}>
-                  <option value="all">الكل</option>
-                  {mineralList.map(m=><option key={m} value={m}>{m}</option>)}
-                </select>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color:"rgba(201,168,76,0.6)" }}>الوحدة</span>
-                <select value={volumeUnit} onChange={e=>setVolumeUnit(e.target.value)}
-                  className="rounded-lg py-1.5 px-3 text-sm font-semibold focus:outline-none"
-                  style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(201,168,76,0.2)", color:"rgba(255,255,255,0.8)" }}>
-                  <option value="ton">ألف طن</option>
-                  <option value="kg">كجم</option>
-                </select>
-              </div>
-            </div>
+            <ChartSectionTitle title="المؤشرات التعدينية" />
+            <CountryComparisonDonut key={`donut-${selected}`} selectedCountry={selected} year={donutYear} onYearChange={setDonutYear} />
 
-            <ChartSectionTitle title="مقارنة الإنتاج" />
-            <CountryComparisonDonut key={`donut-${selected}`} selectedCountry={selected} year={donutYear} mineralFilter={selectedMineral} unit={volumeUnit} onYearChange={setDonutYear} />
+            <CountryLineChart key={`line-${selected}`} country={selected} />
 
-            <ChartSectionTitle title="تطور الإنتاج التعديني" />
-            <CountryLineChart key={`line-${selected}`} country={selected} mineralFilter={selectedMineral} unit={volumeUnit} />
+            <CountryBarChart key={`bar-${selected}`} country={selected} selectedYear={barYear} onYearChange={setBarYear} />
 
-            <ChartSectionTitle title="حصص الخامات حسب الحجم" />
-            <CountryBarChart key={`bar-${selected}`} country={selected} mineralFilter={selectedMineral} unit={volumeUnit} selectedYear={barYear} onYearChange={setBarYear} />
-
-            <ChartSectionTitle title="توزيع المعادن حسب النسبة" />
-            <MineralTreemap key={`tree-${selected}`} country={selected} year={treemapYear} unit={volumeUnit} onYearChange={setTreemapYear} />
+            <MineralTreemap key={`tree-${selected}`} country={selected} year={treemapYear} onYearChange={setTreemapYear} />
           </div>
         )}
       </main>
