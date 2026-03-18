@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Boxes, Weight } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
@@ -182,7 +183,7 @@ export default function M4Page() {
                   المقارنة: الإنتاج العربي مقابل العالمي
                 </div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
-                  <i className="fa-solid fa-weight-hanging" />
+                  <Weight size={14} strokeWidth={2.2} />
                   وحدة: ألف طن
                 </span>
               </div>
@@ -207,7 +208,7 @@ export default function M4Page() {
                   الخامة / المنتج
                 </div>
                 <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-cubes-stacked text-[#082721]" />
+                  <Boxes size={16} strokeWidth={2.2} className="text-[#082721]" />
                   <select
                     value={product}
                     onChange={(e) => {

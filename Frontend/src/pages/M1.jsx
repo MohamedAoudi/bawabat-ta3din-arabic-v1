@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowDownWideNarrow, CalendarDays, Search } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
@@ -502,7 +503,7 @@ export default function M1Page() {
                     الإنتاج حسب الدولة
                   </h3>
                   <div className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
-                    <i className="fa-solid fa-calendar-days" />
+                    <CalendarDays size={14} strokeWidth={2.2} />
                     <span>السنة: {activeYear}</span>
                   </div>
                 </div>
@@ -520,14 +521,14 @@ export default function M1Page() {
                     الإنتاج حسب الدولة
                   </h3>
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-[11px] font-extrabold text-amber-900">
-                    <i className="fa-solid fa-arrow-down-wide-short" />
+                    <ArrowDownWideNarrow size={13} strokeWidth={2.2} />
                     ترتيب
                   </span>
                 </div>
 
                 <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
                   <div className="mb-2 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
-                    <i className="fa-solid fa-magnifying-glass text-slate-400" />
+                    <Search size={14} strokeWidth={2.2} className="text-slate-400" />
                     <input
                       type="text"
                       value={search}

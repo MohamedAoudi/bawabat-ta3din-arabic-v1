@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { ArrowLeft } from "lucide-react";
 import Chart from "chart.js/auto";
 import { TreemapController, TreemapElement } from "chartjs-chart-treemap";
 import Menu from "../layouts/Menu";
@@ -552,7 +553,7 @@ const Countries = () => {
               <p className="mt-0.5 text-sm text-slate-400">اختر دولة للوصول إلى ملفها التعديني</p>
             </div>
             <a href="countries.html" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] shadow-sm ring-1 ring-[#082721]/20 hover:bg-slate-50 transition-colors">
-              <i className="fa-solid fa-arrow-left" /><span>المزيد</span>
+              <ArrowLeft size={14} strokeWidth={2.4} /><span>المزيد</span>
             </a>
           </div>
           <div className="grid gap-y-5 gap-x-3 grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">

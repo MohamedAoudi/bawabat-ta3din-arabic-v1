@@ -1,4 +1,26 @@
 import { useState, useEffect, useRef } from "react";
+import {
+  ArrowLeft,
+  ArrowLeftRight,
+  BookOpen,
+  Bot,
+  Boxes,
+  CalendarDays,
+  ChartColumn,
+  ChartLine,
+  ChevronDown,
+  Circle,
+  CircleDashed,
+  Flag,
+  Gem,
+  Globe,
+  Layers,
+  Microscope,
+  Pickaxe,
+  Search,
+  Ship,
+  Truck,
+} from "lucide-react";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import i7 from "../assets/i-7.png";
@@ -147,6 +169,33 @@ const RESERVE_CARDS = [
     bg: "rgba(8,39,33,0.06)",
   },
 ];
+
+const ICON_MAP = {
+  "fa-cubes": Boxes,
+  "fa-earth-africa": Globe,
+  "fa-calendar-days": CalendarDays,
+  "fa-gem": Gem,
+  "fa-ship": Ship,
+  "fa-truck-ramp-box": Truck,
+  "fa-microscope": Microscope,
+  "fa-chart-column": ChartColumn,
+  "fa-chart-line": ChartLine,
+  "fa-layer-group": Layers,
+  "fa-circle-notch": CircleDashed,
+  "fa-arrow-left": ArrowLeft,
+  "fa-search": Search,
+  "fa-chevron-down": ChevronDown,
+  "fa-pickaxe": Pickaxe,
+  "fa-right-left": ArrowLeftRight,
+  "fa-flag": Flag,
+  "fa-books": BookOpen,
+  "fa-robot": Bot,
+};
+
+const AppIcon = ({ name, size = 18, strokeWidth = 2, style }) => {
+  const Icon = ICON_MAP[name] || Circle;
+  return <Icon size={size} strokeWidth={strokeWidth} style={style} aria-hidden="true" />;
+};
 
 /* ─────────────────────────────────────────────
    MINI CHARTS  (hover-driven via `active` prop)
@@ -312,10 +361,7 @@ const IndicatorRowCard = ({ card }) => {
             transform: hovered?"scale(1.1) rotate(-5deg)":"scale(1) rotate(0deg)",
             transition:"transform 0.32s cubic-bezier(.16,1,.3,1)",
           }}>
-            <i
-              className={`fas ${card.icon}`}
-              style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"3rem", lineHeight:1 }}
-            />
+            <AppIcon name={card.icon} size={56} strokeWidth={1.8} />
           </div>
           <div style={{ flex:1 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6, flexWrap:"wrap" }}>
@@ -323,7 +369,7 @@ const IndicatorRowCard = ({ card }) => {
             </div>
             <p style={{ fontSize:"0.9rem", color:"rgba(255,255,255,0.5)", lineHeight:1.75, margin:"0 0 14px" }}>{card.desc}</p>
             <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${card.tagColor}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:card.tagColor, letterSpacing:"0.04em", textDecoration:"none", background:`${card.tagColor}12` }}>
-              <i className="fas fa-arrow-left" /> المزيد
+              <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> المزيد
             </a>
           </div>
         </div>
@@ -359,7 +405,7 @@ const KpiCard = ({ k }) => {
       {/* Top row */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20, gap:8 }}>
         <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:8, padding:"10px 12px", fontSize:"1.2rem", color:k.color, flexShrink:0 }}>
-          <i className={`fas ${k.icon}`} />
+          <AppIcon name={k.icon} size={22} strokeWidth={2.2} />
         </div>
         <span style={{ background:`${k.color}18`, color:k.color, fontSize:"0.72rem", fontWeight:700, padding:"4px 12px", borderRadius:2, border:`1px solid ${k.color}30`, whiteSpace:"nowrap" }}>
           {k.badge}
@@ -395,13 +441,13 @@ const SectionHeader = ({ icon, tag, title, action }) => (
   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:28, flexWrap:"wrap", gap:12 }}>
     <div>
       <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:2, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
-        <i className={`fas ${icon}`} /> {tag}
+        <AppIcon name={icon} size={14} strokeWidth={2.3} /> {tag}
       </span>
       <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"var(--forest)", marginTop:12, marginBottom:0 }}>{title}</h3>
     </div>
     {action && (
       <a href={action.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"6px 18px", border:"1px solid rgba(8,39,33,0.2)", borderRadius:2, fontSize:"0.78rem", fontWeight:700, color:"var(--forest)", letterSpacing:"0.04em", textDecoration:"none", transition:"background 0.25s,border-color 0.25s,color 0.25s" }}>
-        <i className="fas fa-arrow-left" /> {action.label}
+        <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> {action.label}
       </a>
     )}
   </div>
@@ -631,14 +677,14 @@ border-radius:13px !important;
                 onBlur={() => setSearchFocused(false)}
                 style={{ flex:1, background:"transparent", border:"none", outline:"none", color:"#000", fontSize:"0.9rem", textAlign:"right", caretColor:"#000" }}
               />
-              <i className="fas fa-search" style={{ color:"rgba(201,168,76,0.7)", fontSize:"1rem" }} />
+              <AppIcon name="fa-search" size={16} style={{ color:"rgba(201,168,76,0.7)" }} />
             </div>
           </div>
 
           {/* Scroll hint */}
           <div className="scroll-hint absolute bottom-8"
             style={{ color:"rgba(201,168,76,0.5)", fontSize:"0.7rem", letterSpacing:"0.12em" }}>
-            <i className="fas fa-chevron-down" style={{ display:"block", textAlign:"center", marginBottom:4 }} />
+            <AppIcon name="fa-chevron-down" size={16} style={{ display:"block", margin:"0 auto 4px" }} />
             SCROLL
           </div>
         </div>
@@ -683,13 +729,13 @@ border-radius:13px !important;
             <div style={{ position:"relative", zIndex:1, display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:32, flexWrap:"wrap", gap:12 }}>
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center",marginBottom:"20px", gap:8, padding:"5px 16px", background:"rgba(201,168,76,0.12)", color:"white", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
-                  <i className="fas fa-pickaxe" /> الإنتاج التعديني
+                  <AppIcon name="fa-pickaxe" size={15} strokeWidth={2.2} /> الإنتاج التعديني
                 </span>
                <br />
                 <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", margin:0 }}>4 مؤشرات تفاعلية شاملة للإنتاج العربي</p>
               </div>
               <a href="/m1" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
-                <i className="fas fa-arrow-left" /> الانتقال للمؤشرات
+                <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> الانتقال للمؤشرات
               </a>
             </div>
 
@@ -738,13 +784,13 @@ border-radius:13px !important;
             <div style={{ position:"relative", zIndex:1, display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:32, flexWrap:"wrap", gap:12 }}>
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 16px", background:"rgba(201,168,76,0.12)", color:"white", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
-                  <i className="fas fa-right-left" />
+                  <AppIcon name="fa-right-left" size={15} strokeWidth={2.2} />
                 </span>
                 <br />
                 <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", margin:0 }}>مؤشرات تفاعلية لتتبع الصادرات والواردات التعدينية العربية</p>
               </div>
               <a href="/trade-indicators" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
-                <i className="fas fa-arrow-left" /> جميع مؤشرات التجارة
+                <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> جميع مؤشرات التجارة
               </a>
             </div>
 
@@ -780,7 +826,7 @@ border-radius:13px !important;
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:16, flexWrap:"wrap" }}>
                       <div style={{ flex:"1 1 320px", display:"flex", gap:14, alignItems:"flex-start" }}>
                         <div style={{ width:44, height:44, background:`${accent}20`, border:`1px solid ${accent}50`, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:accent, fontSize:"1rem", flexShrink:0 }}>
-                          <i className={`fas ${card.icon}`} />
+                          <AppIcon name={card.icon} size={18} strokeWidth={2.2} />
                         </div>
                         <div>
                           <p style={{ fontSize:"1.05rem", fontWeight:800, color:"white", margin:"0 0 6px" }}>{card.title}</p>
@@ -788,7 +834,7 @@ border-radius:13px !important;
                         </div>
                       </div>
                       <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${accent}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:accent, letterSpacing:"0.04em", textDecoration:"none", background:`${accent}12`, whiteSpace:"nowrap" }}>
-                        <i className="fas fa-arrow-left" /> المزيد
+                        <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> المزيد
                       </a>
                     </div>
                   </div>
@@ -839,12 +885,12 @@ border-radius:13px !important;
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:8, flexWrap:"wrap", gap:12 }}>
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
-                  <i className="fas fa-flag" /> الدول الأعضاء
+                  <AppIcon name="fa-flag" size={14} strokeWidth={2.2} /> الدول الأعضاء
                 </span>
                 <h5 style={{ fontSize:"1.2rem", fontWeight:900, color:"var(--forest)", margin:"10px 0 4px" }}>الدول العربية</h5>
                 <p style={{ fontSize:"0.8rem", color:"var(--muted)", margin:0 }}>اختر دولة للوصول إلى ملفها التعديني</p>
               </div>
-              <a href="/countries" className="ind-link"><i className="fas fa-arrow-left" /> عرض الكل</a>
+              <a href="/countries" className="ind-link"><AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> عرض الكل</a>
             </div>
 
             <GoldDivider />
@@ -876,7 +922,7 @@ border-radius:13px !important;
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12 }}>
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
-                  <i className="fas fa-books" /> المراجع
+                  <AppIcon name="fa-books" size={14} strokeWidth={2.2} /> المراجع
                 </span>
                 <h2 style={{ fontSize:"1.2rem", fontWeight:900, color:"var(--forest)", margin:"10px 0 0" }}>المراجع والمصادر</h2>
               </div>
@@ -929,7 +975,7 @@ border-radius:13px !important;
               </p>
               <button type="button" onClick={handleChatbotClick}
                 style={{ display:"inline-flex", alignItems:"center", gap:10, background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:"var(--forest)", padding:"12px 32px", borderRadius:13, border:"none", cursor:"pointer", fontSize:"0.88rem", fontWeight:800, letterSpacing:"0.04em", boxShadow:"0 8px 24px rgba(201,168,76,0.3)" }}>
-                <i className="fas fa-robot" /> ابدأ المحادثة
+                <AppIcon name="fa-robot" size={16} strokeWidth={2.2} /> ابدأ المحادثة
               </button>
             </div>
           </div>
@@ -945,7 +991,7 @@ border-radius:13px !important;
         style={{ position:"fixed", bottom:24, right:24, zIndex:50, display:"flex", alignItems:"center", gap:12, padding:"10px 16px 10px 12px", borderRadius:13, cursor:"pointer" }}>
         <span className="online-dot" style={{ position:"absolute", top:8, right:8, width:8, height:8, borderRadius:"50%", background:"#4ade80", boxShadow:"0 0 0 3px rgba(74,222,128,0.25)" }} />
         <div style={{ width:42, height:42, borderRadius:13, background:"linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08))", border:"1px solid rgba(201,168,76,0.4)", display:"flex", alignItems:"center", justifyContent:"center", color:"var(--gold)", fontSize:"1.1rem" }}>
-          <i className="fas fa-robot" />
+          <AppIcon name="fa-robot" size={18} strokeWidth={2.2} />
         </div>
         <div style={{ display:"flex", flexDirection:"column", textAlign:"right" }}>
           <span style={{ fontSize:"0.82rem", fontWeight:800, color:"var(--gold)", lineHeight:1 }}>Chat Bote</span>

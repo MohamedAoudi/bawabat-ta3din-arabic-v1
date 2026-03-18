@@ -1,4 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowDownWideNarrow,
+  Boxes,
+  CalendarDays,
+  RotateCw,
+  Scale,
+  Search,
+} from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
@@ -168,7 +176,7 @@ export default function M7Page() {
 
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-[260px] flex-1 items-center gap-2 rounded-2xl border border-slate-100 bg-white px-3 py-2 shadow-sm">
-              <i className="fa-solid fa-cubes-stacked text-[#082721]" />
+              <Boxes size={16} strokeWidth={2.2} className="text-[#082721]" />
               <select className="w-full border-none bg-transparent text-sm font-bold text-slate-700 outline-none focus:ring-0">
                 <option value="phosphate">صخر الفوسفات</option>
                 <option value="gold">الذهب</option>
@@ -178,7 +186,7 @@ export default function M7Page() {
             </div>
 
             <div className="flex min-w-[260px] flex-1 items-center gap-2 rounded-2xl border border-slate-100 bg-white px-3 py-2 shadow-sm">
-              <i className="fa-solid fa-scale-balanced text-[#082721]" />
+              <Scale size={16} strokeWidth={2.2} className="text-[#082721]" />
               <select className="w-full border-none bg-transparent text-sm font-bold text-slate-700 outline-none focus:ring-0">
                 <option value="ton">وحدة الإنتاج: طن</option>
                 <option value="kton">وحدة الإنتاج: ألف طن</option>
@@ -191,7 +199,7 @@ export default function M7Page() {
               onClick={handleRefresh}
               className="inline-flex items-center gap-2 rounded-xl bg-[#082721] px-4 py-2 text-sm font-extrabold text-white shadow-sm hover:bg-[#ddbc6b] hover:text-[#082721]"
             >
-              <i className="fa-solid fa-rotate" />
+              <RotateCw size={15} strokeWidth={2.4} />
               تحديث
             </button>
           </div>
@@ -207,7 +215,7 @@ export default function M7Page() {
                   الإنتاج حسب الدولة
                 </h3>
                 <div className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
-                  <i className="fa-solid fa-calendar-days" />
+                  <CalendarDays size={14} strokeWidth={2.2} />
                   <span>السنة: {activeYear}</span>
                 </div>
               </div>
@@ -226,14 +234,14 @@ export default function M7Page() {
                   الإنتاج حسب الدولة
                 </h3>
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-[11px] font-extrabold text-amber-900">
-                  <i className="fa-solid fa-arrow-down-wide-short" />
+                  <ArrowDownWideNarrow size={13} strokeWidth={2.2} />
                   ترتيب
                 </span>
               </div>
 
               <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
                 <div className="mb-2 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500">
-                  <i className="fa-solid fa-magnifying-glass text-slate-400" />
+                  <Search size={14} strokeWidth={2.2} className="text-slate-400" />
                   <input
                     type="text"
                     value={search}

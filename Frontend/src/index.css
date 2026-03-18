@@ -2,4 +2,7 @@
 @import "tailwindcss";
 @import "@fortawesome/fontawesome-free/css/all.min.css";
 *{
-    font-family: 'Cairo', sans-serif;}
+    font-family: 'Cairo', sans-serif !important;
+}
+
+

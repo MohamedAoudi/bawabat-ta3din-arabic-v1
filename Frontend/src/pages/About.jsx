@@ -1,25 +1,26 @@
 import React from "react";
+import { Building2, ChartLine, Database, Link2, Shield } from "lucide-react";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 
 const pillars = [
   {
-    icon: "fa-database",
+    icon: Database,
     title: "توحيد البيانات",
     text: "تجميع بيانات التعدين من مصادر عربية ودولية ضمن نموذج موحد يسهل المقارنة والتحليل.",
   },
   {
-    icon: "fa-chart-line",
+    icon: ChartLine,
     title: "تحليل قابل للاستخدام",
     text: "تحويل الأرقام الخام إلى مؤشرات ولوحات تفاعلية تساعد صناع القرار والباحثين على القراءة السريعة.",
   },
   {
-    icon: "fa-shield-halved",
+    icon: Shield,
     title: "حوكمة وشفافية",
     text: "توثيق المنهجية والمصدر وتحديثات البيانات بما يضمن الثقة والوضوح في كل مؤشر منشور.",
   },
   {
-    icon: "fa-link",
+    icon: Link2,
     title: "تكامل عربي",
     text: "دعم التعاون بين الجهات الوطنية عبر لغة بيانات مشتركة تعزز التكامل الاقتصادي والتعديني.",
   },
@@ -80,7 +81,7 @@ const About = () => {
             className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4 text-xs font-bold uppercase tracking-widest"
             style={{ background: "rgba(201,168,76,0.12)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}
           >
-            <i className="fa-solid fa-mountain-city" />
+            <Building2 size={14} strokeWidth={2.2} />
             بوابة المؤشرات التعدينية العربية
           </span>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight">
@@ -150,7 +151,7 @@ const About = () => {
               >
                 <div className="flex items-start gap-3">
                   <div className="h-10 w-10 rounded-xl bg-[#082721] text-[#e8d08a] flex items-center justify-center">
-                    <i className={`fa-solid ${item.icon}`} />
+                    <item.icon size={18} strokeWidth={2.2} />
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-extrabold text-[#082721]">

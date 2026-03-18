@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Boxes, ChartLine, Flag } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
@@ -117,7 +118,7 @@ export default function M8Page() {
                 الدولة
               </div>
               <div className="flex items-center gap-2">
-                <i className="fa-solid fa-flag text-[#082721]" />
+                <Flag size={16} strokeWidth={2.2} className="text-[#082721]" />
                 <select
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
@@ -137,7 +138,7 @@ export default function M8Page() {
                 الخامة / المنتج
               </div>
               <div className="flex items-center gap-2">
-                <i className="fa-solid fa-cubes-stacked text-[#082721]" />
+                <Boxes size={16} strokeWidth={2.2} className="text-[#082721]" />
                 <select
                   value={product}
                   onChange={(e) => setProduct(e.target.value)}
@@ -168,7 +169,7 @@ export default function M8Page() {
                   منحنى التطور عبر الزمن
                 </div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
-                  <i className="fa-solid fa-chart-line" />
+                  <ChartLine size={14} strokeWidth={2.2} />
                   <span>وحدة الإنتاج: {unitLabel}</span>
                 </div>
               </div>

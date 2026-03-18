@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, Scale } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
@@ -170,7 +171,7 @@ export default function M3Page() {
                   الإنتاج عبر السنوات (مقارنة العناصر المختارة)
                 </div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
-                  <i className="fa-solid fa-scale-balanced" />
+                  <Scale size={14} strokeWidth={2.2} />
                   وحدة الإنتاج:{" "}
                   <span className="font-extrabold">{unitLabelFor(unit)}</span>
                 </span>
@@ -235,7 +236,7 @@ export default function M3Page() {
                       key={k}
                       className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-extrabold text-[#082721]"
                     >
-                      <i className="fa-solid fa-check" />
+                      <Check size={13} strokeWidth={2.8} />
                       {seriesMap[k].name}
                       <button
                         type="button"

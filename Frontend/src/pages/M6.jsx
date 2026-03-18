@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Boxes, Check, Scale, Weight } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
@@ -676,7 +677,7 @@ export default function M6Page() {
                   الواردات عبر السنوات (حسب العناصر المختارة)
                 </div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
-                  <i className="fa-solid fa-scale-balanced" />
+                  <Scale size={14} strokeWidth={2.2} />
                   وحدة الإنتاج:{" "}
                   <span className="font-extrabold">{unitLabelFor(unit)}</span>
                 </span>
@@ -736,7 +737,7 @@ export default function M6Page() {
                       key={k}
                       className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-extrabold text-[#082721]"
                     >
-                      <i className="fa-solid fa-check" />
+                      <Check size={13} strokeWidth={2.8} />
                       {seriesMap[k].name}
                       <button
                         type="button"
@@ -765,7 +766,7 @@ export default function M6Page() {
                   توزيع الواردات حسب الدولة العربية
                 </div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
-                  <i className="fa-solid fa-weight-hanging" />
+                  <Weight size={14} strokeWidth={2.2} />
                   وحدة:{" "}
                   <span className="font-extrabold">{unitLabelFor(unit)}</span>
                 </span>
@@ -790,7 +791,7 @@ export default function M6Page() {
                   الخامة / المنتج
                 </div>
                 <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-cubes-stacked text-[#082721]" />
+                  <Boxes size={16} strokeWidth={2.2} className="text-[#082721]" />
                   <select
                     value={countryProduct}
                     onChange={(e) => setCountryProduct(e.target.value)}
