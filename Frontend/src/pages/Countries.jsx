@@ -498,9 +498,9 @@ const CountryBarChart = ({ country, mineralFilter=null, unit="ton", selectedYear
 // ── Treemap ────────────────────────────────────────────────────────────────────
 const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
   const [noData, setNoData] = useState(false);
+  const treeData = getMineralTreemapData(country, year, unit).sort((a, b) => b.value - a.value);
 
   const canvasRef = useChartInit((canvas) => {
-    const treeData = getMineralTreemapData(country, year, unit);
     if (treeData.length===0) { setNoData(true); return null; }
     setNoData(false);
     const sorted = [...treeData].sort((a,b)=>b.value-a.value);
@@ -535,8 +535,28 @@ const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
           <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>لا توجد بيانات</p>
         </div>
       ) : (
-        <div style={{ position:"relative", height:"320px", width:"100%" }}>
-          <canvas ref={canvasRef} style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%" }} />
+        <div className="flex flex-col xl:flex-row gap-6">
+          <div className="flex-1" style={{ position:"relative", height:"320px", minWidth:0 }}>
+            <canvas ref={canvasRef} style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%" }} />
+          </div>
+          <div className="xl:w-64 flex-shrink-0 space-y-2">
+            {treeData.map((item, index) => {
+              const hue = 160 - (index / Math.max(treeData.length - 1, 1)) * 100;
+              const color = `hsl(${hue},60%,38%)`;
+              return (
+                <div key={item.mineral} className="rounded-xl px-3 py-2" style={{ background:"rgba(255,255,255,0.025)" }}>
+                  <div className="flex items-center justify-between mb-1 gap-3">
+                    <span className="text-[11px] font-bold flex items-center gap-1.5 min-w-0" style={{ color }}>
+                      <span className="w-2 h-2 rounded-sm inline-block flex-shrink-0" style={{ background:color }} />
+                      <span className="truncate">{item.mineral}</span>
+                    </span>
+                    <span className="text-[11px] font-black flex-shrink-0" style={{ color:"#C9A84C" }}>{item.pct.toFixed(1)}%</span>
+                  </div>
+                  <p className="text-[9px] font-mono" style={{ color:"rgba(255,255,255,0.28)" }}>{fmtVal(item.rawValue)} {item.unit}</p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </Card>
