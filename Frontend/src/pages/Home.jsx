@@ -248,10 +248,10 @@ const MiniDonut = ({ active }) => (
    INDICATOR CONFIG
 ───────────────────────────────────────────── */
 const INDICATOR_CARDS = [
-  { icon:"fa-chart-column", tag:"KPI",         tagColor:"#c9a84c", title:"حجم الإنتاج التعديني",           desc:"لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة الزمنية.", href:"/m1", Chart:MiniBarChart },
-  { icon:"fa-chart-line",   tag:"Trends",      tagColor:"#7ee0c0", title:"تطور الإنتاج التعديني",           desc:"تتبّع تطور الإنتاج عبر السنوات مع إبراز الاتجاهات وأهم التغيرات السنوية.",    href:"/m2", Chart:MiniLineChart },
-  { icon:"fa-layer-group",  tag:"Compare",     tagColor:"#93c5fd", title:"تطور الإنتاج التعديني العربي",    desc:"مقارنة أداء الدول العربية في الإنتاج عبر أكثر من خام وفترات زمنية مختلفة.",   href:"/m3", Chart:MiniGroupedBar },
-  { icon:"fa-circle-notch", tag:"Global Share",tagColor:"#fbbf24", title:"نسبة الإنتاج العربي من العالمي", desc:"قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري تفاعلي.",      href:"/m4", Chart:MiniDonut },
+  { icon:"fa-chart-column", tagColor:"#c9a84c", title:"حجم الإنتاج التعديني",           desc:"لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة الزمنية.", href:"/m1", Chart:MiniBarChart },
+  { icon:"fa-chart-line",   tagColor:"#7ee0c0", title:"تطور الإنتاج التعديني",           desc:"تتبّع تطور الإنتاج عبر السنوات مع إبراز الاتجاهات وأهم التغيرات السنوية.",    href:"/m2", Chart:MiniLineChart },
+  { icon:"fa-layer-group",  tagColor:"#93c5fd", title:"تطور الإنتاج التعديني العربي",    desc:"مقارنة أداء الدول العربية في الإنتاج عبر أكثر من خام وفترات زمنية مختلفة.",   href:"/m3", Chart:MiniGroupedBar },
+  { icon:"fa-circle-notch", tagColor:"#fbbf24", title:"نسبة الإنتاج العربي من العالمي", desc:"قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري تفاعلي.",      href:"/m4", Chart:MiniDonut },
 ];
 
 /* ─────────────────────────────────────────────
@@ -259,9 +259,34 @@ const INDICATOR_CARDS = [
 ───────────────────────────────────────────── */
 const IndicatorRowCard = ({ card }) => {
   const [hovered, setHovered] = useState(false);
+  const [inView, setInView] = useState(false);
+  const cardRef = useRef(null);
   const { Chart } = card;
+
+  useEffect(() => {
+    if (!cardRef.current) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setInView(true);
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.2, rootMargin: "0px 0px -8% 0px" }
+    );
+
+    io.observe(cardRef.current);
+    return () => io.disconnect();
+  }, []);
+
+  const chartActive = hovered || inView;
+
   return (
     <div
+      ref={cardRef}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -280,21 +305,21 @@ const IndicatorRowCard = ({ card }) => {
         {/* Left */}
         <div style={{ flex:"1 1 280px", display:"flex", gap:16, alignItems:"flex-start" }}>
           <div style={{
-            width:44, height:44, marginTop:2, flexShrink:0,
+            width:88, height:"100%", marginTop:2, flexShrink:0, alignSelf:"stretch",
             background:`${card.tagColor}20`, border:`1px solid ${card.tagColor}50`,
             borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center",
-            color:card.tagColor, fontSize:"1rem",
+            color:card.tagColor,
             transform: hovered?"scale(1.1) rotate(-5deg)":"scale(1) rotate(0deg)",
             transition:"transform 0.32s cubic-bezier(.16,1,.3,1)",
           }}>
-            <i className={`fas ${card.icon}`} />
+            <i
+              className={`fas ${card.icon}`}
+              style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"3rem", lineHeight:1 }}
+            />
           </div>
           <div style={{ flex:1 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6, flexWrap:"wrap" }}>
               <p style={{ fontSize:"1.15rem", fontWeight:800, color:"white", margin:0 }}>{card.title}</p>
-              <span style={{ fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.06em", padding:"4px 12px", borderRadius:2, background:`${card.tagColor}18`, color:card.tagColor, border:`1px solid ${card.tagColor}40` }}>
-                {card.tag}
-              </span>
             </div>
             <p style={{ fontSize:"0.9rem", color:"rgba(255,255,255,0.5)", lineHeight:1.75, margin:"0 0 14px" }}>{card.desc}</p>
             <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${card.tagColor}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:card.tagColor, letterSpacing:"0.04em", textDecoration:"none", background:`${card.tagColor}12` }}>
@@ -305,7 +330,7 @@ const IndicatorRowCard = ({ card }) => {
 
         {/* Right — chart */}
         <div style={{ flex:"0 0 320px", minWidth:260, alignSelf:"center", height:140 }}>
-          <Chart active={hovered} />
+          <Chart active={chartActive} />
         </div>
 
       </div>
@@ -657,7 +682,7 @@ border-radius:13px !important;
             {/* Header */}
             <div style={{ position:"relative", zIndex:1, display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:32, flexWrap:"wrap", gap:12 }}>
               <div>
-                <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 16px", background:"rgba(201,168,76,0.12)", color:"white", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
+                <span style={{ display:"inline-flex", alignItems:"center",marginBottom:"20px", gap:8, padding:"5px 16px", background:"rgba(201,168,76,0.12)", color:"white", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
                   <i className="fas fa-pickaxe" /> الإنتاج التعديني
                 </span>
                <br />
