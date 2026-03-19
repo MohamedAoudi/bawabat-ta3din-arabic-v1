@@ -998,11 +998,12 @@ border-radius:13px !important;
 
         {/* ── KPIs ── */}
         <section className="reveal d2" style={{ marginTop:"20px", position:"relative", zIndex:10, borderRadius:13 }}>
-          <div style={{ textAlign:"center", marginBottom:14 }}>
-            <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
-              <AppIcon name="fa-chart-column" size={14} strokeWidth={2.2} /> البوابة في أرقام
-            </span>
-            <p style={{ margin:"8px 0 0", fontSize:"0.8rem", color:"rgba(8,39,33,0.65)" }}>مؤشرات موجزة عن نطاق البوابة ومحتواها التحليلي</p>
+          <div style={{ textAlign:"center", marginBottom:20, background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)", borderRadius:13, padding:"40px 36px", boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)" }}>
+            <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white", margin:"0" }}>
+              <span style={{ background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
+                البوابة في أرقام
+              </span>
+            </h3>
           </div>
 
           <div className="divf9" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:16, borderRadius:13 }}>
