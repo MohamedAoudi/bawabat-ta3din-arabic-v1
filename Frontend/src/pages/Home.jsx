@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   ArrowLeft,
   ArrowLeftRight,
@@ -47,6 +47,8 @@ import flagEgypt from "../assets/flags/egypt.webp";
 import flagMorocco from "../assets/flags/morocco.webp";
 import flagMauritania from "../assets/flags/mauritania.webp";
 import flagYemen from "../assets/flags/yemen.webp";
+import { dataByMineral } from "./M1";
+import tradeRawText from "../assets/Trade_Critical_Minerals_Morocco.txt?raw";
 
 /* ─────────────────────────────────────────────
    DATA
@@ -93,37 +95,132 @@ const sponsors = [
   { href: "https://www.mim.gov.sa/ar",     img: i7, title: "وزارة الصناعة والثروة المعدنية", subtitle: "المملكة العربية السعودية"        },
 ];
 
-const KPI_DATA = [
+const shortText = (text, max = 95) => (text && text.length > max ? `${text.slice(0, max)}...` : text);
+
+const formatInt = (n) => new Intl.NumberFormat("fr-FR").format(Math.round(n || 0));
+
+const parseFlexibleNumber = (value) => {
+  if (value == null) return null;
+  let s = String(value).trim();
+  if (!s) return null;
+
+  if (s.includes(",") && s.includes(".")) {
+    if (s.lastIndexOf(",") > s.lastIndexOf(".")) {
+      s = s.replace(/\./g, "").replace(/,/g, ".");
+    } else {
+      s = s.replace(/,/g, "");
+    }
+  } else if (s.includes(",")) {
+    s = s.replace(/,/g, ".");
+  }
+
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+};
+
+const buildPortalStats = () => {
+  const minerals = Object.keys(dataByMineral || {});
+  const yearSet = new Set();
+  let productionRows = 0;
+
+  minerals.forEach((mineral) => {
+    Object.entries(dataByMineral[mineral] || {}).forEach(([year, rows]) => {
+      yearSet.add(Number(year));
+      if (Array.isArray(rows)) productionRows += rows.length;
+    });
+  });
+
+  const years = [...yearSet].filter(Number.isFinite).sort((a, b) => a - b);
+  const minYear = years[0] ?? null;
+  const maxYear = years[years.length - 1] ?? null;
+
+  let exportRows = 0;
+  let importRows = 0;
+  let exportTotal = 0;
+  let importTotal = 0;
+
+  tradeRawText
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .forEach((line) => {
+      if (!line.includes("\t")) return;
+      const cells = line.split("\t");
+      if (cells.length < 8 || cells[0] === "reporter") return;
+
+      const flow = (cells[2] || "").toLowerCase();
+      const value = parseFlexibleNumber(cells[7]);
+      if (value == null) return;
+
+      if (flow.startsWith("export")) {
+        exportRows += 1;
+        exportTotal += value;
+      }
+      if (flow.startsWith("import")) {
+        importRows += 1;
+        importTotal += value;
+      }
+    });
+
+  const uniqueSponsors = new Set(sponsors.map((s) => `${s.title}|${s.subtitle}`));
+
+  return {
+    countryCount: countries.length,
+    mineralCount: minerals.length,
+    productionRows,
+    minYear,
+    maxYear,
+    uniqueSourcesCount: uniqueSponsors.size,
+    productionIndicatorCount: INDICATOR_CARDS.length,
+    tradeIndicatorCount: TRADE_CARDS.length,
+    totalIndicatorCount: INDICATOR_CARDS.length + TRADE_CARDS.length + RESERVE_CARDS.length,
+    exportRows,
+    importRows,
+    tradeRows: exportRows + importRows,
+    exportTotal,
+    importTotal,
+  };
+};
+
+const buildKpiData = (stats) => [
   {
-    icon: "fa-cubes",
-    num: "3٬000",
-    unit: "معلومة تعدينية",
-    label: "المعلومات التعدينية العربية",
-    badge: "منتجات وخامات",
+    icon: "fa-flag",
+    altIcon: "fa-earth-africa",
+    num: `${formatInt(stats.countryCount)}`,
+    unit: "دولة عربية",
+    label: "ملفات الدول",
+    badge: "تغطية عربية",
+    details: `يشمل العرض ${formatInt(stats.countryCount)} دولة مع بيانات إنتاج، تجارة، واحتياطيات.`,
     color: "#c9a84c",
   },
   {
-    icon: "fa-earth-africa",
-    num: "21",
-    unit: "دولة",
-    label: "عدد الدول العربية",
-    badge: "نطاق عربي شامل",
+    icon: "fa-chart-line",
+    altIcon: "fa-chart-column",
+    num: `${formatInt(stats.totalIndicatorCount)}`,
+    unit: "مؤشرات تفاعلية",
+    label: "مؤشرات البوابة",
+    badge: "تحليل بصري",
+    details: `${formatInt(stats.productionIndicatorCount)} للإنتاج و${formatInt(stats.tradeIndicatorCount)} للتجارة مع لوحات مقارنة قابلة للتفاعل.`,
     color: "#6fcba5",
   },
   {
     icon: "fa-calendar-days",
-    num: "2010 – 2024",
+    altIcon: "fa-layer-group",
+    num: stats.minYear && stats.maxYear ? `${stats.minYear} – ${stats.maxYear}` : "—",
     unit: "",
-    label: "الفترة الزمنية للبيانات",
-    badge: "قابلة للتحديث",
+    label: "التغطية الزمنية",
+    badge: "تحديث مستمر",
+    details: `نطاق زمني يغطي ${formatInt(stats.productionRows)} سجل إنتاج عبر ${formatInt(stats.mineralCount)} خامات.`,
     color: "#e8a87c",
   },
   {
-    icon: "fa-gem",
-    num: "111",
-    unit: "منتجات تعدينية",
-    label: "خام/منتج تعديني",
-    badge: "تنوع معدني",
+    icon: "fa-books",
+    altIcon: "fa-gem",
+    num: `${formatInt(stats.uniqueSourcesCount)}`,
+    unit: "جهات مرجعية",
+    label: "المراجع المعتمدة",
+    badge: "موثوقية البيانات",
+    details: `الصفحة تعرض ${formatInt(stats.tradeRows)} سجل تجارة (${formatInt(stats.exportRows)} تصدير / ${formatInt(stats.importRows)} استيراد).`,
     color: "#93c5fd",
   },
 ];
@@ -180,6 +277,7 @@ const MiniTradeBar = ({ active, color = "#7ee0c0" }) => {
 const TRADE_CARDS = [
   {
     icon: "fa-ship",
+    altIcon: "fa-right-left",
     title: "الصادرات التعدينية",
     desc: "تحليل تدفقات الصادرات التعدينية حسب الدولة والوجهة والقيمة المالية.",
     href: "/m5",
@@ -187,6 +285,7 @@ const TRADE_CARDS = [
   },
   {
     icon: "fa-truck-ramp-box",
+    altIcon: "fa-ship",
     title: "الواردات التعدينية",
     desc: "رصد حجم وقيمة الواردات من المواد الخام والمنتجات التعدينية المعالجة.",
     href: "/m6",
@@ -348,10 +447,10 @@ const MiniDonut = ({ active }) => (
    INDICATOR CONFIG
 ───────────────────────────────────────────── */
 const INDICATOR_CARDS = [
-  { icon:"fa-chart-column", tagColor:"#c9a84c", title:"حجم الإنتاج التعديني",           desc:"لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة الزمنية.", href:"/m1", Chart:MiniBarChart },
-  { icon:"fa-chart-line",   tagColor:"#7ee0c0", title:"تطور الإنتاج التعديني",           desc:"تتبّع تطور الإنتاج عبر السنوات مع إبراز الاتجاهات وأهم التغيرات السنوية.",    href:"/m2", Chart:MiniLineChart },
-  { icon:"fa-layer-group",  tagColor:"#93c5fd", title:"تطور الإنتاج التعديني العربي",    desc:"مقارنة أداء الدول العربية في الإنتاج عبر أكثر من خام وفترات زمنية مختلفة.",   href:"/m3", Chart:MiniGroupedBar },
-  { icon:"fa-circle-notch", tagColor:"#fbbf24", title:"نسبة الإنتاج العربي من العالمي", desc:"قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري تفاعلي.",      href:"/m4", Chart:MiniDonut },
+  { icon:"fa-chart-column", altIcon:"fa-layer-group", tagColor:"#c9a84c", title:"حجم الإنتاج التعديني",           desc:"لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة الزمنية.", href:"/m1", Chart:MiniBarChart },
+  { icon:"fa-chart-line",   altIcon:"fa-chart-column", tagColor:"#7ee0c0", title:"تطور الإنتاج التعديني",           desc:"تتبّع تطور الإنتاج عبر السنوات مع إبراز الاتجاهات وأهم التغيرات السنوية.",    href:"/m2", Chart:MiniLineChart },
+  { icon:"fa-layer-group",  altIcon:"fa-chart-line", tagColor:"#93c5fd", title:"تطور الإنتاج التعديني العربي",    desc:"مقارنة أداء الدول العربية في الإنتاج عبر أكثر من خام وفترات زمنية مختلفة.",   href:"/m3", Chart:MiniGroupedBar },
+  { icon:"fa-circle-notch", altIcon:"fa-gem", tagColor:"#fbbf24", title:"نسبة الإنتاج العربي من العالمي", desc:"قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري تفاعلي.",      href:"/m4", Chart:MiniDonut },
 ];
 
 /* ─────────────────────────────────────────────
@@ -360,6 +459,8 @@ const INDICATOR_CARDS = [
 const IndicatorRowCard = ({ card }) => {
   const [hovered, setHovered] = useState(false);
   const [inView, setInView] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [iconAlt, setIconAlt] = useState(false);
   const cardRef = useRef(null);
   const { Chart } = card;
 
@@ -382,22 +483,34 @@ const IndicatorRowCard = ({ card }) => {
     return () => io.disconnect();
   }, []);
 
-  const chartActive = hovered || inView;
+  const chartActive = hovered || inView || expanded;
+  const shownIcon = iconAlt ? (card.altIcon || card.icon) : card.icon;
+  const shownDesc = expanded ? card.desc : shortText(card.desc, 86);
 
   return (
     <div
       ref={cardRef}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => setExpanded((v) => !v)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setExpanded((v) => !v);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-expanded={expanded}
       style={{
         borderRadius:8, padding:"20px 24px",
-        background: hovered?"rgba(255,255,255,0.075)":"rgba(255,255,255,0.04)",
+        background: (hovered || expanded)?"rgba(255,255,255,0.075)":"rgba(255,255,255,0.04)",
         border:"1px solid rgba(255,255,255,0.07)",
         borderRight:`3px solid ${card.tagColor}`,
-        transform: hovered?"translateY(-5px)":"translateY(0)",
-        boxShadow: hovered?"0 22px 50px rgba(0,0,0,0.38)":"none",
+        transform: (hovered || expanded)?"translateY(-5px)":"translateY(0)",
+        boxShadow: (hovered || expanded)?"0 22px 50px rgba(0,0,0,0.38)":"none",
         transition:"transform 0.35s cubic-bezier(.16,1,.3,1),box-shadow 0.35s,background 0.3s",
-        cursor:"default",
+        cursor:"pointer",
       }}
     >
       <div style={{ display:"flex", gap:20, alignItems:"stretch", flexWrap:"wrap" }}>
@@ -412,23 +525,45 @@ const IndicatorRowCard = ({ card }) => {
             transform: hovered?"scale(1.1) rotate(-5deg)":"scale(1) rotate(0deg)",
             transition:"transform 0.32s cubic-bezier(.16,1,.3,1)",
           }}>
-            <AppIcon name={card.icon} size={56} strokeWidth={1.8} />
+            <AppIcon name={shownIcon} size={56} strokeWidth={1.8} />
           </div>
           <div style={{ flex:1 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6, flexWrap:"wrap" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, marginBottom:6, flexWrap:"wrap" }}>
               <p style={{ fontSize:"1.15rem", fontWeight:800, color:"white", margin:0 }}>{card.title}</p>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:6 }}>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setIconAlt((v) => !v); }}
+                  title="تغيير الأيقونة"
+                  style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.15)", color:"rgba(255,255,255,0.8)", borderRadius:8, padding:"4px 8px", cursor:"pointer" }}
+                >
+                  <AppIcon name="fa-right-left" size={12} strokeWidth={2.4} />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v); }}
+                  title={expanded ? "إخفاء" : "فتح"}
+                  style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.15)", color:"rgba(255,255,255,0.8)", borderRadius:8, padding:"4px 8px", cursor:"pointer", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 220ms ease" }}
+                >
+                  <ChevronDown size={12} strokeWidth={2.4} />
+                </button>
+              </div>
             </div>
-            <p style={{ fontSize:"0.9rem", color:"rgba(255,255,255,0.5)", lineHeight:1.75, margin:"0 0 14px" }}>{card.desc}</p>
-            <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${card.tagColor}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:card.tagColor, letterSpacing:"0.04em", textDecoration:"none", background:`${card.tagColor}12` }}>
-              <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> المزيد
-            </a>
+            <p style={{ fontSize:"0.9rem", color:"rgba(255,255,255,0.5)", lineHeight:1.75, margin:"0 0 14px" }}>{shownDesc}</p>
+            {expanded && (
+              <a href={card.href} onClick={(e) => e.stopPropagation()} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${card.tagColor}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:card.tagColor, letterSpacing:"0.04em", textDecoration:"none", background:`${card.tagColor}12` }}>
+                <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> المزيد
+              </a>
+            )}
           </div>
         </div>
 
         {/* Right — chart */}
-        <div style={{ flex:"0 0 320px", minWidth:260, alignSelf:"center", height:140 }}>
-          <Chart active={chartActive} />
-        </div>
+        {(expanded || hovered || inView) && (
+          <div style={{ flex:"0 0 320px", minWidth:260, alignSelf:"center", height:140 }}>
+            <Chart active={chartActive} />
+          </div>
+        )}
 
       </div>
     </div>
@@ -440,27 +575,51 @@ const IndicatorRowCard = ({ card }) => {
 ───────────────────────────────────────────── */
 const KpiCard = ({ k }) => {
   const [hovered, setHovered] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [iconAlt, setIconAlt] = useState(false);
+  const shownIcon = iconAlt ? (k.altIcon || k.icon) : k.icon;
   return (
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => setExpanded((v) => !v)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setExpanded((v) => !v);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-expanded={expanded}
       style={{
         background:"var(--forest)",
-        border:`1px solid ${hovered?"rgba(201,168,76,0.6)":"rgba(201,168,76,0.2)"}`,
+        border:`1px solid ${(hovered || expanded)?"rgba(201,168,76,0.6)":"rgba(201,168,76,0.2)"}`,
         borderRadius:13, padding:"24px",
-        transform: hovered?"translateY(-10px)":"translateY(0)",
-        boxShadow: hovered?"0 30px 60px rgba(8,39,33,0.35),0 0 0 1px rgba(201,168,76,0.3)":"none",
+        transform: (hovered || expanded)?"translateY(-10px)":"translateY(0)",
+        boxShadow: (hovered || expanded)?"0 30px 60px rgba(8,39,33,0.35),0 0 0 1px rgba(201,168,76,0.3)":"none",
         transition:"transform 0.4s cubic-bezier(.16,1,.3,1),box-shadow 0.4s,border-color 0.4s",
+        cursor:"pointer",
       }}
     >
       {/* Top row */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20, gap:8 }}>
         <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:8, padding:"10px 12px", fontSize:"1.2rem", color:k.color, flexShrink:0 }}>
-          <AppIcon name={k.icon} size={22} strokeWidth={2.2} />
+          <AppIcon name={shownIcon} size={22} strokeWidth={2.2} />
         </div>
-        <span style={{ background:`${k.color}18`, color:k.color, fontSize:"0.72rem", fontWeight:700, padding:"4px 12px", borderRadius:2, border:`1px solid ${k.color}30`, whiteSpace:"nowrap" }}>
-          {k.badge}
-        </span>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:6 }}>
+          <span style={{ background:`${k.color}18`, color:k.color, fontSize:"0.72rem", fontWeight:700, padding:"4px 12px", borderRadius:2, border:`1px solid ${k.color}30`, whiteSpace:"nowrap" }}>
+            {k.badge}
+          </span>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setIconAlt((v) => !v); }}
+            title="تغيير الأيقونة"
+            style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.15)", color:"rgba(255,255,255,0.8)", borderRadius:8, padding:"4px 8px", cursor:"pointer" }}
+          >
+            <AppIcon name="fa-right-left" size={12} strokeWidth={2.4} />
+          </button>
+        </div>
       </div>
 
       {/* Label */}
@@ -481,6 +640,12 @@ const KpiCard = ({ k }) => {
 
       {/* Unit */}
       {k.unit && <p style={{ color:"rgba(255,255,255,0.4)", fontSize:"0.78rem", margin:"4px 0 0" }}>{k.unit}</p>}
+
+      {expanded && (
+        <p style={{ color:"rgba(255,255,255,0.55)", fontSize:"0.76rem", margin:"10px 0 0", lineHeight:1.7 }}>
+          {k.details}
+        </p>
+      )}
     </div>
   );
 };
@@ -491,6 +656,8 @@ const KpiCard = ({ k }) => {
 const TradeCard = ({ card, accent }) => {
   const [hovered, setHovered] = useState(false);
   const [inView, setInView] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [iconAlt, setIconAlt] = useState(false);
   const ref = useRef(null);
   const { Chart } = card;
 
@@ -504,41 +671,66 @@ const TradeCard = ({ card, accent }) => {
     return () => io.disconnect();
   }, []);
 
-  const chartActive = hovered || inView;
+  const chartActive = hovered || inView || expanded;
+  const shownIcon = iconAlt ? (card.altIcon || card.icon) : card.icon;
+  const shownDesc = expanded ? card.desc : shortText(card.desc, 96);
 
   return (
     <div
       ref={ref}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => setExpanded((v) => !v)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setExpanded((v) => !v);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-expanded={expanded}
       style={{
         borderRadius:8, padding:"20px 24px",
-        background: hovered?"rgba(255,255,255,0.075)":"rgba(255,255,255,0.04)",
+        background: (hovered || expanded)?"rgba(255,255,255,0.075)":"rgba(255,255,255,0.04)",
         border:"1px solid rgba(255,255,255,0.07)",
         borderRight:`3px solid ${accent}`,
-        transform: hovered?"translateY(-5px)":"translateY(0)",
-        boxShadow: hovered?"0 22px 50px rgba(0,0,0,0.38)":"none",
+        transform: (hovered || expanded)?"translateY(-5px)":"translateY(0)",
+        boxShadow: (hovered || expanded)?"0 22px 50px rgba(0,0,0,0.38)":"none",
         transition:"transform 0.35s cubic-bezier(.16,1,.3,1), box-shadow 0.35s, background 0.3s",
+        cursor:"pointer",
       }}
     >
       <div style={{ display:"flex", gap:20, alignItems:"center", flexWrap:"wrap" }}>
         {/* Info */}
         <div style={{ flex:"1 1 240px", display:"flex", gap:14, alignItems:"flex-start" }}>
           <div style={{ width:44, height:44, background:`${accent}20`, border:`1px solid ${accent}50`, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:accent, flexShrink:0 }}>
-            <AppIcon name={card.icon} size={18} strokeWidth={2.2} />
+            <AppIcon name={shownIcon} size={18} strokeWidth={2.2} />
           </div>
           <div>
-            <p style={{ fontSize:"1.05rem", fontWeight:800, color:"white", margin:"0 0 6px" }}>{card.title}</p>
-            <p style={{ fontSize:"0.86rem", color:"rgba(255,255,255,0.55)", lineHeight:1.75, margin:0 }}>{card.desc}</p>
+            <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap", marginBottom:6 }}>
+              <p style={{ fontSize:"1.05rem", fontWeight:800, color:"white", margin:0 }}>{card.title}</p>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setIconAlt((v) => !v); }}
+                title="تغيير الأيقونة"
+                style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.15)", color:"rgba(255,255,255,0.8)", borderRadius:8, padding:"3px 7px", cursor:"pointer" }}
+              >
+                <AppIcon name="fa-right-left" size={11} strokeWidth={2.4} />
+              </button>
+            </div>
+            <p style={{ fontSize:"0.86rem", color:"rgba(255,255,255,0.55)", lineHeight:1.75, margin:0 }}>{shownDesc}</p>
           </div>
         </div>
         {/* Mini chart */}
-        <div style={{ flex:"0 0 260px", minWidth:200, alignSelf:"center" }}>
-          <Chart active={chartActive} color={accent} />
-        </div>
+        {(expanded || hovered || inView) && (
+          <div style={{ flex:"0 0 260px", minWidth:200, alignSelf:"center" }}>
+            <Chart active={chartActive} color={accent} />
+          </div>
+        )}
         {/* CTA */}
         <div style={{ display:"flex", alignItems:"center", marginRight:"auto" }}>
-          <a href={card.href} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${accent}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:accent, letterSpacing:"0.04em", textDecoration:"none", background:`${accent}12`, whiteSpace:"nowrap" }}>
+          <a href={card.href} onClick={(e) => e.stopPropagation()} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${accent}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:accent, letterSpacing:"0.04em", textDecoration:"none", background:`${accent}12`, whiteSpace:"nowrap", opacity: expanded ? 1 : 0.92 }}>
             <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> المزيد
           </a>
         </div>
@@ -596,6 +788,8 @@ const Home = () => {
   const [selectedCountry, setSelectedCountry] = useState("—");
   const [sponsorSlide, setSponsorSlide]       = useState(0);
   const [searchFocused, setSearchFocused]     = useState(false);
+  const portalStats = useMemo(() => buildPortalStats(), []);
+  const kpiData = useMemo(() => buildKpiData(portalStats), [portalStats]);
 
   useReveal();
 
@@ -807,11 +1001,18 @@ border-radius:13px !important;
       <main style={{ maxWidth:1400, margin:"0 auto", padding:"0 24px 80px" }}>
 
         {/* ── KPIs ── */}
-     <section className="reveal d2" style={{ marginTop:"-60px", position:"relative", zIndex:10,borderRadius: 13}}>
-  <div className="divf9" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:16,borderRadius: 13 }}>
-    {KPI_DATA.map((k, i) => <KpiCard key={i} k={k} />)}
-  </div>
-</section>
+        <section className="reveal d2" style={{ marginTop:"-60px", position:"relative", zIndex:10, borderRadius:13 }}>
+          <div style={{ textAlign:"center", marginBottom:14 }}>
+            <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
+              <AppIcon name="fa-chart-column" size={14} strokeWidth={2.2} /> البوابة في أرقام
+            </span>
+            <p style={{ margin:"8px 0 0", fontSize:"0.8rem", color:"rgba(8,39,33,0.65)" }}>مؤشرات موجزة عن نطاق البوابة ومحتواها التحليلي</p>
+          </div>
+
+          <div className="divf9" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:16, borderRadius:13 }}>
+            {kpiData.map((k, i) => <KpiCard key={i} k={k} />)}
+          </div>
+        </section>
 
         {/* ── PRODUCTION INDICATORS ── */}
         <section className="reveal d3"  style={{textAlign:"center",
@@ -845,7 +1046,7 @@ border-radius:13px !important;
                   <AppIcon name="fa-pickaxe" size={15} strokeWidth={2.2} /> الإنتاج التعديني
                 </span>
                <br />
-                <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", margin:0 }}>4 مؤشرات تفاعلية شاملة للإنتاج العربي</p>
+                <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", margin:0 }}>{`${formatInt(portalStats.productionIndicatorCount)} مؤشرات تفاعلية شاملة للإنتاج العربي`}</p>
               </div>
               <a href="/m1" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
                 <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> الانتقال للمؤشرات
@@ -863,7 +1064,9 @@ border-radius:13px !important;
             {/* Footer */}
             <div style={{ position:"relative", zIndex:1, marginTop:28, paddingTop:20, borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", gap:10 }}>
               <span style={{ width:8, height:8, borderRadius:"50%", background:"#4ade80", display:"inline-block", boxShadow:"0 0 8px rgba(74,222,128,0.5)" }} />
-              <span style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>البيانات محدّثة — 2010 إلى 2024 — 21 دولة عربية</span>
+              <span style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>
+                {`البيانات محدّثة — ${portalStats.minYear} إلى ${portalStats.maxYear} — ${formatInt(portalStats.countryCount)} دولة عربية`}
+              </span>
             </div>
           </div>
         </section>
@@ -900,7 +1103,9 @@ border-radius:13px !important;
                   <AppIcon name="fa-right-left" size={15} strokeWidth={2.2} />
                 </span>
                 <br />
-                <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", marginTop:"20px" }}>مؤشرات تفاعلية لتتبع الصادرات والواردات التعدينية العربية</p>
+                <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", marginTop:"20px" }}>
+                  {`تتبّع ${formatInt(portalStats.tradeRows)} سجلًا للتجارة التعدينية العربية (${formatInt(portalStats.exportRows)} تصدير / ${formatInt(portalStats.importRows)} استيراد)`}
+                </p>
               </div>
               <a href="/trade-indicators" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
                 <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> جميع مؤشرات التجارة
@@ -921,7 +1126,9 @@ border-radius:13px !important;
             {/* Footer */}
             <div style={{ position:"relative", zIndex:1, marginTop:28, paddingTop:20, borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", gap:10 }}>
               <span style={{ width:8, height:8, borderRadius:"50%", background:"#4ade80", display:"inline-block", boxShadow:"0 0 8px rgba(74,222,128,0.5)" }} />
-              <span style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>تحليل حي لحركة التجارة الخارجية في القطاع التعديني العربي</span>
+              <span style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>
+                {`إجمالي الصادرات: ${formatInt(portalStats.exportTotal)} دولار — إجمالي الواردات: ${formatInt(portalStats.importTotal)} دولار`}
+              </span>
             </div>
           </div>
         </section>
@@ -974,6 +1181,7 @@ border-radius:13px !important;
             <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:"24px 12px" }}>
               {countries.map(c => (
                 <a key={c.code} href={`/countries?country=${c.code}`} className="country-btn"
+                  onClick={() => setSelectedCountry(c.name)}
                   style={{ background:"none", border:"none", cursor:"pointer", textAlign:"center", padding:0 }}>
                   <div className="flag-frame" style={{ width:"100%", aspectRatio:"3/2" }}>
                     <img src={countryFlags[c.code]} alt={c.name}
