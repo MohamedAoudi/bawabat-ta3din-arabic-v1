@@ -989,11 +989,7 @@ border-radius:13px !important;
           </div>
 
           {/* Scroll hint */}
-          <div className="scroll-hint absolute bottom-8"
-            style={{ color:"rgba(201,168,76,0.5)", fontSize:"0.7rem", letterSpacing:"0.12em" }}>
-            <AppIcon name="fa-chevron-down" size={16} style={{ display:"block", margin:"0 auto 4px" }} />
-            SCROLL
-          </div>
+         
         </div>
       </header>
 
@@ -1001,7 +997,7 @@ border-radius:13px !important;
       <main style={{ maxWidth:1400, margin:"0 auto", padding:"0 24px 80px" }}>
 
         {/* ── KPIs ── */}
-        <section className="reveal d2" style={{ marginTop:"-60px", position:"relative", zIndex:10, borderRadius:13 }}>
+        <section className="reveal d2" style={{ marginTop:"20px", position:"relative", zIndex:10, borderRadius:13 }}>
           <div style={{ textAlign:"center", marginBottom:14 }}>
             <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
               <AppIcon name="fa-chart-column" size={14} strokeWidth={2.2} /> البوابة في أرقام
