@@ -592,9 +592,9 @@ const MOROCCO_SNAPSHOT_2023 = {
     topValueText: "35.62 مليون طن",
   },
   tradeBalance: {
-    valueText: "- 479 مليون دولار",
-    statusText: "عجز تجاري",
-    tone: "negative",
+    valueText: "—",
+    statusText: "—",
+    tone: "neutral",
   },
   exports: {
     totalText: "473.9 مليون دولار",
@@ -815,16 +815,7 @@ const CountrySnapshotPanel = ({
 
         <div className="mt-2">
           <SnapshotSectionHeader title="التجارة التعدينية" featured />
-          <div className="grid gap-2 lg:grid-cols-[92px_minmax(0,1fr)]">
-            <div className="rounded-[22px] bg-white px-2 py-4 text-center" style={{ border: `2px solid ${balanceColor}`, minHeight: 365 }}>
-              <p className="text-[11px] font-bold leading-tight text-slate-700">الميزان التجاري</p>
-              <p className="text-[11px] font-bold leading-tight text-slate-700">(الفائض / العجز)</p>
-              <div className="mt-24 space-y-2">
-                <p className="text-[26px] font-black leading-none text-slate-900">{summary.tradeBalance.statusText}</p>
-                <p className="text-[18px] font-black leading-snug text-slate-900">{summary.tradeBalance.valueText}</p>
-              </div>
-            </div>
-
+          <div>
             <div className="space-y-2">
               <div>
                 <SnapshotSectionHeader title="الصادرات التعدينية" />
