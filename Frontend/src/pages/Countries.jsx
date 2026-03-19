@@ -1622,72 +1622,7 @@ const TradeIndicatorsPanel = ({ country, exportSeries, importSeries, exportBreak
   const latestImportValue = selectedYear ? importsMap.get(selectedYear) || 0 : 0;
   const tradeBalance = selectedYear ? totalExportForYear - latestImportValue : null;
 
-  return (
-    <Card>
-      <CardHeader title="مؤشرات إضافية" subtitle={`${country}${selectedYear ? ` — سنة ${selectedYear}` : ""}`} />
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-        <div className="rounded-xl p-3" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)" }}>
-          <p className="text-[11px] font-bold" style={{ color:"rgba(255,255,255,0.55)" }}>معدل النمو السنوي للصادرات (%)</p>
-          <p className="mt-2 text-[20px] font-black" style={{ color:growth == null ? "rgba(255,255,255,0.45)" : growth >= 0 ? "#10b981" : "#ef4444" }}>
-            {growth == null ? "—" : `${growth.toFixed(2)}%`}
-          </p>
-          {latestExport && prevExport && (
-            <p className="text-[10px] mt-1" style={{ color:"rgba(255,255,255,0.32)" }}>{prevExport.year} → {latestExport.year}</p>
-          )}
-        </div>
-
-        <div className="rounded-xl p-3" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)" }}>
-          <p className="text-[11px] font-bold" style={{ color:"rgba(255,255,255,0.55)" }}>مؤشر تركّز الصادرات (%)</p>
-          <p className="mt-2 text-[20px] font-black" style={{ color:"#C9A84C" }}>
-            {concentration == null ? "—" : `${concentration.toFixed(2)}%`}
-          </p>
-          <p className="text-[10px] mt-1 truncate" style={{ color:"rgba(255,255,255,0.32)" }}>
-            {topMineral ? `أكبر معدن: ${topMineral[0]}` : "لا توجد بيانات كافية"}
-          </p>
-        </div>
-
-        <div className="rounded-xl p-3" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)" }}>
-          <p className="text-[11px] font-bold" style={{ color:"rgba(255,255,255,0.55)" }}>الميزان التجاري التعديني</p>
-          <p className="mt-2 text-[20px] font-black" style={{ color:tradeBalance == null ? "rgba(255,255,255,0.45)" : tradeBalance >= 0 ? "#10b981" : "#ef4444" }}>
-            {tradeBalance == null ? "—" : `${tradeBalance >= 0 ? "+" : "-"}${fmtVal(Math.abs(tradeBalance))} $`}
-          </p>
-          <p className="text-[10px] mt-1" style={{ color:"rgba(255,255,255,0.32)" }}>
-            {tradeBalance == null ? "" : tradeBalance > 0 ? "فائض تجاري" : tradeBalance < 0 ? "عجز تجاري" : "توازن تجاري"}
-          </p>
-          <div className="mt-2 space-y-1">
-            <p
-              className="text-[10px] font-semibold"
-              style={{ color: tradeBalance != null && tradeBalance > 0 ? "#10b981" : "rgba(255,255,255,0.35)" }}
-            >
-              ✓ إذا كانت النتيجة موجبة → فائض تجاري
-            </p>
-            <p
-              className="text-[10px] font-semibold"
-              style={{ color: tradeBalance != null && tradeBalance < 0 ? "#ef4444" : "rgba(255,255,255,0.35)" }}
-            >
-              ✓ إذا كانت النتيجة سالبة → عجز تجاري
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-xl p-3 space-y-2" style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)" }}>
-        <p className="text-[11px] font-bold" style={{ color:"rgba(255,255,255,0.7)" }}>المعادلات الحسابية</p>
-        <p className="text-[10px]" style={{ color:"rgba(255,255,255,0.5)" }}>
-          معدل النمو (%) = (صادرات السنة الحالية − صادرات السنة السابقة) / صادرات السنة السابقة × 100
-        </p>
-        <p className="text-[10px]" style={{ color:"rgba(255,255,255,0.5)" }}>
-          مؤشر تركّز الصادرات (%) = قيمة أكبر معدن / إجمالي الصادرات التعدينية × 100
-        </p>
-        <p className="text-[10px]" style={{ color:"rgba(255,255,255,0.5)" }}>
-          الميزان التجاري = قيمة الصادرات التعدينية − قيمة الواردات التعدينية
-        </p>
-      </div>
-
-   
-    </Card>
-  );
+ 
 };
 
 // ── Main page ──────────────────────────────────────────────────────────────────

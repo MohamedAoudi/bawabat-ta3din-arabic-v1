@@ -862,12 +862,11 @@ border-radius:13px !important;
         .search-box {
           background:rgba(255,255,255,0.83);
           backdrop-filter:blur(20px);
-          border:1px solid rgba(201,168,76,0.35);
+          border:none;
           transition:all 0.4s cubic-bezier(.16,1,.3,1);
         }
         .search-box.focused {
           background:rgb(255,255,255);
-          border-color:rgba(201,168,76,0.7);
           box-shadow:0 0 0 4px rgba(201,168,76,0.12),0 20px 60px rgba(8,39,33,0.4);
         }
         .search-box input::placeholder { color:rgba(0,0,0,0.45); }
