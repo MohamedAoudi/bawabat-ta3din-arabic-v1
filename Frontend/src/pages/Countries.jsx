@@ -730,12 +730,33 @@ const SnapshotStatCard = ({
   </div>
 );
 
-const SnapshotSectionHeader = ({ title }) => (
+const SnapshotSectionHeader = ({ title, featured = false }) => (
   <div
-    className="mb-3 rounded-sm border bg-[#f2f2f2] px-4 py-1 text-center text-[18px] font-black text-slate-800"
-    style={{ borderColor: "#a3a3a3" }}
+    className={featured ? "mb-3 rounded-[13px] px-4 py-3 text-center" : "mb-3 rounded-sm border bg-[#f2f2f2] px-4 py-1 text-center text-[18px] font-black text-slate-800"}
+    style={featured
+      ? {
+          background: "var(--country-title-bg, linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%))",
+          boxShadow: "0 18px 40px rgba(8,39,33,0.18), inset 0 0 0 1px rgba(201,168,76,0.08)",
+        }
+      : { borderColor: "#a3a3a3" }}
   >
-    {title}
+    {featured ? (
+      <span
+        className="text-[20px] font-black"
+        style={{
+          background: "linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)",
+          backgroundSize: "300% auto",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+          animation: "shimmerGold 6s linear infinite",
+        }}
+      >
+        {title}
+      </span>
+    ) : (
+      title
+    )}
   </div>
 );
 
@@ -784,7 +805,7 @@ const CountrySnapshotPanel = ({
           </label>
         </div>
 
-        <SnapshotSectionHeader title="الإنتاج التعديني" />
+        <SnapshotSectionHeader title="الإنتاج التعديني" featured />
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           <SnapshotStatCard title="إجمالي الإنتاج التعديني" value={summary.production.totalText} borderColor="#b9b9b9" className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
           <SnapshotStatCard title="عدد المنتجات التعدينية" value={summary.production.countText} borderColor="#d0a018" className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
@@ -793,7 +814,7 @@ const CountrySnapshotPanel = ({
         </div>
 
         <div className="mt-2">
-          <SnapshotSectionHeader title="التجارة التعدينية" />
+          <SnapshotSectionHeader title="التجارة التعدينية" featured />
           <div className="grid gap-2 lg:grid-cols-[92px_minmax(0,1fr)]">
             <div className="rounded-[22px] bg-white px-2 py-4 text-center" style={{ border: `2px solid ${balanceColor}`, minHeight: 365 }}>
               <p className="text-[11px] font-bold leading-tight text-slate-700">الميزان التجاري</p>
@@ -854,7 +875,7 @@ const CountrySnapshotPanel = ({
         </label>
       </div>
 
-      <SnapshotSectionHeader title="الإنتاج التعديني" />
+      <SnapshotSectionHeader title="الإنتاج التعديني" featured />
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <SnapshotStatCard title="إجمالي الإنتاج التعديني" value={summary.production.totalText} borderColor="#a3a3a3" />
         <SnapshotStatCard title="عدد المنتجات التعدينية" value={summary.production.countText} borderColor="#d4a017" />
@@ -863,7 +884,7 @@ const CountrySnapshotPanel = ({
       </div>
 
       <div className="mt-5">
-        <SnapshotSectionHeader title="التجارة التعدينية" />
+        <SnapshotSectionHeader title="التجارة التعدينية" featured />
         <div className="grid gap-3 xl:grid-cols-[180px_minmax(0,1fr)]">
           <div className="rounded-[22px] bg-white px-4 py-6 text-center" style={{ border: `2px solid ${balanceColor}` }}>
             <p className="text-[13px] font-bold text-slate-700">الميزان التجاري</p>
