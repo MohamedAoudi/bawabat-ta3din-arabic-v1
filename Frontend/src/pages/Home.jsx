@@ -998,7 +998,7 @@ border-radius:13px !important;
 
         {/* ── KPIs ── */}
         <section className="reveal d2" style={{ marginTop:"20px", position:"relative", zIndex:10, borderRadius:13 }}>
-          <div style={{ textAlign:"center", marginBottom:20, background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)", borderRadius:13, padding:"40px 36px", boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)" }}>
+          <div style={{ textAlign:"center", marginBottom:12, background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)", borderRadius:13, padding:"40px 36px", boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)" }}>
             <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white", margin:"0" }}>
               <span style={{ background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
                 البوابة في أرقام
@@ -1022,7 +1022,7 @@ border-radius:13px !important;
                     المؤشرات التعدينية
                   </span>
                 </h3></section>
-        <section className="reveal d3" style={{ marginTop:72 }}>
+        <section className="reveal d3" style={{ marginTop:16 }}>
           <div style={{
             background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)",
             border:"1px solid rgba(201,168,76,0.22)",
@@ -1078,7 +1078,7 @@ border-radius:13px !important;
                   </span>
                 </h3></section>
         {/* ── TRADE ── */}
-        <section className="reveal d3" style={{ marginTop:72 }}>
+        <section className="reveal d3" style={{ marginTop:16 }}>
           <div style={{
             background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)",
             border:"1px solid rgba(201,168,76,0.22)",
