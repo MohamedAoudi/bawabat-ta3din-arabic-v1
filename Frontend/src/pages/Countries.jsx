@@ -496,6 +496,415 @@ const fmtVal = (v) => {
 
 const DONUT_PALETTE = ["#10b981","#3b82f6","#f59e0b","#8b5cf6","#ef4444","#06b6d4","#84cc16","#f97316","#ec4899","#64748b","#a78bfa","#fb923c"];
 
+const COUNTRY_THEME_PRESETS = {
+  atlas: {
+    shellBg: "radial-gradient(circle at top right, rgba(201,168,76,0.18), transparent 28%), linear-gradient(160deg, #f7f4ea 0%, #eef5ef 45%, #e3ede4 100%)",
+    shellBorder: "rgba(22, 101, 52, 0.14)",
+    shellShadow: "0 24px 60px rgba(8,39,33,0.08)",
+    cardBg: "linear-gradient(160deg,#18473e 0%,#0d342b 58%,#08211c 100%)",
+    cardBorder: "rgba(201,168,76,0.24)",
+    cardShadow: "0 10px 30px rgba(7,30,26,0.24), inset 0 1px 0 rgba(255,255,255,0.05)",
+    titleBg: "linear-gradient(145deg,#0b2a24 0%,#11463a 45%,#0d362d 100%)",
+    heroBg: "linear-gradient(135deg,#0f3c32 0%,#1e5d44 42%,#123228 100%)",
+    heroGlow: "radial-gradient(circle at 82% 50%, rgba(201,168,76,0.18) 0%, transparent 68%)",
+  },
+  gulf: {
+    shellBg: "radial-gradient(circle at top left, rgba(23, 162, 184, 0.12), transparent 30%), linear-gradient(160deg, #eef6f7 0%, #eff7f0 45%, #e7efe8 100%)",
+    shellBorder: "rgba(8, 120, 110, 0.14)",
+    shellShadow: "0 24px 60px rgba(3,37,46,0.08)",
+    cardBg: "linear-gradient(160deg,#0e4250 0%,#0b3340 52%,#08252f 100%)",
+    cardBorder: "rgba(157, 210, 194, 0.28)",
+    cardShadow: "0 10px 30px rgba(7,25,33,0.24), inset 0 1px 0 rgba(255,255,255,0.05)",
+    titleBg: "linear-gradient(145deg,#0b2633 0%,#114155 45%,#0d3140 100%)",
+    heroBg: "linear-gradient(135deg,#0e3c48 0%,#17616b 40%,#12333c 100%)",
+    heroGlow: "radial-gradient(circle at 82% 50%, rgba(157,210,194,0.22) 0%, transparent 68%)",
+  },
+  nile: {
+    shellBg: "radial-gradient(circle at top right, rgba(217, 119, 6, 0.14), transparent 26%), linear-gradient(160deg, #faf4ea 0%, #f3f1e8 48%, #ece6db 100%)",
+    shellBorder: "rgba(146, 64, 14, 0.14)",
+    shellShadow: "0 24px 60px rgba(58,33,8,0.08)",
+    cardBg: "linear-gradient(160deg,#4a371f 0%,#2f2416 56%,#1f180f 100%)",
+    cardBorder: "rgba(245, 158, 11, 0.24)",
+    cardShadow: "0 10px 30px rgba(45,26,7,0.24), inset 0 1px 0 rgba(255,255,255,0.05)",
+    titleBg: "linear-gradient(145deg,#2f2417 0%,#5a4323 42%,#392b18 100%)",
+    heroBg: "linear-gradient(135deg,#4f391d 0%,#795223 38%,#3d2a17 100%)",
+    heroGlow: "radial-gradient(circle at 82% 50%, rgba(245,158,11,0.20) 0%, transparent 68%)",
+  },
+  levant: {
+    shellBg: "radial-gradient(circle at top right, rgba(185, 28, 28, 0.10), transparent 30%), linear-gradient(160deg, #f7f0ef 0%, #f2f4f5 48%, #ebeef0 100%)",
+    shellBorder: "rgba(127, 29, 29, 0.14)",
+    shellShadow: "0 24px 60px rgba(39,19,24,0.08)",
+    cardBg: "linear-gradient(160deg,#4a1f28 0%,#341922 54%,#1f1117 100%)",
+    cardBorder: "rgba(248, 113, 113, 0.24)",
+    cardShadow: "0 10px 30px rgba(30,10,15,0.24), inset 0 1px 0 rgba(255,255,255,0.05)",
+    titleBg: "linear-gradient(145deg,#311620 0%,#5a2433 46%,#391823 100%)",
+    heroBg: "linear-gradient(135deg,#4d2029 0%,#702d3b 40%,#34151d 100%)",
+    heroGlow: "radial-gradient(circle at 82% 50%, rgba(248,113,113,0.18) 0%, transparent 68%)",
+  },
+  coast: {
+    shellBg: "radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 30%), linear-gradient(160deg, #eef5fb 0%, #edf6f5 45%, #e5eef0 100%)",
+    shellBorder: "rgba(14, 116, 144, 0.14)",
+    shellShadow: "0 24px 60px rgba(15,39,63,0.08)",
+    cardBg: "linear-gradient(160deg,#103a54 0%,#0d2d40 52%,#081e2e 100%)",
+    cardBorder: "rgba(125, 211, 252, 0.24)",
+    cardShadow: "0 10px 30px rgba(8,28,45,0.24), inset 0 1px 0 rgba(255,255,255,0.05)",
+    titleBg: "linear-gradient(145deg,#0c283d 0%,#144965 44%,#0d3348 100%)",
+    heroBg: "linear-gradient(135deg,#123a51 0%,#1d5875 38%,#112f43 100%)",
+    heroGlow: "radial-gradient(circle at 82% 50%, rgba(125,211,252,0.18) 0%, transparent 68%)",
+  },
+};
+
+const COUNTRY_THEME_BY_CODE = {
+  ma: "atlas",
+  dz: "atlas",
+  tn: "atlas",
+  mr: "atlas",
+  ae: "gulf",
+  bh: "gulf",
+  sa: "gulf",
+  qa: "gulf",
+  kw: "gulf",
+  om: "gulf",
+  eg: "nile",
+  sd: "nile",
+  jo: "levant",
+  ps: "levant",
+  lb: "levant",
+  sy: "levant",
+  iq: "levant",
+  dj: "coast",
+  so: "coast",
+  ye: "coast",
+  ly: "coast",
+};
+
+const getCountryTheme = (countryCode) => {
+  const presetKey = COUNTRY_THEME_BY_CODE[countryCode] || "atlas";
+  return COUNTRY_THEME_PRESETS[presetKey];
+};
+
+const MOROCCO_SNAPSHOT_2023 = {
+  year: 2023,
+  production: {
+    totalText: "83.8 مليون طن",
+    countText: "14 منتج / خام",
+    topMineral: "الفوسفات",
+    topValueText: "35.62 مليون طن",
+  },
+  tradeBalance: {
+    valueText: "- 479 مليون دولار",
+    statusText: "عجز تجاري",
+    tone: "negative",
+  },
+  exports: {
+    totalText: "473.9 مليون دولار",
+    countText: "21 معدن",
+    topMineral: "الفضة",
+    growthText: "3.52 %",
+    growthSubtext: "مقارنة بـ 2022",
+    marketsText: "108 سوق",
+    concentrationText: "46.8 %",
+  },
+  imports: {
+    totalText: "952.9 مليون دولار",
+    countText: "22 معدن",
+    topMineral: "الألمنيوم",
+    growthText: "-5.1 %",
+    growthSubtext: "مقارنة بـ 2022",
+    marketsText: "100 سوق",
+    concentrationText: "34.7 %",
+  },
+};
+
+const formatLargeTonValue = (value) => {
+  if (value == null) return "—";
+  if (value >= 1000) return `${(value / 1000).toFixed(2)} مليون طن`;
+  return `${fmtVal(value)} ألف طن`;
+};
+
+const formatDollarValue = (value) => {
+  if (value == null) return "—";
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)} مليون دولار`;
+  return `${fmtVal(value)} دولار`;
+};
+
+const formatGrowthPercent = (value) => {
+  if (value == null) return "—";
+  return `${value.toFixed(2)} %`;
+};
+
+const getTopMineralEntry = (byMineral) =>
+  Object.entries(byMineral || {}).sort(([, a], [, b]) => b - a)[0] || null;
+
+const buildCountrySnapshot = ({
+  country,
+  countryCode,
+  year,
+  exportSeries,
+  importSeries,
+  exportBreakdownByYear,
+  importBreakdownByYear,
+}) => {
+  if (countryCode === "ma" && year === 2023) {
+    return MOROCCO_SNAPSHOT_2023;
+  }
+
+  const productionRows = getMineralShareForYear(country, year, null, "ton");
+  const productionTotal = productionRows.reduce((sum, row) => sum + (row.value || 0), 0);
+  const topProduction = [...productionRows].sort((a, b) => b.value - a.value)[0] || null;
+
+  const exportsMap = new Map((exportSeries || []).map((entry) => [entry.year, entry.value]));
+  const importsMap = new Map((importSeries || []).map((entry) => [entry.year, entry.value]));
+  const exportValue = exportsMap.get(year) ?? null;
+  const importValue = importsMap.get(year) ?? null;
+  const previousExportValue = exportsMap.get(year - 1) ?? null;
+  const previousImportValue = importsMap.get(year - 1) ?? null;
+  const exportGrowth =
+    exportValue != null && previousExportValue && previousExportValue > 0
+      ? ((exportValue - previousExportValue) / previousExportValue) * 100
+      : null;
+  const importGrowth =
+    importValue != null && previousImportValue && previousImportValue > 0
+      ? ((importValue - previousImportValue) / previousImportValue) * 100
+      : null;
+
+  const exportsByMineral = exportBreakdownByYear?.[year] || {};
+  const importsByMineral = importBreakdownByYear?.[year] || {};
+  const topExport = getTopMineralEntry(exportsByMineral);
+  const topImport = getTopMineralEntry(importsByMineral);
+  const exportConcentration = topExport && exportValue ? (topExport[1] / exportValue) * 100 : null;
+  const importConcentration = topImport && importValue ? (topImport[1] / importValue) * 100 : null;
+  const tradeBalance =
+    exportValue != null && importValue != null ? exportValue - importValue : null;
+
+  return {
+    year,
+    production: {
+      totalText: formatLargeTonValue(productionTotal),
+      countText: productionRows.length ? `${productionRows.length} منتج / خام` : "—",
+      topMineral: topProduction?.mineral || "—",
+      topValueText: topProduction ? formatLargeTonValue(topProduction.value) : "—",
+    },
+    tradeBalance: {
+      valueText: tradeBalance == null ? "—" : `${tradeBalance >= 0 ? "+" : "-"} ${formatDollarValue(Math.abs(tradeBalance))}`,
+      statusText:
+        tradeBalance == null ? "لا توجد بيانات" : tradeBalance > 0 ? "فائض تجاري" : tradeBalance < 0 ? "عجز تجاري" : "توازن تجاري",
+      tone: tradeBalance == null ? "neutral" : tradeBalance >= 0 ? "positive" : "negative",
+    },
+    exports: {
+      totalText: formatDollarValue(exportValue),
+      countText: Object.keys(exportsByMineral).length ? `${Object.keys(exportsByMineral).length} معدن` : "—",
+      topMineral: topExport?.[0] || "—",
+      growthText: formatGrowthPercent(exportGrowth),
+      growthSubtext: previousExportValue != null ? `مقارنة بـ ${year - 1}` : "لا توجد سنة مقارنة",
+      marketsText: "—",
+      concentrationText: exportConcentration != null ? `${exportConcentration.toFixed(1)} %` : "—",
+    },
+    imports: {
+      totalText: formatDollarValue(importValue),
+      countText: Object.keys(importsByMineral).length ? `${Object.keys(importsByMineral).length} معدن` : "—",
+      topMineral: topImport?.[0] || "—",
+      growthText: formatGrowthPercent(importGrowth),
+      growthSubtext: previousImportValue != null ? `مقارنة بـ ${year - 1}` : "لا توجد سنة مقارنة",
+      marketsText: "—",
+      concentrationText: importConcentration != null ? `${importConcentration.toFixed(1)} %` : "—",
+    },
+  };
+};
+
+const SnapshotStatCard = ({
+  title,
+  value,
+  note,
+  borderColor = "rgba(201,168,76,0.9)",
+  className = "",
+  valueClassName = "",
+}) => (
+  <div
+    className={`rounded-[18px] bg-white px-4 py-4 text-center ${className}`}
+    style={{ border: `2px solid ${borderColor}`, boxShadow: "0 4px 12px rgba(15,23,42,0.06)" }}
+  >
+    <p className="text-[12px] font-bold text-slate-700">{title}</p>
+    <p className={`mt-2 text-[25px] font-black leading-tight text-slate-900 ${valueClassName}`}>{value}</p>
+    {note ? <p className="mt-1 text-[11px] font-semibold text-slate-500">{note}</p> : null}
+  </div>
+);
+
+const SnapshotSectionHeader = ({ title }) => (
+  <div
+    className="mb-3 rounded-sm border bg-[#f2f2f2] px-4 py-1 text-center text-[18px] font-black text-slate-800"
+    style={{ borderColor: "#a3a3a3" }}
+  >
+    {title}
+  </div>
+);
+
+const CountrySnapshotPanel = ({
+  country,
+  countryCode,
+  year,
+  onYearChange,
+  exportSeries,
+  importSeries,
+  exportBreakdownByYear,
+  importBreakdownByYear,
+}) => {
+  const summary = buildCountrySnapshot({
+    country,
+    countryCode,
+    year,
+    exportSeries,
+    importSeries,
+    exportBreakdownByYear,
+    importBreakdownByYear,
+  });
+  const isMorocco = countryCode === "ma";
+  const balanceColor =
+    summary.tradeBalance.tone === "positive"
+      ? "#16a34a"
+      : summary.tradeBalance.tone === "negative"
+        ? "#16a34a"
+        : "#94a3b8";
+
+  if (isMorocco) {
+    return (
+      <section className="rounded-[10px] bg-white p-1.5 sm:p-2" style={{ border: "1px solid #b8b8b8" }}>
+        <div className="mb-2 flex items-center justify-end gap-3 px-1">
+          <h3 className="text-[18px] font-black leading-none text-[#b8860b]">{country}</h3>
+          <label className="flex items-center gap-2 text-[14px] font-bold text-slate-700">
+            <span>اختر السنة :</span>
+            <select
+              value={2023}
+              onChange={() => {}}
+              disabled
+              className="rounded-md border border-slate-300 bg-white px-2 py-1 text-[14px] font-bold text-slate-800 outline-none disabled:cursor-not-allowed"
+            >
+              <option value={2023}>2023</option>
+            </select>
+          </label>
+        </div>
+
+        <SnapshotSectionHeader title="الإنتاج التعديني" />
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <SnapshotStatCard title="إجمالي الإنتاج التعديني" value={summary.production.totalText} borderColor="#b9b9b9" className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+          <SnapshotStatCard title="عدد المنتجات التعدينية" value={summary.production.countText} borderColor="#d0a018" className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+          <SnapshotStatCard title="أكبر منتج تعديني" value={summary.production.topMineral} borderColor="#9b4f16" className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+          <SnapshotStatCard title="قيمة أكبر منتج تعديني" value={summary.production.topValueText} borderColor="#1f9d39" className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+        </div>
+
+        <div className="mt-2">
+          <SnapshotSectionHeader title="التجارة التعدينية" />
+          <div className="grid gap-2 lg:grid-cols-[92px_minmax(0,1fr)]">
+            <div className="rounded-[22px] bg-white px-2 py-4 text-center" style={{ border: `2px solid ${balanceColor}`, minHeight: 365 }}>
+              <p className="text-[11px] font-bold leading-tight text-slate-700">الميزان التجاري</p>
+              <p className="text-[11px] font-bold leading-tight text-slate-700">(الفائض / العجز)</p>
+              <div className="mt-24 space-y-2">
+                <p className="text-[26px] font-black leading-none text-slate-900">{summary.tradeBalance.statusText}</p>
+                <p className="text-[18px] font-black leading-snug text-slate-900">{summary.tradeBalance.valueText}</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div>
+                <SnapshotSectionHeader title="الصادرات التعدينية" />
+                <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
+                  <SnapshotStatCard title="إجمالي الصادرات" value={summary.exports.totalText} borderColor="#b9b9b9" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="عدد المعادن المصدرة" value={summary.exports.countText} borderColor="#d0a018" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="أكبر معدن مصدر" value={summary.exports.topMineral} borderColor="#9b4f16" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="معدل النمو السنوي للصادرات" value={summary.exports.growthText} note={`(${summary.exports.growthSubtext})`} borderColor="#b9b9b9" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="عدد الأسواق المصدرة" value={summary.exports.marketsText} borderColor="#d0a018" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="مؤشر تركّز الصادرات" value={summary.exports.concentrationText} borderColor="#9b4f16" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                </div>
+              </div>
+
+              <div>
+                <SnapshotSectionHeader title="الواردات التعدينية" />
+                <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
+                  <SnapshotStatCard title="إجمالي الواردات" value={summary.imports.totalText} borderColor="#b9b9b9" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="عدد المعادن الواردة" value={summary.imports.countText} borderColor="#d0a018" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="أكبر معدن وارد" value={summary.imports.topMineral} borderColor="#9b4f16" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="معدل النمو السنوي للواردات" value={summary.imports.growthText} note={`(${summary.imports.growthSubtext})`} borderColor="#b9b9b9" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="عدد الأسواق الواردة" value={summary.imports.marketsText} borderColor="#d0a018" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="مؤشر تركّز الواردات" value={summary.imports.concentrationText} borderColor="#9b4f16" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="rounded-[24px] bg-[#f7f7f7] p-4 sm:p-5" style={{ border: "1px solid #d4d4d4" }}>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-[28px] font-black text-[#b8860b]">{country}</h3>
+        <label className="flex items-center gap-2 text-[14px] font-bold text-slate-700">
+          <span>اختر السنة :</span>
+          <select
+            value={year}
+            onChange={(e) => onYearChange?.(Number(e.target.value))}
+            disabled={isMorocco}
+            className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-[14px] font-bold text-slate-800 outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
+          >
+            {(isMorocco ? [2023] : ALL_YEARS).map((yr) => (
+              <option key={yr} value={yr}>{yr}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <SnapshotSectionHeader title="الإنتاج التعديني" />
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <SnapshotStatCard title="إجمالي الإنتاج التعديني" value={summary.production.totalText} borderColor="#a3a3a3" />
+        <SnapshotStatCard title="عدد المنتجات التعدينية" value={summary.production.countText} borderColor="#d4a017" />
+        <SnapshotStatCard title="أكبر منتج تعديني" value={summary.production.topMineral} borderColor="#a0522d" />
+        <SnapshotStatCard title="قيمة أكبر منتج تعديني" value={summary.production.topValueText} borderColor="#16a34a" />
+      </div>
+
+      <div className="mt-5">
+        <SnapshotSectionHeader title="التجارة التعدينية" />
+        <div className="grid gap-3 xl:grid-cols-[180px_minmax(0,1fr)]">
+          <div className="rounded-[22px] bg-white px-4 py-6 text-center" style={{ border: `2px solid ${balanceColor}` }}>
+            <p className="text-[13px] font-bold text-slate-700">الميزان التجاري</p>
+            <p className="text-[13px] font-bold text-slate-700">(الفائض / العجز)</p>
+            <div className="mt-16 space-y-2">
+              <p className="text-[28px] font-black text-slate-900">{summary.tradeBalance.statusText}</p>
+              <p className="text-[32px] font-black leading-tight text-slate-900">{summary.tradeBalance.valueText}</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <SnapshotSectionHeader title="الصادرات التعدينية" />
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <SnapshotStatCard title="إجمالي الصادرات" value={summary.exports.totalText} borderColor="#a3a3a3" />
+                <SnapshotStatCard title="عدد المعادن المصدرة" value={summary.exports.countText} borderColor="#d4a017" />
+                <SnapshotStatCard title="أكبر معدن مصدر" value={summary.exports.topMineral} borderColor="#a0522d" />
+                <SnapshotStatCard title="معدل النمو السنوي للصادرات" value={summary.exports.growthText} note={summary.exports.growthSubtext} borderColor="#a3a3a3" />
+                <SnapshotStatCard title="عدد الأسواق المصدرة" value={summary.exports.marketsText} borderColor="#d4a017" />
+                <SnapshotStatCard title="مؤشر تركّز الصادرات" value={summary.exports.concentrationText} borderColor="#a0522d" />
+              </div>
+            </div>
+
+            <div>
+              <SnapshotSectionHeader title="الواردات التعدينية" />
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <SnapshotStatCard title="إجمالي الواردات" value={summary.imports.totalText} borderColor="#a3a3a3" />
+                <SnapshotStatCard title="عدد المعادن الواردة" value={summary.imports.countText} borderColor="#d4a017" />
+                <SnapshotStatCard title="أكبر معدن وارد" value={summary.imports.topMineral} borderColor="#a0522d" />
+                <SnapshotStatCard title="معدل النمو السنوي للواردات" value={summary.imports.growthText} note={summary.imports.growthSubtext} borderColor="#a3a3a3" />
+                <SnapshotStatCard title="عدد الأسواق الواردة" value={summary.imports.marketsText} borderColor="#d4a017" />
+                <SnapshotStatCard title="مؤشر تركّز الواردات" value={summary.imports.concentrationText} borderColor="#a0522d" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // ── useChartInit: wait for container to have real size, then init chart ────────
 function useChartInit(buildChart, deps) {
   const canvasRef = useRef(null);
@@ -543,7 +952,7 @@ function useChartInit(buildChart, deps) {
 // ── Shared UI ─────────────────────────────────────────────────────────────────
 const Card = ({ children, className = "" }) => (
   <div className={`rounded-2xl p-5 sm:p-6 ${className}`}
-    style={{ background:"linear-gradient(160deg,#0e4238 0%,#082c23 60%,#051a15 100%)", border:"1px solid rgba(201,168,76,0.20)", boxShadow:"0 4px 24px rgba(0,0,0,0.30),inset 0 1px 0 rgba(201,168,76,0.08)", fontFamily:"'Cairo','Tajawal',sans-serif" }}>
+    style={{ background:"var(--country-card-bg, linear-gradient(160deg,#0e4238 0%,#082c23 60%,#051a15 100%))", border:"1px solid var(--country-card-border, rgba(201,168,76,0.20))", boxShadow:"var(--country-card-shadow, 0 4px 24px rgba(0,0,0,0.30), inset 0 1px 0 rgba(201,168,76,0.08))", fontFamily:"'Cairo','Tajawal',sans-serif" }}>
     {children}
   </div>
 );
@@ -580,7 +989,7 @@ const ChartSectionTitle = ({ title }) => (
     style={{
       textAlign: "center",
       marginTop: 32,
-      background: "linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)",
+      background: "var(--country-title-bg, linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%))",
       borderRadius: 13,
       padding: "28px 24px",
       boxShadow: "0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)",
@@ -604,13 +1013,13 @@ const ChartSectionTitle = ({ title }) => (
 );
 
 // ── Country Hero Banner ────────────────────────────────────────────────────────
-const CountryHeroBanner = ({ country, countryCode }) => {
+const CountryHeroBanner = ({ country, countryCode, theme }) => {
   const flagSrc = countryFlags[countryCode];
   return (
     <div className="relative overflow-hidden rounded-2xl flex items-center gap-6 px-6 py-5"
-      style={{ background:"linear-gradient(135deg,#082c23 0%,#0d3b2e 40%,#0a3028 100%)", border:"1px solid rgba(201,168,76,0.25)", boxShadow:"0 4px 24px rgba(0,0,0,0.35),inset 0 1px 0 rgba(201,168,76,0.10)", fontFamily:"'Cairo','Tajawal',sans-serif" }}>
+      style={{ background:theme?.heroBg || "linear-gradient(135deg,#082c23 0%,#0d3b2e 40%,#0a3028 100%)", border:"1px solid rgba(201,168,76,0.25)", boxShadow:"0 4px 24px rgba(0,0,0,0.35),inset 0 1px 0 rgba(201,168,76,0.10)", fontFamily:"'Cairo','Tajawal',sans-serif" }}>
       <div className="absolute right-0 top-0 bottom-0 w-64 pointer-events-none"
-        style={{ background:"radial-gradient(ellipse at 80% 50%,rgba(201,168,76,0.08) 0%,transparent 70%)" }} />
+        style={{ background:theme?.heroGlow || "radial-gradient(ellipse at 80% 50%,rgba(201,168,76,0.08) 0%,transparent 70%)" }} />
       {flagSrc && (
         <div className="relative flex-shrink-0 overflow-hidden"
           style={{ width:160, height:110, borderRadius:14, boxShadow:"0 6px 20px rgba(0,0,0,0.5),0 0 0 1px rgba(201,168,76,0.3)" }}>
@@ -1283,11 +1692,21 @@ const Countries = () => {
   const [treemapYear, setTreemapYear]         = useState(lastAvailableYear);
   const [lineMineralFilter, setLineMineralFilter] = useState("all");
   const [lineUnit, setLineUnit]               = useState("ton");
+  const [summaryYear, setSummaryYear]         = useState(lastAvailableYear);
   const [tradeByCountry, setTradeByCountry]   = useState({ imports: null, exports: null });
-  const [tradeBreakdownByCountry, setTradeBreakdownByCountry] = useState({ exports: null });
+  const [tradeBreakdownByCountry, setTradeBreakdownByCountry] = useState({ exports: null, imports: null });
 
   const selectedCountryObj = COUNTRIES.find(c=>c.name===selected);
   const selectedCountryCsvName = COUNTRY_AR_TO_CSV_NAME[selected] || null;
+  const selectedTheme = getCountryTheme(selectedCountryObj?.code);
+
+  useEffect(() => {
+    if (selectedCountryObj?.code === "ma") {
+      setSummaryYear(2023);
+      return;
+    }
+    setSummaryYear(lastAvailableYear);
+  }, [selectedCountryObj?.code, lastAvailableYear]);
 
   useEffect(() => {
     let active = true;
@@ -1307,12 +1726,13 @@ const Countries = () => {
         });
         setTradeBreakdownByCountry({
           exports: buildTradeByCountryYearMineralFromRawText(combinedText, "Export"),
+          imports: buildTradeByCountryYearMineralFromRawText(combinedText, "Import"),
         });
       })
       .catch(() => {
         if (!active) return;
         setTradeByCountry({ imports: {}, exports: {} });
-        setTradeBreakdownByCountry({ exports: {} });
+        setTradeBreakdownByCountry({ exports: {}, imports: {} });
       });
 
     return () => {
@@ -1329,6 +1749,10 @@ const Countries = () => {
   const exportBreakdownByYear =
     selectedCountryCsvName && tradeBreakdownByCountry.exports
       ? tradeBreakdownByCountry.exports[selectedCountryCsvName] || {}
+      : {};
+  const importBreakdownByYear =
+    selectedCountryCsvName && tradeBreakdownByCountry.imports
+      ? tradeBreakdownByCountry.imports[selectedCountryCsvName] || {}
       : {};
 
   return (
@@ -1389,8 +1813,32 @@ const Countries = () => {
         </section>
 
         {selected!=="—"&&(
-          <div className="space-y-5">
-            {selectedCountryObj&&<CountryHeroBanner country={selected} countryCode={selectedCountryObj.code} />}
+          <div
+            className="space-y-5 rounded-[28px] p-4 sm:p-5 lg:p-6"
+            style={{
+              background: selectedTheme.shellBg,
+              border: `1px solid ${selectedTheme.shellBorder}`,
+              boxShadow: selectedTheme.shellShadow,
+              "--country-card-bg": selectedTheme.cardBg,
+              "--country-card-border": selectedTheme.cardBorder,
+              "--country-card-shadow": selectedTheme.cardShadow,
+              "--country-title-bg": selectedTheme.titleBg,
+            }}
+          >
+            {selectedCountryObj&&<CountryHeroBanner country={selected} countryCode={selectedCountryObj.code} theme={selectedTheme} />}
+
+            {selectedCountryObj && (
+              <CountrySnapshotPanel
+                country={selected}
+                countryCode={selectedCountryObj.code}
+                year={summaryYear}
+                onYearChange={setSummaryYear}
+                exportSeries={exportSeries}
+                importSeries={importSeries}
+                exportBreakdownByYear={exportBreakdownByYear}
+                importBreakdownByYear={importBreakdownByYear}
+              />
+            )}
 
             <ChartSectionTitle title="المؤشرات التعدينية" />
             <CountryComparisonDonut key={`donut-${selected}`} selectedCountry={selected} year={donutYear} onYearChange={setDonutYear} />
