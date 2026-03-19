@@ -24,7 +24,7 @@ import {
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import i7 from "../assets/i-7.png";
-import bgHeaderVideo from "../assets/bg 1.mp4";
+import bgHeaderVideo from "../assets/bg 6.mp4";
 import mapImg from "../assets/map.png";
 import flagJordan from "../assets/flags/jordan.webp";
 import flagUae from "../assets/flags/uae.webp";
