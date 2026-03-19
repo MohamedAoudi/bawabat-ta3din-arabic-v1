@@ -306,6 +306,80 @@ const buildTradeTotalsFromRawText = (rawText, expectedType) => {
   return totals;
 };
 
+const buildTradeByCountryYearMineralFromRawText = (rawText, expectedType) => {
+  const lines = String(rawText || "").split(/\r?\n/);
+  const result = {};
+  const expectedFlow = normalizeFlow(expectedType);
+
+  let idx = {
+    reporter: -1,
+    flow: -1,
+    year: -1,
+    value: -1,
+    quantity: -1,
+    units: -1,
+    mineral: -1,
+  };
+
+  for (const line of lines) {
+    const clean = line.trim();
+    if (!clean) continue;
+    if (/^\d+[\d.,]*$/.test(clean)) continue;
+
+    const delimiter = line.includes("\t") ? "\t" : ",";
+    const cols = parseCsvLine(line, delimiter).map((c) => String(c || "").trim());
+    if (cols.length < 3) continue;
+
+    const normalized = cols.map(normalizeHeaderKey);
+    const headerLike =
+      normalized.includes("reporter") &&
+      normalized.includes("flow") &&
+      normalized.includes("year") &&
+      (normalized.includes("value") || normalized.includes("value (us$)") || normalized.includes("quantity"));
+
+    if (headerLike) {
+      idx = {
+        reporter: normalized.indexOf("reporter"),
+        flow: normalized.indexOf("flow"),
+        year: normalized.indexOf("year"),
+        value: normalized.findIndex((h) => h === "value" || h === "value (us$)"),
+        quantity: normalized.indexOf("quantity"),
+        units: normalized.indexOf("units"),
+        mineral: normalized.indexOf("aggregate_product"),
+      };
+      continue;
+    }
+
+    const flowRaw = idx.flow !== -1 ? cols[idx.flow] : cols[2];
+    const flowValue = normalizeFlow(flowRaw);
+    if (!flowValue.startsWith(expectedFlow)) continue;
+
+    const reporter = idx.reporter !== -1 ? cols[idx.reporter] : cols[0];
+    const yearRaw = idx.year !== -1 ? cols[idx.year] : cols[6];
+    const mineral = idx.mineral !== -1 ? cols[idx.mineral] : "غير مصنف";
+    if (!reporter || !yearRaw) continue;
+
+    const year = parseYearFromCsv(yearRaw);
+    if (!year) continue;
+
+    let value = null;
+    if (idx.value !== -1) {
+      value = parseFlexibleNumber(cols[idx.value]);
+    } else if (idx.quantity !== -1) {
+      value = quantityToKton(cols[idx.quantity], idx.units !== -1 ? cols[idx.units] : "");
+    } else if (cols.length >= 8) {
+      value = parseFlexibleNumber(cols[7]);
+    }
+    if (value == null) continue;
+
+    if (!result[reporter]) result[reporter] = {};
+    if (!result[reporter][year]) result[reporter][year] = {};
+    result[reporter][year][mineral] = (result[reporter][year][mineral] || 0) + value;
+  }
+
+  return result;
+};
+
 const toTradeSeries = (totalsByCountry, countryEn) => {
   const byYear = totalsByCountry?.[countryEn] || {};
   return Object.keys(byYear)
@@ -1103,6 +1177,96 @@ const CountryTradeChart = ({ title, country, series, color }) => {
   );
 };
 
+const TradeIndicatorsPanel = ({ country, exportSeries, importSeries, exportBreakdownByYear }) => {
+  const sortedExports = [...(exportSeries || [])].sort((a, b) => a.year - b.year);
+  const latestExport = sortedExports[sortedExports.length - 1] || null;
+  const prevExport = sortedExports[sortedExports.length - 2] || null;
+
+  const growth =
+    latestExport && prevExport && prevExport.value > 0
+      ? ((latestExport.value - prevExport.value) / prevExport.value) * 100
+      : null;
+
+  const selectedYear = latestExport?.year || null;
+  const exportsByMineral = selectedYear ? exportBreakdownByYear?.[selectedYear] || {} : {};
+  const mineralRows = Object.entries(exportsByMineral).sort(([, a], [, b]) => b - a);
+  const topMineral = mineralRows[0] || null;
+  const totalExportForYear = latestExport?.value || 0;
+  const concentration =
+    topMineral && totalExportForYear > 0 ? (topMineral[1] / totalExportForYear) * 100 : null;
+
+  const importsMap = new Map((importSeries || []).map((d) => [d.year, d.value]));
+  const latestImportValue = selectedYear ? importsMap.get(selectedYear) || 0 : 0;
+  const tradeBalance = selectedYear ? totalExportForYear - latestImportValue : null;
+
+  return (
+    <Card>
+      <CardHeader title="مؤشرات إضافية" subtitle={`${country}${selectedYear ? ` — سنة ${selectedYear}` : ""}`} />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        <div className="rounded-xl p-3" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)" }}>
+          <p className="text-[11px] font-bold" style={{ color:"rgba(255,255,255,0.55)" }}>معدل النمو السنوي للصادرات (%)</p>
+          <p className="mt-2 text-[20px] font-black" style={{ color:growth == null ? "rgba(255,255,255,0.45)" : growth >= 0 ? "#10b981" : "#ef4444" }}>
+            {growth == null ? "—" : `${growth.toFixed(2)}%`}
+          </p>
+          {latestExport && prevExport && (
+            <p className="text-[10px] mt-1" style={{ color:"rgba(255,255,255,0.32)" }}>{prevExport.year} → {latestExport.year}</p>
+          )}
+        </div>
+
+        <div className="rounded-xl p-3" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)" }}>
+          <p className="text-[11px] font-bold" style={{ color:"rgba(255,255,255,0.55)" }}>مؤشر تركّز الصادرات (%)</p>
+          <p className="mt-2 text-[20px] font-black" style={{ color:"#C9A84C" }}>
+            {concentration == null ? "—" : `${concentration.toFixed(2)}%`}
+          </p>
+          <p className="text-[10px] mt-1 truncate" style={{ color:"rgba(255,255,255,0.32)" }}>
+            {topMineral ? `أكبر معدن: ${topMineral[0]}` : "لا توجد بيانات كافية"}
+          </p>
+        </div>
+
+        <div className="rounded-xl p-3" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)" }}>
+          <p className="text-[11px] font-bold" style={{ color:"rgba(255,255,255,0.55)" }}>الميزان التجاري التعديني</p>
+          <p className="mt-2 text-[20px] font-black" style={{ color:tradeBalance == null ? "rgba(255,255,255,0.45)" : tradeBalance >= 0 ? "#10b981" : "#ef4444" }}>
+            {tradeBalance == null ? "—" : `${tradeBalance >= 0 ? "+" : "-"}${fmtVal(Math.abs(tradeBalance))} $`}
+          </p>
+          <p className="text-[10px] mt-1" style={{ color:"rgba(255,255,255,0.32)" }}>
+            {tradeBalance == null ? "" : tradeBalance > 0 ? "فائض تجاري" : tradeBalance < 0 ? "عجز تجاري" : "توازن تجاري"}
+          </p>
+          <div className="mt-2 space-y-1">
+            <p
+              className="text-[10px] font-semibold"
+              style={{ color: tradeBalance != null && tradeBalance > 0 ? "#10b981" : "rgba(255,255,255,0.35)" }}
+            >
+              ✓ إذا كانت النتيجة موجبة → فائض تجاري
+            </p>
+            <p
+              className="text-[10px] font-semibold"
+              style={{ color: tradeBalance != null && tradeBalance < 0 ? "#ef4444" : "rgba(255,255,255,0.35)" }}
+            >
+              ✓ إذا كانت النتيجة سالبة → عجز تجاري
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-xl p-3 space-y-2" style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)" }}>
+        <p className="text-[11px] font-bold" style={{ color:"rgba(255,255,255,0.7)" }}>المعادلات الحسابية</p>
+        <p className="text-[10px]" style={{ color:"rgba(255,255,255,0.5)" }}>
+          معدل النمو (%) = (صادرات السنة الحالية − صادرات السنة السابقة) / صادرات السنة السابقة × 100
+        </p>
+        <p className="text-[10px]" style={{ color:"rgba(255,255,255,0.5)" }}>
+          مؤشر تركّز الصادرات (%) = قيمة أكبر معدن / إجمالي الصادرات التعدينية × 100
+        </p>
+        <p className="text-[10px]" style={{ color:"rgba(255,255,255,0.5)" }}>
+          الميزان التجاري = قيمة الصادرات التعدينية − قيمة الواردات التعدينية
+        </p>
+      </div>
+
+   
+    </Card>
+  );
+};
+
 // ── Main page ──────────────────────────────────────────────────────────────────
 const Countries = () => {
   const query = typeof window!=="undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
@@ -1120,6 +1284,7 @@ const Countries = () => {
   const [lineMineralFilter, setLineMineralFilter] = useState("all");
   const [lineUnit, setLineUnit]               = useState("ton");
   const [tradeByCountry, setTradeByCountry]   = useState({ imports: null, exports: null });
+  const [tradeBreakdownByCountry, setTradeBreakdownByCountry] = useState({ exports: null });
 
   const selectedCountryObj = COUNTRIES.find(c=>c.name===selected);
   const selectedCountryCsvName = COUNTRY_AR_TO_CSV_NAME[selected] || null;
@@ -1140,10 +1305,14 @@ const Countries = () => {
           imports: buildTradeTotalsFromRawText(combinedText, "Import"),
           exports: buildTradeTotalsFromRawText(combinedText, "Export"),
         });
+        setTradeBreakdownByCountry({
+          exports: buildTradeByCountryYearMineralFromRawText(combinedText, "Export"),
+        });
       })
       .catch(() => {
         if (!active) return;
         setTradeByCountry({ imports: {}, exports: {} });
+        setTradeBreakdownByCountry({ exports: {} });
       });
 
     return () => {
@@ -1157,6 +1326,10 @@ const Countries = () => {
   const exportSeries = selectedCountryCsvName
     ? toTradeSeries(tradeByCountry.exports, selectedCountryCsvName)
     : [];
+  const exportBreakdownByYear =
+    selectedCountryCsvName && tradeBreakdownByCountry.exports
+      ? tradeBreakdownByCountry.exports[selectedCountryCsvName] || {}
+      : {};
 
   return (
     <div dir="rtl" className="min-h-screen" style={{ background:"white", fontFamily:"'Cairo',system-ui,sans-serif" }}>
@@ -1261,6 +1434,12 @@ const Countries = () => {
                 color="#3b82f6"
               />
             </div>
+            <TradeIndicatorsPanel
+              country={selected}
+              exportSeries={exportSeries}
+              importSeries={importSeries}
+              exportBreakdownByYear={exportBreakdownByYear}
+            />
           </div>
         )}
       </main>
