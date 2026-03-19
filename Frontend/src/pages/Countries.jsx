@@ -62,6 +62,30 @@ const COUNTRIES = [
   { name: "الجمهورية اليمنية", code: "ye" },
 ];
 
+const COUNTRY_AR_TO_CSV_NAME = {
+  "المملكة الأردنية الهاشمية": "Jordan",
+  "دولة الامارات العربية المتحدة": "United Arab Emirates",
+  "مملكة البحرين": "Bahrain",
+  "الجمهورية التونسية": "Tunisia",
+  "الجمهورية الجزائرية الديمقراطية الشعبية": "Algeria",
+  "دولة جيبوتي": "Djibouti",
+  "المملكة العربية السعودية": "Saudi Arabia",
+  "جمهورية السودان": "Sudan",
+  "الجمهورية العربية السورية": "Syria",
+  "جمهورية الصومال": "Somalia",
+  "جمهورية العراق": "Iraq",
+  "سلطنة عمان": "Oman",
+  "دولة فلسطين": "Palestine",
+  "دولة قطر": "Qatar",
+  "دولة الكويت": "Kuwait",
+  "الجمهورية اللبنانية": "Lebanon",
+  "دولة ليبيا": "Libya",
+  "جمهورية مصر العربية": "Egypt",
+  "المملكة المغربية": "Morocco",
+  "الجمهورية الإسلامية الموريتانية": "Mauritania",
+  "الجمهورية اليمنية": "Yemen",
+};
+
 const ARAB_COUNTRY_NAMES = COUNTRIES.map((c) => c.name);
 
 const ALL_YEARS = Array.from(
@@ -73,6 +97,218 @@ const ALL_YEARS = Array.from(
 ).sort((a, b) => a - b);
 
 const UNIT_LABELS = { ton: "ألف طن", kg: "كجم" };
+
+const parseCsvLine = (line, delimiter = ",") => {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i += 1) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === delimiter && !inQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+
+  result.push(current);
+  return result;
+};
+
+const parseYearFromCsv = (value) => {
+  if (!value) return null;
+  if (value.includes("/")) {
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? null : d.getFullYear();
+  }
+  const parsed = Number.parseInt(value, 10);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const normalizeHeaderKey = (key) =>
+  String(key || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+
+const parseFlexibleNumber = (raw) => {
+  if (raw == null) return null;
+  let s = String(raw).trim().replace(/\s+/g, "");
+  if (!s) return null;
+
+  const commaIdx = s.lastIndexOf(",");
+  const dotIdx = s.lastIndexOf(".");
+
+  if (commaIdx !== -1 && dotIdx !== -1) {
+    if (commaIdx > dotIdx) {
+      s = s.replace(/\./g, "").replace(/,/g, ".");
+    } else {
+      s = s.replace(/,/g, "");
+    }
+  } else if (commaIdx !== -1) {
+    s = s.replace(/,/g, ".");
+  }
+
+  const parsed = Number.parseFloat(s);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const normalizeFlow = (value) => String(value || "").trim().toLowerCase();
+
+const quantityToKton = (quantityRaw, unitsRaw) => {
+  if (!quantityRaw) return null;
+  const quantity = Number.parseFloat(quantityRaw);
+  if (Number.isNaN(quantity)) return null;
+  const units = (unitsRaw || "").toLowerCase();
+  if (units.includes("kilogram")) return quantity / 1_000_000;
+  if (units.includes("ton")) return quantity / 1_000;
+  return quantity;
+};
+
+const buildTradeTotalsByCountry = (csvText, expectedType) => {
+  const lines = csvText.split(/\r?\n/);
+  if (lines.length < 2) return {};
+
+  const delimiter = lines[0].includes("\t") ? "\t" : ",";
+  const header = parseCsvLine(lines[0], delimiter);
+  const normalized = header.map(normalizeHeaderKey);
+
+  const yearIdx = normalized.indexOf("year");
+  const reporterIdx = normalized.indexOf("reporter");
+  const flowIdx = normalized.indexOf("flow");
+  const countryIdx = normalized.indexOf("country_trans");
+  const typeIdx = normalized.indexOf("bgs_statistic_type_trans");
+  const unitsIdx = normalized.indexOf("units");
+  const qtyIdx = normalized.indexOf("quantity");
+  const valueIdx = normalized.findIndex((h) => h === "value" || h === "value (us$)");
+
+  if (yearIdx === -1) return {};
+
+  const totals = {};
+  const expectedFlow = normalizeFlow(expectedType);
+
+  for (let i = 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+
+    const cols = parseCsvLine(line, delimiter);
+    if (cols.length < header.length) continue;
+
+    let flowValue = "";
+    if (flowIdx !== -1) {
+      flowValue = normalizeFlow(cols[flowIdx]);
+    } else if (typeIdx !== -1) {
+      flowValue = normalizeFlow(cols[typeIdx]);
+    }
+    if (!flowValue.startsWith(expectedFlow)) continue;
+
+    const year = parseYearFromCsv(cols[yearIdx]);
+    if (!year) continue;
+
+    const country = (reporterIdx !== -1 ? cols[reporterIdx] : cols[countryIdx]) || "";
+    if (!country) continue;
+
+    let value = null;
+    if (valueIdx !== -1) {
+      value = parseFlexibleNumber(cols[valueIdx]);
+    } else if (qtyIdx !== -1) {
+      value = quantityToKton(cols[qtyIdx], unitsIdx !== -1 ? cols[unitsIdx] : "");
+    }
+    if (value == null) continue;
+
+    if (!totals[country]) totals[country] = {};
+    totals[country][year] = (totals[country][year] || 0) + value;
+  }
+
+  return totals;
+};
+
+const buildTradeTotalsFromRawText = (rawText, expectedType) => {
+  const lines = String(rawText || "").split(/\r?\n/);
+  const totals = {};
+  const expectedFlow = normalizeFlow(expectedType);
+
+  let idx = {
+    reporter: -1,
+    flow: -1,
+    year: -1,
+    value: -1,
+    quantity: -1,
+    units: -1,
+  };
+
+  for (const line of lines) {
+    const clean = line.trim();
+    if (!clean) continue;
+    if (/^\d+[\d.,]*$/.test(clean)) continue;
+
+    const delimiter = line.includes("\t") ? "\t" : ",";
+    const cols = parseCsvLine(line, delimiter).map((c) => String(c || "").trim());
+    if (cols.length < 3) continue;
+
+    const normalized = cols.map(normalizeHeaderKey);
+    const headerLike =
+      normalized.includes("reporter") &&
+      normalized.includes("flow") &&
+      normalized.includes("year") &&
+      (normalized.includes("value") || normalized.includes("value (us$)") || normalized.includes("quantity"));
+
+    if (headerLike) {
+      idx = {
+        reporter: normalized.indexOf("reporter"),
+        flow: normalized.indexOf("flow"),
+        year: normalized.indexOf("year"),
+        value: normalized.findIndex((h) => h === "value" || h === "value (us$)"),
+        quantity: normalized.indexOf("quantity"),
+        units: normalized.indexOf("units"),
+      };
+      continue;
+    }
+
+    const flowRaw = idx.flow !== -1 ? cols[idx.flow] : cols[2];
+    const flowValue = normalizeFlow(flowRaw);
+    if (!flowValue.startsWith(expectedFlow)) continue;
+
+    const reporter = idx.reporter !== -1 ? cols[idx.reporter] : cols[0];
+    const yearRaw = idx.year !== -1 ? cols[idx.year] : cols[6];
+    if (!reporter || !yearRaw) continue;
+
+    const year = parseYearFromCsv(yearRaw);
+    if (!year) continue;
+
+    let value = null;
+    if (idx.value !== -1) {
+      value = parseFlexibleNumber(cols[idx.value]);
+    } else if (idx.quantity !== -1) {
+      value = quantityToKton(cols[idx.quantity], idx.units !== -1 ? cols[idx.units] : "");
+    } else if (cols.length >= 8) {
+      value = parseFlexibleNumber(cols[7]);
+    }
+    if (value == null) continue;
+
+    if (!totals[reporter]) totals[reporter] = {};
+    totals[reporter][year] = (totals[reporter][year] || 0) + value;
+  }
+
+  return totals;
+};
+
+const toTradeSeries = (totalsByCountry, countryEn) => {
+  const byYear = totalsByCountry?.[countryEn] || {};
+  return Object.keys(byYear)
+    .map(Number)
+    .sort((a, b) => a - b)
+    .map((year) => ({ year, value: Number((byYear[year] || 0).toFixed(2)) }));
+};
 
 const convertVolume = (value, fromUnit, toUnit) => {
   if (value == null) return value;
@@ -570,6 +806,97 @@ const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
   );
 };
 
+const CountryTradeChart = ({ title, country, series, color }) => {
+  const canvasRef = useChartInit((canvas) => {
+    if (!series || series.length === 0) return null;
+
+    return new Chart(canvas, {
+      type: "line",
+      data: {
+        labels: series.map((d) => d.year),
+        datasets: [
+          {
+            label: title,
+            data: series.map((d) => d.value),
+            borderColor: color,
+            backgroundColor: `${color}26`,
+            fill: true,
+            borderWidth: 2.5,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            tension: 0.35,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            rtl: true,
+            bodyFont: { family: "Cairo", size: 12 },
+            titleFont: { family: "Cairo", size: 13, weight: "700" },
+            callbacks: {
+              label(context) {
+                const v = context.parsed.y || 0;
+                return ` ${v.toLocaleString("fr-FR", { maximumFractionDigits: 0 })} $`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            border: { display: false },
+            ticks: {
+              color: "rgba(255,255,255,0.5)",
+              font: { family: "Cairo", size: 11, weight: "700" },
+            },
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: "rgba(255,255,255,0.06)" },
+            border: { display: false },
+            ticks: {
+              color: "rgba(255,255,255,0.5)",
+              font: { family: "Cairo", size: 11 },
+              callback: (v) => {
+                if (v >= 1_000_000_000) return `${(v / 1_000_000_000).toFixed(1)}B`;
+                if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
+                if (v >= 1_000) return `${(v / 1_000).toFixed(1)}K`;
+                return v;
+              },
+            },
+          },
+        },
+      },
+    });
+  }, [series, title, color]);
+
+  return (
+    <Card>
+      <CardHeader title={title} subtitle={`${country} — القيمة بالدولار الأمريكي`} />
+      {series && series.length > 0 ? (
+        <div style={{ position: "relative", height: "280px", width: "100%" }}>
+          <canvas
+            ref={canvasRef}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+          />
+        </div>
+      ) : (
+        <div className="h-[280px] flex items-center justify-center">
+          <p className="text-[13px] font-semibold" style={{ color: "rgba(255,255,255,0.25)" }}>
+            لا توجد بيانات
+          </p>
+        </div>
+      )}
+    </Card>
+  );
+};
+
 // ── Main page ──────────────────────────────────────────────────────────────────
 const Countries = () => {
   const query = typeof window!=="undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
@@ -582,8 +909,44 @@ const Countries = () => {
   const [donutYear, setDonutYear]             = useState(lastAvailableYear);
   const [barYear, setBarYear]                 = useState(lastAvailableYear);
   const [treemapYear, setTreemapYear]         = useState(lastAvailableYear);
+  const [tradeByCountry, setTradeByCountry]   = useState({ imports: null, exports: null });
 
   const selectedCountryObj = COUNTRIES.find(c=>c.name===selected);
+  const selectedCountryCsvName = COUNTRY_AR_TO_CSV_NAME[selected] || null;
+
+  useEffect(() => {
+    let active = true;
+
+    const combinedTradeUrl = new URL("../assets/Trade_Critical_Minerals_Morocco.txt", import.meta.url);
+
+    fetch(combinedTradeUrl)
+      .then((r) => {
+        if (!r.ok) throw new Error("Missing user trade data");
+        return r.text();
+      })
+      .then((combinedText) => {
+        if (!active) return;
+        setTradeByCountry({
+          imports: buildTradeTotalsFromRawText(combinedText, "Import"),
+          exports: buildTradeTotalsFromRawText(combinedText, "Export"),
+        });
+      })
+      .catch(() => {
+        if (!active) return;
+        setTradeByCountry({ imports: {}, exports: {} });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const importSeries = selectedCountryCsvName
+    ? toTradeSeries(tradeByCountry.imports, selectedCountryCsvName)
+    : [];
+  const exportSeries = selectedCountryCsvName
+    ? toTradeSeries(tradeByCountry.exports, selectedCountryCsvName)
+    : [];
 
   return (
     <div dir="rtl" className="min-h-screen" style={{ background:"white", fontFamily:"'Cairo',system-ui,sans-serif" }}>
@@ -654,6 +1017,24 @@ const Countries = () => {
             <CountryBarChart key={`bar-${selected}`} country={selected} selectedYear={barYear} onYearChange={setBarYear} />
 
             <MineralTreemap key={`tree-${selected}`} country={selected} year={treemapYear} onYearChange={setTreemapYear} />
+
+            <ChartSectionTitle title="الصادرات والواردات حسب الدولة" />
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+              <CountryTradeChart
+                key={`export-${selected}`}
+                title="الصادرات"
+                country={selected}
+                series={exportSeries}
+                color="#f59e0b"
+              />
+              <CountryTradeChart
+                key={`import-${selected}`}
+                title="الواردات"
+                country={selected}
+                series={importSeries}
+                color="#3b82f6"
+              />
+            </div>
           </div>
         )}
       </main>

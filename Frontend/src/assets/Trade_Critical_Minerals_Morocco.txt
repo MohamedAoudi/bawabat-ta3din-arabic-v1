@@ -1,0 +1,55 @@
+Trade in Critical Minerals
+reporter	partner	flow	aggregate_product	hs_code	hs_description	year	Value (US$)
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2010	180906243
+Morocco	World	Export	Gold	710812	Metals; gold, non-monetary, unwrought (but not powder)	2010	113615721
+Morocco	World	Export	Lead	780110	Lead; unwrought, refined	2010	87528694
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2011	233844445
+Morocco	World	Export	Lead	260700	Lead ores and concentrates	2011	98433410
+Morocco	World	Export	Lead	780110	Lead; unwrought, refined	2011	85070609
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2012	194705967
+Morocco	World	Export	Lead	260700	Lead ores and concentrates	2012	78731456
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2013	139981014
+Morocco	World	Export	Lead	260700	Lead ores and concentrates	2013	76364982
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2014	110805190
+Morocco	World	Export	Gold	710812	Metals; gold, non-monetary, unwrought (but not powder)	2014	56728294
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2015	103161396,3
+Morocco	World	Export	Gold	710813	Metals; gold, semi-manufactured	2015	54010871,32
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2016	121594425
+Morocco	World	Export	Gold	710813	Metals; gold, semi-manufactured	2016	87553542
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2017	114649333
+Morocco	World	Export	Zinc	260800	Zinc ores and concentrates	2017	83221915
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2018	70449397,94
+Morocco	World	Export	Lead	260700	Lead ores and concentrates	2018	86961078,83
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2019	93475256
+Morocco	World	Export	Lead	260700	Lead ores and concentrates	2019	75973016
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2020	99991197
+Morocco	World	Export	Lead	260700	Lead ores and concentrates	2020	69772866
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2021	108137756
+Morocco	World	Export	Lead	260700	Lead ores and concentrates	2021	82992682
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2022	82277475,44
+Morocco	World	Export	Lead	260700	Lead ores and concentrates	2022	86289814,4
+Morocco	World	Export	Silver	710691	Metals; silver, unwrought, (but not powder)	2023	125291282
+Morocco	World	Export	Lead	260700	Lead ores and concentrates	2023	83568697,19
+export
+reporter	partner	flow	aggregate_product	hs_code	hs_description	year	value
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2010	42177886,79
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2011	68586586,88
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2012	50969319,48
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2013	51798945
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2014	53867451
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2015	59798489,94
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2016	72184375,02
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2017	103561329,6
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2018	122989213
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2019	147856216
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2020	153482694
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2021	319011623,8
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2022	435166502,2
+Morocco	World	Import	Aluminium	760120	Aluminium; unwrought, alloys	2023	391134923,9
+Morocco	World	Import	Gold	710812	Metals; gold, non-monetary, unwrought (but not powder)	2014	28674504
+Morocco	World	Import	Gold	710812	Metals; gold, non-monetary, unwrought (but not powder)	2018	18783216,89
+Morocco	World	Import	Gold	710812	Metals; gold, non-monetary, unwrought (but not powder)	2019	32148998
+Morocco	World	Import	Gold	710812	Metals; gold, non-monetary, unwrought (but not powder)	2021	16852778
+Morocco	World	Import	Gold	710812	Metals; gold, non-monetary, unwrought (but not powder)	2022	26249021,36
+Morocco	World	Import	Gold	710812	Metals; gold, non-monetary, unwrought (but not powder)	2023	58986630,61
+import
