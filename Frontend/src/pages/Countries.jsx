@@ -376,6 +376,11 @@ const getComparisonData = (selectedCountry, year, mineralFilter, unit, scope) =>
   const sorted = Object.entries(countryTotals).filter(([, v]) => v > 0).sort(([, a], [, b]) => b - a);
   if (sorted.length === 0) return null;
   const selectedValue = countryTotals[selectedCountry] || 0;
+  const selectedRank = sorted.findIndex(([name]) => name === selectedCountry) + 1;
+  const leaderName = sorted[0]?.[0] || null;
+  const leaderValue = sorted[0]?.[1] || 0;
+  const leaderGap = Math.max(leaderValue - selectedValue, 0);
+
   const others = sorted.filter(([name]) => name !== selectedCountry);
   const topOthers = others.slice(0, 8);
   const restValue = others.slice(8).reduce((s, [, v]) => s + v, 0);
@@ -383,12 +388,33 @@ const getComparisonData = (selectedCountry, year, mineralFilter, unit, scope) =>
   if (selectedValue > 0) slices.push({ name: selectedCountry, value: selectedValue, isSelected: true });
   topOthers.forEach(([name, value]) => slices.push({ name, value, isSelected: false }));
   if (restValue > 0) slices.push({ name: "أخرى", value: restValue, isSelected: false });
-  return { slices, total: slices.reduce((s, d) => s + d.value, 0) };
+  const total = slices.reduce((s, d) => s + d.value, 0);
+
+  return {
+    slices,
+    total,
+    selectedValue,
+    selectedRank: selectedRank > 0 ? selectedRank : null,
+    leaderName,
+    leaderValue,
+    leaderGap,
+    countriesCount: sorted.length,
+    topCountries: sorted.slice(0, 3).map(([name, value]) => ({
+      name,
+      value,
+      pct: total > 0 ? (value / total) * 100 : 0,
+    })),
+  };
 };
 
 const destroyChart = (ref) => { if (ref.current) { ref.current.destroy(); ref.current = null; } };
 
-const fmtVal = (v) => v >= 1_000_000 ? `${(v/1_000_000).toFixed(2)}M` : v >= 1_000 ? `${(v/1_000).toFixed(1)}K` : v.toFixed(2);
+const fmtVal = (v) => {
+  if (v >= 1_000_000_000) return `${(v / 1_000_000_000).toFixed(2)}B`;
+  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(2)}M`;
+  if (v >= 1_000) return `${(v / 1_000).toFixed(1)}K`;
+  return v.toFixed(2);
+};
 
 const DONUT_PALETTE = ["#10b981","#3b82f6","#f59e0b","#8b5cf6","#ef4444","#06b6d4","#84cc16","#f97316","#ec4899","#64748b","#a78bfa","#fb923c"];
 
@@ -562,10 +588,11 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
   const result = getComparisonData(selectedCountry, year, mineralFilter, unit, scope);
   const selectedSlice = result?.slices.find(s=>s.isSelected);
   const selectedPct   = result && selectedSlice ? ((selectedSlice.value/result.total)*100).toFixed(1) : null;
+  const leaderPct = result && result.leaderValue ? ((result.leaderValue / result.total) * 100).toFixed(1) : null;
 
   return (
     <Card>
-      <CardHeader title="مقارنة الإنتاج" subtitle={`حصة الدولة مقارنةً بـ${scope==="arab"?"الدول العربية":"دول العالم"} — سنة ${year}`}>
+      <CardHeader title="مقارنة الإنتاج" subtitle={`حصة الدولة مقارنةً بـ${scope==="arab"?"الدول العربية":"دول العالم"} — سنة ${year} (${UNIT_LABELS[unit]||""})`}>
         <div className="flex rounded-full overflow-hidden" style={{ border:"1px solid rgba(201,168,76,0.25)" }}>
           {[{key:"arab",label:"الدول العربية"},{key:"world",label:"العالم"}].map(({key,label})=>(
             <button key={key} type="button" onClick={()=>setScope(key)}
@@ -583,54 +610,95 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
           <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>لا توجد بيانات لسنة {year}</p>
         </div>
       ) : (
-        <div className="flex flex-col lg:flex-row gap-8 items-center">
-          <div style={{ position:"relative", width:"260px", height:"260px", flexShrink:0 }}>
-            <canvas ref={canvasRef} width={260} height={260} style={{ display:"block" }} />
-            {selectedPct!==null && (
-              <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", pointerEvents:"none" }}>
-                <span className="text-[30px] font-black leading-none" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
-                <span className="text-[10px] font-bold mt-1 text-center px-4 leading-snug" style={{ color:"rgba(255,255,255,0.35)" }}>
-                  {scope==="arab"?"من الإنتاج العربي":"من الإنتاج العالمي"}
-                </span>
-              </div>
-            )}
-          </div>
-          <div className="flex-1 w-full min-w-0">
-            {selectedSlice && (
-              <div className="rounded-xl px-4 py-3 mb-4" style={{ background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.25)" }}>
-                <div className="flex items-center justify-between">
-                  <span className="text-[12px] font-black flex items-center gap-2" style={{ color:"#C9A84C" }}>
-                    <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background:"#C9A84C" }} />{selectedSlice.name}
-                  </span>
-                  <span className="text-[15px] font-black" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
-                </div>
-                <p className="text-[10px] mt-1 font-mono" style={{ color:"rgba(201,168,76,0.45)" }}>{fmtVal(selectedSlice.value)} {UNIT_LABELS[unit]||""}</p>
-              </div>
-            )}
-            <div className="space-y-2 overflow-y-auto pr-1" style={{ maxHeight:200, scrollbarWidth:"thin", scrollbarColor:"rgba(201,168,76,0.2) transparent" }}>
-              {result.slices.filter(s=>!s.isSelected).map((s)=>{
-                const pct=result.total>0?(s.value/result.total)*100:0;
-                const idx=result.slices.findIndex(x=>x.name===s.name);
-                const color=DONUT_PALETTE[idx%DONUT_PALETTE.length];
-                return (
-                  <div key={s.name} className="rounded-xl px-3 py-2" style={{ background:"rgba(255,255,255,0.025)" }}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[11px] font-bold flex items-center gap-1.5 truncate" style={{ color }}>
-                        <span className="w-2 h-2 rounded-full inline-block flex-shrink-0" style={{ background:color }} />{s.name}
-                      </span>
-                      <span className="text-[11px] font-bold flex-shrink-0 ml-2" style={{ color:"rgba(255,255,255,0.45)" }}>{pct.toFixed(1)}%</span>
-                    </div>
-                    <div className="h-0.5 rounded-full overflow-hidden" style={{ background:"rgba(255,255,255,0.06)" }}>
-                      <div className="h-full rounded-full" style={{ width:`${pct}%`, background:color }} />
-                    </div>
-                    <p className="text-[9px] mt-0.5 font-mono" style={{ color:"rgba(255,255,255,0.22)" }}>{fmtVal(s.value)} {UNIT_LABELS[unit]||""}</p>
-                  </div>
-                );
-              })}
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5">
+            <div className="rounded-xl px-3 py-2.5" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)" }}>
+              <p className="text-[10px] font-bold" style={{ color:"rgba(255,255,255,0.35)" }}>ترتيب الدولة</p>
+              <p className="mt-1 text-[16px] font-black" style={{ color:"#C9A84C" }}>
+                {result.selectedRank ? `#${result.selectedRank}` : "-"}
+              </p>
             </div>
-            <div className="mt-3 rounded-xl px-4 py-2 flex items-center justify-between" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)" }}>
-              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(255,255,255,0.25)" }}>الإجمالي</span>
-              <span className="text-[13px] font-black" style={{ color:"rgba(255,255,255,0.6)" }}>{fmtVal(result.total)} {UNIT_LABELS[unit]||""}</span>
+            <div className="rounded-xl px-3 py-2.5" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)" }}>
+              <p className="text-[10px] font-bold" style={{ color:"rgba(255,255,255,0.35)" }}>عدد الدول</p>
+              <p className="mt-1 text-[16px] font-black" style={{ color:"rgba(255,255,255,0.78)" }}>{result.countriesCount}</p>
+            </div>
+            <div className="rounded-xl px-3 py-2.5" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)" }}>
+              <p className="text-[10px] font-bold" style={{ color:"rgba(255,255,255,0.35)" }}>فجوة المركز الأول</p>
+              <p className="mt-1 text-[16px] font-black" style={{ color:"rgba(255,255,255,0.78)" }}>{fmtVal(result.leaderGap)}</p>
+            </div>
+            <div className="rounded-xl px-3 py-2.5" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)" }}>
+              <p className="text-[10px] font-bold" style={{ color:"rgba(255,255,255,0.35)" }}>الدولة الأولى</p>
+              <p className="mt-1 text-[13px] font-black truncate" style={{ color:"rgba(255,255,255,0.82)" }}>{result.leaderName || "-"}</p>
+              {leaderPct !== null && (
+                <p className="text-[10px] mt-0.5" style={{ color:"rgba(201,168,76,0.8)" }}>{leaderPct}%</p>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-col lg:flex-row gap-8 items-center">
+            <div style={{ position:"relative", width:"260px", height:"260px", flexShrink:0 }}>
+              <canvas ref={canvasRef} width={260} height={260} style={{ display:"block" }} />
+              {selectedPct!==null && (
+                <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", pointerEvents:"none" }}>
+                  <span className="text-[30px] font-black leading-none" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
+                  <span className="text-[10px] font-bold mt-1 text-center px-4 leading-snug" style={{ color:"rgba(255,255,255,0.35)" }}>
+                    {scope==="arab"?"من الإنتاج العربي":"من الإنتاج العالمي"}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="flex-1 w-full min-w-0 space-y-3">
+              {selectedSlice && (
+                <div className="rounded-xl px-4 py-3" style={{ background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.25)" }}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12px] font-black flex items-center gap-2" style={{ color:"#C9A84C" }}>
+                      <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background:"#C9A84C" }} />{selectedSlice.name}
+                    </span>
+                    <span className="text-[15px] font-black" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
+                  </div>
+                  <p className="text-[10px] mt-1 font-mono" style={{ color:"rgba(201,168,76,0.45)" }}>{fmtVal(selectedSlice.value)} {UNIT_LABELS[unit]||""}</p>
+                </div>
+              )}
+
+              <div className="rounded-xl p-3" style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)" }}>
+                <p className="text-[11px] font-bold mb-2" style={{ color:"rgba(255,255,255,0.62)" }}>أكبر الدول إنتاجًا</p>
+                <div className="space-y-2">
+                  {result.topCountries.map((c, i) => (
+                    <div key={`${c.name}-${i}`} className="rounded-lg px-3 py-2" style={{ background:"rgba(255,255,255,0.025)" }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[11px] font-bold truncate" style={{ color: i===0 ? "#C9A84C" : "rgba(255,255,255,0.8)" }}>{c.name}</span>
+                        <span className="text-[11px] font-bold" style={{ color:"rgba(255,255,255,0.55)" }}>{c.pct.toFixed(1)}%</span>
+                      </div>
+                      <div className="h-0.5 rounded-full overflow-hidden" style={{ background:"rgba(255,255,255,0.07)" }}>
+                        <div className="h-full rounded-full" style={{ width:`${Math.min(c.pct, 100)}%`, background:i===0?"#C9A84C":"rgba(255,255,255,0.45)" }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2 overflow-y-auto pr-1" style={{ maxHeight:170, scrollbarWidth:"thin", scrollbarColor:"rgba(201,168,76,0.2) transparent" }}>
+                {result.slices.filter(s=>!s.isSelected).map((s)=>{
+                  const pct=result.total>0?(s.value/result.total)*100:0;
+                  const idx=result.slices.findIndex(x=>x.name===s.name);
+                  const color=DONUT_PALETTE[idx%DONUT_PALETTE.length];
+                  return (
+                    <div key={s.name} className="rounded-xl px-3 py-2" style={{ background:"rgba(255,255,255,0.025)" }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[11px] font-bold flex items-center gap-1.5 truncate" style={{ color }}>
+                          <span className="w-2 h-2 rounded-full inline-block flex-shrink-0" style={{ background:color }} />{s.name}
+                        </span>
+                        <span className="text-[11px] font-bold flex-shrink-0 ml-2" style={{ color:"rgba(255,255,255,0.45)" }}>{pct.toFixed(1)}%</span>
+                      </div>
+                      <p className="text-[9px] mt-0.5 font-mono" style={{ color:"rgba(255,255,255,0.22)" }}>{fmtVal(s.value)} {UNIT_LABELS[unit]||""}</p>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="rounded-xl px-4 py-2 flex items-center justify-between" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)" }}>
+                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(255,255,255,0.25)" }}>الإجمالي</span>
+                <span className="text-[13px] font-black" style={{ color:"rgba(255,255,255,0.6)" }}>{fmtVal(result.total)} {UNIT_LABELS[unit]||""}</span>
+              </div>
             </div>
           </div>
         </div>
