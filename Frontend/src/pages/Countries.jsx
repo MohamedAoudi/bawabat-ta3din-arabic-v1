@@ -717,16 +717,18 @@ const SnapshotStatCard = ({
   value,
   note,
   borderColor = "rgba(201,168,76,0.9)",
+  bgColor = "#ffffff",
+  dark = false,
   className = "",
   valueClassName = "",
 }) => (
   <div
-    className={`rounded-[18px] bg-white px-4 py-4 text-center ${className}`}
-    style={{ border: `2px solid ${borderColor}`, boxShadow: "0 4px 12px rgba(15,23,42,0.06)" }}
+    className={`rounded-[18px] px-4 py-4 text-center ${className}`}
+    style={{ backgroundColor: bgColor, border: `2px solid ${borderColor}`, boxShadow: "0 4px 12px rgba(15,23,42,0.06)" }}
   >
-    <p className="text-[12px] font-bold text-slate-700">{title}</p>
-    <p className={`mt-2 text-[25px] font-black leading-tight text-slate-900 ${valueClassName}`}>{value}</p>
-    {note ? <p className="mt-1 text-[11px] font-semibold text-slate-500">{note}</p> : null}
+    <p className={`text-[12px] font-bold ${dark ? "text-emerald-50" : "text-slate-700"}`}>{title}</p>
+    <p className={`mt-2 text-[25px] font-black leading-tight ${dark ? "text-white" : "text-slate-900"} ${valueClassName}`}>{value}</p>
+    {note ? <p className={`mt-1 text-[11px] font-semibold ${dark ? "text-emerald-100/80" : "text-slate-500"}`}>{note}</p> : null}
   </div>
 );
 
@@ -807,10 +809,10 @@ const CountrySnapshotPanel = ({
 
         <SnapshotSectionHeader title="الإنتاج التعديني" featured />
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <SnapshotStatCard title="إجمالي الإنتاج التعديني" value={summary.production.totalText} borderColor="#b9b9b9" className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
-          <SnapshotStatCard title="عدد المنتجات التعدينية" value={summary.production.countText} borderColor="#d0a018" className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
-          <SnapshotStatCard title="أكبر منتج تعديني" value={summary.production.topMineral} borderColor="#9b4f16" className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
-          <SnapshotStatCard title="قيمة أكبر منتج تعديني" value={summary.production.topValueText} borderColor="#1f9d39" className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+          <SnapshotStatCard title="إجمالي الإنتاج التعديني" value={summary.production.totalText} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+          <SnapshotStatCard title="عدد المنتجات التعدينية" value={summary.production.countText} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+          <SnapshotStatCard title="أكبر منتج تعديني" value={summary.production.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+          <SnapshotStatCard title="قيمة أكبر منتج تعديني" value={summary.production.topValueText} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
         </div>
 
         <div className="mt-2">
@@ -820,24 +822,24 @@ const CountrySnapshotPanel = ({
               <div>
                 <SnapshotSectionHeader title="الصادرات التعدينية" />
                 <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
-                  <SnapshotStatCard title="إجمالي الصادرات" value={summary.exports.totalText} borderColor="#b9b9b9" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="عدد المعادن المصدرة" value={summary.exports.countText} borderColor="#d0a018" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="أكبر معدن مصدر" value={summary.exports.topMineral} borderColor="#9b4f16" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="معدل النمو السنوي للصادرات" value={summary.exports.growthText} note={`(${summary.exports.growthSubtext})`} borderColor="#b9b9b9" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="عدد الأسواق المصدرة" value={summary.exports.marketsText} borderColor="#d0a018" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="مؤشر تركّز الصادرات" value={summary.exports.concentrationText} borderColor="#9b4f16" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="إجمالي الصادرات" value={summary.exports.totalText} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="عدد المعادن المصدرة" value={summary.exports.countText} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="أكبر معدن مصدر" value={summary.exports.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="معدل النمو السنوي للصادرات" value={summary.exports.growthText} note={`(${summary.exports.growthSubtext})`} borderColor="#b9b9b9" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="عدد الأسواق المصدرة" value={summary.exports.marketsText} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="مؤشر تركّز الصادرات" value={summary.exports.concentrationText} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
                 </div>
               </div>
 
               <div>
                 <SnapshotSectionHeader title="الواردات التعدينية" />
                 <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
-                  <SnapshotStatCard title="إجمالي الواردات" value={summary.imports.totalText} borderColor="#b9b9b9" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="عدد المعادن الواردة" value={summary.imports.countText} borderColor="#d0a018" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="أكبر معدن وارد" value={summary.imports.topMineral} borderColor="#9b4f16" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="معدل النمو السنوي للواردات" value={summary.imports.growthText} note={`(${summary.imports.growthSubtext})`} borderColor="#b9b9b9" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="عدد الأسواق الواردة" value={summary.imports.marketsText} borderColor="#d0a018" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="مؤشر تركّز الواردات" value={summary.imports.concentrationText} borderColor="#9b4f16" className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="إجمالي الواردات" value={summary.imports.totalText} borderColor="#b9b9b9" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="عدد المعادن الواردة" value={summary.imports.countText} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="أكبر معدن وارد" value={summary.imports.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="معدل النمو السنوي للواردات" value={summary.imports.growthText} note={`(${summary.imports.growthSubtext})`} borderColor="#b9b9b9" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="عدد الأسواق الواردة" value={summary.imports.marketsText} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title="مؤشر تركّز الواردات" value={summary.imports.concentrationText} borderColor="#d0a018" bgColor="#0e4238" dark className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
                 </div>
               </div>
             </div>
@@ -850,7 +852,6 @@ const CountrySnapshotPanel = ({
   return (
     <section className="rounded-[24px] bg-[#f7f7f7] p-4 sm:p-5" style={{ border: "1px solid #d4d4d4" }}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-[28px] font-black text-[#b8860b]">{country}</h3>
         <label className="flex items-center gap-2 text-[14px] font-bold text-slate-700">
           <span>اختر السنة :</span>
           <select
