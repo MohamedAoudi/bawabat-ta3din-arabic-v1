@@ -97,6 +97,10 @@ const ALL_YEARS = Array.from(
 ).sort((a, b) => a - b);
 
 const UNIT_LABELS = { ton: "ألف طن", kg: "كجم" };
+const MINERAL_FILTER_OPTIONS = [
+  { value: "all", label: "كل الخامات" },
+  ...Object.keys(dataByMineral).map((mineral) => ({ value: mineral, label: mineral })),
+];
 
 const parseCsvLine = (line, delimiter = ",") => {
   const result = [];
@@ -708,7 +712,13 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
 };
 
 // ── Line chart ─────────────────────────────────────────────────────────────────
-const CountryLineChart = ({ country, mineralFilter=null, unit="ton" }) => {
+const CountryLineChart = ({
+  country,
+  mineralFilter = "all",
+  unit = "ton",
+  onMineralFilterChange,
+  onUnitChange,
+}) => {
   const wrapperRef = useRef(null);
 
   const canvasRef = useChartInit((canvas) => {
@@ -731,7 +741,69 @@ const CountryLineChart = ({ country, mineralFilter=null, unit="ton" }) => {
 
   return (
     <Card>
-      <CardHeader title="تطوّر الإنتاج التعديني" subtitle={`${country} — جميع السنوات`} />
+      <CardHeader
+        title="تطوّر الإنتاج التعديني"
+        subtitle={`${country} — جميع السنوات${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`}
+      >
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onUnitChange?.("ton")}
+            className="rounded-full px-3 py-1 text-[11px] font-bold transition-all"
+            style={
+              unit === "ton"
+                ? {
+                    background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
+                    color: "#082721",
+                  }
+                : {
+                    background: "rgba(255,255,255,0.04)",
+                    color: "rgba(255,255,255,0.5)",
+                    border: "1px solid rgba(201,168,76,0.18)",
+                  }
+            }
+          >
+            ألف طن
+          </button>
+          <button
+            type="button"
+            onClick={() => onUnitChange?.("kg")}
+            className="rounded-full px-3 py-1 text-[11px] font-bold transition-all"
+            style={
+              unit === "kg"
+                ? {
+                    background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
+                    color: "#082721",
+                  }
+                : {
+                    background: "rgba(255,255,255,0.04)",
+                    color: "rgba(255,255,255,0.5)",
+                    border: "1px solid rgba(201,168,76,0.18)",
+                  }
+            }
+          >
+            كجم
+          </button>
+        </div>
+
+        <select
+          value={mineralFilter || "all"}
+          onChange={(e) => onMineralFilterChange?.(e.target.value)}
+          className="rounded-full px-3 py-1.5 text-[11px] font-bold"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            color: "rgba(255,255,255,0.85)",
+            border: "1px solid rgba(201,168,76,0.24)",
+            outline: "none",
+          }}
+        >
+          {MINERAL_FILTER_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value} style={{ color: "#082721" }}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </CardHeader>
       <div ref={wrapperRef} style={{ position:"relative", height:"320px", width:"100%" }}>
         <canvas ref={canvasRef} style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%" }} />
       </div>
@@ -740,7 +812,15 @@ const CountryLineChart = ({ country, mineralFilter=null, unit="ton" }) => {
 };
 
 // ── Bar chart ──────────────────────────────────────────────────────────────────
-const CountryBarChart = ({ country, mineralFilter=null, unit="ton", selectedYear, onYearChange }) => {
+const CountryBarChart = ({
+  country,
+  mineralFilter = "all",
+  unit = "ton",
+  selectedYear,
+  onYearChange,
+  onMineralFilterChange,
+  onUnitChange,
+}) => {
   const [noData, setNoData] = useState(false);
   const slices = getMineralShareForYear(country, selectedYear, mineralFilter, unit).sort((a,b)=>b.value-a.value);
   const total  = slices.reduce((s,d)=>s+d.value, 0);
@@ -763,7 +843,65 @@ const CountryBarChart = ({ country, mineralFilter=null, unit="ton", selectedYear
 
   return (
     <Card>
-      <CardHeader title="حصص الخامات حسب الحجم" subtitle={`${country} — سنة ${selectedYear}`}>
+      <CardHeader title="حصص الخامات حسب الحجم" subtitle={`${country} — سنة ${selectedYear}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""} (${UNIT_LABELS[unit]||""})`}>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onUnitChange?.("ton")}
+            className="rounded-full px-3 py-1 text-[11px] font-bold transition-all"
+            style={
+              unit === "ton"
+                ? {
+                    background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
+                    color: "#082721",
+                  }
+                : {
+                    background: "rgba(255,255,255,0.04)",
+                    color: "rgba(255,255,255,0.5)",
+                    border: "1px solid rgba(201,168,76,0.18)",
+                  }
+            }
+          >
+            ألف طن
+          </button>
+          <button
+            type="button"
+            onClick={() => onUnitChange?.("kg")}
+            className="rounded-full px-3 py-1 text-[11px] font-bold transition-all"
+            style={
+              unit === "kg"
+                ? {
+                    background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
+                    color: "#082721",
+                  }
+                : {
+                    background: "rgba(255,255,255,0.04)",
+                    color: "rgba(255,255,255,0.5)",
+                    border: "1px solid rgba(201,168,76,0.18)",
+                  }
+            }
+          >
+            كجم
+          </button>
+        </div>
+
+        <select
+          value={mineralFilter || "all"}
+          onChange={(e) => onMineralFilterChange?.(e.target.value)}
+          className="rounded-full px-3 py-1.5 text-[11px] font-bold"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            color: "rgba(255,255,255,0.85)",
+            border: "1px solid rgba(201,168,76,0.24)",
+            outline: "none",
+          }}
+        >
+          {MINERAL_FILTER_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value} style={{ color: "#082721" }}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
         <YearPills selectedYear={selectedYear} onYearChange={onYearChange} />
       </CardHeader>
       {noData ? (
@@ -778,7 +916,7 @@ const CountryBarChart = ({ country, mineralFilter=null, unit="ton", selectedYear
           <div className="xl:w-60 flex-shrink-0">
             <div className="rounded-xl px-4 py-2.5 mb-3 flex items-center justify-between" style={{ background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.18)" }}>
               <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(201,168,76,0.6)" }}>المجموع</span>
-              <span className="text-[15px] font-black" style={{ color:"#C9A84C" }}>{fmtVal(total)}</span>
+              <span className="text-[15px] font-black" style={{ color:"#C9A84C" }}>{fmtVal(total)} {UNIT_LABELS[unit]||""}</span>
             </div>
             <div className="space-y-1.5">
               {slices.map((d,i)=>{
@@ -976,7 +1114,11 @@ const Countries = () => {
   const [selected, setSelected]               = useState(initialSelected);
   const [donutYear, setDonutYear]             = useState(lastAvailableYear);
   const [barYear, setBarYear]                 = useState(lastAvailableYear);
+  const [barMineralFilter, setBarMineralFilter] = useState("all");
+  const [barUnit, setBarUnit]                 = useState("ton");
   const [treemapYear, setTreemapYear]         = useState(lastAvailableYear);
+  const [lineMineralFilter, setLineMineralFilter] = useState("all");
+  const [lineUnit, setLineUnit]               = useState("ton");
   const [tradeByCountry, setTradeByCountry]   = useState({ imports: null, exports: null });
 
   const selectedCountryObj = COUNTRIES.find(c=>c.name===selected);
@@ -1080,9 +1222,25 @@ const Countries = () => {
             <ChartSectionTitle title="المؤشرات التعدينية" />
             <CountryComparisonDonut key={`donut-${selected}`} selectedCountry={selected} year={donutYear} onYearChange={setDonutYear} />
 
-            <CountryLineChart key={`line-${selected}`} country={selected} />
+            <CountryLineChart
+              key={`line-${selected}`}
+              country={selected}
+              mineralFilter={lineMineralFilter}
+              unit={lineUnit}
+              onMineralFilterChange={setLineMineralFilter}
+              onUnitChange={setLineUnit}
+            />
 
-            <CountryBarChart key={`bar-${selected}`} country={selected} selectedYear={barYear} onYearChange={setBarYear} />
+            <CountryBarChart
+              key={`bar-${selected}`}
+              country={selected}
+              selectedYear={barYear}
+              onYearChange={setBarYear}
+              mineralFilter={barMineralFilter}
+              unit={barUnit}
+              onMineralFilterChange={setBarMineralFilter}
+              onUnitChange={setBarUnit}
+            />
 
             <MineralTreemap key={`tree-${selected}`} country={selected} year={treemapYear} onYearChange={setTreemapYear} />
 
