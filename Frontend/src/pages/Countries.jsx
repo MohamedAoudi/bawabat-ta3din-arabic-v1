@@ -31,6 +31,13 @@ const getCountryFlags = () => {
 
 const countryFlags = getCountryFlags();
 
+const FLAG_IMAGE_STYLE = {
+  width: "100%",
+  height: "100%",
+  objectFit: "contain",
+  imageRendering: "auto",
+};
+
 const COUNTRIES = [
   { name: "المملكة الأردنية الهاشمية", code: "jo" },
   { name: "دولة الامارات العربية المتحدة", code: "ae" },
@@ -267,7 +274,7 @@ const CountryHeroBanner = ({ country, countryCode }) => {
       {flagSrc && (
         <div className="relative flex-shrink-0 overflow-hidden"
           style={{ width:160, height:110, borderRadius:14, boxShadow:"0 6px 20px rgba(0,0,0,0.5),0 0 0 1px rgba(201,168,76,0.3)" }}>
-          <img src={flagSrc} alt={country} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+          <img src={flagSrc} alt={country} decoding="async" style={{ ...FLAG_IMAGE_STYLE, display:"block", background:"#0b1f1a" }} />
           <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,rgba(255,255,255,0.07) 0%,transparent 60%)", borderRadius:14 }} />
         </div>
       )}
@@ -611,9 +618,9 @@ const Countries = () => {
             {COUNTRIES.map((c) => (
               <button key={c.code} type="button" onClick={()=>setSelected(c.name)}
                       className="group flex flex-col items-center text-center transition-transform hover:-translate-y-1 focus:outline-none">
-                <div className="relative flex h-25 w-full items-center justify-center overflow-hidden rounded-lg bg-slate-50 transition-all"
+                <div className="relative flex h-24 w-full items-center justify-center overflow-hidden rounded-lg bg-slate-50 transition-all"
                   style={{ boxShadow:selected===c.name?"0 0 0 2px #C9A84C,0 4px 12px rgba(201,168,76,0.25)":"0 1px 4px rgba(0,0,0,0.08)" }}>
-                  <img src={countryFlags[c.code]} alt={c.name} className="h-full w-full object-cover" loading="lazy" />
+                  <img src={countryFlags[c.code]} alt={c.name} loading="lazy" decoding="async" style={{ ...FLAG_IMAGE_STYLE, padding:"2px", background:"#f8fafc" }} />
                   {selected===c.name && <div className="absolute inset-0 rounded-lg" style={{ background:"rgba(201,168,76,0.08)" }} />}
                 </div>
                 <p className={`mt-1.5 text-[11px] font-bold leading-tight transition-colors ${selected===c.name?"text-[#C9A84C]":"text-slate-600 group-hover:text-[#082721]"}`}>
@@ -627,7 +634,7 @@ const Countries = () => {
               <span className="text-sm text-slate-400">الدولة المختارة:</span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-900 border border-emerald-100">
                 {selectedCountryObj&&countryFlags[selectedCountryObj.code]&&(
-                  <img src={countryFlags[selectedCountryObj.code]} alt="" className="h-4 w-6 object-cover rounded-sm" />
+                  <img src={countryFlags[selectedCountryObj.code]} alt="" decoding="async" className="h-5 w-7 object-contain rounded-sm" />
                 )}
                 {selected}
               </span>
