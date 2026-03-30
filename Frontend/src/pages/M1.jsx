@@ -8,46 +8,122 @@ export const dataByMineral = {
   "الذهب": {
     // Gold - كجم
     2010: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 7589 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 723 },
+      { country: "المملكة العربية السعودية", value: 4400 },
       { country: "المملكة المغربية", value: 650 },
+      { country: "جمهورية السودان", value: 34000 },
+      { country: "جمهورية مصر العربية", value: 4451 },
     ],
     2011: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 7473 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 340 },
+      { country: "المملكة العربية السعودية", value: 4612 },
       { country: "المملكة المغربية", value: 520 },
+      { country: "جمهورية السودان", value: 38000 },
+      { country: "جمهورية مصر العربية", value: 7439 },
     ],
     2012: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 6889 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 264 },
+      { country: "المملكة العربية السعودية", value: 4292 },
       { country: "المملكة المغربية", value: 532 },
+      { country: "جمهورية السودان", value: 40000 },
+      { country: "جمهورية مصر العربية", value: 8523 },
     ],
     2013: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 9355 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 140 },
+      { country: "المملكة العربية السعودية", value: 4158 },
       { country: "المملكة المغربية", value: 463 },
+      { country: "جمهورية السودان", value: 70000 },
+      { country: "جمهورية مصر العربية", value: 12616 },
     ],
     2014: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 8771 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 85 },
+      { country: "المملكة العربية السعودية", value: 4789 },
       { country: "المملكة المغربية", value: 377 },
+      { country: "جمهورية السودان", value: 73400 },
+      { country: "جمهورية مصر العربية", value: 13202 },
     ],
     2015: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 8025 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 106 },
+      { country: "المملكة العربية السعودية", value: 5089 },
       { country: "المملكة المغربية", value: 448 },
+      { country: "جمهورية السودان", value: 82300 },
+      { country: "جمهورية مصر العربية", value: 15651 },
     ],
     2016: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 6495 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 102 },
+      { country: "المملكة العربية السعودية", value: 6946 },
       { country: "المملكة المغربية", value: 352 },
+      { country: "جمهورية السودان", value: 93400 },
+      { country: "جمهورية مصر العربية", value: 17140 },
     ],
     2017: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 8292 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 134 },
+      { country: "المملكة العربية السعودية", value: 10333 },
       { country: "المملكة المغربية", value: 220 },
+      { country: "جمهورية السودان", value: 107300 },
+      { country: "جمهورية مصر العربية", value: 16941 },
     ],
     2018: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 8448 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 128 },
+      { country: "المملكة العربية السعودية", value: 11765 },
       { country: "المملكة المغربية", value: 386 },
+      { country: "جمهورية السودان", value: 93600 },
+      { country: "جمهورية مصر العربية", value: 14694 },
     ],
     2019: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 12252 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 52 },
+      { country: "المملكة العربية السعودية", value: 12593 },
       { country: "المملكة المغربية", value: 221 },
+      { country: "جمهورية السودان", value: 90000 },
+      { country: "جمهورية مصر العربية", value: 14946 },
     ],
     2020: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 12873 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 71 },
+      { country: "المملكة العربية السعودية", value: 11822 },
       { country: "المملكة المغربية", value: 200 },
+      { country: "جمهورية السودان", value: 93600 },
+      { country: "جمهورية مصر العربية", value: 14070 },
     ],
     2021: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 5922 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 41 },
+      { country: "المملكة العربية السعودية", value: 11153 },
       { country: "المملكة المغربية", value: 200 },
+      { country: "جمهورية السودان", value: 49700 },
+      { country: "جمهورية مصر العربية", value: 14900 },
     ],
     2022: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 16250 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 100 },
+      { country: "المملكة العربية السعودية", value: 13200 },
       { country: "المملكة المغربية", value: 100 },
+      { country: "جمهورية السودان", value: 35700 },
+      { country: "جمهورية مصر العربية", value: 14100 },
     ],
     2023: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 18319 },
+      { country: "الجمهورية الجزائرية الديمقراطية الشعبية", value: 102 },
+      { country: "المملكة العربية السعودية", value: 12976 },
       { country: "المملكة المغربية", value: 100 },
+      { country: "جمهورية السودان", value: 49700 },
+      { country: "جمهورية مصر العربية", value: 12900 },
+    ],
+    2024: [
+      { country: "الجمهورية الإسلامية الموريتانية", value: 21900 },
+      { country: "المملكة العربية السعودية", value: 12000 },
+      { country: "جمهورية السودان", value: 73800 },
+      { country: "جمهورية مصر العربية", value: 14174 },
     ],
   },
 
@@ -235,6 +311,100 @@ function formatNumber(n) {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+const wrapLabel = (text, maxCharsPerLine = 12) => {
+  const words = String(text || "").split(/\s+/).filter(Boolean);
+  if (!words.length) return [""];
+
+  const lines = [];
+  let current = words[0];
+
+  for (let i = 1; i < words.length; i += 1) {
+    const next = `${current} ${words[i]}`;
+    if (next.length <= maxCharsPerLine) {
+      current = next;
+    } else {
+      lines.push(current);
+      current = words[i];
+    }
+  }
+
+  lines.push(current);
+  return lines;
+};
+
+// Draw each country name below the last visible point (pip) on the line chart.
+const linePointCountryLabelPlugin = {
+  id: "linePointCountryLabelPlugin",
+  afterDatasetsDraw(chart) {
+    const { ctx } = chart;
+    const placedRects = [];
+
+    const intersects = (a, b) =>
+      a.x < b.x + b.w &&
+      a.x + a.w > b.x &&
+      a.y < b.y + b.h &&
+      a.y + a.h > b.y;
+
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    const lineHeight = 10;
+    ctx.font = "700 8px Cairo";
+
+    chart.data.datasets.forEach((dataset, datasetIndex) => {
+      const meta = chart.getDatasetMeta(datasetIndex);
+      if (!meta || meta.hidden || !meta.data?.length) return;
+
+      let lastPoint = null;
+      for (let i = meta.data.length - 1; i >= 0; i -= 1) {
+        const val = dataset.data?.[i];
+        if (val == null) continue;
+        lastPoint = meta.data[i];
+        break;
+      }
+
+      if (!lastPoint) return;
+
+      const label = dataset.label || "";
+      const lines = wrapLabel(label, 12);
+      const textW = Math.max(...lines.map((line) => ctx.measureText(line).width));
+      const textH = lines.length * lineHeight;
+
+      // Candidate positions around the point; first non-overlapping spot wins.
+      const candidates = [
+        { x: lastPoint.x + 14, y: lastPoint.y + 10 },
+        { x: lastPoint.x - 14, y: lastPoint.y + 10 },
+        { x: lastPoint.x + 14, y: lastPoint.y + 24 },
+        { x: lastPoint.x - 14, y: lastPoint.y + 24 },
+        { x: lastPoint.x + 14, y: lastPoint.y - 18 },
+        { x: lastPoint.x - 14, y: lastPoint.y - 18 },
+      ];
+
+      let chosen = candidates[datasetIndex % candidates.length];
+      for (const candidate of candidates) {
+        const rect = {
+          x: candidate.x - textW / 2,
+          y: candidate.y,
+          w: textW,
+          h: textH,
+        };
+        if (!placedRects.some((r) => intersects(rect, r))) {
+          chosen = candidate;
+          placedRects.push(rect);
+          break;
+        }
+      }
+
+      ctx.fillStyle = dataset.borderColor || "#082721";
+      lines.forEach((line, idx) => {
+        ctx.fillText(line, chosen.x, chosen.y + idx * lineHeight);
+      });
+    });
+
+    ctx.restore();
+  },
+};
+
 // ── Line chart: evolution over all years for selected mineral ──────────────
 function LineChartPanel({ mineral }) {
   const canvasRef = useRef(null);
@@ -277,6 +447,7 @@ function LineChartPanel({ mineral }) {
 
     instanceRef.current = new Chart(ctx, {
       type: "line",
+      plugins: [linePointCountryLabelPlugin],
       data: { labels: years, datasets },
       options: {
         responsive: true,
@@ -297,7 +468,12 @@ function LineChartPanel({ mineral }) {
         scales: {
           x: {
             grid: { display: false },
-            ticks: { font: { family: "Cairo", weight: "700" } },
+            ticks: {
+              autoSkip: false,
+              maxRotation: 45,
+              minRotation: 45,
+              font: { family: "Cairo", weight: "700" },
+            },
           },
           y: {
             beginAtZero: true,
@@ -408,7 +584,12 @@ export default function M1Page() {
             ticks: {
               maxRotation: 0,
               autoSkip: true,
-              font: { family: "Cairo", weight: "700" },
+              maxTicksLimit: 10,
+              padding: 12,
+              callback(value) {
+                return wrapLabel(this.getLabelForValue(value), 12);
+              },
+              font: { family: "Cairo", weight: "700", size: 9 },
             },
           },
           y: {

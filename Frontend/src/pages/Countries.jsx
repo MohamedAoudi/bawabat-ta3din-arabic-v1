@@ -727,9 +727,9 @@ const SnapshotStatCard = ({
     className={`rounded-[18px] px-4 py-4 text-center ${className}`}
     style={{ backgroundColor: bgColor, border: noBorder ? "none" : `2px solid ${borderColor}`, boxShadow: "0 4px 12px rgba(15,23,42,0.06)" }}
   >
-    <p className={`text-[12px] font-bold ${dark ? "text-emerald-50" : "text-slate-700"}`}>{title}</p>
+    <p className="text-[16px] font-bold" style={{ color: "#d4a017" }}>{title}</p>
     <p className={`mt-2 text-[25px] font-black leading-tight ${dark ? "text-white" : "text-slate-900"} ${valueClassName}`}>{value}</p>
-    {note ? <p className={`mt-1 text-[11px] font-semibold ${dark ? "text-emerald-100/80" : "text-slate-500"}`}>{note}</p> : null}
+    {note ? <p className="mt-1 text-[13px] font-semibold" style={{ color: "#d4a017" }}>{note}</p> : null}
   </div>
 );
 
@@ -796,13 +796,13 @@ const CountrySnapshotPanel = ({
       <section className="rounded-[10px] bg-white p-1.5 sm:p-2" style={{ border: "1px solid #b8b8b8" }}>
         <div className="mb-2 flex items-center justify-end gap-3 px-1">
           <h3 className="text-[18px] font-black leading-none text-[#b8860b]">{country}</h3>
-          <label className="flex items-center gap-2 text-[14px] font-bold text-slate-700">
+          <label className="flex items-center gap-2 text-[16px] font-bold text-slate-700">
             <span>اختر السنة :</span>
             <select
               value={2023}
               onChange={() => {}}
               disabled
-              className="rounded-md border border-slate-300 bg-white px-2 py-1 text-[14px] font-bold text-slate-800 outline-none disabled:cursor-not-allowed"
+              className="rounded-md border border-slate-300 bg-white px-2 py-1 text-[16px] font-bold text-slate-800 outline-none disabled:cursor-not-allowed"
             >
               <option value={2023}>2023</option>
             </select>
@@ -853,13 +853,13 @@ const CountrySnapshotPanel = ({
   return (
     <section className="rounded-[24px] bg-[#f7f7f7] p-4 sm:p-5" style={{ border: "1px solid #d4d4d4" }}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <label className="flex items-center gap-2 text-[14px] font-bold text-slate-700">
+        <label className="flex items-center gap-2 text-[16px] font-bold text-slate-700">
           <span>اختر السنة :</span>
           <select
             value={year}
             onChange={(e) => onYearChange?.(Number(e.target.value))}
             disabled={isMorocco}
-            className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-[14px] font-bold text-slate-800 outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
+            className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-[16px] font-bold text-slate-800 outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
           >
             {(isMorocco ? [2023] : ALL_YEARS).map((yr) => (
               <option key={yr} value={yr}>{yr}</option>
@@ -870,7 +870,7 @@ const CountrySnapshotPanel = ({
 
       <SnapshotSectionHeader title="الإنتاج التعديني" featured />
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <SnapshotStatCard title="إجمالي الإنتاج التعديني" value={summary.production.totalText} borderColor="#a3a3a3" />
+        <SnapshotStatCard title="إجمالي الإنتاج التعديني" value={summary.production.totalText} borderColor="#a3a3a3 " />
         <SnapshotStatCard title="عدد المنتجات التعدينية" value={summary.production.countText} borderColor="#d4a017" />
         <SnapshotStatCard title="أكبر منتج تعديني" value={summary.production.topMineral} borderColor="#a0522d" />
         <SnapshotStatCard title="قيمة أكبر منتج تعديني" value={summary.production.topValueText} borderColor="#16a34a" />
@@ -880,8 +880,8 @@ const CountrySnapshotPanel = ({
         <SnapshotSectionHeader title="التجارة التعدينية" featured />
         <div className="grid gap-3 xl:grid-cols-[180px_minmax(0,1fr)]">
           <div className="rounded-[22px] bg-white px-4 py-6 text-center" style={{ border: `2px solid ${balanceColor}` }}>
-            <p className="text-[13px] font-bold text-slate-700">الميزان التجاري</p>
-            <p className="text-[13px] font-bold text-slate-700">(الفائض / العجز)</p>
+            <p className="text-[15px] font-bold" style={{ color: "#d4a017" }}>الميزان التجاري</p>
+            <p className="text-[16px] font-bold" style={{ color: "#d4a017" }}>(الفائض / العجز)</p>
             <div className="mt-16 space-y-2">
               <p className="text-[28px] font-black text-slate-900">{summary.tradeBalance.statusText}</p>
               <p className="text-[32px] font-black leading-tight text-slate-900">{summary.tradeBalance.valueText}</p>
@@ -976,8 +976,8 @@ const CardHeader = ({ title, subtitle, children }) => (
     <div className="flex items-center gap-3">
       <div className="w-0.5 h-6 rounded-full flex-shrink-0" style={{ background:"linear-gradient(180deg,#C9A84C,#7a4a00)" }} />
       <div>
-        <h3 className="text-sm font-extrabold text-white/90 leading-tight">{title}</h3>
-        {subtitle && <p className="text-[11px] mt-0.5" style={{ color:"rgba(201,168,76,0.55)" }}>{subtitle}</p>}
+        <h3 className="text-[18px] font-extrabold leading-tight" style={{ color: "#d4a017" }}>{title}</h3>
+        {subtitle && <p className="text-[16px] mt-0.5" style={{ color: "#d4a017" }}>{subtitle}</p>}
       </div>
     </div>
     {children && <div className="flex items-center gap-2 flex-wrap">{children}</div>}
@@ -1109,27 +1109,8 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
       ) : (
         <div className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5">
-            <div className="rounded-xl px-3 py-2.5" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)" }}>
-              <p className="text-[10px] font-bold" style={{ color:"rgba(255,255,255,0.35)" }}>ترتيب الدولة</p>
-              <p className="mt-1 text-[16px] font-black" style={{ color:"#C9A84C" }}>
-                {result.selectedRank ? `#${result.selectedRank}` : "-"}
-              </p>
-            </div>
-            <div className="rounded-xl px-3 py-2.5" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)" }}>
-              <p className="text-[10px] font-bold" style={{ color:"rgba(255,255,255,0.35)" }}>عدد الدول</p>
-              <p className="mt-1 text-[16px] font-black" style={{ color:"rgba(255,255,255,0.78)" }}>{result.countriesCount}</p>
-            </div>
-            <div className="rounded-xl px-3 py-2.5" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)" }}>
-              <p className="text-[10px] font-bold" style={{ color:"rgba(255,255,255,0.35)" }}>فجوة المركز الأول</p>
-              <p className="mt-1 text-[16px] font-black" style={{ color:"rgba(255,255,255,0.78)" }}>{fmtVal(result.leaderGap)}</p>
-            </div>
-            <div className="rounded-xl px-3 py-2.5" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)" }}>
-              <p className="text-[10px] font-bold" style={{ color:"rgba(255,255,255,0.35)" }}>الدولة الأولى</p>
-              <p className="mt-1 text-[13px] font-black truncate" style={{ color:"rgba(255,255,255,0.82)" }}>{result.leaderName || "-"}</p>
-              {leaderPct !== null && (
-                <p className="text-[10px] mt-0.5" style={{ color:"rgba(201,168,76,0.8)" }}>{leaderPct}%</p>
-              )}
-            </div>
+  
+            
           </div>
           <div className="flex flex-col lg:flex-row gap-8 items-center">
             <div style={{ position:"relative", width:"260px", height:"260px", flexShrink:0 }}>
