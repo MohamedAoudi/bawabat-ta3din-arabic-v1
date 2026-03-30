@@ -56,53 +56,54 @@ const commodityConfig = {
   aluminum: { csvName: "aluminium", label: "الألمنيوم" },
 };
 
+const DEFAULT_COUNTRY = "Morocco";
+
 const countryNameAr = {
-  Algeria: "الجمهورية الجزائرية الديمقراطية الشعبية",
-  Bahrain: "مملكة البحرين",
-  Comoros: "اتحاد جزر القمر",
-  Djibouti: "جمهورية جيبوتي",
-  Egypt: "جمهورية مصر العربية",
-  Iraq: "جمهورية العراق",
   Jordan: "المملكة الأردنية الهاشمية",
+  "United Arab Emirates": "دولة الامارات العربية المتحدة",
+  Bahrain: "مملكة البحرين",
+  Tunisia: "الجمهورية التونسية",
+  Algeria: "الجمهورية الجزائرية الديمقراطية الشعبية",
+  Djibouti: "دولة جيبوتي",
+  "Saudi Arabia": "المملكة العربية السعودية",
+  Sudan: "جمهورية السودان",
+  Syria: "الجمهورية العربية السورية",
+  Somalia: "جمهورية الصومال",
+  Iraq: "جمهورية العراق",
+  Oman: "سلطنة عمان",
+  Palestine: "دولة فلسطين",
+  Qatar: "دولة قطر",
   Kuwait: "دولة الكويت",
   Lebanon: "الجمهورية اللبنانية",
   Libya: "دولة ليبيا",
-  Mauritania: "الجمهورية الإسلامية الموريتانية",
+  Egypt: "جمهورية مصر العربية",
   Morocco: "المملكة المغربية",
-  Oman: "سلطنة عُمان",
-  Palestine: "دولة فلسطين",
-  Qatar: "دولة قطر",
-  "Saudi Arabia": "المملكة العربية السعودية",
-  Somalia: "جمهورية الصومال الفيدرالية",
-  Sudan: "جمهورية السودان",
-  Syria: "الجمهورية العربية السورية",
-  Tunisia: "الجمهورية التونسية",
-  "United Arab Emirates": "دولة الإمارات العربية المتحدة",
+  Mauritania: "الجمهورية الإسلامية الموريتانية",
   Yemen: "الجمهورية اليمنية",
+  Comoros: "اتحاد جزر القمر",
 };
 
 const arabCountryList = [
-  "Algeria",
-  "Bahrain",
-  "Comoros",
-  "Djibouti",
-  "Egypt",
-  "Iraq",
   "Jordan",
-  "Kuwait",
-  "Lebanon",
-  "Libya",
-  "Mauritania",
-  "Morocco",
+  "United Arab Emirates",
+  "Bahrain",
+  "Tunisia",
+  "Algeria",
+  "Djibouti",
+  "Saudi Arabia",
+  "Sudan",
+  "Syria",
+  "Somalia",
+  "Iraq",
   "Oman",
   "Palestine",
   "Qatar",
-  "Saudi Arabia",
-  "Somalia",
-  "Sudan",
-  "Syria",
-  "Tunisia",
-  "United Arab Emirates",
+  "Kuwait",
+  "Lebanon",
+  "Libya",
+  "Egypt",
+  "Morocco",
+  "Mauritania",
   "Yemen",
 ];
 
@@ -495,13 +496,19 @@ export default function M5Page() {
   const effectiveBarCountries =
     barCountriesFilter.length > 0
       ? barCountriesFilter.filter((c) => barCountries.includes(c))
-      : barCountries.slice(0, 3);
+      : barCountries.includes(DEFAULT_COUNTRY)
+        ? [DEFAULT_COUNTRY]
+        : barCountries.slice(0, 3);
 
   useEffect(() => {
     if (!barCountries.length) return;
     setBarCountriesFilter((prev) => {
       const valid = prev.filter((c) => barCountries.includes(c));
-      return valid.length ? valid : barCountries.slice(0, 3);
+      return valid.length
+        ? valid
+        : barCountries.includes(DEFAULT_COUNTRY)
+          ? [DEFAULT_COUNTRY]
+          : barCountries.slice(0, 3);
     }
     );
   }, [barCountries]);
@@ -558,7 +565,9 @@ export default function M5Page() {
   const effectiveCountry =
     selectedCountry && availableCountries.includes(selectedCountry)
       ? selectedCountry
-      : availableCountries[0] || "";
+      : availableCountries.includes(DEFAULT_COUNTRY)
+        ? DEFAULT_COUNTRY
+        : availableCountries[0] || "";
 
   const canvasRef = useRef(null);
   const chartRef = useRef(null);
