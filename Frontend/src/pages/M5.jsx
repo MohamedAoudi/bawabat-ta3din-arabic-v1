@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Boxes, Check, Scale, Weight } from "lucide-react";
+import { Scale, Weight } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 
-const fallbackYears = [
-  2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022,
-  2023, 2024,
-];
+const MIN_YEAR = 2010;
+const MAX_YEAR = 2023;
+
+const fallbackYears = Array.from(
+  { length: MAX_YEAR - MIN_YEAR + 1 },
+  (_, i) => MIN_YEAR + i
+);
 
 const fallbackSeriesMap = {
   gold: {
@@ -54,31 +57,31 @@ const commodityConfig = {
 };
 
 const countryNameAr = {
-  Algeria: "الجزائر",
-  Bahrain: "البحرين",
-  Comoros: "جزر القمر",
-  Djibouti: "جيبوتي",
-  Egypt: "مصر",
-  Iraq: "العراق",
-  Jordan: "الأردن",
-  Kuwait: "الكويت",
-  Lebanon: "لبنان",
-  Libya: "ليبيا",
-  Mauritania: "موريتانيا",
-  Morocco: "المغرب",
-  Oman: "عُمان",
-  Palestine: "فلسطين",
-  Qatar: "قطر",
-  "Saudi Arabia": "السعودية",
-  Somalia: "الصومال",
-  Sudan: "السودان",
-  Syria: "سوريا",
-  Tunisia: "تونس",
-  "United Arab Emirates": "الإمارات",
-  Yemen: "اليمن",
+  Algeria: "الجمهورية الجزائرية الديمقراطية الشعبية",
+  Bahrain: "مملكة البحرين",
+  Comoros: "اتحاد جزر القمر",
+  Djibouti: "جمهورية جيبوتي",
+  Egypt: "جمهورية مصر العربية",
+  Iraq: "جمهورية العراق",
+  Jordan: "المملكة الأردنية الهاشمية",
+  Kuwait: "دولة الكويت",
+  Lebanon: "الجمهورية اللبنانية",
+  Libya: "دولة ليبيا",
+  Mauritania: "الجمهورية الإسلامية الموريتانية",
+  Morocco: "المملكة المغربية",
+  Oman: "سلطنة عُمان",
+  Palestine: "دولة فلسطين",
+  Qatar: "دولة قطر",
+  "Saudi Arabia": "المملكة العربية السعودية",
+  Somalia: "جمهورية الصومال الفيدرالية",
+  Sudan: "جمهورية السودان",
+  Syria: "الجمهورية العربية السورية",
+  Tunisia: "الجمهورية التونسية",
+  "United Arab Emirates": "دولة الإمارات العربية المتحدة",
+  Yemen: "الجمهورية اليمنية",
 };
 
-const arabCountries = new Set([
+const arabCountryList = [
   "Algeria",
   "Bahrain",
   "Comoros",
@@ -101,9 +104,11 @@ const arabCountries = new Set([
   "Tunisia",
   "United Arab Emirates",
   "Yemen",
-]);
+];
 
-function parseCsvLine(line) {
+const arabCountries = new Set(arabCountryList);
+
+function parseCsvLine(line, delimiter = ",") {
   const result = [];
   let current = "";
   let inQuotes = false;
@@ -118,7 +123,7 @@ function parseCsvLine(line) {
       } else {
         inQuotes = !inQuotes;
       }
-    } else if (ch === "," && !inQuotes) {
+    } else if (ch === delimiter && !inQuotes) {
       result.push(current);
       current = "";
     } else {
@@ -130,28 +135,47 @@ function parseCsvLine(line) {
   return result;
 }
 
-function buildSeriesFromCsv(csvText) {
-  const lines = csvText.split(/\r?\n/);
-  if (lines.length < 2) return null;
+const normalizeHeaderKey = (key) =>
+  String(key || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
 
-  const header = parseCsvLine(lines[0]);
-  const yearIdx = header.indexOf("year");
-  const qtyIdx = header.indexOf("quantity");
-  const unitsIdx = header.indexOf("units");
-  const typeIdx = header.indexOf("bgs_statistic_type_trans");
-  const commodityIdx = header.indexOf("bgs_commodity_trans");
-  const countryIdx = header.indexOf("country_trans");
-
-  if (
-    yearIdx === -1 ||
-    qtyIdx === -1 ||
-    unitsIdx === -1 ||
-    typeIdx === -1 ||
-    commodityIdx === -1 ||
-    countryIdx === -1
-  ) {
-    return null;
+const parseYearFromValue = (value) => {
+  if (!value) return null;
+  if (String(value).includes("/")) {
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? null : d.getFullYear();
   }
+  const parsed = Number.parseInt(value, 10);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const parseFlexibleNumber = (raw) => {
+  if (raw == null) return null;
+  let s = String(raw).trim().replace(/\s+/g, "");
+  if (!s) return null;
+
+  const commaIdx = s.lastIndexOf(",");
+  const dotIdx = s.lastIndexOf(".");
+
+  if (commaIdx !== -1 && dotIdx !== -1) {
+    if (commaIdx > dotIdx) {
+      s = s.replace(/\./g, "").replace(/,/g, ".");
+    } else {
+      s = s.replace(/,/g, "");
+    }
+  } else if (commaIdx !== -1) {
+    s = s.replace(/,/g, ".");
+  }
+
+  const parsed = Number.parseFloat(s);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+function buildSeriesFromCsv(csvText) {
+  const lines = String(csvText || "").split(/\r?\n/);
+  if (lines.length < 2) return null;
 
   const seriesByKey = {};
   const timeSeriesByKey = {};
@@ -162,40 +186,56 @@ function buildSeriesFromCsv(csvText) {
     timeSeriesByKey[key] = { arab: {}, world: {} };
   });
 
+  let idx = {
+    reporter: -1,
+    flow: -1,
+    year: -1,
+    value: -1,
+    commodity: -1,
+  };
+
   for (let i = 1; i < lines.length; i += 1) {
-    const line = lines[i];
+    const line = lines[i] || "";
     if (!line.trim()) continue;
+    if (/^(trade in critical minerals|export|import)$/i.test(line.trim())) continue;
 
-    const cols = parseCsvLine(line);
-    if (cols.length !== header.length) continue;
+    const delimiter = line.includes("\t") ? "\t" : ",";
+    const cols = parseCsvLine(line, delimiter).map((c) => String(c || "").trim());
+    if (cols.length < 5) continue;
 
-    const statType = cols[typeIdx];
-    if (statType !== "Imports") continue;
+    const normalized = cols.map(normalizeHeaderKey);
+    const headerLike =
+      normalized.includes("reporter") &&
+      normalized.includes("flow") &&
+      normalized.includes("year") &&
+      normalized.includes("aggregate_product") &&
+      (normalized.includes("value") || normalized.includes("value (us$)"));
 
-    const commodity = cols[commodityIdx].toLowerCase();
-    const yearValue = cols[yearIdx];
-    let yearNumber;
-
-    if (yearValue.includes("/")) {
-      const d = new Date(yearValue);
-      yearNumber = Number.isNaN(d.getTime()) ? null : d.getFullYear();
-    } else {
-      const parsed = parseInt(yearValue, 10);
-      yearNumber = Number.isNaN(parsed) ? null : parsed;
+    if (headerLike) {
+      idx = {
+        reporter: normalized.indexOf("reporter"),
+        flow: normalized.indexOf("flow"),
+        year: normalized.indexOf("year"),
+        value: normalized.findIndex((h) => h === "value" || h === "value (us$)"),
+        commodity: normalized.indexOf("aggregate_product"),
+      };
+      continue;
     }
 
+    const flowRaw = idx.flow !== -1 ? cols[idx.flow] : cols[2];
+    if (String(flowRaw).toLowerCase() !== "export") continue;
+
+    const commodityRaw = idx.commodity !== -1 ? cols[idx.commodity] : cols[3];
+    const commodity = String(commodityRaw || "").toLowerCase();
+
+    const yearRaw = idx.year !== -1 ? cols[idx.year] : cols[6];
+    const yearNumber = parseYearFromValue(yearRaw);
     if (!yearNumber) continue;
+    if (yearNumber < MIN_YEAR || yearNumber > MAX_YEAR) continue;
 
-    const quantityRaw = cols[qtyIdx];
-    if (!quantityRaw) continue;
-    const quantity = parseFloat(quantityRaw);
-    if (Number.isNaN(quantity)) continue;
-
-    const units = cols[unitsIdx].toLowerCase();
-    let tonnes = quantity;
-    if (units.includes("kilograms")) {
-      tonnes = quantity / 1000;
-    }
+    const valueRaw = idx.value !== -1 ? cols[idx.value] : cols[7];
+    const value = parseFlexibleNumber(valueRaw);
+    if (value == null) continue;
 
     const commodityKey = Object.keys(commodityConfig).find((key) => {
       const csvName = commodityConfig[key].csvName.toLowerCase();
@@ -204,27 +244,29 @@ function buildSeriesFromCsv(csvText) {
 
     if (!commodityKey) continue;
 
-    const country = cols[countryIdx];
+    const country = idx.reporter !== -1 ? cols[idx.reporter] : cols[0];
     allYearsSet.add(yearNumber);
 
     if (!seriesByKey[commodityKey][yearNumber]) {
       seriesByKey[commodityKey][yearNumber] = 0;
     }
 
-    seriesByKey[commodityKey][yearNumber] += tonnes / 1000;
+    // Stored as "kton" in internal helpers; for this file it's monetary value,
+    // but we keep same scaling pipeline for UI consistency.
+    seriesByKey[commodityKey][yearNumber] += value;
 
     // Track time series (world total)
     if (!timeSeriesByKey[commodityKey].world[yearNumber]) {
       timeSeriesByKey[commodityKey].world[yearNumber] = 0;
     }
-    timeSeriesByKey[commodityKey].world[yearNumber] += tonnes / 1000;
+    timeSeriesByKey[commodityKey].world[yearNumber] += value;
 
     // Track time series (arab subset)
     if (arabCountries.has(country)) {
       if (!timeSeriesByKey[commodityKey].arab[yearNumber]) {
         timeSeriesByKey[commodityKey].arab[yearNumber] = 0;
       }
-      timeSeriesByKey[commodityKey].arab[yearNumber] += tonnes / 1000;
+      timeSeriesByKey[commodityKey].arab[yearNumber] += value;
     }
   }
 
@@ -260,27 +302,8 @@ function buildSeriesFromCsv(csvText) {
 }
 
 function buildImportCountryDataFromCsv(csvText) {
-  const lines = csvText.split(/\r?\n/);
+  const lines = String(csvText || "").split(/\r?\n/);
   if (lines.length < 2) return null;
-
-  const header = parseCsvLine(lines[0]);
-  const yearIdx = header.indexOf("year");
-  const qtyIdx = header.indexOf("quantity");
-  const unitsIdx = header.indexOf("units");
-  const typeIdx = header.indexOf("bgs_statistic_type_trans");
-  const commodityIdx = header.indexOf("bgs_commodity_trans");
-  const countryIdx = header.indexOf("country_trans");
-
-  if (
-    yearIdx === -1 ||
-    qtyIdx === -1 ||
-    unitsIdx === -1 ||
-    typeIdx === -1 ||
-    commodityIdx === -1 ||
-    countryIdx === -1
-  ) {
-    return null;
-  }
 
   const byProductYearCountry = {};
 
@@ -288,40 +311,56 @@ function buildImportCountryDataFromCsv(csvText) {
     byProductYearCountry[key] = {};
   });
 
+  let idx = {
+    reporter: -1,
+    flow: -1,
+    year: -1,
+    value: -1,
+    commodity: -1,
+  };
+
   for (let i = 1; i < lines.length; i += 1) {
-    const line = lines[i];
+    const line = lines[i] || "";
     if (!line.trim()) continue;
+    if (/^(trade in critical minerals|export|import)$/i.test(line.trim())) continue;
 
-    const cols = parseCsvLine(line);
-    if (cols.length !== header.length) continue;
+    const delimiter = line.includes("\t") ? "\t" : ",";
+    const cols = parseCsvLine(line, delimiter).map((c) => String(c || "").trim());
+    if (cols.length < 5) continue;
 
-    const statType = cols[typeIdx];
-    if (statType !== "Imports") continue;
+    const normalized = cols.map(normalizeHeaderKey);
+    const headerLike =
+      normalized.includes("reporter") &&
+      normalized.includes("flow") &&
+      normalized.includes("year") &&
+      normalized.includes("aggregate_product") &&
+      (normalized.includes("value") || normalized.includes("value (us$)"));
 
-    const commodity = cols[commodityIdx].toLowerCase();
-    const yearValue = cols[yearIdx];
-    let yearNumber;
-
-    if (yearValue.includes("/")) {
-      const d = new Date(yearValue);
-      yearNumber = Number.isNaN(d.getTime()) ? null : d.getFullYear();
-    } else {
-      const parsed = parseInt(yearValue, 10);
-      yearNumber = Number.isNaN(parsed) ? null : parsed;
+    if (headerLike) {
+      idx = {
+        reporter: normalized.indexOf("reporter"),
+        flow: normalized.indexOf("flow"),
+        year: normalized.indexOf("year"),
+        value: normalized.findIndex((h) => h === "value" || h === "value (us$)"),
+        commodity: normalized.indexOf("aggregate_product"),
+      };
+      continue;
     }
 
+    const flowRaw = idx.flow !== -1 ? cols[idx.flow] : cols[2];
+    if (String(flowRaw).toLowerCase() !== "export") continue;
+
+    const commodityRaw = idx.commodity !== -1 ? cols[idx.commodity] : cols[3];
+    const commodity = String(commodityRaw || "").toLowerCase();
+
+    const yearRaw = idx.year !== -1 ? cols[idx.year] : cols[6];
+    const yearNumber = parseYearFromValue(yearRaw);
     if (!yearNumber) continue;
+    if (yearNumber < MIN_YEAR || yearNumber > MAX_YEAR) continue;
 
-    const quantityRaw = cols[qtyIdx];
-    if (!quantityRaw) continue;
-    const quantity = parseFloat(quantityRaw);
-    if (Number.isNaN(quantity)) continue;
-
-    const units = cols[unitsIdx].toLowerCase();
-    let tonnes = quantity;
-    if (units.includes("kilograms")) {
-      tonnes = quantity / 1000;
-    }
+    const valueRaw = idx.value !== -1 ? cols[idx.value] : cols[7];
+    const value = parseFlexibleNumber(valueRaw);
+    if (value == null) continue;
 
     const productKey = Object.keys(commodityConfig).find((key) => {
       const csvName = commodityConfig[key].csvName.toLowerCase();
@@ -330,8 +369,7 @@ function buildImportCountryDataFromCsv(csvText) {
 
     if (!productKey) continue;
 
-    const country = cols[countryIdx];
-    if (!arabCountries.has(country)) continue;
+    const country = idx.reporter !== -1 ? cols[idx.reporter] : cols[0];
 
     const store = byProductYearCountry[productKey];
 
@@ -341,7 +379,7 @@ function buildImportCountryDataFromCsv(csvText) {
     if (!store[yearNumber][country]) {
       store[yearNumber][country] = 0;
     }
-    store[yearNumber][country] += tonnes / 1000;
+    store[yearNumber][country] += value;
   }
 
   const products = {};
@@ -368,16 +406,6 @@ function buildImportCountryDataFromCsv(csvText) {
 
   return { products };
 }
-
-const mineralOptions = [
-  { value: "gold", label: "الذهب" },
-  { value: "silver", label: "الفضة" },
-  { value: "copper", label: "النحاس" },
-  { value: "phosphate", label: "الفوسفات" },
-  { value: "iron", label: "الحديد" },
-  { value: "bauxite", label: "البوكسيت" },
-  { value: "aluminum", label: "الألمنيوم" },
-];
 
 function unitLabelFor(unit) {
   if (unit === "kg") return "كجم";
@@ -414,10 +442,9 @@ function scaleValuesByUnit(valuesInKton, unit) {
 
 export default function M5Page() {
   const [unit, setUnit] = useState("kg");
-  const [selected, setSelected] = useState(["gold", "silver"]);
   const [dynamicData, setDynamicData] = useState(null);
   const [importCountryData, setImportCountryData] = useState(null);
-  const [countryProduct, setCountryProduct] = useState("gold");
+  const [barCountriesFilter, setBarCountriesFilter] = useState([]);
   const [countryYear, setCountryYear] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState("");
 
@@ -426,10 +453,8 @@ export default function M5Page() {
   const timeSeriesMap = dynamicData?.timeSeriesMap || {};
 
   useEffect(() => {
-    const csvUrl = new URL(
-      "../assets/Minerals_Data_ Import.csv",
-      import.meta.url
-    );
+    // Reuse the same trade source used in Countries page.
+    const csvUrl = new URL("../assets/Trade_Critical_Minerals_Morocco.txt", import.meta.url);
 
     fetch(csvUrl)
       .then((res) => res.text())
@@ -449,15 +474,65 @@ export default function M5Page() {
   }, []);
 
   const selectedKeys = useMemo(() => {
-    const keys = selected.filter((k) => seriesMap[k]);
-    return keys.length ? keys : ["gold"];
-  }, [selected, seriesMap]);
+    const keys = Object.keys(seriesMap).filter((k) => commodityConfig[k]);
+    return keys.length ? keys : Object.keys(commodityConfig);
+  }, [seriesMap]);
 
-  const countryProductData =
-    importCountryData?.products?.[countryProduct] || null;
+  const barYears = useMemo(() => {
+    const set = new Set();
+    selectedKeys.forEach((key) => {
+      const yrs = importCountryData?.products?.[key]?.years || [];
+      yrs.forEach((y) => set.add(y));
+    });
+    return Array.from(set).sort((a, b) => a - b);
+  }, [importCountryData, selectedKeys]);
 
-  const countryYears = countryProductData?.years || [];
-  const countryDonutByYear = countryProductData?.donutByYear || {};
+  const barCountries = useMemo(
+    () => arabCountryList.filter((country) => countryNameAr[country]),
+    []
+  );
+
+  const effectiveBarCountries =
+    barCountriesFilter.length > 0
+      ? barCountriesFilter.filter((c) => barCountries.includes(c))
+      : barCountries.slice(0, 3);
+
+  useEffect(() => {
+    if (!barCountries.length) return;
+    setBarCountriesFilter((prev) => {
+      const valid = prev.filter((c) => barCountries.includes(c));
+      return valid.length ? valid : barCountries.slice(0, 3);
+    }
+    );
+  }, [barCountries]);
+
+  const countryYears = useMemo(() => {
+    const set = new Set();
+    selectedKeys.forEach((key) => {
+      const yrs = importCountryData?.products?.[key]?.years || [];
+      yrs.forEach((y) => set.add(y));
+    });
+    return Array.from(set).sort((a, b) => a - b);
+  }, [importCountryData, selectedKeys]);
+
+  const countryDonutByYear = useMemo(() => {
+    const combined = {};
+    countryYears.forEach((year) => {
+      const countryTotals = {};
+      selectedKeys.forEach((key) => {
+        const rows = importCountryData?.products?.[key]?.donutByYear?.[year]?.table || [];
+        rows.forEach((r) => {
+          countryTotals[r.c] = (countryTotals[r.c] || 0) + (r.v || 0);
+        });
+      });
+      combined[year] = {
+        table: Object.entries(countryTotals)
+          .map(([c, v]) => ({ c, v: Number(v.toFixed(2)) }))
+          .sort((a, b) => b.v - a.v),
+      };
+    });
+    return combined;
+  }, [countryYears, importCountryData, selectedKeys]);
 
   useEffect(() => {
     if (!countryYears.length) return;
@@ -509,17 +584,32 @@ export default function M5Page() {
       "rgba(8, 39, 33, .55)", // primary (light)
     ];
 
-    const datasets = selectedKeys.map((k, idx) => ({
-      label: seriesMap[k].name,
-      data: scaleValuesByUnit(seriesMap[k].values, unit),
-      borderWidth: 0,
-      borderRadius: 8,
-      backgroundColor: palette[idx % palette.length],
-    }));
+    if (!barYears.length || !effectiveBarCountries.length) return;
+
+    const datasets = effectiveBarCountries.map((country, idx) => {
+      const data = barYears.map((year) => {
+        const totalInKton = selectedKeys.reduce((sum, k) => {
+          const product = importCountryData?.products?.[k];
+          const row = product?.donutByYear?.[year]?.table?.find(
+            (r) => r.c === country
+          );
+          return sum + (row ? row.v : 0);
+        }, 0);
+        return scaleValueByUnit(totalInKton, unit);
+      });
+
+      return {
+        label: countryNameAr[country] || country,
+        data,
+        borderWidth: 0,
+        borderRadius: 8,
+        backgroundColor: palette[idx % palette.length],
+      };
+    });
 
     chartRef.current = new Chart(ctx, {
       type: "bar",
-      data: { labels: years, datasets },
+      data: { labels: barYears, datasets },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -561,7 +651,7 @@ export default function M5Page() {
         chartRef.current = null;
       }
     };
-  }, [selectedKeys, unit]);
+  }, [selectedKeys, unit, barYears, effectiveBarCountries, importCountryData, seriesMap]);
 
   useEffect(() => {
     const ctx = donutCanvasRef.current?.getContext("2d");
@@ -573,46 +663,59 @@ export default function M5Page() {
     }
 
     const rows = countryPack.table || [];
-    if (!rows.length || !effectiveCountry) return;
-
-    const countryRow = rows.find((r) => r.c === effectiveCountry);
-    const countryInKton = countryRow ? countryRow.v : 0;
+    if (!rows.length) return;
 
     const totalArabInKton = rows.reduce((sum, r) => sum + r.v, 0);
-    const othersInKton = Math.max(totalArabInKton - countryInKton, 0);
+    const labels = rows.map((r) => countryNameAr[r.c] || r.c);
+    const values = rows.map((r) => scaleValuesByUnit([r.v], unit)[0]);
+    const borderWidths = rows.map((r) => (r.c === effectiveCountry ? 3 : 1));
+    const borderColors = rows.map((r) =>
+      r.c === effectiveCountry ? "rgba(8,39,33,0.9)" : "rgba(255,255,255,0.9)"
+    );
 
-    const scaledCountry = scaleValuesByUnit([countryInKton], unit)[0];
-    const scaledOthers = scaleValuesByUnit([othersInKton], unit)[0];
-
-    const total = countryInKton + othersInKton;
+    const colorPalette = [
+      "rgba(8, 39, 33, .92)",
+      "rgba(16, 185, 129, .85)",
+      "rgba(245, 158, 11, .85)",
+      "rgba(168, 85, 247, .85)",
+      "rgba(239, 68, 68, .85)",
+      "rgba(20, 184, 166, .85)",
+      "rgba(59, 130, 246, .85)",
+      "rgba(217, 119, 6, .85)",
+      "rgba(5, 150, 105, .85)",
+      "rgba(14, 116, 144, .85)",
+      "rgba(8, 39, 33, .55)",
+    ];
+    const backgroundColors = rows.map((_, i) => colorPalette[i % colorPalette.length]);
 
     donutChartRef.current = new Chart(ctx, {
       type: "doughnut",
       data: {
-        labels: [
-          countryNameAr[effectiveCountry] || effectiveCountry,
-          "باقي الدول العربية",
-        ],
+        labels,
         datasets: [
           {
-            data: [scaledCountry, scaledOthers],
-            borderWidth: 0,
+            data: values,
+            borderWidth: borderWidths,
+            borderColor: borderColors,
             cutout: "68%",
-            backgroundColor: [
-              "rgba(8, 39, 33, .92)",
-              "rgba(16, 185, 129, .85)",
-              "rgba(245, 158, 11, .85)",
-              "rgba(168, 85, 247, .85)",
-              "rgba(239, 68, 68, .85)",
-              "rgba(20, 184, 166, .85)",
-              "rgba(8, 39, 33, .55)",
-            ],
+            backgroundColor: backgroundColors,
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        onClick: (_evt, elements) => {
+          if (!elements?.length) return;
+          const idx = elements[0].index;
+          const clickedCountry = rows[idx]?.c;
+          if (clickedCountry) setSelectedCountry(clickedCountry);
+        },
+        onHover: (evt, elements) => {
+          const target = evt?.native?.target;
+          if (!target) return;
+          target.style.cursor = elements?.length ? "pointer" : "default";
+        },
         plugins: {
           legend: {
             position: "top",
@@ -622,9 +725,10 @@ export default function M5Page() {
             callbacks: {
               label: (c) => {
                 const v = c.parsed;
-                const baseVal =
-                  c.dataIndex === 0 ? countryInKton : othersInKton;
-                const pct = total ? Math.round((baseVal / total) * 100) : 0;
+                const baseVal = rows[c.dataIndex]?.v || 0;
+                const pct = totalArabInKton
+                  ? Math.round((baseVal / totalArabInKton) * 100)
+                  : 0;
                 return ` ${c.label}: ${v.toLocaleString("fr-FR")} ${unitLabelFor(
                   unit
                 )} (${pct}%)`;
@@ -643,15 +747,6 @@ export default function M5Page() {
     };
   }, [countryPack, unit, effectiveCountry]);
 
-  const onMultiChange = (e) => {
-    const values = Array.from(e.target.selectedOptions).map((o) => o.value);
-    setSelected(values);
-  };
-
-  const removeSel = (key) => {
-    setSelected((prev) => prev.filter((k) => k !== key));
-  };
-
   return (
     <div className="" dir="rtl">
       <Menu />
@@ -663,8 +758,7 @@ export default function M5Page() {
             الصادرات التعدينية
           </h1>
           <p className="text-sm text-slate-100/80">
-            مقارنة زمنية لواردات الخامات والمنتجات التعدينية، مع إمكانية اختيار عدة
-            عناصر ووحدة قياس مختلفة لكل السلسلة الزمنية.
+            مقارنة زمنية لإجمالي صادرات المعادن حسب الدولة والسنة.
           </p>
         </header>
 
@@ -696,25 +790,26 @@ export default function M5Page() {
                 التحكم
               </div>
               <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
-                <div className="rounded-2xl border border-slate-200 bg-white p-3">
+                <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3">
                   <div className="mb-2 text-xs font-extrabold text-slate-500">
-                    الخامة / المنتج (عدة اختيارات)
+                    الدول (للمخطط العلوي)
                   </div>
                   <select
                     multiple
-                    size={7}
-                    value={selectedKeys}
-                    onChange={onMultiChange}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-2 py-2 text-sm font-bold text-slate-700 outline-none"
+                    size={8}
+                    value={effectiveBarCountries}
+                    onChange={(e) => {
+                      const values = Array.from(e.target.selectedOptions).map((o) => o.value);
+                      setBarCountriesFilter(values);
+                    }}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 outline-none"
                   >
-                    {mineralOptions.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
+                    {barCountries.map((c) => (
+                      <option key={c} value={c}>
+                        {countryNameAr[c] || c}
                       </option>
                     ))}
                   </select>
-
-                  
                 </div>
 
                 <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3">
@@ -732,25 +827,6 @@ export default function M5Page() {
                   </select>
                 </div>
 
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {selectedKeys.map((k) => (
-                    <span
-                      key={k}
-                      className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-extrabold text-[#082721]"
-                    >
-                      <Check size={13} strokeWidth={2.8} />
-                      {seriesMap[k].name}
-                      <button
-                        type="button"
-                        onClick={() => removeSel(k)}
-                        className="ms-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#082721]/10 text-[#082721] hover:bg-[#082721]/20"
-                        aria-label={`Remove ${seriesMap[k].name}`}
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
               </div>
             </div>
 
@@ -784,27 +860,7 @@ export default function M5Page() {
           <div className="lg:col-span-4">
             <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
               <div className="mb-3 text-sm font-extrabold text-slate-800">
-                مقارنة دولة عربية مختارة مع باقي الدول العربية
-              </div>
-
-              <div className="mb-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
-                <div className="mb-2 text-xs font-extrabold text-slate-500">
-                  الخامة / المنتج
-                </div>
-                <div className="flex items-center gap-2">
-                  <Boxes size={16} strokeWidth={2.2} className="text-[#082721]" />
-                  <select
-                    value={countryProduct}
-                    onChange={(e) => setCountryProduct(e.target.value)}
-                    className="w-full border-none bg-transparent text-sm font-bold text-slate-700 outline-none focus:ring-0"
-                  >
-                    {mineralOptions.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                مقارنة دولة مختارة مع باقي الدول
               </div>
 
               <div className="mb-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
@@ -842,7 +898,11 @@ export default function M5Page() {
               </div>
 
               <div className="mb-2 text-sm font-extrabold text-slate-800">
-               مجموع الصادرات حسب الدولة
+               مجموع الصادرات حسب الدول
+              </div>
+
+              <div className="mb-2 rounded-xl bg-[#ddbc6b]/10 px-3 py-2 text-xs font-bold text-[#082721]">
+                الدولة المختارة: {countryNameAr[effectiveCountry] || effectiveCountry || "-"}
               </div>
 
               <div className="max-h-[260px] overflow-y-auto rounded-2xl border border-slate-100 bg-white">
@@ -859,7 +919,12 @@ export default function M5Page() {
                     {countryPack?.table?.map((r) => (
                       <tr
                         key={r.c}
-                        className="border-t border-slate-100 text-slate-700"
+                        onClick={() => setSelectedCountry(r.c)}
+                        className={`border-t text-slate-700 cursor-pointer transition-colors ${
+                          r.c === effectiveCountry
+                            ? "border-[#082721]/20 bg-[#082721]/10"
+                            : "border-slate-100 hover:bg-slate-50"
+                        }`}
                       >
                         <td className="px-3 py-1.5 font-bold">
                           {countryNameAr[r.c] || r.c}
