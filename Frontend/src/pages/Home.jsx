@@ -96,6 +96,30 @@ const sponsors = [
 
 ];
 
+const officialContacts = [
+  { country: "عمان - المملكة الأردنية الهاشمية", ministry: "وزارة الطاقة والثروة المعدنية", emails: ["memr@memr.gov.jo"] },
+  { country: "أبوظبي - دولة الإمارات العربية المتحدة", ministry: "وزارة الطاقة والبنية التحتية", emails: ["Archive.section@moei.gov.ae", "info@moei.gov.ae"] },
+  { country: "المنامة - مملكة البحرين", ministry: "وزارة الصناعة والتجارة", emails: ["minoffice@moic.gov.bh"] },
+  { country: "تونس - الجمهورية التونسية", ministry: "وزارة الصناعة والمناجم والطاقة", emails: ["contact@energiemines.gov.tn"] },
+  { country: "الجزائر - الجمهورية الجزائرية الديمقراطية الشعبية", ministry: "وزارة المحروقات والمناجم", emails: ["contact@energy.gov.dz", "sofiane.ouffa@energy.gov.dz"] },
+  { country: "جيبوتي - جمهورية جيبوتي", ministry: "وزارة الطاقة المكلف بالموارد الطبيعية", emails: ["contact@mern-gouv.com", "cabinet@energie.gouv.dj"] },
+  { country: "الرياض - المملكة العربية السعودية", ministry: "وزارة الصناعة والثروة المعدنية", emails: ["info@mim.gov.sa"] },
+  { country: "الخرطوم - جمهورية السودان", ministry: "وزارة المعادن", emails: ["info@minerals.gov.sd"] },
+  { country: "الجمهورية العربية السورية", ministry: "وزارة الطاقة", emails: ["info@mopmr.gov.sy"] },
+  { country: "مقاديشو - جمهورية الصومال الفيدرالية", ministry: "وزارة البترول والثروة المعدنية", emails: ["dg@mopmr.gov.so"] },
+  { country: "بغداد - جمهورية العراق", ministry: "وزارة الصناعة والمعادن", emails: ["invest@industry.gov.iq", "minister@industry.gov.iq"] },
+  { country: "مسقط - سلطنة عمان", ministry: "وزارة الطاقة والمعادن", emails: ["info@mog.gov.om"] },
+  { country: "رام الله - دولة فلسطين", ministry: "وزارة الصناعة", emails: ["manalf@met.gov.ps", "m.farhan@mind.gov.ps", "minister.office@met.gov.ps"] },
+  { country: "الدوحة - دولة قطر", ministry: "وزارة التجارة والصناعة", emails: ["salbraidi@moci.gov.qa"] },
+  { country: "الكويت - دولة الكويت", ministry: "وزارة التجارة والصناعة", emails: ["indust@pai.gov.kw"] },
+  { country: "بيروت - الجمهورية اللبنانية", ministry: "وزارة الطاقة والمياه", emails: ["minister@energyandwater.gov.lb", "mew@terra.net.lb"] },
+  { country: "دولة ليبيا", ministry: "وزارة الصناعة والمعادن", emails: ["masnaili@yahoo.com", "info2@industry.gov.ly"] },
+  { country: "القاهرة - جمهورية مصر العربية", ministry: "وزارة البترول والثروة المعدنية", emails: ["contact@petroleum.gov.eg"] },
+  { country: "الرباط - المملكة المغربية", ministry: "وزارة الانتقال الطاقي والتنمية المستدامة", emails: ["ministre@mem.gov.ma"] },
+  { country: "نواكشوط - الجمهورية الإسلامية الموريتانية", ministry: "وزارة المعادن والصناعة", emails: ["contact.mpemi@gmail.com"] },
+  { country: "الجمهورية اليمنية", ministry: "وزارة النفط والمعادن", emails: ["info@mom-ye.com"] },
+];
+
 const shortText = (text, max = 95) => (text && text.length > max ? `${text.slice(0, max)}...` : text);
 
 const formatInt = (n) => new Intl.NumberFormat("fr-FR").format(Math.round(n || 0));
@@ -795,8 +819,18 @@ const Home = () => {
   useReveal();
 
   /* Sponsor carousel */
+  const referenceCards = [
+    ...sponsors,
+    ...officialContacts.map((c) => ({
+      href: `mailto:${c.emails[0]}`,
+      title: c.country,
+      subtitle: c.ministry,
+      emails: c.emails,
+    })),
+  ];
+
   const sponsorSlides = [];
-  for (let i = 0; i < sponsors.length; i += 3) sponsorSlides.push(sponsors.slice(i, i + 3));
+  for (let i = 0; i < referenceCards.length; i += 3) sponsorSlides.push(referenceCards.slice(i, i + 3));
 
   useEffect(() => {
     if (sponsorSlides.length <= 1) return;
@@ -1208,17 +1242,35 @@ border-radius:13px !important;
             </div>
 
             {/* Carousel */}
-            <div style={{ position:"relative", height:130 }}>
+            <div style={{ position:"relative", height:190 }}>
               {sponsorSlides.map((slide, idx) => (
                 <div key={idx} style={{ position:"absolute", inset:0, opacity:idx===sponsorSlide?1:0, pointerEvents:idx===sponsorSlide?"auto":"none", transition:"opacity 0.7s ease", display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12 }}>
                   {slide.map((s, si) => (
                     <a key={si} href={s.href} target="_blank" rel="noopener noreferrer" className="sponsor-card"
-                      style={{ height:110, borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden", position:"relative" }}>
-                      <img src={s.img} alt={s.title} style={{ width:"100%", height:"100%", objectFit:"contain", padding:12 }} />
-                      <div className="sponsor-hover" style={{ position:"absolute", inset:0, background:"rgba(255,255,255,0.97)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", opacity:0, transition:"opacity 0.3s", padding:12, textAlign:"center" }}>
-                        <p style={{ fontSize:"0.82rem", fontWeight:800, color:"var(--forest)", margin:"0 0 4px" }}>{s.title}</p>
-                        <p style={{ fontSize:"0.72rem", color:"var(--muted)", margin:0 }}>{s.subtitle}</p>
-                      </div>
+                      style={{ height:170, borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden", position:"relative", padding:10 }}>
+                      {s.img ? (
+                        <>
+                          <img src={s.img} alt={s.title} style={{ width:"100%", height:"100%", objectFit:"contain", padding:12 }} />
+                          <div className="sponsor-hover" style={{ position:"absolute", inset:0, background:"rgba(255,255,255,0.97)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", opacity:0, transition:"opacity 0.3s", padding:12, textAlign:"center" }}>
+                            <p style={{ fontSize:"0.82rem", fontWeight:800, color:"var(--forest)", margin:"0 0 4px" }}>{s.title}</p>
+                            <p style={{ fontSize:"0.72rem", color:"var(--muted)", margin:0 }}>{s.subtitle}</p>
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{ width:"100%", height:"100%", border:"1px solid rgba(8,39,33,0.08)", borderRadius:12, background:"#fff", padding:10, display:"flex", flexDirection:"column", justifyContent:"space-between", gap:8 }}>
+                          <div>
+                            <p style={{ margin:0, fontSize:"0.72rem", color:"var(--muted)", fontWeight:700 }}>{s.title}</p>
+                            <p style={{ margin:"6px 0 0", fontSize:"0.78rem", color:"var(--forest)", fontWeight:800, lineHeight:1.45 }}>{s.subtitle}</p>
+                          </div>
+                          <div style={{ display:"flex", flexDirection:"column", gap:2 }}>
+                            {(s.emails || []).slice(0, 2).map((email) => (
+                              <span key={email} style={{ fontSize:"0.7rem", color:"var(--forest-mid)", textDecoration:"underline", wordBreak:"break-all" }}>
+                                {email}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </a>
                   ))}
                 </div>
