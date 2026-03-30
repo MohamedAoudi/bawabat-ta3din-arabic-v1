@@ -243,7 +243,7 @@ export default function M4Page() {
               </div>
 
               <div className="mb-2 text-sm font-extrabold text-slate-800">
-                Somme de الإنتاج حسب الدولة
+                 الإنتاج حسب الدولة
               </div>
 
               <div className="max-h-[330px] overflow-y-auto rounded-2xl border border-slate-100 bg-white">
@@ -251,7 +251,7 @@ export default function M4Page() {
                   <thead className="sticky top-0 bg-slate-50 text-[11px] font-extrabold text-[#082721]">
                     <tr>
                       <th className="px-3 py-2">الدولة</th>
-                      <th className="px-3 py-2">Somme de الإنتاج</th>
+                      <th className="px-3 py-2"> الإنتاج</th>
                     </tr>
                   </thead>
                   <tbody>

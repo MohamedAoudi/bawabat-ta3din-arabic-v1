@@ -674,8 +674,8 @@ export default function M5Page() {
             <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <div className="text-base font-extrabold text-slate-800">
-                  الصادرات عبر السنوات (حسب العناصر المختارة)
-                </div>
+اجمالي الصادرات التعدينية للدول العربية حسب السنة والخام والمنتج    
+            </div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
                   <Scale size={14} strokeWidth={2.2} />
                   وحدة الإنتاج:{" "}

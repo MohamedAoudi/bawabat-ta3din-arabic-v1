@@ -1244,7 +1244,7 @@ border-radius:13px !important;
                 مساعد ذكي متاح الآن
               </div>
               <h2 style={{ fontSize:"1.8rem", fontWeight:900, color:"white", margin:"0 0 12px" }}>
-                دردشة مع{" "}
+               {" "}
                 <span style={{ background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
                   المساعد الذكي
                 </span>

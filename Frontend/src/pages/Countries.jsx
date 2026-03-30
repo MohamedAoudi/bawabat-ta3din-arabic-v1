@@ -1048,11 +1048,7 @@ const CountryHeroBanner = ({ country, countryCode, theme }) => {
         </div>
         <h2 className="font-black leading-snug" style={{ color:"#ffffff", fontSize:"clamp(16px,2.5vw,22px)", textShadow:"0 2px 12px rgba(0,0,0,0.5)" }}>{country}</h2>
         <div className="flex items-center gap-2 mt-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-[10px] font-bold"
-            style={{ background:"rgba(201,168,76,0.12)", color:"#C9A84C", border:"1px solid rgba(201,168,76,0.25)" }}>
-            <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background:"#C9A84C" }} />
-            الإنتاج التعديني
-          </span>
+          
         </div>
       </div>
     </div>
@@ -1093,7 +1089,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
 
   return (
     <Card>
-      <CardHeader title="مقارنة الإنتاج" subtitle={`حصة الدولة مقارنةً بـ${scope==="arab"?"الدول العربية":"دول العالم"} — سنة ${year} (${UNIT_LABELS[unit]||""})`}>
+      <CardHeader title="مقارنة الإنتاج" subtitle={`انتاج الخامات بالحجم حسب السنة    ${year} (${UNIT_LABELS[unit]||""})`}>
         <div className="flex rounded-full overflow-hidden" style={{ border:"1px solid rgba(201,168,76,0.25)" }}>
           {[{key:"arab",label:"الدول العربية"},{key:"world",label:"العالم"}].map(({key,label})=>(
             <button key={key} type="button" onClick={()=>setScope(key)}
@@ -1340,7 +1336,7 @@ const CountryBarChart = ({
 
   return (
     <Card>
-      <CardHeader title="حصص الخامات حسب الحجم" subtitle={`${country} — سنة ${selectedYear}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""} (${UNIT_LABELS[unit]||""})`}>
+      <CardHeader title="انتاج الخامات بالحجم حسب السنة " subtitle={`${country} — سنة ${selectedYear}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""} (${UNIT_LABELS[unit]||""})`}>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -1824,18 +1820,18 @@ const Countries = () => {
 
             <MineralTreemap key={`tree-${selected}`} country={selected} year={treemapYear} onYearChange={setTreemapYear} />
 
-            <ChartSectionTitle title="الصادرات والواردات حسب الدولة" />
+            <ChartSectionTitle title="الصادرات والواردات" />
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
               <CountryTradeChart
                 key={`export-${selected}`}
-                title="الصادرات"
+                title="اجمالي الصادرات للمعادن "
                 country={selected}
                 series={exportSeries}
                 color="#f59e0b"
               />
               <CountryTradeChart
                 key={`import-${selected}`}
-                title="الواردات"
+                title="اجمالي الواردات للمعادن"
                 country={selected}
                 series={importSeries}
                 color="#3b82f6"
