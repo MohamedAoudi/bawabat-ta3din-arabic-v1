@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Countries from "./pages/countries";
-import M1Page from "./pages/m1";
+import M1Page from "./pages/M1";
 import M2Page from "./pages/M2";
 import M3Page from "./pages/M3";
 import M4Page from "./pages/M4";

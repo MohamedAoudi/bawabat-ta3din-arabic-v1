@@ -167,8 +167,7 @@ export default function M4Page() {
         {/* Header */}
         <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
           <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
-            نسبة الإنتاج التعديني العربي من الإنتاج العالمي
-          </h1>
+           	نسبة الإنتاج العربي مقارنة بالإنتاج العالمي      </h1>
           <p className="text-sm text-slate-100/80">
             مخطط حلقي (Donut) + اختيار المنتج والسنة + جدول الدول (Prototype)
           </p>

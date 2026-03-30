@@ -24,6 +24,9 @@ import {
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import i7 from "../assets/i-7.png";
+import im1 from "../assets/وزارة-الصناعة-والمعادن-دولة-ليبيا-removebg-preview.png";
+import im2 from "../assets/وزارة-الصناعة-والتجارة-الجمهورية-اليمنية-removebg-preview.png";
+
 import bgHeaderVideo from "../assets/bg 7.mp4";
 import mapImg from "../assets/map.png";
 import flagJordan from "../assets/flags/jordan.webp";
@@ -87,12 +90,10 @@ const countries = [
 ];
 
 const sponsors = [
-  { href: "https://procedures.gov.mr/ar/", img: i7, title: "وزارة المعادن والصناعة",        subtitle: "الجمهورية الإسلامية الموريتانية" },
-  { href: "https://www.mim.gov.sa/ar",     img: i7, title: "وزارة الصناعة والثروة المعدنية", subtitle: "المملكة العربية السعودية"        },
-  { href: "https://procedures.gov.mr/ar/", img: i7, title: "وزارة المعادن والصناعة",        subtitle: "الجمهورية الإسلامية الموريتانية" },
-  { href: "https://www.mim.gov.sa/ar",     img: i7, title: "وزارة الصناعة والثروة المعدنية", subtitle: "المملكة العربية السعودية"        },
-  { href: "https://procedures.gov.mr/ar/", img: i7, title: "وزارة المعادن والصناعة",        subtitle: "الجمهورية الإسلامية الموريتانية" },
-  { href: "https://www.mim.gov.sa/ar",     img: i7, title: "وزارة الصناعة والثروة المعدنية", subtitle: "المملكة العربية السعودية"        },
+  { href: "https://csc.gov.ly/portfolio/%D9%88%D8%B2%D8%A7%D8%B1%D8%A9-%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D8%A9-%D9%88%D8%A7%D9%84%D9%85%D8%B9%D8%A7%D8%AF%D9%86/", img: im1, title: "دولــة لـيـبـيـا",        subtitle: "وزارة الصناعة والمعادن" },
+  { href: "https://mom-ye.com/site-ar/",     img: im2, title: "الجمهورية اليمنية", subtitle: "وزارة النفط والمعادن"        },
+  { href: "https://www.mim.gov.sa/ar", img: i7, title: "المملكة العربية السعودية",        subtitle: "وزارة المعادن والصناعة" },
+
 ];
 
 const shortText = (text, max = 95) => (text && text.length > max ? `${text.slice(0, max)}...` : text);
@@ -450,7 +451,7 @@ const INDICATOR_CARDS = [
   { icon:"fa-chart-column", altIcon:"fa-layer-group", tagColor:"#c9a84c", title:"حجم الإنتاج التعديني",           desc:"لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة الزمنية.", href:"/m1", Chart:MiniBarChart },
   { icon:"fa-chart-line",   altIcon:"fa-chart-column", tagColor:"#7ee0c0", title:"تطور الإنتاج التعديني",           desc:"تتبّع تطور الإنتاج عبر السنوات مع إبراز الاتجاهات وأهم التغيرات السنوية.",    href:"/m2", Chart:MiniLineChart },
   { icon:"fa-layer-group",  altIcon:"fa-chart-line", tagColor:"#93c5fd", title:"تطور الإنتاج التعديني العربي",    desc:"مقارنة أداء الدول العربية في الإنتاج عبر أكثر من خام وفترات زمنية مختلفة.",   href:"/m3", Chart:MiniGroupedBar },
-  { icon:"fa-circle-notch", altIcon:"fa-gem", tagColor:"#fbbf24", title:"نسبة الإنتاج العربي من العالمي", desc:"قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري تفاعلي.",      href:"/m4", Chart:MiniDonut },
+  { icon:"fa-circle-notch", altIcon:"fa-gem", tagColor:"#fbbf24", title:"نسبة الإنتاج العربي مقارنة بالإنتاج العالمي", desc:"قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري تفاعلي.",      href:"/m4", Chart:MiniDonut },
 ];
 
 /* ─────────────────────────────────────────────
@@ -966,8 +967,7 @@ border-radius:13px !important;
           {/* Sub */}
           <p className="hero-sub"
             style={{ color:"rgba(255,255,255,0.72)", fontSize:"clamp(0.9rem,1.8vw,1.15rem)", maxWidth:560, lineHeight:1.8, margin:"0 0 2.5rem" }}>
-              نافذتك الاو لى البيانات قطاع التعدين العربي.
-          </p>
+نافذتك لبيانات ومؤشرات قطاع التعدين العربي           </p>
 
           {/* Search */}
           <div className="hero-search w-full" style={{ maxWidth:580 }}>
@@ -1073,7 +1073,7 @@ border-radius:13px !important;
             boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)",
           }}> <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white" }}>
                   <span style={{  background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
-                    التجارة الدولية الخارجية
+                   التجارة التعدنية
                   </span>
                 </h3></section>
         {/* ── TRADE ── */}
@@ -1097,11 +1097,10 @@ border-radius:13px !important;
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 16px", background:"rgba(201,168,76,0.12)", color:"white", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
                   <AppIcon name="fa-right-left" size={15} strokeWidth={2.2} />
+                  الصادرات والواردات
                 </span>
                 <br />
-                <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", marginTop:"20px" }}>
-                  {`تتبّع ${formatInt(portalStats.tradeRows)} سجلًا للتجارة التعدينية العربية (${formatInt(portalStats.exportRows)} تصدير / ${formatInt(portalStats.importRows)} استيراد)`}
-                </p>
+               
               </div>
               <a href="/trade-indicators" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
                 <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> جميع مؤشرات التجارة
