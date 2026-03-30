@@ -849,12 +849,12 @@ export default function M6Page() {
           <div className="space-y-4 lg:col-span-3">
             <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
               <div className="mb-2 text-sm font-extrabold text-slate-800">
-                الدولة
+                
               </div>
               <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
                 <div className="rounded-2xl border border-slate-200 bg-white p-3">
                   <div className="mb-2 text-xs font-extrabold text-slate-500">
-                    الدول (للمخطط العلوي)
+                    الدول 
                   </div>
                   <select
                     multiple
