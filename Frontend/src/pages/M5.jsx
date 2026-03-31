@@ -279,8 +279,7 @@ export default function M5Page() {
               الصادرات التعدينية
             </h1>
             <p className="text-sm text-slate-100/80">
-              مقارنة زمنية لإجمالي صادرات المعادن حسب الدولة والسنة.
-            </p>
+تحليل تدفقات الصادرات التعدينية حسب الدولة والوجهة والقيمة المالية.            </p>
           </header>
 
           <section className="grid gap-4 lg:grid-cols-12">

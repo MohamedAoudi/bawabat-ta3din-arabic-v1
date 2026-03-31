@@ -1200,7 +1200,7 @@ border-radius:13px !important;
                   <AppIcon name="fa-flag" size={14} strokeWidth={2.2} /> الدول الأعضاء
                 </span>
                 <h5 style={{ fontSize:"1.2rem", fontWeight:900, color:"var(--forest)", margin:"10px 0 4px" }}>الدول العربية</h5>
-                <p style={{ fontSize:"0.8rem", color:"var(--muted)", margin:0 }}>اختر دولة للوصول إلى ملفها التعديني</p>
+                <p style={{ fontSize:"0.8rem", color:"var(--muted)", margin:0 }}>اختر دولة للوصول إلى مؤشراتها التعدينية</p>
               </div>
               <a href="/countries" className="ind-link"><AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> عرض الكل</a>
             </div>
