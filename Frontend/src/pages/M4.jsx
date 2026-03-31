@@ -169,7 +169,7 @@ export default function M4Page() {
           <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
            	نسبة الإنتاج العربي مقارنة بالإنتاج العالمي      </h1>
           <p className="text-sm text-slate-100/80">
-            مخطط حلقي (Donut) + اختيار المنتج والسنة + جدول الدول (Prototype)
+           قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري تفاعلي.
           </p>
         </header>
 

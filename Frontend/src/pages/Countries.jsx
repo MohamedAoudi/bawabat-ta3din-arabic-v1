@@ -96,6 +96,10 @@ const ALL_YEARS = Array.from(
   )
 ).sort((a, b) => a - b);
 
+const DEFAULT_SELECTED_YEAR = ALL_YEARS.includes(2019)
+  ? 2019
+  : ALL_YEARS[ALL_YEARS.length - 1];
+
 const UNIT_LABELS = { ton: "ألف طن", kg: "كجم" };
 const MINERAL_FILTER_OPTIONS = [
   { value: "all", label: "كل الخامات" },
@@ -1428,21 +1432,32 @@ const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
     setNoData(false);
     const sorted = [...treeData].sort((a,b)=>b.value-a.value);
     const colorMap = {};
+    const getTreemapDatum = (raw) => {
+      const mineralKey = raw?._data?.mineral || raw?.g || raw?.mineral || "";
+      return treeData.find((item) => item.mineral === mineralKey) || raw?._data || raw || null;
+    };
     sorted.forEach((d,i)=>{ const hue=160-(i/Math.max(sorted.length-1,1))*100; colorMap[d.mineral]=`hsl(${hue},60%,38%)`; });
     return new Chart(canvas, {
       type:"treemap",
       data:{ datasets:[{ label:"المعادن", tree:treeData, key:"value", groups:["mineral"],
         borderColor:"rgba(255,255,255,0.15)", borderWidth:1, spacing:2,
-        backgroundColor(ctx){ const raw=ctx.raw; if(!raw) return"#10b981"; const d=raw._data||raw; return colorMap[d.mineral]||"#10b981"; },
+        backgroundColor(ctx){ const raw=ctx.raw; if(!raw) return"#10b981"; const d=getTreemapDatum(raw); return colorMap[d?.mineral]||"#10b981"; },
         labels:{ display:true, align:"center", position:"middle",
-          formatter(ctx){ const raw=ctx.raw; if(!raw) return""; const d=raw._data||raw; return[`${d.mineral||""}`,`${d.pct!=null?d.pct.toFixed(1):""}%`]; },
-          color:"rgba(255,255,255,0.88)", font:[{family:"Cairo",size:11,weight:"700"},{family:"Cairo",size:10}],
+          formatter(ctx){
+            const raw=ctx.raw;
+            if(!raw) return "";
+            const d=getTreemapDatum(raw);
+            const mineral = d?.mineral || "";
+            const pct = d?.pct != null ? `${Number(d.pct).toFixed(1)}%` : "";
+            return [mineral, pct].filter(Boolean).join(" ");
+          },
+          color:"rgba(255,255,255,0.92)", font:{family:"Cairo",size:11,weight:"700"},
         },
       }] },
       options:{ responsive:true, maintainAspectRatio:false,
         plugins:{ legend:{display:false}, tooltip:{callbacks:{
-          title(items){ const raw=items[0]?.raw; const d=raw?._data||raw; return d?.mineral||""; },
-          label(item){ const raw=item.raw; const d=raw?._data||raw; const pct=d?.pct!=null?d.pct.toFixed(1):"—"; const val=d?.rawValue!=null?fmtVal(d.rawValue):"—"; return[`${pct}% من الإنتاج`,`${val} ${d?.unit||""}`]; },
+          title(items){ const raw=items[0]?.raw; const d=getTreemapDatum(raw); return d?.mineral||""; },
+          label(item){ const raw=item.raw; const d=getTreemapDatum(raw); const pct=d?.pct!=null?d.pct.toFixed(1):"—"; const val=d?.rawValue!=null?fmtVal(d.rawValue):"—"; return[`${pct}% من الإنتاج`,`${val} ${d?.unit||""}`]; },
         }}},
       },
     });
@@ -1611,14 +1626,14 @@ const Countries = () => {
   const lastAvailableYear = ALL_YEARS[ALL_YEARS.length - 1];
 
   const [selected, setSelected]               = useState(initialSelected);
-  const [donutYear, setDonutYear]             = useState(lastAvailableYear);
-  const [barYear, setBarYear]                 = useState(lastAvailableYear);
+  const [donutYear, setDonutYear]             = useState(DEFAULT_SELECTED_YEAR);
+  const [barYear, setBarYear]                 = useState(DEFAULT_SELECTED_YEAR);
   const [barMineralFilter, setBarMineralFilter] = useState("all");
   const [barUnit, setBarUnit]                 = useState("ton");
-  const [treemapYear, setTreemapYear]         = useState(lastAvailableYear);
+  const [treemapYear, setTreemapYear]         = useState(DEFAULT_SELECTED_YEAR);
   const [lineMineralFilter, setLineMineralFilter] = useState("all");
   const [lineUnit, setLineUnit]               = useState("ton");
-  const [summaryYear, setSummaryYear]         = useState(lastAvailableYear);
+  const [summaryYear, setSummaryYear]         = useState(DEFAULT_SELECTED_YEAR);
   const [tradeByCountry, setTradeByCountry]   = useState({ imports: null, exports: null });
   const [tradeBreakdownByCountry, setTradeBreakdownByCountry] = useState({ exports: null, imports: null });
 
@@ -1631,8 +1646,8 @@ const Countries = () => {
       setSummaryYear(2023);
       return;
     }
-    setSummaryYear(lastAvailableYear);
-  }, [selectedCountryObj?.code, lastAvailableYear]);
+    setSummaryYear(DEFAULT_SELECTED_YEAR);
+  }, [selectedCountryObj?.code]);
 
   useEffect(() => {
     let active = true;
