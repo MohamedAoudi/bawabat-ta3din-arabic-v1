@@ -68,9 +68,26 @@ const GlobeIcon = ({ className = "" }) => (
   </svg>
 );
 
-// ─── Desktop sub-menu (CSS hover, opens to the right/end in RTL) ──────────────
-const DesktopSubMenu = ({ section }) => (
-  <div className="dd-sub-trigger relative">
+// ─── Desktop sub-menu (React hover + delay, opens to the right/end in RTL) ─────
+const DesktopSubMenu = ({ section }) => {
+  const [open, setOpen] = useState(false);
+  const closeRef = useRef(null);
+
+  const onEnter = () => {
+    if (closeRef.current) { clearTimeout(closeRef.current); closeRef.current = null; }
+    setOpen(true);
+  };
+  const onLeave = () => {
+    clearTimeout(closeRef.current);
+    closeRef.current = setTimeout(() => setOpen(false), 150);
+  };
+
+  return (
+  <div
+    className={`dd-sub-trigger relative ${open ? "dd-sub-open" : ""}`}
+    onMouseEnter={onEnter}
+    onMouseLeave={onLeave}
+  >
     <div
       dir="rtl"
       className="flex items-center justify-between rounded-xl px-4 py-2.5 cursor-pointer
@@ -107,7 +124,8 @@ const DesktopSubMenu = ({ section }) => (
       </ul>
     </div>
   </div>
-);
+  );
+};
 
 // ─── Mobile accordion (React-controlled, smooth height animation) ─────────────
 const MobileAccordion = ({ label, children, level = 0 }) => {
@@ -236,7 +254,8 @@ const Menu = () => {
           transition: opacity .18s ease, transform .18s ease;
         }
         .dd-sub-trigger:hover .dd-sub-panel,
-        .dd-sub-trigger:focus-within .dd-sub-panel {
+        .dd-sub-trigger:focus-within .dd-sub-panel,
+        .dd-sub-trigger.dd-sub-open .dd-sub-panel {
           opacity: 1; pointer-events: auto;
           transform: translateX(0) scale(1);
         }
