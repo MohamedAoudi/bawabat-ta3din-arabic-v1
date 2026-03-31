@@ -380,7 +380,7 @@ const Menu = () => {
                 </button>
 
                 <a
-                  href="reports.html"
+                  href="/rapport"
                   className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-bold
                              text-[#082721] hover:brightness-110 transition-all whitespace-nowrap"
                   style={{
@@ -508,7 +508,7 @@ const Menu = () => {
               </button>
 
               <a
-                href="reports.html"
+                href="/rapport"
                 className="flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-bold text-[#082721]"
                 style={{ background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)" }}
               >
