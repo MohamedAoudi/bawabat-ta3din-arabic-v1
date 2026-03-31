@@ -813,7 +813,6 @@ const Home = () => {
   const [selectedCountry, setSelectedCountry] = useState("—");
   const [sponsorSlide, setSponsorSlide]       = useState(0);
   const [searchFocused, setSearchFocused]     = useState(false);
-  const [isSponsorPaused, setIsSponsorPaused] = useState(false);
   const portalStats = useMemo(() => buildPortalStats(), []);
   const kpiData = useMemo(() => buildKpiData(portalStats), [portalStats]);
 
@@ -840,14 +839,6 @@ const Home = () => {
     }
     return slides;
   }, [referenceCards]);
-
-  useEffect(() => {
-    if (sponsorSlides.length <= 1 || isSponsorPaused) return;
-    const t = setInterval(() => {
-      setSponsorSlide((p) => (p + 1) % sponsorSlides.length);
-    }, 4000);
-    return () => clearInterval(t);
-  }, [sponsorSlides.length, isSponsorPaused]);
 
   useEffect(() => {
     setSponsorSlide((current) => {
@@ -1260,13 +1251,7 @@ border-radius:13px !important;
             </div>
 
             {/* Carousel */}
-            <div
-              style={{ position:"relative", height:190 }}
-              onMouseEnter={() => setIsSponsorPaused(true)}
-              onMouseLeave={() => setIsSponsorPaused(false)}
-              onTouchStart={() => setIsSponsorPaused(true)}
-              onTouchEnd={() => setIsSponsorPaused(false)}
-            >
+            <div style={{ position:"relative", height:190 }}>
               {sponsorSlides.map((slide, idx) => (
                 <div key={idx} style={{ position:"absolute", inset:0, opacity:idx===sponsorSlide?1:0, pointerEvents:idx===sponsorSlide?"auto":"none", transition:"opacity 0.7s ease", display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12 }}>
                   {slide.map((s, si) => (
