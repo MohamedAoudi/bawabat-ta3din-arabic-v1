@@ -17,7 +17,7 @@ const INDICATORS = [
     ],
   },
   {
-    label: "التجارة التعدنية",
+    label: "التجارة التعدينية",
     key: "trade",
     items: [
       { label: "الصادرات التعدينية", href: "/m5" },

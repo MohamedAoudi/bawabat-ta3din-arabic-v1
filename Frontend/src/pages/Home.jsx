@@ -1107,7 +1107,7 @@ border-radius:13px !important;
             boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)",
           }}> <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white" }}>
                   <span style={{  background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
-                   التجارة التعدنية
+                   التجارة التعدينية
                   </span>
                 </h3></section>
         {/* ── TRADE ── */}
