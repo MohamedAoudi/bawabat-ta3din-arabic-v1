@@ -1089,7 +1089,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
 
   return (
     <Card>
-      <CardHeader title="مقارنة الإنتاج" subtitle={`انتاج الخامات بالحجم حسب السنة    ${year} (${UNIT_LABELS[unit]||""})`}>
+      <CardHeader title="مقارنة الإنتاج" subtitle={`انتاج الخامات بالحجم حسب السنة    ${year} `}>
         <div className="flex rounded-full overflow-hidden" style={{ border:"1px solid rgba(201,168,76,0.25)" }}>
           {[{key:"arab",label:"الدول العربية"},{key:"world",label:"العالم"}].map(({key,label})=>(
             <button key={key} type="button" onClick={()=>setScope(key)}
