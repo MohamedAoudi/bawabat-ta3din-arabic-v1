@@ -20,7 +20,7 @@ const Rapport = () => {
           className="w-24 h-[3px] rounded-full mb-8"
           style={{ background: "linear-gradient(90deg,#8B2500,#C9A84C,#082721)" }}
         />
-
+aoudi@2002@
         {/* Animated icon */}
         <div className="relative mb-8">
           <div

@@ -813,29 +813,47 @@ const Home = () => {
   const [selectedCountry, setSelectedCountry] = useState("—");
   const [sponsorSlide, setSponsorSlide]       = useState(0);
   const [searchFocused, setSearchFocused]     = useState(false);
+  const [isSponsorPaused, setIsSponsorPaused] = useState(false);
   const portalStats = useMemo(() => buildPortalStats(), []);
   const kpiData = useMemo(() => buildKpiData(portalStats), [portalStats]);
 
   useReveal();
 
   /* Sponsor carousel */
-  const referenceCards = [
-    ...sponsors,
-    ...officialContacts.map((c) => ({
-      href: `mailto:${c.emails[0]}`,
-      title: c.country,
-      subtitle: c.ministry,
-      emails: c.emails,
-    })),
-  ];
+  const referenceCards = useMemo(
+    () => [
+      ...sponsors,
+      ...officialContacts.map((c) => ({
+        href: `mailto:${c.emails[0]}`,
+        title: c.country,
+        subtitle: c.ministry,
+        emails: c.emails,
+      })),
+    ],
+    []
+  );
 
-  const sponsorSlides = [];
-  for (let i = 0; i < referenceCards.length; i += 3) sponsorSlides.push(referenceCards.slice(i, i + 3));
+  const sponsorSlides = useMemo(() => {
+    const slides = [];
+    for (let i = 0; i < referenceCards.length; i += 3) {
+      slides.push(referenceCards.slice(i, i + 3));
+    }
+    return slides;
+  }, [referenceCards]);
 
   useEffect(() => {
-    if (sponsorSlides.length <= 1) return;
-    const t = setInterval(() => setSponsorSlide(p => (p + 1) % sponsorSlides.length), 4000);
+    if (sponsorSlides.length <= 1 || isSponsorPaused) return;
+    const t = setInterval(() => {
+      setSponsorSlide((p) => (p + 1) % sponsorSlides.length);
+    }, 4000);
     return () => clearInterval(t);
+  }, [sponsorSlides.length, isSponsorPaused]);
+
+  useEffect(() => {
+    setSponsorSlide((current) => {
+      if (sponsorSlides.length === 0) return 0;
+      return Math.min(current, sponsorSlides.length - 1);
+    });
   }, [sponsorSlides.length]);
 
   const handleChatbotClick = () => alert("Chat Bote — محلل البيانات الذكي (واجهة تجريبية).");
@@ -1242,7 +1260,13 @@ border-radius:13px !important;
             </div>
 
             {/* Carousel */}
-            <div style={{ position:"relative", height:190 }}>
+            <div
+              style={{ position:"relative", height:190 }}
+              onMouseEnter={() => setIsSponsorPaused(true)}
+              onMouseLeave={() => setIsSponsorPaused(false)}
+              onTouchStart={() => setIsSponsorPaused(true)}
+              onTouchEnd={() => setIsSponsorPaused(false)}
+            >
               {sponsorSlides.map((slide, idx) => (
                 <div key={idx} style={{ position:"absolute", inset:0, opacity:idx===sponsorSlide?1:0, pointerEvents:idx===sponsorSlide?"auto":"none", transition:"opacity 0.7s ease", display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12 }}>
                   {slide.map((s, si) => (
