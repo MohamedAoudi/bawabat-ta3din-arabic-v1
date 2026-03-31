@@ -336,20 +336,18 @@ const wrapLabel = (text, maxCharsPerLine = 12) => {
 const linePointCountryLabelPlugin = {
   id: "linePointCountryLabelPlugin",
   afterDatasetsDraw(chart) {
-    const { ctx } = chart;
-    const placedRects = [];
-
-    const intersects = (a, b) =>
-      a.x < b.x + b.w &&
-      a.x + a.w > b.x &&
-      a.y < b.y + b.h &&
-      a.y + a.h > b.y;
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return;
 
     ctx.save();
-    ctx.textAlign = "center";
-    ctx.textBaseline = "top";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
     const lineHeight = 10;
+    const labelGap = 6;
+    const anchorGap = 18;
     ctx.font = "700 8px Cairo";
+
+    const labelEntries = [];
 
     chart.data.datasets.forEach((dataset, datasetIndex) => {
       const meta = chart.getDatasetMeta(datasetIndex);
@@ -370,34 +368,62 @@ const linePointCountryLabelPlugin = {
       const textW = Math.max(...lines.map((line) => ctx.measureText(line).width));
       const textH = lines.length * lineHeight;
 
-      // Candidate positions around the point; first non-overlapping spot wins.
-      const candidates = [
-        { x: lastPoint.x + 14, y: lastPoint.y + 10 },
-        { x: lastPoint.x - 14, y: lastPoint.y + 10 },
-        { x: lastPoint.x + 14, y: lastPoint.y + 24 },
-        { x: lastPoint.x - 14, y: lastPoint.y + 24 },
-        { x: lastPoint.x + 14, y: lastPoint.y - 18 },
-        { x: lastPoint.x - 14, y: lastPoint.y - 18 },
-      ];
+      labelEntries.push({
+        color: dataset.borderColor || "#082721",
+        height: textH,
+        lines,
+        point: lastPoint,
+        preferredY: lastPoint.y,
+        width: textW,
+      });
+    });
 
-      let chosen = candidates[datasetIndex % candidates.length];
-      for (const candidate of candidates) {
-        const rect = {
-          x: candidate.x - textW / 2,
-          y: candidate.y,
-          w: textW,
-          h: textH,
-        };
-        if (!placedRects.some((r) => intersects(rect, r))) {
-          chosen = candidate;
-          placedRects.push(rect);
-          break;
-        }
-      }
+    if (!labelEntries.length) {
+      ctx.restore();
+      return;
+    }
 
-      ctx.fillStyle = dataset.borderColor || "#082721";
-      lines.forEach((line, idx) => {
-        ctx.fillText(line, chosen.x, chosen.y + idx * lineHeight);
+    labelEntries.sort((a, b) => a.preferredY - b.preferredY);
+
+    labelEntries.forEach((entry, index) => {
+      const halfHeight = entry.height / 2;
+      const minY =
+        index === 0
+          ? chartArea.top + halfHeight
+          : labelEntries[index - 1].y +
+            labelEntries[index - 1].height / 2 +
+            labelGap +
+            halfHeight;
+      entry.y = Math.max(entry.preferredY, minY);
+    });
+
+    for (let index = labelEntries.length - 1; index >= 0; index -= 1) {
+      const entry = labelEntries[index];
+      const halfHeight = entry.height / 2;
+      const maxY =
+        index === labelEntries.length - 1
+          ? chartArea.bottom - halfHeight
+          : labelEntries[index + 1].y -
+            labelEntries[index + 1].height / 2 -
+            labelGap -
+            halfHeight;
+      entry.y = Math.min(entry.y, maxY);
+    }
+
+    const labelX = chartArea.right + 110;
+
+    labelEntries.forEach((entry) => {
+      ctx.strokeStyle = entry.color;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(entry.point.x + 6, entry.point.y);
+      ctx.lineTo(labelX - entry.width - anchorGap, entry.y);
+      ctx.stroke();
+
+      ctx.fillStyle = entry.color;
+      entry.lines.forEach((line, idx) => {
+        const offsetY = (idx - (entry.lines.length - 1) / 2) * lineHeight;
+        ctx.fillText(line, labelX, entry.y + offsetY);
       });
     });
 
@@ -452,6 +478,11 @@ function LineChartPanel({ mineral }) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: {
+            right: 120,
+          },
+        },
         plugins: {
           legend: {
             display: true,
