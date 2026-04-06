@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useContext } from "react";
-import { LanguageContext } from "../App";
+import { LanguageContext, ThemeContext } from "../App";
 
 // ─── Replace with your real imports ──────────────────────────────────────────
 import logoAmip from "../assets/logo n v.png";
@@ -24,6 +24,8 @@ const TRANSLATIONS = {
     quickSearch: "بحث سريع",
     smartReports: "التقارير الذكية",
     language: "اللغة",
+    darkMode: "الوضع الليلي",
+    lightMode: "الوضع النهاري",
   },
   fr: {
     home: "Accueil",
@@ -42,6 +44,8 @@ const TRANSLATIONS = {
     quickSearch: "Recherche Rapide",
     smartReports: "Rapports Intelligents",
     language: "Langue",
+    darkMode: "Mode Nuit",
+    lightMode: "Mode Jour",
   },
   en: {
     home: "Home",
@@ -60,6 +64,8 @@ const TRANSLATIONS = {
     quickSearch: "Quick Search",
     smartReports: "Smart Reports",
     language: "Language",
+    darkMode: "Dark Mode",
+    lightMode: "Light Mode",
   },
 };
 
@@ -118,6 +124,17 @@ const GlobeIcon = ({ className = "" }) => (
   <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
     <circle cx="12" cy="12" r="10" />
     <path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" />
+  </svg>
+);
+const MoonIcon = ({ className = "" }) => (
+  <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+  </svg>
+);
+const SunIcon = ({ className = "" }) => (
+  <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="4" />
+    <path strokeLinecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41" />
   </svg>
 );
 
@@ -238,6 +255,7 @@ const MobileAccordion = ({ label, children, level = 0 }) => {
 // ─── Main Menu ────────────────────────────────────────────────────────────────
 const Menu = () => {
   const { language, changeLanguage } = useContext(LanguageContext);
+  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled,   setScrolled]   = useState(false);
   const [isHome,     setIsHome]     = useState(true);
@@ -364,13 +382,20 @@ const Menu = () => {
           <div className="flex h-[66px] items-center justify-between gap-3  ">
 
             {/* ── Logo ─────────────────────────────────────────────────────── */}
-            <div className="flex items-center gap-3 rounded-full bg-white px-4 py-2">
+            <div
+              className="flex items-center gap-3 rounded-full px-4 py-2 transition-colors"
+              style={{
+                background: "#ffffff",
+                border: isDarkMode ? "1px solid rgba(201,168,76,0.28)" : "1px solid rgba(8,39,33,0.08)",
+                boxShadow: "0 4px 14px rgba(8,39,33,0.08)",
+              }}
+            >
             <a href="/" aria-label="AMIP" className="flex-shrink-0 ">
               <img
                 src={logoAmip}
                 alt="AMIP"
-                className="h-[50px] w-auto object-contain   "
-                
+                className="h-[50px] w-auto object-contain"
+                style={{ filter: isDarkMode ? "brightness(1.02) contrast(1.02)" : "none" }}
               />
             </a>
 </div>
@@ -448,6 +473,22 @@ const Menu = () => {
                   <span>{t("quickSearch")}</span>
                 </button>
 
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-semibold
+                             text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
+                             hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
+                  title={isDarkMode ? t("lightMode") : t("darkMode")}
+                >
+                  {isDarkMode ? (
+                    <SunIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                  ) : (
+                    <MoonIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                  )}
+                  <span>{isDarkMode ? t("lightMode") : t("darkMode")}</span>
+                </button>
+
                 <a
                   href="/rapport"
                   className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-bold
@@ -503,8 +544,13 @@ const Menu = () => {
                   <img
                     src={logoAidsmo}
                     alt="AIDSMO"
-                    className="h-10 w-auto object-contain rounded-full bg-white p-1"
-                    style={{ boxShadow: "0 0 0 1px rgba(201,168,76,0.3)" }}
+                    className="h-10 w-auto object-contain rounded-full p-1"
+                    style={{
+                      background: "#ffffff",
+                      boxShadow: isDarkMode
+                        ? "0 0 0 1px rgba(201,168,76,0.45)"
+                        : "0 0 0 1px rgba(201,168,76,0.3)",
+                    }}
                   />
                 </a>
               </div>
@@ -591,6 +637,21 @@ const Menu = () => {
                 <span>{t("quickSearch")}</span>
               </button>
 
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold
+                           border border-white/20 text-white/80 hover:border-[#C9A84C]/60 hover:text-[#C9A84C] transition-all"
+                title={isDarkMode ? t("lightMode") : t("darkMode")}
+              >
+                {isDarkMode ? (
+                  <SunIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                ) : (
+                  <MoonIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                )}
+                <span>{isDarkMode ? t("lightMode") : t("darkMode")}</span>
+              </button>
+
               <a
                 href="/rapport"
                 className="flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-bold text-[#082721]"
@@ -640,7 +701,13 @@ const Menu = () => {
                 <img
                   src={logoAidsmo}
                   alt="AIDSMO"
-                  className="h-10 w-auto object-contain rounded-full bg-white p-1"
+                  className="h-10 w-auto object-contain rounded-full p-1"
+                  style={{
+                    background: "#ffffff",
+                    boxShadow: isDarkMode
+                      ? "0 0 0 1px rgba(201,168,76,0.45)"
+                      : "0 0 0 1px rgba(201,168,76,0.3)",
+                  }}
                 />
               </a>
             </div>

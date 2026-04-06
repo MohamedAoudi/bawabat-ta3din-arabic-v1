@@ -14,6 +14,7 @@ import M8Page from "./pages/M8";
 import Rapport from "./pages/Rapport";
 
 export const LanguageContext = createContext();
+export const ThemeContext = createContext();
 
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState(() => {
@@ -42,25 +43,49 @@ export function LanguageProvider({ children }) {
   );
 }
 
+export function ThemeProvider({ children }) {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("appTheme") === "dark";
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("appTheme", isDarkMode ? "dark" : "light");
+    document.documentElement.classList.toggle("theme-dark", isDarkMode);
+  }, [isDarkMode]);
+
+  const toggleTheme = () => setIsDarkMode((prev) => !prev);
+
+  return (
+    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
 export default function App() {
   return (
-    <LanguageProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/countries" element={<Countries />} />
-          <Route path="/m1" element={<M1Page />} />
-          <Route path="/m2" element={<M2Page />} />
-          <Route path="/m3" element={<M3Page />} />
-          <Route path="/m4" element={<M4Page />} />
-          <Route path="/m5" element={<M5Page />} />
-          <Route path="/m6" element={<M6Page />} />
-          <Route path="/m7" element={<M7Page />} />
-          <Route path="/m8" element={<M8Page />} />
-          <Route path="/rapport" element={<Rapport />} />
-        </Routes>
-      </BrowserRouter>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/countries" element={<Countries />} />
+            <Route path="/m1" element={<M1Page />} />
+            <Route path="/m2" element={<M2Page />} />
+            <Route path="/m3" element={<M3Page />} />
+            <Route path="/m4" element={<M4Page />} />
+            <Route path="/m5" element={<M5Page />} />
+            <Route path="/m6" element={<M6Page />} />
+            <Route path="/m7" element={<M7Page />} />
+            <Route path="/m8" element={<M8Page />} />
+            <Route path="/rapport" element={<Rapport />} />
+          </Routes>
+        </BrowserRouter>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }

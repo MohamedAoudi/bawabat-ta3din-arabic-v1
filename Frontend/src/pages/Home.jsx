@@ -21,7 +21,7 @@ import {
   Ship,
   Truck,
 } from "lucide-react";
-import { LanguageContext } from "../App";
+import { LanguageContext, ThemeContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import i7 from "../assets/i-7.png";
@@ -1028,6 +1028,7 @@ const useReveal = () => {
 ───────────────────────────────────────────── */
 const Home = () => {
   const { language } = useContext(LanguageContext);
+  const { isDarkMode } = useContext(ThemeContext);
   const labels = HOME_TRANSLATIONS[language] || HOME_TRANSLATIONS.ar;
   const numberLocale = NUMBER_LOCALES[language] || NUMBER_LOCALES.ar;
   const isArabic = language === "ar";
@@ -1071,8 +1072,8 @@ const Home = () => {
   const handleChatbotClick = () => alert(labels.chatbotAlert);
 
   return (
-    <div className="min-h-screen" dir={isArabic ? "rtl" : "ltr"} lang={language}
-      style={{ background:"#f5f3ef", fontFamily:"'Cairo','Amiri',Georgia,serif" }}>
+    <div className="min-h-screen home-page" dir={isArabic ? "rtl" : "ltr"} lang={language}
+      style={{ background:isDarkMode ? "#071611" : "#f5f3ef", fontFamily:"'Cairo','Amiri',Georgia,serif" }}>
 
       {/* ═══════════════════════ GLOBAL STYLES ═══════════════════════ */}
       <style>{`
@@ -1088,6 +1089,18 @@ const Home = () => {
           --parchment:  #ede9df;
           --ink:        #1a1510;
           --muted:      #7a7060;
+        }
+        html.theme-dark .home-page {
+          --forest:     #efe8d4;
+          --forest-mid: #d1c7ad;
+          --gold:       #d3b468;
+          --gold-light: #efdba2;
+          --gold-pale:  #1a332d;
+          --cream:      #071611;
+          --parchment:  #0c2620;
+          --ink:        #efe8d4;
+          --muted:      #b8b09d;
+          color: #efe8d4;
         }
 .divf9{
 border-radius:13px !important;
@@ -1177,6 +1190,33 @@ border-radius:13px !important;
         .sponsor-card { border:1px solid rgba(8,39,33,0.08); background:white; transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s; }
         .sponsor-card:hover { transform:translateY(-4px); border-color:var(--gold); box-shadow:0 16px 36px rgba(8,39,33,0.12); }
         .sponsor-card:hover .sponsor-hover { opacity:1 !important; }
+
+        /* Dark mode overrides for light surfaces in this page */
+        html.theme-dark .home-page .home-surface {
+          background: linear-gradient(145deg,#0a221c 0%,#0d2a23 100%) !important;
+          border-color: rgba(201,168,76,0.22) !important;
+          box-shadow: 0 24px 56px rgba(0,0,0,0.35) !important;
+        }
+        html.theme-dark .home-page .reserve-card,
+        html.theme-dark .home-page .sponsor-card {
+          background: #0f3129 !important;
+          border-color: rgba(201,168,76,0.2) !important;
+        }
+        html.theme-dark .home-page .sponsor-hover {
+          background: rgba(7,22,17,0.96) !important;
+        }
+        html.theme-dark .home-page .country-name {
+          color: #efe8d4;
+        }
+        html.theme-dark .home-page .ind-link {
+          border-color: rgba(201,168,76,0.35);
+          color: #efe8d4;
+        }
+        html.theme-dark .home-page .ind-link:hover {
+          background: rgba(201,168,76,0.14);
+          border-color: rgba(201,168,76,0.6);
+          color: #efdba2;
+        }
 
         /* Chatbot CTA */
         .chat-cta { background:linear-gradient(135deg,var(--forest) 0%,#0d3d34 60%,#102e28 100%); border:1px solid rgba(201,168,76,0.25); position:relative; overflow:hidden; }
@@ -1424,7 +1464,7 @@ border-radius:13px !important;
 
         {/* ── COUNTRIES ── */}
         <section className="reveal d4" style={{ marginTop:72 }}>
-          <div style={{ background:"white", border:"1px solid rgba(8,39,33,0.08)", borderRadius:13, padding:32 }}>
+          <div className="home-surface" style={{ background:"white", border:"1px solid rgba(8,39,33,0.08)", borderRadius:13, padding:32 }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:8, flexWrap:"wrap", gap:12 }}>
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
@@ -1462,7 +1502,7 @@ border-radius:13px !important;
 
         {/* ── SOURCES / SPONSORS ── */}
         <section className="reveal d4" style={{ marginTop:56 }}>
-          <div style={{ background:"white", border:"1px solid rgba(8,39,33,0.08)", borderRadius:13, padding:32 }}>
+          <div className="home-surface" style={{ background:"white", border:"1px solid rgba(8,39,33,0.08)", borderRadius:13, padding:32 }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12 }}>
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
@@ -1536,7 +1576,7 @@ border-radius:13px !important;
                 {labels.assistantSubtitle}
               </p>
               <button type="button" onClick={handleChatbotClick}
-                style={{ display:"inline-flex", alignItems:"center", gap:10, background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:"var(--forest)", padding:"12px 32px", borderRadius:13, border:"none", cursor:"pointer", fontSize:"0.88rem", fontWeight:800, letterSpacing:"0.04em", boxShadow:"0 8px 24px rgba(201,168,76,0.3)" }}>
+                style={{ display:"inline-flex", alignItems:"center", gap:10, background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:isDarkMode ? "#082721" : "var(--forest)", padding:"12px 32px", borderRadius:13, border:"none", cursor:"pointer", fontSize:"0.88rem", fontWeight:800, letterSpacing:"0.04em", boxShadow:"0 8px 24px rgba(201,168,76,0.3)" }}>
                 <AppIcon name="fa-robot" size={16} strokeWidth={2.2} /> {labels.startChat}
               </button>
             </div>
@@ -1550,14 +1590,27 @@ border-radius:13px !important;
 
       {/* ── FLOATING BOT BUTTON ── */}
       <button type="button" onClick={handleChatbotClick} title={labels.floatingBotSubtitle} className="float-btn"
-        style={{ position:"fixed", bottom:24, [isArabic ? "right" : "left"]:24, zIndex:50, display:"flex", alignItems:"center", gap:12, padding:"10px 16px 10px 12px", borderRadius:13, cursor:"pointer" }}>
+        style={{
+          position:"fixed",
+          bottom:24,
+          [isArabic ? "right" : "left"]:24,
+          zIndex:50,
+          display:"flex",
+          alignItems:"center",
+          gap:12,
+          padding:"10px 16px 10px 12px",
+          borderRadius:13,
+          cursor:"pointer",
+          background:isDarkMode ? "#0b2922" : "var(--forest)",
+          border:isDarkMode ? "1px solid rgba(201,168,76,0.45)" : "1px solid rgba(201,168,76,0.3)",
+        }}>
         <span className="online-dot" style={{ position:"absolute", top:8, right:8, width:8, height:8, borderRadius:"50%", background:"#4ade80", boxShadow:"0 0 0 3px rgba(74,222,128,0.25)" }} />
-        <div style={{ width:42, height:42, borderRadius:13, background:"linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08))", border:"1px solid rgba(201,168,76,0.4)", display:"flex", alignItems:"center", justifyContent:"center", color:"var(--gold)", fontSize:"1.1rem" }}>
+        <div style={{ width:42, height:42, borderRadius:13, background:isDarkMode ? "linear-gradient(135deg,rgba(201,168,76,0.28),rgba(201,168,76,0.12))" : "linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08))", border:"1px solid rgba(201,168,76,0.4)", display:"flex", alignItems:"center", justifyContent:"center", color:"var(--gold)", fontSize:"1.1rem" }}>
           <AppIcon name="fa-robot" size={18} strokeWidth={2.2} />
         </div>
         <div style={{ display:"flex", flexDirection:"column", textAlign:isArabic ? "right" : "left" }}>
           <span style={{ fontSize:"0.82rem", fontWeight:800, color:"var(--gold)", lineHeight:1 }}>{labels.floatingBotTitle}</span>
-          <span style={{ fontSize:"0.7rem", color:"rgba(255,255,255,0.5)", marginTop:2 }}>{labels.floatingBotSubtitle}</span>
+          <span style={{ fontSize:"0.7rem", color:isDarkMode ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.5)", marginTop:2 }}>{labels.floatingBotSubtitle}</span>
         </div>
       </button>
 

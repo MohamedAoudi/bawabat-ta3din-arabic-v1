@@ -5,4 +5,44 @@
     font-family: 'Cairo', sans-serif !important;
 }
 
+html,
+body,
+#root {
+    min-height: 100%;
+}
+
+body {
+    background: #f6f3ea;
+    color: #15231e;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+html.theme-dark body {
+    background: #071611;
+    color: #efe8d4;
+}
+
+html.theme-dark section,
+html.theme-dark main,
+html.theme-dark article,
+html.theme-dark aside,
+html.theme-dark .bg-white,
+html.theme-dark [class*="bg-white/"] {
+    background-color: rgba(12, 35, 29, 0.88) !important;
+    color: #efe8d4;
+}
+
+html.theme-dark .text-black,
+html.theme-dark .text-slate-800,
+html.theme-dark .text-slate-900,
+html.theme-dark .text-gray-900,
+html.theme-dark .text-gray-800 {
+    color: #efe8d4 !important;
+}
+
+html.theme-dark .border,
+html.theme-dark [class*="border-"] {
+    border-color: rgba(201, 168, 76, 0.25);
+}
+
 
