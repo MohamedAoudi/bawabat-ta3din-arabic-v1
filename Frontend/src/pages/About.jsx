@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Building2, ChartLine, Database, Link2, Shield } from "lucide-react";
-import { LanguageContext } from "../App";
+import { LanguageContext, ThemeContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 
@@ -158,11 +158,17 @@ const PILLAR_ICONS = [Database, ChartLine, Shield, Link2];
 
 const About = () => {
   const { language } = useContext(LanguageContext);
+  const { isDarkMode } = useContext(ThemeContext);
   const t = ABOUT_TRANSLATIONS[language] || ABOUT_TRANSLATIONS.ar;
   const isArabic = language === "ar";
 
   return (
-    <div dir={isArabic ? "rtl" : "ltr"} lang={language} className="min-h-screen text-slate-800 bg-[#f4f2ec]">
+    <div
+      dir={isArabic ? "rtl" : "ltr"}
+      lang={language}
+      className="min-h-screen text-slate-800"
+      style={{ background: isDarkMode ? "#071611" : "#f4f2ec" }}
+    >
       <Menu />
 
       <header

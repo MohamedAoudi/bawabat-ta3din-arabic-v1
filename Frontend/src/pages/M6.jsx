@@ -3,7 +3,7 @@ import { Scale, Weight, Globe2, Pickaxe, TrendingUp, Info } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
-import { LanguageContext } from "../App";
+import { LanguageContext, ThemeContext } from "../App";
 import {
   tradeCriticalMineralsImportData,
   tradeCriticalMineralsImportByYear,
@@ -168,6 +168,7 @@ const localizeMineral = (name, language, allFallback) => {
 
 export default function M6Page() {
   const { language } = useContext(LanguageContext);
+  const { isDarkMode } = useContext(ThemeContext);
   const t = PAGE_TRANSLATIONS[language] || PAGE_TRANSLATIONS.ar;
 
   const [selectedCountry, setSelectedCountry] = useState("ma");
@@ -226,7 +227,12 @@ export default function M6Page() {
   }, [yearlyUsdData, language, t.importsValueLabel]);
 
   return (
-    <div dir={language === "ar" ? "rtl" : "ltr"} lang={language} className="bg-[#f8fafc] min-h-screen font-['Cairo']">
+    <div
+      dir={language === "ar" ? "rtl" : "ltr"}
+      lang={language}
+      className="min-h-screen font-['Cairo']"
+      style={{ background: isDarkMode ? "#071611" : "#f8fafc" }}
+    >
       <Menu />
       
       <main className="max-w-7xl mx-auto px-4 py-8">

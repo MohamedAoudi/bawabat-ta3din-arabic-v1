@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import Chart from "chart.js/auto";
 import { TreemapController, TreemapElement } from "chartjs-chart-treemap";
-import { LanguageContext } from "../App";
+import { LanguageContext, ThemeContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { dataByMineral, mineralUnits } from "./M1";
@@ -366,11 +366,13 @@ const getCountryDisplayName = (countryName, language) => {
 
 const useCountriesI18n = () => {
   const { language } = useContext(LanguageContext);
+  const { isDarkMode } = useContext(ThemeContext);
   return {
     language,
     labels: getLabelsForLanguage(language),
     locale: NUMBER_LOCALES[language] || NUMBER_LOCALES.ar,
     isArabic: language === "ar",
+    isDarkMode,
   };
 };
 
@@ -1901,7 +1903,7 @@ const TradeIndicatorsPanel = ({ country, exportSeries, importSeries, exportBreak
 
 // ── Main page ──────────────────────────────────────────────────────────────────
 const Countries = () => {
-  const { labels, language, isArabic } = useCountriesI18n();
+  const { labels, language, isArabic, isDarkMode } = useCountriesI18n();
   const query = typeof window!=="undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
   const initialCountryCode = query.get("country");
   const initialSelected    = initialCountryCode ? (COUNTRIES.find(c=>c.code===initialCountryCode)?.name??"—") : "—";
@@ -1980,7 +1982,15 @@ const Countries = () => {
       : {};
 
   return (
-    <div dir={isArabic ? "rtl" : "ltr"} lang={language} className="min-h-screen" style={{ background:"white", fontFamily:"'Cairo',system-ui,sans-serif" }}>
+    <div
+      dir={isArabic ? "rtl" : "ltr"}
+      lang={language}
+      className="min-h-screen"
+      style={{
+        background: isDarkMode ? "#071611" : "white",
+        fontFamily: "'Cairo',system-ui,sans-serif",
+      }}
+    >
       <style>{`
         @keyframes shimmerGold {
           0% { background-position: -300% center; }

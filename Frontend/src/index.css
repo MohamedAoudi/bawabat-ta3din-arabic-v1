@@ -35,9 +35,34 @@ html.theme-dark [class*="bg-white/"] {
 html.theme-dark .text-black,
 html.theme-dark .text-slate-800,
 html.theme-dark .text-slate-900,
+html.theme-dark .text-slate-700,
+html.theme-dark .text-slate-600,
+html.theme-dark .text-slate-500,
+html.theme-dark .text-slate-400,
 html.theme-dark .text-gray-900,
 html.theme-dark .text-gray-800 {
     color: #efe8d4 !important;
+}
+
+html.theme-dark .bg-slate-50,
+html.theme-dark .bg-slate-100,
+html.theme-dark .bg-slate-200,
+html.theme-dark [class*="bg-slate-50"],
+html.theme-dark [class*="bg-slate-100"] {
+    background-color: rgba(16, 43, 36, 0.88) !important;
+}
+
+html.theme-dark input,
+html.theme-dark select,
+html.theme-dark textarea {
+    background-color: rgba(16, 43, 36, 0.88) !important;
+    color: #efe8d4 !important;
+    border-color: rgba(201, 168, 76, 0.28) !important;
+}
+
+html.theme-dark option {
+    background-color: #0c2620;
+    color: #efe8d4;
 }
 
 html.theme-dark .border,

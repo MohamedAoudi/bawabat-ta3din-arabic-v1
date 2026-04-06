@@ -3,7 +3,7 @@ import { CalendarRange, Gem, Globe2, Scale, TrendingUp, Weight, Filter, ChevronD
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
-import { LanguageContext } from "../App";
+import { LanguageContext, ThemeContext } from "../App";
 import {
   tradeCriticalMineralsData,
   tradeCriticalMineralsByYear,
@@ -209,6 +209,7 @@ function textWithCount(template, count) {
 
 export default function M5Page() {
   const { language } = useContext(LanguageContext);
+  const { isDarkMode } = useContext(ThemeContext);
   const t = PAGE_TRANSLATIONS[language] || PAGE_TRANSLATIONS.ar;
 
   const [selectedCountry, setSelectedCountry] = useState(DEFAULT_COUNTRY);
@@ -415,7 +416,12 @@ export default function M5Page() {
   }, [countryPack, language, t.usd]);
 
   return (
-    <div dir={language === "ar" ? "rtl" : "ltr"} lang={language} className="min-h-screen bg-[#F4F7F5] font-['Cairo'] text-slate-800">
+    <div
+      dir={language === "ar" ? "rtl" : "ltr"}
+      lang={language}
+      className="min-h-screen font-['Cairo'] text-slate-800"
+      style={{ background: isDarkMode ? "#071611" : "#F4F7F5" }}
+    >
       <Menu />
       
       {/* Hero Section */}
