@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { CalendarRange, Gem, Globe2, Scale, TrendingUp, Weight, Filter, ChevronDown, List } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
+import { LanguageContext } from "../App";
 import {
   tradeCriticalMineralsData,
   tradeCriticalMineralsByYear,
@@ -38,12 +39,128 @@ const DEFAULT_COUNTRY = "ma";
 
 const availableCountries = COUNTRIES.map((c) => c.code);
 
-function unitLabelFor() {
-  return "دولار أمريكي";
-}
+const COUNTRY_LABELS = {
+  jo: { ar: "المملكة الاردنية الهاشمية", fr: "Royaume hachemite de Jordanie", en: "Hashemite Kingdom of Jordan" },
+  ae: { ar: "دولة الامارات العربية المتحدة", fr: "Emirats arabes unis", en: "United Arab Emirates" },
+  bh: { ar: "مملكة البحرين", fr: "Royaume de Bahrein", en: "Kingdom of Bahrain" },
+  tn: { ar: "الجمهورية التونسية", fr: "Republique tunisienne", en: "Tunisian Republic" },
+  dz: { ar: "الجمهورية الجزائرية الديمقراطية الشعبية", fr: "Republique algerienne democratique et populaire", en: "People's Democratic Republic of Algeria" },
+  dj: { ar: "جمهورية جيبوتي", fr: "Republique de Djibouti", en: "Republic of Djibouti" },
+  sa: { ar: "المملكة العربية السعودية", fr: "Royaume d'Arabie saoudite", en: "Kingdom of Saudi Arabia" },
+  sd: { ar: "جمهورية السودان", fr: "Republique du Soudan", en: "Republic of the Sudan" },
+  sy: { ar: "الجمهورية العربية السورية", fr: "Republique arabe syrienne", en: "Syrian Arab Republic" },
+  so: { ar: "جمهورية الصومال", fr: "Republique federale de Somalie", en: "Federal Republic of Somalia" },
+  iq: { ar: "جمهورية العراق", fr: "Republique d'Irak", en: "Republic of Iraq" },
+  om: { ar: "سلطنة عمان", fr: "Sultanat d'Oman", en: "Sultanate of Oman" },
+  ps: { ar: "دولة فلسطين", fr: "Etat de Palestine", en: "State of Palestine" },
+  qa: { ar: "دولة قطر", fr: "Etat du Qatar", en: "State of Qatar" },
+  kw: { ar: "دولة الكويت", fr: "Etat du Koweit", en: "State of Kuwait" },
+  lb: { ar: "الجمهورية اللبنانية", fr: "Republique libanaise", en: "Lebanese Republic" },
+  ly: { ar: "دولة ليبيا", fr: "Etat de Libye", en: "State of Libya" },
+  eg: { ar: "جمهورية مصر العربية", fr: "Republique arabe d'Egypte", en: "Arab Republic of Egypt" },
+  ma: { ar: "المملكة المغربية", fr: "Royaume du Maroc", en: "Kingdom of Morocco" },
+  mr: { ar: "الجمهورية الاسلامية الموريتانية", fr: "Republique islamique de Mauritanie", en: "Islamic Republic of Mauritania" },
+  ye: { ar: "الجمهورية اليمنية", fr: "Republique du Yemen", en: "Republic of Yemen" },
+};
 
-function formatUsd(value) {
-  return Number(value || 0).toLocaleString("fr-FR");
+const PAGE_TRANSLATIONS = {
+  ar: {
+    badge: "البيانات التعدينية العربية",
+    heroTitle: "الصادرات التعدينية",
+    heroTitleAccent: "الاستراتيجية",
+    heroSubtitle: "منصة تحليلية ذكية لرصد وتتبع تدفقات المعادن الحرجة في المنطقة العربية، توفر نظرة شاملة على القيم الاقتصادية والتوجهات السنوية.",
+    latestYear: "احدث سنة",
+    lastYearValue: "قيمة اخر سنة",
+    yearlyAverage: "المتوسط السنوي",
+    yearlyChange: "التغير السنوي",
+    acrossYears: "عبر {count} سنوات",
+    usd: "دولار امريكي",
+    trendAnalysis: "تحليل الاتجاه الزمني",
+    trendSubtitle: "تطور قيم الصادرات حسب الخام المختار",
+    exportsValue: "قيمة الصادرات",
+    quantitiesSoon: "الكميات (قريبا)",
+    countryExportDetails: "تفاصيل الصادرات حسب الدولة",
+    yearTag: "سنة",
+    arabCountry: "الدولة العربية",
+    exportValue: "قيمة الصادرات",
+    share: "الحصة",
+    filterTools: "ادوات التصفية",
+    chooseCountry: "اختر الدولة",
+    mineralType: "نوع المعدن",
+    referenceYear: "السنة المرجعية",
+    relativeDistribution: "التوزيع النسبي للصادرات",
+    totalShare: "اجمالي الحصة",
+    totalExports: "اجمالي الصادرات",
+    allMinerals: "كل المعادن",
+  },
+  fr: {
+    badge: "Donnees minieres arabes",
+    heroTitle: "Exportations minieres",
+    heroTitleAccent: "strategiques",
+    heroSubtitle: "Plateforme analytique pour suivre les flux de mineraux critiques dans la region arabe et visualiser les tendances economiques annuelles.",
+    latestYear: "Derniere annee",
+    lastYearValue: "Valeur de la derniere annee",
+    yearlyAverage: "Moyenne annuelle",
+    yearlyChange: "Variation annuelle",
+    acrossYears: "sur {count} ans",
+    usd: "USD",
+    trendAnalysis: "Analyse de tendance temporelle",
+    trendSubtitle: "Evolution des valeurs d'export selon le minerai choisi",
+    exportsValue: "Valeur des exportations",
+    quantitiesSoon: "Quantites (bientot)",
+    countryExportDetails: "Details des exportations par pays",
+    yearTag: "Annee",
+    arabCountry: "Pays arabe",
+    exportValue: "Valeur des exportations",
+    share: "Part",
+    filterTools: "Outils de filtre",
+    chooseCountry: "Choisir le pays",
+    mineralType: "Type de minerai",
+    referenceYear: "Annee de reference",
+    relativeDistribution: "Distribution relative des exportations",
+    totalShare: "Part totale",
+    totalExports: "Exportations totales",
+    allMinerals: "Tous les mineraux",
+  },
+  en: {
+    badge: "Arab mining data",
+    heroTitle: "Strategic mining",
+    heroTitleAccent: "exports",
+    heroSubtitle: "Smart analytics platform to monitor critical mineral flows in the Arab region with annual value trends.",
+    latestYear: "Latest year",
+    lastYearValue: "Last year value",
+    yearlyAverage: "Yearly average",
+    yearlyChange: "Year-over-year change",
+    acrossYears: "across {count} years",
+    usd: "USD",
+    trendAnalysis: "Time trend analysis",
+    trendSubtitle: "Export values over time by selected mineral",
+    exportsValue: "Export value",
+    quantitiesSoon: "Volumes (soon)",
+    countryExportDetails: "Country export details",
+    yearTag: "Year",
+    arabCountry: "Arab country",
+    exportValue: "Export value",
+    share: "Share",
+    filterTools: "Filter tools",
+    chooseCountry: "Choose country",
+    mineralType: "Mineral type",
+    referenceYear: "Reference year",
+    relativeDistribution: "Relative export distribution",
+    totalShare: "Total share",
+    totalExports: "Total exports",
+    allMinerals: "All minerals",
+  },
+};
+
+const NUMBER_LOCALES = {
+  ar: "ar-MA",
+  fr: "fr-FR",
+  en: "en-US",
+};
+
+function formatUsd(value, language = "ar") {
+  return Number(value || 0).toLocaleString(NUMBER_LOCALES[language] || NUMBER_LOCALES.ar);
 }
 
 const mineralNameAr = {
@@ -60,12 +177,40 @@ const mineralNameAr = {
   Cobalt: "الكوبالت",
 };
 
-function translateMineral(name) {
-  if (!name || name === "all") return "كل المعادن";
+function translateMineral(name, language, fallback) {
+  if (!name || name === "all") return fallback;
+  if (language === "fr") {
+    const mineralNameFr = {
+      Gold: "Or",
+      Tin: "Etain",
+      Silver: "Argent",
+      Uranium: "Uranium",
+      Copper: "Cuivre",
+      Iron: "Fer",
+      Lead: "Plomb",
+      Zinc: "Zinc",
+      Nickel: "Nickel",
+      Lithium: "Lithium",
+      Cobalt: "Cobalt",
+    };
+    return mineralNameFr[name] || name;
+  }
+  if (language === "en") {
+    return name;
+  }
   return mineralNameAr[name] || name;
 }
 
+const localizeCountryCode = (code, language) => COUNTRY_LABELS[code]?.[language] || countryNameAr[code] || code;
+
+function textWithCount(template, count) {
+  return template.replace("{count}", count);
+}
+
 export default function M5Page() {
+  const { language } = useContext(LanguageContext);
+  const t = PAGE_TRANSLATIONS[language] || PAGE_TRANSLATIONS.ar;
+
   const [selectedCountry, setSelectedCountry] = useState(DEFAULT_COUNTRY);
   const [selectedMineral, setSelectedMineral] = useState("all");
   const [countryYear, setCountryYear] = useState(null);
@@ -182,7 +327,7 @@ export default function M5Page() {
       data: {
         labels: barYears,
         datasets: [{
-          label: selectedMineral === "all" ? "إجمالي الصادرات" : translateMineral(selectedMineral),
+          label: selectedMineral === "all" ? t.totalExports : translateMineral(selectedMineral, language, t.allMinerals),
           data: chartValues,
           backgroundColor: gradient,
           borderRadius: 12,
@@ -200,6 +345,9 @@ export default function M5Page() {
             bodyFont: { family: "Cairo", size: 13 },
             padding: 12,
             cornerRadius: 10,
+            callbacks: {
+              label: (context) => ` ${formatUsd(context.parsed.y, language)} ${t.usd}`,
+            },
           }
         },
         scales: {
@@ -209,7 +357,7 @@ export default function M5Page() {
       }
     });
     return () => chartRef.current?.destroy();
-  }, [barYears, chartValues, selectedMineral]);
+  }, [barYears, chartValues, selectedMineral, language, t.totalExports, t.allMinerals, t.usd]);
 
   useEffect(() => {
     const ctx = donutCanvasRef.current?.getContext("2d");
@@ -223,7 +371,7 @@ export default function M5Page() {
     const rows = countryPack.table || [];
     if (!rows.length) return;
 
-    const labels = rows.map((r) => countryNameAr[r.c] || r.c);
+    const labels = rows.map((r) => localizeCountryCode(r.c, language));
     const values = rows.map((r) => r.v);
 
     donutChartRef.current = new Chart(ctx, {
@@ -250,7 +398,7 @@ export default function M5Page() {
             callbacks: {
               label: (c) => {
                 const v = c.parsed;
-                return ` ${c.label}: ${formatUsd(v)} ${unitLabelFor()} (100%)`;
+                return ` ${c.label}: ${formatUsd(v, language)} ${t.usd} (100%)`;
               },
             },
           },
@@ -264,10 +412,10 @@ export default function M5Page() {
         donutChartRef.current = null;
       }
     };
-  }, [countryPack]);
+  }, [countryPack, language, t.usd]);
 
   return (
-    <div dir="rtl" className="min-h-screen bg-[#F4F7F5] font-['Cairo'] text-slate-800">
+    <div dir={language === "ar" ? "rtl" : "ltr"} lang={language} className="min-h-screen bg-[#F4F7F5] font-['Cairo'] text-slate-800">
       <Menu />
       
       {/* Hero Section */}
@@ -275,11 +423,11 @@ export default function M5Page() {
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ddbc6b 1px, transparent 1px)', size: '20px 20px' }}></div>
         <div className="container mx-auto px-4 text-center relative z-10">
           <span className="inline-block px-4 py-1.5 mb-4 text-xs font-bold tracking-widest uppercase bg-[#ddbc6b]/20 border border-[#ddbc6b]/30 rounded-full text-[#ddbc6b]">
-            البيانات التعدينية العربية
+            {t.badge}
           </span>
-          <h1 className="text-4xl md:text-5xl font-black mb-4">الصادرات التعدينية <span className="text-[#ddbc6b]">الاستراتيجية</span></h1>
+          <h1 className="text-4xl md:text-5xl font-black mb-4">{t.heroTitle} <span className="text-[#ddbc6b]">{t.heroTitleAccent}</span></h1>
           <p className="max-w-2xl mx-auto text-slate-300 text-sm md:text-base leading-relaxed">
-            منصة تحليلية ذكية لرصد وتتبع تدفقات المعادن الحرجة في المنطقة العربية، توفر نظرة شاملة على القيم الاقتصادية والتوجهات السنوية.
+            {t.heroSubtitle}
           </p>
         </div>
       </div>
@@ -289,10 +437,10 @@ export default function M5Page() {
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "أحدث سنة", value: latestYear, icon: <CalendarRange />, color: "bg-blue-500" },
-            { label: "قيمة آخر سنة", value: formatUsd(latestYearValue), sub: "دولار أمريكي", icon: <Gem />, color: "bg-[#ddbc6b]" },
-            { label: "المتوسط السنوي", value: formatUsd(avgYearlyValue), sub: `عبر ${countryYears.length} سنوات`, icon: <Globe2 />, color: "bg-emerald-500" },
-            { label: "التغير السنوي", value: yoyChange ? `${yoyChange.toFixed(1)}%` : "-", icon: <TrendingUp />, color: yoyChange > 0 ? "bg-green-500" : "bg-red-500" },
+            { label: t.latestYear, value: latestYear ? formatUsd(latestYear, language) : "-", icon: <CalendarRange />, color: "bg-blue-500" },
+            { label: t.lastYearValue, value: formatUsd(latestYearValue, language), sub: t.usd, icon: <Gem />, color: "bg-[#ddbc6b]" },
+            { label: t.yearlyAverage, value: formatUsd(avgYearlyValue, language), sub: textWithCount(t.acrossYears, countryYears.length), icon: <Globe2 />, color: "bg-emerald-500" },
+            { label: t.yearlyChange, value: yoyChange !== null ? `${yoyChange.toFixed(1)}%` : "-", icon: <TrendingUp />, color: yoyChange > 0 ? "bg-green-500" : "bg-red-500" },
           ].map((card, i) => (
             <div key={i} className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-white flex items-center gap-5 transition-transform hover:-translate-y-1">
               <div className={`${card.color} p-4 rounded-2xl text-white shadow-lg shadow-inherit`}>
@@ -315,13 +463,13 @@ export default function M5Page() {
                 <div>
                   <h3 className="text-xl font-bold flex items-center gap-2">
                     <TrendingUp className="text-[#ddbc6b]" size={20} />
-                    تحليل الاتجاه الزمني
+                    {t.trendAnalysis}
                   </h3>
-                  <p className="text-xs text-slate-400">تطور قيم الصادرات حسب الخام المختار</p>
+                  <p className="text-xs text-slate-400">{t.trendSubtitle}</p>
                 </div>
                 <div className="flex gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
-                   <button className="px-4 py-2 text-xs font-bold rounded-xl bg-white shadow-sm text-[#082721]">قيمة الصادرات</button>
-                   <button className="px-4 py-2 text-xs font-bold rounded-xl text-slate-400 hover:text-slate-600">الكميات (قريباً)</button>
+                   <button className="px-4 py-2 text-xs font-bold rounded-xl bg-white shadow-sm text-[#082721]">{t.exportsValue}</button>
+                   <button className="px-4 py-2 text-xs font-bold rounded-xl text-slate-400 hover:text-slate-600">{t.quantitiesSoon}</button>
                 </div>
               </div>
               <div className="h-[400px]">
@@ -334,17 +482,17 @@ export default function M5Page() {
                <div className="p-6 border-b border-slate-50 flex justify-between items-center">
                   <h3 className="font-bold flex items-center gap-2">
                     <List className="text-[#ddbc6b]" size={20} />
-                    تفاصيل الصادرات حسب الدولة
+                    {t.countryExportDetails}
                   </h3>
-                  <span className="text-[10px] bg-slate-100 px-3 py-1 rounded-full font-bold uppercase tracking-wider text-slate-500">سنة {countryYear}</span>
+                  <span className="text-[10px] bg-slate-100 px-3 py-1 rounded-full font-bold uppercase tracking-wider text-slate-500">{t.yearTag} {countryYear ? formatUsd(countryYear, language) : "-"}</span>
                </div>
                <div className="overflow-x-auto">
-                 <table className="w-full text-right">
+                 <table className={`w-full ${language === "ar" ? "text-right" : "text-left"}`}>
                    <thead className="bg-slate-50/50 text-slate-400 text-[11px] uppercase font-black">
                      <tr>
-                       <th className="px-6 py-4">الدولة العربية</th>
-                       <th className="px-6 py-4 text-left">قيمة الصادرات</th>
-                       <th className="px-6 py-4 text-center">الحصة</th>
+                       <th className="px-6 py-4">{t.arabCountry}</th>
+                       <th className={`px-6 py-4 ${language === "ar" ? "text-left" : "text-right"}`}>{t.exportValue}</th>
+                       <th className="px-6 py-4 text-center">{t.share}</th>
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-50 text-sm font-bold">
@@ -352,9 +500,9 @@ export default function M5Page() {
                         <tr key={r.c} className="hover:bg-slate-50/80 transition-colors group">
                           <td className="px-6 py-4 flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] group-hover:bg-[#ddbc6b]/20 group-hover:text-[#082721] transition-colors">{r.c.toUpperCase()}</div>
-                            {countryNameAr[r.c]}
+                            {localizeCountryCode(r.c, language)}
                           </td>
-                          <td className="px-6 py-4 text-left font-black text-[#082721]">{formatUsd(r.v)} $</td>
+                          <td className={`px-6 py-4 font-black text-[#082721] ${language === "ar" ? "text-left" : "text-right"}`}>{formatUsd(r.v, language)} {t.usd}</td>
                           <td className="px-6 py-4">
                              <div className="w-24 h-1.5 bg-slate-100 rounded-full mx-auto overflow-hidden">
                                 <div className="h-full bg-[#ddbc6b]" style={{width: '100%'}}></div>
@@ -375,26 +523,30 @@ export default function M5Page() {
               
               <h3 className="text-lg font-bold mb-6 flex items-center gap-3">
                 <Filter size={20} className="text-[#ddbc6b]" />
-                أدوات التصفية
+                {t.filterTools}
               </h3>
 
               <div className="space-y-6 relative z-10">
                 <div>
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">اختر الدولة</label>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.chooseCountry}</label>
                   <div className="relative">
                     <select 
                       value={effectiveCountry} 
                       onChange={(e) => setSelectedCountry(e.target.value)}
                       className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:border-[#ddbc6b] appearance-none transition-all"
                     >
-                      {availableCountries.map(c => <option key={c} value={c} className="text-slate-800">{countryNameAr[c]}</option>)}
+                      {availableCountries.map((c) => (
+                        <option key={c} value={c} className="text-slate-800">
+                          {localizeCountryCode(c, language)}
+                        </option>
+                      ))}
                     </select>
                     <ChevronDown className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">نوع المعدن</label>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.mineralType}</label>
                   <div className="grid grid-cols-2 gap-2">
                     {mineralOptions.slice(0, 6).map(m => (
                       <button 
@@ -402,14 +554,14 @@ export default function M5Page() {
                         onClick={() => setSelectedMineral(m)}
                         className={`px-3 py-3 rounded-xl text-[11px] font-bold border transition-all ${selectedMineral === m ? 'bg-[#ddbc6b] border-[#ddbc6b] text-[#082721]' : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'}`}
                       >
-                        {translateMineral(m)}
+                        {translateMineral(m, language, t.allMinerals)}
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">السنة المرجعية</label>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.referenceYear}</label>
                   <div className="flex flex-wrap gap-2">
                     {countryYears.map(y => (
                       <button 
@@ -417,7 +569,7 @@ export default function M5Page() {
                         onClick={() => setCountryYear(y)}
                         className={`w-12 h-12 rounded-xl flex items-center justify-center text-xs font-black transition-all ${y === countryYear ? 'bg-white text-[#082721] scale-110 shadow-lg' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
                       >
-                        {y}
+                        {formatUsd(y, language)}
                       </button>
                     ))}
                   </div>
@@ -427,11 +579,11 @@ export default function M5Page() {
 
             {/* Donut Chart Card */}
             <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/60 border border-slate-100">
-              <h3 className="text-base font-black mb-6 text-center">التوزيع النسبي للصادرات</h3>
+              <h3 className="text-base font-black mb-6 text-center">{t.relativeDistribution}</h3>
               <div className="h-[250px] relative">
                 <canvas ref={donutCanvasRef} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                   <span className="text-xs text-slate-400 font-bold">إجمالي الحصة</span>
+                   <span className="text-xs text-slate-400 font-bold">{t.totalShare}</span>
                    <span className="text-2xl font-black text-[#082721]">100%</span>
                 </div>
               </div>

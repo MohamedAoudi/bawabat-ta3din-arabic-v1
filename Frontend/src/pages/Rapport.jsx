@@ -1,14 +1,62 @@
-import React from "react";
+import React, { useContext } from "react";
+import { LanguageContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 
+const RAPPORT_TRANSLATIONS = {
+  ar: {
+    soon: "قريباً",
+    title: "التقارير الذكية",
+    subtitle:
+      "هذه الصفحة قيد التطوير. سيتم إطلاق التقارير التفاعلية والذكية قريباً ضمن بوابة المعطيات التعدينية العربية.",
+    progressLabel: "نسبة الإنجاز",
+    features: [
+      { icon: "📊", label: "تقارير تفاعلية" },
+      { icon: "📥", label: "تصدير PDF / Excel" },
+      { icon: "🔔", label: "تنبيهات آنية" },
+    ],
+    backHome: "العودة إلى الرئيسية",
+  },
+  fr: {
+    soon: "Bientot",
+    title: "Rapports intelligents",
+    subtitle:
+      "Cette page est en cours de developpement. Les rapports interactifs et intelligents seront lances bientot dans le portail arabe des donnees minieres.",
+    progressLabel: "Taux d'avancement",
+    features: [
+      { icon: "📊", label: "Rapports interactifs" },
+      { icon: "📥", label: "Export PDF / Excel" },
+      { icon: "🔔", label: "Alertes en temps reel" },
+    ],
+    backHome: "Retour a l'accueil",
+  },
+  en: {
+    soon: "Coming Soon",
+    title: "Smart Reports",
+    subtitle:
+      "This page is under development. Interactive and intelligent reports will be launched soon within the Arab mining data portal.",
+    progressLabel: "Progress",
+    features: [
+      { icon: "📊", label: "Interactive reports" },
+      { icon: "📥", label: "PDF / Excel export" },
+      { icon: "🔔", label: "Real-time alerts" },
+    ],
+    backHome: "Back to home",
+  },
+};
+
 const Rapport = () => {
+  const { language } = useContext(LanguageContext);
+  const t = RAPPORT_TRANSLATIONS[language] || RAPPORT_TRANSLATIONS.ar;
+  const isArabic = language === "ar";
+
   return (
     <>
       <Menu />
 
       <main
-        dir="rtl"
+        dir={isArabic ? "rtl" : "ltr"}
+        lang={language}
         className="min-h-[calc(100vh-69px)] flex flex-col items-center justify-center px-4 py-20"
         style={{
           background: "linear-gradient(160deg,#082721 0%,#0d3b33 50%,#082721 100%)",
@@ -20,7 +68,7 @@ const Rapport = () => {
           className="w-24 h-[3px] rounded-full mb-8"
           style={{ background: "linear-gradient(90deg,#8B2500,#C9A84C,#082721)" }}
         />
-aoudi@2002@
+
         {/* Animated icon */}
         <div className="relative mb-8">
           <div
@@ -68,25 +116,25 @@ aoudi@2002@
             color: "#C9A84C",
           }}
         >
-          قريباً
+          {t.soon}
         </div>
 
         {/* Title */}
         <h1
           className="text-3xl sm:text-4xl font-black text-white text-center mb-4 leading-tight"
         >
-          التقارير الذكية
+          {t.title}
         </h1>
 
         {/* Subtitle */}
         <p className="text-white/50 text-[15px] text-center max-w-md mb-10 leading-relaxed">
-          هذه الصفحة قيد التطوير. سيتم إطلاق التقارير التفاعلية والذكية قريباً ضمن بوابة المعطيات التعدينية العربية.
+          {t.subtitle}
         </p>
 
         {/* Progress bar */}
         <div className="w-full max-w-sm mb-10">
           <div className="flex justify-between text-[12px] text-white/40 mb-2">
-            <span>نسبة الإنجاز</span>
+            <span>{t.progressLabel}</span>
             <span>65%</span>
           </div>
           <div
@@ -106,11 +154,7 @@ aoudi@2002@
 
         {/* Features list */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl mb-12">
-          {[
-            { icon: "📊", label: "تقارير تفاعلية" },
-            { icon: "📥", label: "تصدير PDF / Excel" },
-            { icon: "🔔", label: "تنبيهات آنية" },
-          ].map((f) => (
+          {t.features.map((f) => (
             <div
               key={f.label}
               className="flex flex-col items-center gap-2 rounded-2xl px-4 py-5 text-center"
@@ -137,7 +181,7 @@ aoudi@2002@
           <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
-          العودة إلى الرئيسية
+          {t.backHome}
         </a>
 
         {/* Decorative bottom line */}

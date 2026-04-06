@@ -1,37 +1,90 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
+import { LanguageContext } from "../App";
 
 // ─── Replace with your real imports ──────────────────────────────────────────
 import logoAmip from "../assets/logo n v.png";
 import logoAidsmo from "../assets/aidsmo logo sans bg 800x 800.png";
 
+// ─── Translations ─────────────────────────────────────────────────────────────
+const TRANSLATIONS = {
+  ar: {
+    home: "الرئيسية",
+    indicators: "المؤشرات التعدينية",
+    mainAxes: "المحاور الرئيسية",
+    miningProduction: "الانتاج التعديني",
+    productionVolume: "حجم الإنتاج التعديني",
+    productionTrend: "تطور الإنتاج التعديني",
+    arabicProductionTrend: "تطور الإنتاج التعديني العربي",
+    productionComparison: "نسبة الإنتاج العربي مقارنة بالإنتاج العالمي",
+    miningTrade: "التجارة التعدينية",
+    exports: "الصادرات التعدينية",
+    imports: "الواردات التعدينية",
+    arabCountries: "الدول العربية",
+    about: "عن البوابة",
+    quickSearch: "بحث سريع",
+    smartReports: "التقارير الذكية",
+    language: "اللغة",
+  },
+  fr: {
+    home: "Accueil",
+    indicators: "Indicateurs Miniers",
+    mainAxes: "Axes Principaux",
+    miningProduction: "Production Minière",
+    productionVolume: "Volume de Production Minière",
+    productionTrend: "Évolution de la Production Minière",
+    arabicProductionTrend: "Évolution de la Production Minière Arabe",
+    productionComparison: "Part de la Production Arabe par rapport à la Production Mondiale",
+    miningTrade: "Commerce Minier",
+    exports: "Exportations Minières",
+    imports: "Importations Minières",
+    arabCountries: "Pays Arabes",
+    about: "À Propos du Portail",
+    quickSearch: "Recherche Rapide",
+    smartReports: "Rapports Intelligents",
+    language: "Langue",
+  },
+  en: {
+    home: "Home",
+    indicators: "Mining Indicators",
+    mainAxes: "Main Axes",
+    miningProduction: "Mining Production",
+    productionVolume: "Mining Production Volume",
+    productionTrend: "Mining Production Trend",
+    arabicProductionTrend: "Arabic Mining Production Trend",
+    productionComparison: "Arabic Production Share vs Global Production",
+    miningTrade: "Mining Trade",
+    exports: "Mining Exports",
+    imports: "Mining Imports",
+    arabCountries: "Arab Countries",
+    about: "About the Portal",
+    quickSearch: "Quick Search",
+    smartReports: "Smart Reports",
+    language: "Language",
+  },
+};
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const INDICATORS = [
   {
-    label: "الانتاج التعديني",
+    label: "انتاج التعدين",
     key: "prod",
+    labelKey: "miningProduction",
     items: [
-      { label: "حجم الإنتاج التعديني",                           href: "/m1" },
-      { label: "تطور الإنتاج التعديني",                          href: "/m2" },
-      { label: "تطور الإنتاج التعديني العربي",                   href: "/m3" },
-      { label: "نسبة الإنتاج العربي مقارنة بالإنتاج العالمي", href: "/m4" },
+      { label: "حجم الإنتاج التعديني", labelKey: "productionVolume", href: "/m1" },
+      { label: "تطور الإنتاج التعديني", labelKey: "productionTrend", href: "/m2" },
+      { label: "تطور الإنتاج التعديني العربي", labelKey: "arabicProductionTrend", href: "/m3" },
+      { label: "نسبة الإنتاج العربي مقارنة بالإنتاج العالمي", labelKey: "productionComparison", href: "/m4" },
     ],
   },
   {
     label: "التجارة التعدينية",
     key: "trade",
+    labelKey: "miningTrade",
     items: [
-      { label: "الصادرات التعدينية", href: "/m5" },
-      { label: "الواردات التعدينية", href: "/m6" },
+      { label: "الصادرات التعدينية", labelKey: "exports", href: "/m5" },
+      { label: "الواردات التعدينية", labelKey: "imports", href: "/m6" },
     ],
   },
-  // {
-  //   label: "الاحتياطي",
-  //   key: "reserve",
-  //   items: [
-  //     { label: "احتياطي الخام حسب الدولة",   href: "/m7" },
-  //     { label: "الاحتياطي المؤكد / المحتمل",  href: "/m8" },
-  //   ],
-  // },
 ];
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
@@ -69,7 +122,7 @@ const GlobeIcon = ({ className = "" }) => (
 );
 
 // ─── Desktop sub-menu (React hover + delay, opens to the right/end in RTL) ─────
-const DesktopSubMenu = ({ section }) => {
+const DesktopSubMenu = ({ section, t }) => {
   const [open, setOpen] = useState(false);
   const closeRef = useRef(null);
 
@@ -93,7 +146,7 @@ const DesktopSubMenu = ({ section }) => {
       className="flex items-center justify-between rounded-xl px-4 py-2.5 cursor-pointer
                  hover:bg-[#C9A84C]/10 transition-colors group/row"
     >
-      <span dir="rtl" className="text-[14px] font-bold text-white/90">{section.label}</span>
+      <span dir="rtl" className="text-[14px] font-bold text-white/90">{t(section.labelKey)}</span>
       <ChevronLeft className="w-3 h-3 text-[#C9A84C]/40 group-hover/row:text-[#C9A84C] transition-colors flex-shrink-0" />
     </div>
     {/* Sub-panel — positioned to the END (left in RTL) */}
@@ -106,7 +159,7 @@ const DesktopSubMenu = ({ section }) => {
       }}
     >
       <div className="px-4 py-2.5 border-b border-[#C9A84C]/20">
-        <p className="text-[10px] text-[#C9A84C]/70 uppercase tracking-widest truncate">{section.label}</p>
+        <p className="text-[10px] text-[#C9A84C]/70 uppercase tracking-widest truncate">{t(section.labelKey)}</p>
       </div>
       <ul className="p-2 space-y-0.5">
         {section.items.map((item) => (
@@ -117,7 +170,7 @@ const DesktopSubMenu = ({ section }) => {
                          hover:bg-[#C9A84C]/15 hover:text-white transition-colors"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C]/50 flex-shrink-0" />
-              {item.label}
+              {t(item.labelKey)}
             </a>
           </li>
         ))}
@@ -184,11 +237,15 @@ const MobileAccordion = ({ label, children, level = 0 }) => {
 
 // ─── Main Menu ────────────────────────────────────────────────────────────────
 const Menu = () => {
+  const { language, changeLanguage } = useContext(LanguageContext);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled,   setScrolled]   = useState(false);
   const [isHome,     setIsHome]     = useState(true);
   const [menuOpen,   setMenuOpen]   = useState(false);
   const closeTimeoutRef = useRef(null);
+
+  // Helper function to get translation
+  const t = (key) => TRANSLATIONS[language]?.[key] || key;
 
   const openMenu = () => {
     if (closeTimeoutRef.current) {
@@ -201,6 +258,18 @@ const Menu = () => {
   const closeMenu = () => {
     if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
     closeTimeoutRef.current = setTimeout(() => setMenuOpen(false), 150);
+  };
+
+  const cycleLanguage = () => {
+    const languages = ["ar", "fr", "en"];
+    const currentIndex = languages.indexOf(language);
+    const nextLanguage = languages[(currentIndex + 1) % languages.length];
+    changeLanguage(nextLanguage);
+  };
+
+  const getLanguageDisplay = () => {
+    const displays = { ar: "العربية", fr: "Français", en: "English" };
+    return displays[language] || language.toUpperCase();
   };
 
   useEffect(() => {
@@ -287,7 +356,7 @@ const Menu = () => {
            style={{ background: "linear-gradient(90deg,#8B2500,#C9A84C 50%,#082721)" }} />
 
       <nav
-        dir="rtl"
+        dir={language === "ar" ? "rtl" : "ltr"}
         className={`fixed top-[3px] left-0 right-0 z-40 transition-all duration-400 ${navBg}`}
         style={{ fontFamily: "'Cairo','Tajawal',sans-serif" }}
       >
@@ -312,7 +381,7 @@ const Menu = () => {
               <ul className="flex items-center gap-0 flex-shrink-0">
                 <li className="nav-sep">
                   <a href="/" className="nav-link inline-block px-3 py-1.5 text-[15px] font-bold text-white/90 hover:text-[#C9A84C] transition-colors">
-                    الرئيسية
+                    {t("home")}
                   </a>
                 </li>
 
@@ -328,7 +397,7 @@ const Menu = () => {
                     className="nav-link inline-flex items-center gap-1.5 px-3 py-1.5 text-[15px] font-bold text-white/90 hover:text-[#C9A84C] transition-colors"
                   >
                     <ChevronDown className="w-2.5 h-2.5 opacity-60" />
-                    <span dir="rtl">المؤشرات التعدينية</span>
+                    <span dir={language === "ar" ? "rtl" : "ltr"}>{t("indicators")}</span>
                   </button>
 
                   <div
@@ -342,11 +411,11 @@ const Menu = () => {
                     }}
                   >
                     <div className="px-5 py-3 border-b border-[#C9A84C]/20">
-                      <p className="text-[10px] text-[#C9A84C]/70 uppercase tracking-widest">المحاور الرئيسية</p>
+                      <p className="text-[10px] text-[#C9A84C]/70 uppercase tracking-widest">{t("mainAxes")}</p>
                     </div>
                     <div className="p-3 space-y-1">
                       {INDICATORS.map((sec) => (
-                        <DesktopSubMenu key={sec.key} section={sec} />
+                        <DesktopSubMenu key={sec.key} section={sec} t={t} />
                       ))}
                     </div>
                     <div className="h-[2px]" style={{ background: "linear-gradient(90deg,#8B2500,#C9A84C,#082721)" }} />
@@ -355,13 +424,13 @@ const Menu = () => {
 
                 <li className="nav-sep">
                   <a href="/countries" className="nav-link inline-block px-3 py-1.5 text-[15px] font-bold text-white/90 hover:text-[#C9A84C] transition-colors">
-                    الدول العربية
+                    {t("arabCountries")}
                   </a>
                 </li>
 
                 <li className="nav-sep">
                   <a href="/about" className="nav-link inline-block px-3 py-1.5 text-[15px] font-bold text-white/90 hover:text-[#C9A84C] transition-colors">
-                    عن البوابة
+                    {t("about")}
                   </a>
                 </li>
               </ul>
@@ -376,7 +445,7 @@ const Menu = () => {
                              hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
                 >
                   <SearchIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>بحث سريع</span>
+                  <span>{t("quickSearch")}</span>
                 </button>
 
                 <a
@@ -389,29 +458,44 @@ const Menu = () => {
                   }}
                 >
                   <DocIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>التقارير الذكية</span>
+                  <span>{t("smartReports")}</span>
                 </a>
 
-                <button
-                  type="button"
-                  title="تسجيل الدخول"
-                  className="flex items-center justify-center w-9 h-9 rounded-full flex-shrink-0
-                             border border-white/20 text-white/70 hover:text-[#C9A84C]
-                             hover:border-[#C9A84C]/60 transition-all"
-                >
-                  <LoginIcon className="w-4 h-4" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => alert("FR (AR/EN لاحقًا)")}
-                  className="flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[12px] font-semibold
-                             border border-white/20 text-white/70 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
-                             transition-all flex-shrink-0"
-                >
-                  <GlobeIcon className="w-3 h-3" />
-                  <span>EN</span>
-                </button>
+                <div className="flex items-center gap-1 border border-white/20 rounded-full p-1 flex-shrink-0 bg-white/5">
+                  <button
+                    onClick={() => changeLanguage("ar")}
+                    className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
+                      language === "ar"
+                        ? "bg-[#C9A84C] text-slate-800"
+                        : "text-white/70 hover:text-[#C9A84C]"
+                    }`}
+                    title="العربية"
+                  >
+                    🇸🇦 AR
+                  </button>
+                  <button
+                    onClick={() => changeLanguage("fr")}
+                    className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
+                      language === "fr"
+                        ? "bg-[#C9A84C] text-slate-800"
+                        : "text-white/70 hover:text-[#C9A84C]"
+                    }`}
+                    title="Français"
+                  >
+                    🇫🇷 FR
+                  </button>
+                  <button
+                    onClick={() => changeLanguage("en")}
+                    className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
+                      language === "en"
+                        ? "bg-[#C9A84C] text-slate-800"
+                        : "text-white/70 hover:text-[#C9A84C]"
+                    }`}
+                    title="English"
+                  >
+                    🇬🇧 EN
+                  </button>
+                </div>
 
                 <div className="w-px h-6 bg-white/15 mx-0.5 flex-shrink-0" />
 
@@ -462,12 +546,12 @@ const Menu = () => {
             <a href="/"
                className="block rounded-xl px-4 py-3 text-[15px] font-bold text-white/90
                           hover:bg-[#C9A84C]/10 hover:text-[#C9A84C] transition-colors">
-              الرئيسية
+              {t("home")}
             </a>
 
-            <MobileAccordion label="المؤشرات التعدينية" level={0}>
+            <MobileAccordion label={t("indicators")} level={0}>
               {INDICATORS.map((sec) => (
-                <MobileAccordion key={sec.key} label={sec.label} level={1}>
+                <MobileAccordion key={sec.key} label={t(sec.labelKey)} level={1}>
                   {sec.items.map((item) => (
                     <a
                       key={item.href}
@@ -476,7 +560,7 @@ const Menu = () => {
                                  hover:text-[#C9A84C] hover:bg-white/5 transition-colors"
                     >
                       <span className="w-1 h-1 rounded-full bg-[#C9A84C]/50 flex-shrink-0" />
-                      {item.label}
+                      {t(item.labelKey)}
                     </a>
                   ))}
                 </MobileAccordion>
@@ -486,13 +570,13 @@ const Menu = () => {
             <a href="/countries"
                className="block rounded-xl px-4 py-3 text-[15px] font-bold text-white/90
                           hover:bg-[#C9A84C]/10 hover:text-[#C9A84C] transition-colors">
-              الدول العربية
+              {t("arabCountries")}
             </a>
 
             <a href="/about"
                className="block rounded-xl px-4 py-3 text-[15px] font-bold text-white/90
                           hover:bg-[#C9A84C]/10 hover:text-[#C9A84C] transition-colors">
-              عن البوابة
+              {t("about")}
             </a>
 
             {/* Action row */}
@@ -504,7 +588,7 @@ const Menu = () => {
                            border border-white/20 text-white/80 hover:border-[#C9A84C]/60 hover:text-[#C9A84C] transition-all"
               >
                 <SearchIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>بحث سريع</span>
+                <span>{t("quickSearch")}</span>
               </button>
 
               <a
@@ -513,27 +597,44 @@ const Menu = () => {
                 style={{ background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)" }}
               >
                 <DocIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>التقارير الذكية</span>
+                <span>{t("smartReports")}</span>
               </a>
 
-              <button
-                type="button"
-                className="flex items-center justify-center w-10 h-10 rounded-full
-                           border border-white/20 text-white/70 hover:text-[#C9A84C]
-                           hover:border-[#C9A84C]/50 transition-all flex-shrink-0"
-              >
-                <LoginIcon className="w-4 h-4" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => alert("FR (AR/EN لاحقًا)")}
-                className="flex items-center gap-1.5 rounded-full px-3 py-2 text-[12px] font-semibold
-                           border border-white/20 text-white/70 hover:border-[#C9A84C]/60 hover:text-[#C9A84C] transition-all"
-              >
-                <GlobeIcon className="w-3.5 h-3.5" />
-                <span>EN</span>
-              </button>
+              <div className="flex items-center gap-1 border border-white/20 rounded-full p-1 bg-white/5">
+                <button
+                  onClick={() => changeLanguage("ar")}
+                  className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
+                    language === "ar"
+                      ? "bg-[#C9A84C] text-slate-800"
+                      : "text-white/70 hover:text-[#C9A84C]"
+                  }`}
+                  title="العربية"
+                >
+                  🇸🇦 AR
+                </button>
+                <button
+                  onClick={() => changeLanguage("fr")}
+                  className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
+                    language === "fr"
+                      ? "bg-[#C9A84C] text-slate-800"
+                      : "text-white/70 hover:text-[#C9A84C]"
+                  }`}
+                  title="Français"
+                >
+                  🇫🇷 FR
+                </button>
+                <button
+                  onClick={() => changeLanguage("en")}
+                  className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
+                    language === "en"
+                      ? "bg-[#C9A84C] text-slate-800"
+                      : "text-white/70 hover:text-[#C9A84C]"
+                  }`}
+                  title="English"
+                >
+                  🇬🇧 EN
+                </button>
+              </div>
 
               <a href="https://aidsmo.org" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
                 <img

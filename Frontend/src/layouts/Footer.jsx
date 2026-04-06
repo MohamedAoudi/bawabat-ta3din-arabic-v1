@@ -1,7 +1,96 @@
-import React from "react";
+import React, { useContext } from "react";
 import logo from "../assets/LOGO_ARAB MINING grand.svg";
+import { LanguageContext } from "../App";
 
 const Footer = () => {
+  const { language } = useContext(LanguageContext);
+
+  const TRANSLATIONS = {
+    ar: {
+      logoAlt: "Arab Mining Indicators Portal",
+      aboutTitle: "عن بوابة المؤشرات التعدينية العربية",
+      aboutText:
+        "بوابة تحليلية للبيانات التعدينية في الدول العربية، تجمع بين المؤشرات والتقارير ودعم صناع القرار والباحثين والمستثمرين في قطاع الثروات المعدنية",
+      sitemapTitle: "خريطة البوابة",
+      relatedTitle: "روابط ذات صلة",
+      home: "الرئيسية",
+      indicators: "المؤشرات التعدينية",
+      countries: "الدول العربية",
+      sources: "المصادر",
+      reports: "التقارير",
+      about: "عن البوابة",
+      apfm: "APFM (لاحقا)",
+      library: "المكتبة (لاحقا)",
+      contact: "تواصل معنا (لاحقا)",
+      protoTitle: "نسخة اولية تجريبية",
+      protoVersion: "V1 - Prototype",
+      rights: "جميع الحقوق محفوظة",
+      developed: "تم تطوير هذه النسخة لاغراض العرض والتجربة الاولية للبوابة.",
+      online: "Online",
+    },
+    fr: {
+      logoAlt: "Portail des indicateurs miniers arabes",
+      aboutTitle: "A propos du portail des indicateurs miniers arabes",
+      aboutText:
+        "Portail analytique des donnees minieres dans les pays arabes, combinant indicateurs et rapports pour soutenir decideurs, chercheurs et investisseurs.",
+      sitemapTitle: "Plan du portail",
+      relatedTitle: "Liens associes",
+      home: "Accueil",
+      indicators: "Indicateurs miniers",
+      countries: "Pays arabes",
+      sources: "Sources",
+      reports: "Rapports",
+      about: "A propos",
+      apfm: "APFM (bientot)",
+      library: "Bibliotheque (bientot)",
+      contact: "Contact (bientot)",
+      protoTitle: "Version prototype initiale",
+      protoVersion: "V1 - Prototype",
+      rights: "Tous droits reserves",
+      developed: "Cette version a ete developpee pour demonstration et test initial du portail.",
+      online: "En ligne",
+    },
+    en: {
+      logoAlt: "Arab Mining Indicators Portal",
+      aboutTitle: "About the Arab Mining Indicators Portal",
+      aboutText:
+        "Analytical portal for mining data across Arab countries, combining indicators and reports to support decision-makers, researchers, and investors.",
+      sitemapTitle: "Portal map",
+      relatedTitle: "Related links",
+      home: "Home",
+      indicators: "Mining indicators",
+      countries: "Arab countries",
+      sources: "Sources",
+      reports: "Reports",
+      about: "About",
+      apfm: "APFM (soon)",
+      library: "Library (soon)",
+      contact: "Contact us (soon)",
+      protoTitle: "Early prototype version",
+      protoVersion: "V1 - Prototype",
+      rights: "All rights reserved",
+      developed: "This version was developed for showcase and early portal testing.",
+      online: "Online",
+    },
+  };
+
+  const t = TRANSLATIONS[language] || TRANSLATIONS.ar;
+
+  const sitemapLinks = [
+    { l: t.home, h: "/" },
+    { l: t.indicators, h: "/m1" },
+    { l: t.countries, h: "/countries" },
+    { l: t.sources, h: "sources.html" },
+    { l: t.reports, h: "reports.html" },
+    { l: t.about, h: "/about" },
+  ];
+
+  const relatedLinks = [
+    { l: t.apfm, h: "#" },
+    { l: t.library, h: "#" },
+    { l: t.contact, h: "#" },
+  ];
+
   return (
     <>
       <style>{`
@@ -42,7 +131,8 @@ const Footer = () => {
       `}</style>
 
       <footer
-        dir="rtl"
+        dir={language === "ar" ? "rtl" : "ltr"}
+        lang={language}
         style={{ fontFamily: "'Cairo','Tajawal',sans-serif" }}
       >
         {/* ── top gold bar — identical to Menu ───────────────────────────── */}
@@ -58,7 +148,7 @@ const Footer = () => {
 
               <img
                 src={logo}
-                alt="Arab Mining Indicators Portal"
+                alt={t.logoAlt}
                 className="h-[60px] w-auto object-contain"
                 style={{ filter: "drop-shadow(0 1px 8px rgba(201,168,76,0.3))" }}
               />
@@ -71,29 +161,22 @@ const Footer = () => {
 
               {/* About */}
               <div>
-                <p className="ft-col-title">عن بوابة المؤشرات التعدينية العربية</p>
+                <p className="ft-col-title">{t.aboutTitle}</p>
                 <p className="text-[13.5px] leading-7 text-white/55">
-            بوابة تحليلية للبيانات التعدينية في الدول العربية، تجمع بين المؤشرات والتقارير ودعم صُنّاع القرار والباحثين والمستثمرين في قطاع الثروات المعدنية
+                  {t.aboutText}
                 </p>
               </div>
 
               {/* Sitemap */}
               <div>
-                <p className="ft-col-title">خريطة البوابة</p>
+                <p className="ft-col-title">{t.sitemapTitle}</p>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                  {[
-                    { l: "الرئيسية",           h: "/" },
-                    { l: "المؤشرات التعدينية", h: "/m1" },
-                    { l: "الدول العربية",      h: "/countries" },
-                    { l: "المصادر",            h: "sources.html" },
-                    { l: "التقارير",           h: "reports.html" },
-                    { l: "عن البوابة",         h: "/about" },
-                  ].map(({ l, h }) => (
+                  {sitemapLinks.map(({ l, h }) => (
                     <a key={l} href={h} className="ft-link" dir="ltr">
                       <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
                       </svg>
-                      <span dir="rtl">{l}</span>
+                      <span dir={language === "ar" ? "rtl" : "ltr"}>{l}</span>
                     </a>
                   ))}
                 </div>
@@ -101,18 +184,14 @@ const Footer = () => {
 
               {/* Related links */}
               <div>
-                <p className="ft-col-title">روابط ذات صلة</p>
+                <p className="ft-col-title">{t.relatedTitle}</p>
                 <div className="space-y-3">
-                  {[
-                    { l: "APFM (لاحقًا)",      h: "#" },
-                    { l: "المكتبة (لاحقًا)",   h: "#" },
-                    { l: "تواصل معنا (لاحقًا)", h: "#" },
-                  ].map(({ l, h }) => (
+                  {relatedLinks.map(({ l, h }) => (
                     <a key={l} href={h} className="ft-link block" dir="ltr">
                       <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
                       </svg>
-                      <span dir="rtl">{l}</span>
+                      <span dir={language === "ar" ? "rtl" : "ltr"}>{l}</span>
                     </a>
                   ))}
 
@@ -138,8 +217,8 @@ const Footer = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-[12px] font-bold text-white/80">نسخة أولية تجريبية</p>
-                      <p className="text-[11px] font-mono" style={{ color: "rgba(201,168,76,0.65)" }}>V1 · Prototype</p>
+                      <p className="text-[12px] font-bold text-white/80">{t.protoTitle}</p>
+                      <p className="text-[11px] font-mono" style={{ color: "rgba(201,168,76,0.65)" }}>{t.protoVersion}</p>
                     </div>
                   </div>
                 </div>
@@ -153,17 +232,17 @@ const Footer = () => {
           <div
             className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 py-4
                         flex flex-col sm:flex-row items-center justify-between gap-2"
-            dir="rtl"
+            dir={language === "ar" ? "rtl" : "ltr"}
           >
             <p className="text-[12px] text-white/30">
-              © AIDSMO {new Date().getFullYear()} — جميع الحقوق محفوظة
+              © AIDSMO {new Date().getFullYear()} - {t.rights}
             </p>
             <p className="text-[11px] text-white/25 text-center">
-              تم تطوير هذه النسخة لأغراض العرض والتجربة الأولية للبوابة.
+              {t.developed}
             </p>
             <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[11px] text-white/25">Online</span>
+              <span className="text-[11px] text-white/25">{t.online}</span>
             </div>
           </div>
         </div>

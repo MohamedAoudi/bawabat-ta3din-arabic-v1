@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import Chart from "chart.js/auto";
 import { TreemapController, TreemapElement } from "chartjs-chart-treemap";
+import { LanguageContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { dataByMineral, mineralUnits } from "./M1";
@@ -62,6 +63,248 @@ const COUNTRIES = [
   { name: "الجمهورية اليمنية", code: "ye" },
 ];
 
+const COUNTRY_LABELS = {
+  jo: { ar: "المملكة الأردنية الهاشمية", fr: "Royaume hachémite de Jordanie", en: "Hashemite Kingdom of Jordan" },
+  ae: { ar: "دولة الامارات العربية المتحدة", fr: "Émirats arabes unis", en: "United Arab Emirates" },
+  bh: { ar: "مملكة البحرين", fr: "Royaume de Bahreïn", en: "Kingdom of Bahrain" },
+  tn: { ar: "الجمهورية التونسية", fr: "République tunisienne", en: "Tunisian Republic" },
+  dz: { ar: "الجمهورية الجزائرية الديمقراطية الشعبية", fr: "République algérienne démocratique et populaire", en: "People's Democratic Republic of Algeria" },
+  dj: { ar: "جمهورية جيبوتي", fr: "République de Djibouti", en: "Republic of Djibouti" },
+  sa: { ar: "المملكة العربية السعودية", fr: "Royaume d'Arabie saoudite", en: "Kingdom of Saudi Arabia" },
+  sd: { ar: "جمهورية السودان", fr: "République du Soudan", en: "Republic of the Sudan" },
+  sy: { ar: "الجمهورية العربية السورية", fr: "République arabe syrienne", en: "Syrian Arab Republic" },
+  so: { ar: "جمهورية الصومال", fr: "République fédérale de Somalie", en: "Federal Republic of Somalia" },
+  iq: { ar: "جمهورية العراق", fr: "République d'Irak", en: "Republic of Iraq" },
+  om: { ar: "سلطنة عمان", fr: "Sultanat d'Oman", en: "Sultanate of Oman" },
+  ps: { ar: "دولة فلسطين", fr: "État de Palestine", en: "State of Palestine" },
+  qa: { ar: "دولة قطر", fr: "État du Qatar", en: "State of Qatar" },
+  kw: { ar: "دولة الكويت", fr: "État du Koweït", en: "State of Kuwait" },
+  lb: { ar: "الجمهورية اللبنانية", fr: "République libanaise", en: "Lebanese Republic" },
+  ly: { ar: "دولة ليبيا", fr: "État de Libye", en: "State of Libya" },
+  eg: { ar: "جمهورية مصر العربية", fr: "République arabe d'Égypte", en: "Arab Republic of Egypt" },
+  ma: { ar: "المملكة المغربية", fr: "Royaume du Maroc", en: "Kingdom of Morocco" },
+  mr: { ar: "الجمهورية الإسلامية الموريتانية", fr: "République islamique de Mauritanie", en: "Islamic Republic of Mauritania" },
+  ye: { ar: "الجمهورية اليمنية", fr: "République du Yémen", en: "Republic of Yemen" },
+};
+
+const PAGE_TRANSLATIONS = {
+  ar: {
+    none: "—",
+    allMinerals: "كل الخامات",
+    thousandTon: "ألف طن",
+    kilograms: "كجم",
+    countryProfile: "ملف الدولة",
+    productionComparison: "مقارنة الإنتاج",
+    productionComparisonSubtitle: (year) => `انتاج الخامات بالحجم حسب السنة ${year}`,
+    arabCountries: "الدول العربية",
+    world: "العالم",
+    noDataForYear: (year) => `لا توجد بيانات لسنة ${year}`,
+    noData: "لا توجد بيانات",
+    shareOfArab: "من الإنتاج العربي",
+    shareOfWorld: "من الإنتاج العالمي",
+    topProducingCountries: "أكبر الدول إنتاجًا",
+    total: "الإجمالي",
+    productionTrend: "تطوّر الإنتاج التعديني",
+    productionTrendSubtitle: (country, mineralFilter) => `${country} — جميع السنوات${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
+    yearlyProduction: "انتاج الخامات بالحجم حسب السنة",
+    yearlyProductionSubtitle: (country, year, mineralFilter, unitLabel) => `${country} — سنة ${year}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""} (${unitLabel})`,
+    mineralDistribution: "توزيع المعادن حسب النسبة",
+    mineralDistributionSubtitle: (country, year) => `${country} — ${year}`,
+    tradeValueUsd: (country) => `${country} — القيمة بالدولار الأمريكي`,
+    miningOutputBadge: "الإنتاج التعديني العربي",
+    countriesFilesTitle: "ملفات الدول",
+    countriesFilesSubtitle: "اختر دولة لعرض بياناتها التعدينية",
+    arabCountriesTitle: "الدول العربية",
+    chooseCountry: "اختر دولة للوصول إلى ملفها التعديني",
+    more: "المزيد",
+    selectedCountry: "الدولة المختارة:",
+    miningIndicators: "المؤشرات التعدينية",
+    tradeIndicators: "الصادرات والواردات",
+    totalExportsTitle: "اجمالي الصادرات للمعادن",
+    totalImportsTitle: "اجمالي الواردات للمعادن",
+    selectYear: "اختر السنة :",
+    miningProduction: "الإنتاج التعديني",
+    totalMiningProduction: "إجمالي الإنتاج التعديني",
+    numberOfProducts: "عدد المنتجات التعدينية",
+    topMiningProduct: "أكبر منتج تعديني",
+    topMiningProductValue: "قيمة أكبر منتج تعديني",
+    tradeBalance: "الميزان التجاري",
+    surplusDeficit: "(الفائض / العجز)",
+    miningTrade: "التجارة التعدينية",
+    miningExports: "الصادرات التعدينية",
+    totalExports: "إجمالي الصادرات",
+    numberOfExportedMinerals: "عدد المعادن المصدرة",
+    topExportedMineral: "أكبر معدن مصدر",
+    exportGrowth: "معدل النمو السنوي للصادرات",
+    exportMarkets: "عدد الأسواق المصدرة",
+    exportConcentration: "مؤشر تركّز الصادرات",
+    miningImports: "الواردات التعدينية",
+    totalImports: "إجمالي الواردات",
+    numberOfImportedMinerals: "عدد المعادن الواردة",
+    topImportedMineral: "أكبر معدن وارد",
+    importGrowth: "معدل النمو السنوي للواردات",
+    importMarkets: "عدد الأسواق الواردة",
+    importConcentration: "مؤشر تركّز الواردات",
+    noComparisonYear: "لا توجد سنة مقارنة",
+    comparedTo: (year) => `مقارنة بـ ${year}`,
+    tradeSurplus: "فائض تجاري",
+    tradeDeficit: "عجز تجاري",
+    tradeBalanced: "توازن تجاري",
+    noTradeData: "لا توجد بيانات",
+    productsCount: (count) => `${count} منتج / خام`,
+    mineralsCount: (count) => `${count} معدن`,
+    millionDollar: "مليون دولار",
+    dollar: "دولار",
+    millionTonValue: "مليون طن",
+  },
+  fr: {
+    none: "—",
+    allMinerals: "Tous les minerais",
+    thousandTon: "Kt",
+    kilograms: "kg",
+    countryProfile: "Fiche pays",
+    productionComparison: "Comparaison de la production",
+    productionComparisonSubtitle: (year) => `Production minière par volume en ${year}`,
+    arabCountries: "Pays arabes",
+    world: "Monde",
+    noDataForYear: (year) => `Aucune donnée pour ${year}`,
+    noData: "Aucune donnée",
+    shareOfArab: "de la production arabe",
+    shareOfWorld: "de la production mondiale",
+    topProducingCountries: "Principaux pays producteurs",
+    total: "Total",
+    productionTrend: "Évolution de la production minière",
+    productionTrendSubtitle: (country, mineralFilter) => `${country} — toutes les années${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
+    yearlyProduction: "Production minière annuelle",
+    yearlyProductionSubtitle: (country, year, mineralFilter, unitLabel) => `${country} — ${year}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""} (${unitLabel})`,
+    mineralDistribution: "Répartition des minerais",
+    mineralDistributionSubtitle: (country, year) => `${country} — ${year}`,
+    tradeValueUsd: (country) => `${country} — valeur en dollars US`,
+    miningOutputBadge: "Production minière arabe",
+    countriesFilesTitle: "Profils pays",
+    countriesFilesSubtitle: "Choisissez un pays pour afficher ses données minières",
+    arabCountriesTitle: "Pays arabes",
+    chooseCountry: "Choisissez un pays pour accéder à sa fiche minière",
+    more: "Voir plus",
+    selectedCountry: "Pays sélectionné :",
+    miningIndicators: "Indicateurs miniers",
+    tradeIndicators: "Exportations et importations",
+    totalExportsTitle: "Total des exportations minières",
+    totalImportsTitle: "Total des importations minières",
+    selectYear: "Choisir l'année :",
+    miningProduction: "Production minière",
+    totalMiningProduction: "Production minière totale",
+    numberOfProducts: "Nombre de produits miniers",
+    topMiningProduct: "Premier produit minier",
+    topMiningProductValue: "Valeur du premier produit",
+    tradeBalance: "Balance commerciale",
+    surplusDeficit: "(excédent / déficit)",
+    miningTrade: "Commerce minier",
+    miningExports: "Exportations minières",
+    totalExports: "Exportations totales",
+    numberOfExportedMinerals: "Nombre de minerais exportés",
+    topExportedMineral: "Minerai le plus exporté",
+    exportGrowth: "Croissance annuelle des exportations",
+    exportMarkets: "Nombre de marchés d'exportation",
+    exportConcentration: "Indice de concentration des exportations",
+    miningImports: "Importations minières",
+    totalImports: "Importations totales",
+    numberOfImportedMinerals: "Nombre de minerais importés",
+    topImportedMineral: "Minerai le plus importé",
+    importGrowth: "Croissance annuelle des importations",
+    importMarkets: "Nombre de marchés d'importation",
+    importConcentration: "Indice de concentration des importations",
+    noComparisonYear: "Aucune année de comparaison",
+    comparedTo: (year) => `Comparé à ${year}`,
+    tradeSurplus: "Excédent commercial",
+    tradeDeficit: "Déficit commercial",
+    tradeBalanced: "Équilibre commercial",
+    noTradeData: "Aucune donnée",
+    productsCount: (count) => `${count} produits / minerais`,
+    mineralsCount: (count) => `${count} minerais`,
+    millionDollar: "millions USD",
+    dollar: "USD",
+    millionTonValue: "millions de tonnes",
+  },
+  en: {
+    none: "—",
+    allMinerals: "All minerals",
+    thousandTon: "k tons",
+    kilograms: "kg",
+    countryProfile: "Country profile",
+    productionComparison: "Production comparison",
+    productionComparisonSubtitle: (year) => `Mining output by volume in ${year}`,
+    arabCountries: "Arab countries",
+    world: "World",
+    noDataForYear: (year) => `No data for ${year}`,
+    noData: "No data",
+    shareOfArab: "of Arab output",
+    shareOfWorld: "of global output",
+    topProducingCountries: "Top producing countries",
+    total: "Total",
+    productionTrend: "Mining production trend",
+    productionTrendSubtitle: (country, mineralFilter) => `${country} — all years${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
+    yearlyProduction: "Yearly mining output",
+    yearlyProductionSubtitle: (country, year, mineralFilter, unitLabel) => `${country} — ${year}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""} (${unitLabel})`,
+    mineralDistribution: "Mineral distribution share",
+    mineralDistributionSubtitle: (country, year) => `${country} — ${year}`,
+    tradeValueUsd: (country) => `${country} — value in USD`,
+    miningOutputBadge: "Arab mining production",
+    countriesFilesTitle: "Country profiles",
+    countriesFilesSubtitle: "Choose a country to view its mining data",
+    arabCountriesTitle: "Arab countries",
+    chooseCountry: "Choose a country to open its mining profile",
+    more: "More",
+    selectedCountry: "Selected country:",
+    miningIndicators: "Mining indicators",
+    tradeIndicators: "Exports and imports",
+    totalExportsTitle: "Total mineral exports",
+    totalImportsTitle: "Total mineral imports",
+    selectYear: "Select year:",
+    miningProduction: "Mining production",
+    totalMiningProduction: "Total mining production",
+    numberOfProducts: "Number of mining products",
+    topMiningProduct: "Top mining product",
+    topMiningProductValue: "Top product value",
+    tradeBalance: "Trade balance",
+    surplusDeficit: "(surplus / deficit)",
+    miningTrade: "Mining trade",
+    miningExports: "Mining exports",
+    totalExports: "Total exports",
+    numberOfExportedMinerals: "Number of exported minerals",
+    topExportedMineral: "Top exported mineral",
+    exportGrowth: "Annual export growth",
+    exportMarkets: "Number of export markets",
+    exportConcentration: "Export concentration index",
+    miningImports: "Mining imports",
+    totalImports: "Total imports",
+    numberOfImportedMinerals: "Number of imported minerals",
+    topImportedMineral: "Top imported mineral",
+    importGrowth: "Annual import growth",
+    importMarkets: "Number of import markets",
+    importConcentration: "Import concentration index",
+    noComparisonYear: "No comparison year",
+    comparedTo: (year) => `Compared with ${year}`,
+    tradeSurplus: "Trade surplus",
+    tradeDeficit: "Trade deficit",
+    tradeBalanced: "Balanced trade",
+    noTradeData: "No data",
+    productsCount: (count) => `${count} products / ores`,
+    mineralsCount: (count) => `${count} minerals`,
+    millionDollar: "million USD",
+    dollar: "USD",
+    millionTonValue: "million tons",
+  },
+};
+
+const NUMBER_LOCALES = {
+  ar: "ar-SA",
+  fr: "fr-FR",
+  en: "en-US",
+};
+
+const UNIT_LABELS = { ton: "ألف طن", kg: "كجم" };
+
 const COUNTRY_AR_TO_CSV_NAME = {
   "المملكة الأردنية الهاشمية": "Jordan",
   "دولة الامارات العربية المتحدة": "United Arab Emirates",
@@ -100,11 +343,36 @@ const DEFAULT_SELECTED_YEAR = ALL_YEARS.includes(2019)
   ? 2019
   : ALL_YEARS[ALL_YEARS.length - 1];
 
-const UNIT_LABELS = { ton: "ألف طن", kg: "كجم" };
-const MINERAL_FILTER_OPTIONS = [
-  { value: "all", label: "كل الخامات" },
-  ...Object.keys(dataByMineral).map((mineral) => ({ value: mineral, label: mineral })),
-];
+const getLabelsForLanguage = (language) => PAGE_TRANSLATIONS[language] || PAGE_TRANSLATIONS.ar;
+
+const getUnitLabel = (unit, language) => {
+  const labels = getLabelsForLanguage(language);
+  return unit === "kg" ? labels.kilograms : labels.thousandTon;
+};
+
+const buildMineralFilterOptions = (language) => {
+  const labels = getLabelsForLanguage(language);
+  return [
+    { value: "all", label: labels.allMinerals },
+    ...Object.keys(dataByMineral).map((mineral) => ({ value: mineral, label: mineral })),
+  ];
+};
+
+const getCountryDisplayName = (countryName, language) => {
+  const country = COUNTRIES.find((item) => item.name === countryName || item.code === countryName);
+  if (!country) return countryName;
+  return COUNTRY_LABELS[country.code]?.[language] || country.name;
+};
+
+const useCountriesI18n = () => {
+  const { language } = useContext(LanguageContext);
+  return {
+    language,
+    labels: getLabelsForLanguage(language),
+    locale: NUMBER_LOCALES[language] || NUMBER_LOCALES.ar,
+    isArabic: language === "ar",
+  };
+};
 
 const parseCsvLine = (line, delimiter = ",") => {
   const result = [];
@@ -498,6 +766,18 @@ const fmtVal = (v) => {
   return v.toFixed(2);
 };
 
+const formatLargeTonValue = (value, labels, locale) => {
+  if (value == null) return labels.none;
+  if (value >= 1000) return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(value / 1000)} ${labels.millionTonValue}`;
+  return `${fmtVal(value)} ${labels.thousandTon}`;
+};
+
+const formatDollarValue = (value, labels, locale) => {
+  if (value == null) return labels.none;
+  if (value >= 1_000_000) return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(value / 1_000_000)} ${labels.millionDollar}`;
+  return `${fmtVal(value)} ${labels.dollar}`;
+};
+
 const DONUT_PALETTE = ["#10b981","#3b82f6","#f59e0b","#8b5cf6","#ef4444","#06b6d4","#84cc16","#f97316","#ec4899","#64748b","#a78bfa","#fb923c"];
 
 const COUNTRY_THEME_PRESETS = {
@@ -620,18 +900,6 @@ const MOROCCO_SNAPSHOT_2023 = {
   },
 };
 
-const formatLargeTonValue = (value) => {
-  if (value == null) return "—";
-  if (value >= 1000) return `${(value / 1000).toFixed(2)} مليون طن`;
-  return `${fmtVal(value)} ألف طن`;
-};
-
-const formatDollarValue = (value) => {
-  if (value == null) return "—";
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)} مليون دولار`;
-  return `${fmtVal(value)} دولار`;
-};
-
 const formatGrowthPercent = (value) => {
   if (value == null) return "—";
   return `${value.toFixed(2)} %`;
@@ -648,6 +916,8 @@ const buildCountrySnapshot = ({
   importSeries,
   exportBreakdownByYear,
   importBreakdownByYear,
+  labels,
+  locale,
 }) => {
   if (countryCode === "ma" && year === 2023) {
     return MOROCCO_SNAPSHOT_2023;
@@ -684,34 +954,34 @@ const buildCountrySnapshot = ({
   return {
     year,
     production: {
-      totalText: formatLargeTonValue(productionTotal),
-      countText: productionRows.length ? `${productionRows.length} منتج / خام` : "—",
-      topMineral: topProduction?.mineral || "—",
-      topValueText: topProduction ? formatLargeTonValue(topProduction.value) : "—",
+      totalText: formatLargeTonValue(productionTotal, labels, locale),
+      countText: productionRows.length ? labels.productsCount(productionRows.length) : labels.none,
+      topMineral: topProduction?.mineral || labels.none,
+      topValueText: topProduction ? formatLargeTonValue(topProduction.value, labels, locale) : labels.none,
     },
     tradeBalance: {
-      valueText: tradeBalance == null ? "—" : `${tradeBalance >= 0 ? "+" : "-"} ${formatDollarValue(Math.abs(tradeBalance))}`,
+      valueText: tradeBalance == null ? labels.none : `${tradeBalance >= 0 ? "+" : "-"} ${formatDollarValue(Math.abs(tradeBalance), labels, locale)}`,
       statusText:
-        tradeBalance == null ? "لا توجد بيانات" : tradeBalance > 0 ? "فائض تجاري" : tradeBalance < 0 ? "عجز تجاري" : "توازن تجاري",
+        tradeBalance == null ? labels.noTradeData : tradeBalance > 0 ? labels.tradeSurplus : tradeBalance < 0 ? labels.tradeDeficit : labels.tradeBalanced,
       tone: tradeBalance == null ? "neutral" : tradeBalance >= 0 ? "positive" : "negative",
     },
     exports: {
-      totalText: formatDollarValue(exportValue),
-      countText: Object.keys(exportsByMineral).length ? `${Object.keys(exportsByMineral).length} معدن` : "—",
-      topMineral: topExport?.[0] || "—",
+      totalText: formatDollarValue(exportValue, labels, locale),
+      countText: Object.keys(exportsByMineral).length ? labels.mineralsCount(Object.keys(exportsByMineral).length) : labels.none,
+      topMineral: topExport?.[0] || labels.none,
       growthText: formatGrowthPercent(exportGrowth),
-      growthSubtext: previousExportValue != null ? `مقارنة بـ ${year - 1}` : "لا توجد سنة مقارنة",
-      marketsText: "—",
-      concentrationText: exportConcentration != null ? `${exportConcentration.toFixed(1)} %` : "—",
+      growthSubtext: previousExportValue != null ? labels.comparedTo(year - 1) : labels.noComparisonYear,
+      marketsText: labels.none,
+      concentrationText: exportConcentration != null ? `${exportConcentration.toFixed(1)} %` : labels.none,
     },
     imports: {
-      totalText: formatDollarValue(importValue),
-      countText: Object.keys(importsByMineral).length ? `${Object.keys(importsByMineral).length} معدن` : "—",
-      topMineral: topImport?.[0] || "—",
+      totalText: formatDollarValue(importValue, labels, locale),
+      countText: Object.keys(importsByMineral).length ? labels.mineralsCount(Object.keys(importsByMineral).length) : labels.none,
+      topMineral: topImport?.[0] || labels.none,
       growthText: formatGrowthPercent(importGrowth),
-      growthSubtext: previousImportValue != null ? `مقارنة بـ ${year - 1}` : "لا توجد سنة مقارنة",
-      marketsText: "—",
-      concentrationText: importConcentration != null ? `${importConcentration.toFixed(1)} %` : "—",
+      growthSubtext: previousImportValue != null ? labels.comparedTo(year - 1) : labels.noComparisonYear,
+      marketsText: labels.none,
+      concentrationText: importConcentration != null ? `${importConcentration.toFixed(1)} %` : labels.none,
     },
   };
 };
@@ -778,6 +1048,7 @@ const CountrySnapshotPanel = ({
   exportBreakdownByYear,
   importBreakdownByYear,
 }) => {
+  const { labels, language, locale } = useCountriesI18n();
   const summary = buildCountrySnapshot({
     country,
     countryCode,
@@ -786,6 +1057,8 @@ const CountrySnapshotPanel = ({
     importSeries,
     exportBreakdownByYear,
     importBreakdownByYear,
+    labels,
+    locale,
   });
   const isMorocco = countryCode === "ma";
   const balanceColor =
@@ -799,9 +1072,9 @@ const CountrySnapshotPanel = ({
     return (
       <section className="rounded-[10px] bg-white p-1.5 sm:p-2" style={{ border: "1px solid #b8b8b8" }}>
         <div className="mb-2 flex items-center justify-end gap-3 px-1">
-          <h3 className="text-[18px] font-black leading-none text-[#b8860b]">{country}</h3>
+          <h3 className="text-[18px] font-black leading-none text-[#b8860b]">{getCountryDisplayName(country, language)}</h3>
           <label className="flex items-center gap-2 text-[16px] font-bold text-slate-700">
-            <span>اختر السنة :</span>
+            <span>{labels.selectYear}</span>
             <select
               value={2023}
               onChange={() => {}}
@@ -813,38 +1086,38 @@ const CountrySnapshotPanel = ({
           </label>
         </div>
 
-        <SnapshotSectionHeader title="الإنتاج التعديني" featured />
+        <SnapshotSectionHeader title={labels.miningProduction} featured />
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <SnapshotStatCard title="إجمالي الإنتاج التعديني" value={summary.production.totalText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
-          <SnapshotStatCard title="عدد المنتجات التعدينية" value={summary.production.countText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
-          <SnapshotStatCard title="أكبر منتج تعديني" value={summary.production.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
-          <SnapshotStatCard title="قيمة أكبر منتج تعديني" value={summary.production.topValueText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+          <SnapshotStatCard title={labels.totalMiningProduction} value={summary.production.totalText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+          <SnapshotStatCard title={labels.numberOfProducts} value={summary.production.countText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+          <SnapshotStatCard title={labels.topMiningProduct} value={summary.production.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
+          <SnapshotStatCard title={labels.topMiningProductValue} value={summary.production.topValueText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
         </div>
 
         <div className="mt-2">
           <div>
             <div className="space-y-2">
               <div>
-                <SnapshotSectionHeader title="الصادرات التعدينية" featured />
+                <SnapshotSectionHeader title={labels.miningExports} featured />
                 <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
-                  <SnapshotStatCard title="إجمالي الصادرات" value={summary.exports.totalText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="عدد المعادن المصدرة" value={summary.exports.countText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="أكبر معدن مصدر" value={summary.exports.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="معدل النمو السنوي للصادرات" value={summary.exports.growthText} note={`(${summary.exports.growthSubtext})`} borderColor="#b9b9b9" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="عدد الأسواق المصدرة" value={summary.exports.marketsText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="مؤشر تركّز الصادرات" value={summary.exports.concentrationText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.totalExports} value={summary.exports.totalText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.numberOfExportedMinerals} value={summary.exports.countText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.topExportedMineral} value={summary.exports.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.exportGrowth} value={summary.exports.growthText} note={`(${summary.exports.growthSubtext})`} borderColor="#b9b9b9" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.exportMarkets} value={summary.exports.marketsText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.exportConcentration} value={summary.exports.concentrationText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
                 </div>
               </div>
 
               <div>
-                <SnapshotSectionHeader title="الواردات التعدينية" featured />
+                <SnapshotSectionHeader title={labels.miningImports} featured />
                 <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
-                  <SnapshotStatCard title="إجمالي الواردات" value={summary.imports.totalText} borderColor="#b9b9b9" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="عدد المعادن الواردة" value={summary.imports.countText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="أكبر معدن وارد" value={summary.imports.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="معدل النمو السنوي للواردات" value={summary.imports.growthText} note={`(${summary.imports.growthSubtext})`} borderColor="#b9b9b9" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="عدد الأسواق الواردة" value={summary.imports.marketsText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title="مؤشر تركّز الواردات" value={summary.imports.concentrationText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.totalImports} value={summary.imports.totalText} borderColor="#b9b9b9" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.numberOfImportedMinerals} value={summary.imports.countText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.topImportedMineral} value={summary.imports.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.importGrowth} value={summary.imports.growthText} note={`(${summary.imports.growthSubtext})`} borderColor="#b9b9b9" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.importMarkets} value={summary.imports.marketsText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
+                  <SnapshotStatCard title={labels.importConcentration} value={summary.imports.concentrationText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
                 </div>
               </div>
             </div>
@@ -858,7 +1131,7 @@ const CountrySnapshotPanel = ({
     <section className="rounded-[24px] bg-[#f7f7f7] p-4 sm:p-5" style={{ border: "1px solid #d4d4d4" }}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <label className="flex items-center gap-2 text-[16px] font-bold text-slate-700">
-          <span>اختر السنة :</span>
+          <span>{labels.selectYear}</span>
           <select
             value={year}
             onChange={(e) => onYearChange?.(Number(e.target.value))}
@@ -872,20 +1145,20 @@ const CountrySnapshotPanel = ({
         </label>
       </div>
 
-      <SnapshotSectionHeader title="الإنتاج التعديني" featured />
+      <SnapshotSectionHeader title={labels.miningProduction} featured />
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <SnapshotStatCard title="إجمالي الإنتاج التعديني" value={summary.production.totalText} borderColor="#a3a3a3 " />
-        <SnapshotStatCard title="عدد المنتجات التعدينية" value={summary.production.countText} borderColor="#d4a017" />
-        <SnapshotStatCard title="أكبر منتج تعديني" value={summary.production.topMineral} borderColor="#a0522d" />
-        <SnapshotStatCard title="قيمة أكبر منتج تعديني" value={summary.production.topValueText} borderColor="#16a34a" />
+        <SnapshotStatCard title={labels.totalMiningProduction} value={summary.production.totalText} borderColor="#a3a3a3 " />
+        <SnapshotStatCard title={labels.numberOfProducts} value={summary.production.countText} borderColor="#d4a017" />
+        <SnapshotStatCard title={labels.topMiningProduct} value={summary.production.topMineral} borderColor="#a0522d" />
+        <SnapshotStatCard title={labels.topMiningProductValue} value={summary.production.topValueText} borderColor="#16a34a" />
       </div>
 
       <div className="mt-5">
-        <SnapshotSectionHeader title="التجارة التعدينية" featured />
+        <SnapshotSectionHeader title={labels.miningTrade} featured />
         <div className="grid gap-3 xl:grid-cols-[180px_minmax(0,1fr)]">
           <div className="rounded-[22px] bg-white px-4 py-6 text-center" style={{ border: `2px solid ${balanceColor}` }}>
-            <p className="text-[15px] font-bold" style={{ color: "#d4a017" }}>الميزان التجاري</p>
-            <p className="text-[16px] font-bold" style={{ color: "#d4a017" }}>(الفائض / العجز)</p>
+            <p className="text-[15px] font-bold" style={{ color: "#d4a017" }}>{labels.tradeBalance}</p>
+            <p className="text-[16px] font-bold" style={{ color: "#d4a017" }}>{labels.surplusDeficit}</p>
             <div className="mt-16 space-y-2">
               <p className="text-[28px] font-black text-slate-900">{summary.tradeBalance.statusText}</p>
               <p className="text-[32px] font-black leading-tight text-slate-900">{summary.tradeBalance.valueText}</p>
@@ -894,26 +1167,26 @@ const CountrySnapshotPanel = ({
 
           <div className="space-y-4">
             <div>
-              <SnapshotSectionHeader title="الصادرات التعدينية" />
+              <SnapshotSectionHeader title={labels.miningExports} />
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                <SnapshotStatCard title="إجمالي الصادرات" value={summary.exports.totalText} borderColor="#a3a3a3" />
-                <SnapshotStatCard title="عدد المعادن المصدرة" value={summary.exports.countText} borderColor="#d4a017" />
-                <SnapshotStatCard title="أكبر معدن مصدر" value={summary.exports.topMineral} borderColor="#a0522d" />
-                <SnapshotStatCard title="معدل النمو السنوي للصادرات" value={summary.exports.growthText} note={summary.exports.growthSubtext} borderColor="#a3a3a3" />
-                <SnapshotStatCard title="عدد الأسواق المصدرة" value={summary.exports.marketsText} borderColor="#d4a017" />
-                <SnapshotStatCard title="مؤشر تركّز الصادرات" value={summary.exports.concentrationText} borderColor="#a0522d" />
+                <SnapshotStatCard title={labels.totalExports} value={summary.exports.totalText} borderColor="#a3a3a3" />
+                <SnapshotStatCard title={labels.numberOfExportedMinerals} value={summary.exports.countText} borderColor="#d4a017" />
+                <SnapshotStatCard title={labels.topExportedMineral} value={summary.exports.topMineral} borderColor="#a0522d" />
+                <SnapshotStatCard title={labels.exportGrowth} value={summary.exports.growthText} note={summary.exports.growthSubtext} borderColor="#a3a3a3" />
+                <SnapshotStatCard title={labels.exportMarkets} value={summary.exports.marketsText} borderColor="#d4a017" />
+                <SnapshotStatCard title={labels.exportConcentration} value={summary.exports.concentrationText} borderColor="#a0522d" />
               </div>
             </div>
 
             <div>
-              <SnapshotSectionHeader title="الواردات التعدينية" />
+              <SnapshotSectionHeader title={labels.miningImports} />
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                <SnapshotStatCard title="إجمالي الواردات" value={summary.imports.totalText} borderColor="#a3a3a3" />
-                <SnapshotStatCard title="عدد المعادن الواردة" value={summary.imports.countText} borderColor="#d4a017" />
-                <SnapshotStatCard title="أكبر معدن وارد" value={summary.imports.topMineral} borderColor="#a0522d" />
-                <SnapshotStatCard title="معدل النمو السنوي للواردات" value={summary.imports.growthText} note={summary.imports.growthSubtext} borderColor="#a3a3a3" />
-                <SnapshotStatCard title="عدد الأسواق الواردة" value={summary.imports.marketsText} borderColor="#d4a017" />
-                <SnapshotStatCard title="مؤشر تركّز الواردات" value={summary.imports.concentrationText} borderColor="#a0522d" />
+                <SnapshotStatCard title={labels.totalImports} value={summary.imports.totalText} borderColor="#a3a3a3" />
+                <SnapshotStatCard title={labels.numberOfImportedMinerals} value={summary.imports.countText} borderColor="#d4a017" />
+                <SnapshotStatCard title={labels.topImportedMineral} value={summary.imports.topMineral} borderColor="#a0522d" />
+                <SnapshotStatCard title={labels.importGrowth} value={summary.imports.growthText} note={summary.imports.growthSubtext} borderColor="#a3a3a3" />
+                <SnapshotStatCard title={labels.importMarkets} value={summary.imports.marketsText} borderColor="#d4a017" />
+                <SnapshotStatCard title={labels.importConcentration} value={summary.imports.concentrationText} borderColor="#a0522d" />
               </div>
             </div>
           </div>
@@ -1032,7 +1305,9 @@ const ChartSectionTitle = ({ title }) => (
 
 // ── Country Hero Banner ────────────────────────────────────────────────────────
 const CountryHeroBanner = ({ country, countryCode, theme }) => {
+  const { labels, language } = useCountriesI18n();
   const flagSrc = countryFlags[countryCode];
+  const countryLabel = getCountryDisplayName(country, language);
   return (
     <div className="relative overflow-hidden rounded-2xl flex items-center gap-6 px-6 py-5"
       style={{ background:theme?.heroBg || "linear-gradient(135deg,#082c23 0%,#0d3b2e 40%,#0a3028 100%)", border:"1px solid rgba(201,168,76,0.25)", boxShadow:"0 4px 24px rgba(0,0,0,0.35),inset 0 1px 0 rgba(201,168,76,0.10)", fontFamily:"'Cairo','Tajawal',sans-serif" }}>
@@ -1048,9 +1323,9 @@ const CountryHeroBanner = ({ country, countryCode, theme }) => {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 mb-1">
           <div className="h-px flex-1" style={{ background:"linear-gradient(90deg,rgba(201,168,76,0.4),transparent)" }} />
-          <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(201,168,76,0.5)" }}>ملف الدولة</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(201,168,76,0.5)" }}>{labels.countryProfile}</span>
         </div>
-        <h2 className="font-black leading-snug" style={{ color:"#ffffff", fontSize:"clamp(16px,2.5vw,22px)", textShadow:"0 2px 12px rgba(0,0,0,0.5)" }}>{country}</h2>
+        <h2 className="font-black leading-snug" style={{ color:"#ffffff", fontSize:"clamp(16px,2.5vw,22px)", textShadow:"0 2px 12px rgba(0,0,0,0.5)" }}>{countryLabel}</h2>
         <div className="flex items-center gap-2 mt-2">
           
         </div>
@@ -1061,6 +1336,7 @@ const CountryHeroBanner = ({ country, countryCode, theme }) => {
 
 // ── Donut ──────────────────────────────────────────────────────────────────────
 const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, onYearChange }) => {
+  const { labels, language } = useCountriesI18n();
   const canvasRef = useRef(null);
   const chartRef  = useRef(null);
   const [scope, setScope] = useState("arab");
@@ -1081,7 +1357,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
       data: { labels: result.slices.map(s=>s.name), datasets: [{ data: result.slices.map(s=>s.value), backgroundColor: colors, borderColor: borders, borderWidth: borderWidths, hoverOffset: 10 }] },
       options: { responsive:true, maintainAspectRatio:false, cutout:"64%",
         plugins: { legend:{display:false}, tooltip:{ rtl:true, bodyFont:{family:"Cairo",size:12}, titleFont:{family:"Cairo",size:13,weight:"700"},
-          callbacks:{ label(c){ const val=c.parsed; const pct=result.total>0?((val/result.total)*100).toFixed(1):0; return ` ${fmtVal(val)} ${UNIT_LABELS[unit]||""}  (${pct}%)`; } } } } },
+          callbacks:{ label(c){ const val=c.parsed; const pct=result.total>0?((val/result.total)*100).toFixed(1):0; return ` ${fmtVal(val)} ${getUnitLabel(unit, language)}  (${pct}%)`; } } } } },
     });
     return () => { destroyChart(chartRef); };
   }, [selectedCountry, year, mineralFilter, unit, scope]);
@@ -1093,9 +1369,9 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
 
   return (
     <Card>
-      <CardHeader title="مقارنة الإنتاج" subtitle={`انتاج الخامات بالحجم حسب السنة    ${year} `}>
+      <CardHeader title={labels.productionComparison} subtitle={labels.productionComparisonSubtitle(year)}>
         <div className="flex rounded-full overflow-hidden" style={{ border:"1px solid rgba(201,168,76,0.25)" }}>
-          {[{key:"arab",label:"الدول العربية"},{key:"world",label:"العالم"}].map(({key,label})=>(
+          {[{key:"arab",label:labels.arabCountries},{key:"world",label:labels.world}].map(({key,label})=>(
             <button key={key} type="button" onClick={()=>setScope(key)}
               className="px-4 py-1.5 text-[11px] font-bold transition-all duration-200"
               style={scope===key?{background:"linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",color:"#082721"}:{background:"transparent",color:"rgba(255,255,255,0.4)"}}>
@@ -1108,7 +1384,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
 
       {noData||!result ? (
         <div className="h-[300px] flex flex-col items-center justify-center gap-3">
-          <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>لا توجد بيانات لسنة {year}</p>
+          <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.noDataForYear(year)}</p>
         </div>
       ) : (
         <div className="space-y-5">
@@ -1123,7 +1399,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
                 <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", pointerEvents:"none" }}>
                   <span className="text-[30px] font-black leading-none" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
                   <span className="text-[10px] font-bold mt-1 text-center px-4 leading-snug" style={{ color:"rgba(255,255,255,0.35)" }}>
-                    {scope==="arab"?"من الإنتاج العربي":"من الإنتاج العالمي"}
+                    {scope==="arab" ? labels.shareOfArab : labels.shareOfWorld}
                   </span>
                 </div>
               )}
@@ -1137,12 +1413,12 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
                     </span>
                     <span className="text-[15px] font-black" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
                   </div>
-                  <p className="text-[10px] mt-1 font-mono" style={{ color:"rgba(201,168,76,0.45)" }}>{fmtVal(selectedSlice.value)} {UNIT_LABELS[unit]||""}</p>
+                  <p className="text-[10px] mt-1 font-mono" style={{ color:"rgba(201,168,76,0.45)" }}>{fmtVal(selectedSlice.value)} {getUnitLabel(unit, language)}</p>
                 </div>
               )}
 
               <div className="rounded-xl p-3" style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)" }}>
-                <p className="text-[11px] font-bold mb-2" style={{ color:"rgba(255,255,255,0.62)" }}>أكبر الدول إنتاجًا</p>
+                <p className="text-[11px] font-bold mb-2" style={{ color:"rgba(255,255,255,0.62)" }}>{labels.topProducingCountries}</p>
                 <div className="space-y-2">
                   {result.topCountries.map((c, i) => (
                     <div key={`${c.name}-${i}`} className="rounded-lg px-3 py-2" style={{ background:"rgba(255,255,255,0.025)" }}>
@@ -1171,15 +1447,15 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
                         </span>
                         <span className="text-[11px] font-bold flex-shrink-0 ml-2" style={{ color:"rgba(255,255,255,0.45)" }}>{pct.toFixed(1)}%</span>
                       </div>
-                      <p className="text-[9px] mt-0.5 font-mono" style={{ color:"rgba(255,255,255,0.22)" }}>{fmtVal(s.value)} {UNIT_LABELS[unit]||""}</p>
+                      <p className="text-[9px] mt-0.5 font-mono" style={{ color:"rgba(255,255,255,0.22)" }}>{fmtVal(s.value)} {getUnitLabel(unit, language)}</p>
                     </div>
                   );
                 })}
               </div>
 
               <div className="rounded-xl px-4 py-2 flex items-center justify-between" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)" }}>
-                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(255,255,255,0.25)" }}>الإجمالي</span>
-                <span className="text-[13px] font-black" style={{ color:"rgba(255,255,255,0.6)" }}>{fmtVal(result.total)} {UNIT_LABELS[unit]||""}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.total}</span>
+                <span className="text-[13px] font-black" style={{ color:"rgba(255,255,255,0.6)" }}>{fmtVal(result.total)} {getUnitLabel(unit, language)}</span>
               </div>
             </div>
           </div>
@@ -1197,6 +1473,8 @@ const CountryLineChart = ({
   onMineralFilterChange,
   onUnitChange,
 }) => {
+  const { labels, language } = useCountriesI18n();
+  const mineralOptions = buildMineralFilterOptions(language);
   const wrapperRef = useRef(null);
 
   const canvasRef = useChartInit((canvas) => {
@@ -1211,7 +1489,7 @@ const CountryLineChart = ({
     return new Chart(canvas, {
       type:"line", data:{ labels:years, datasets },
       options:{ responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{position:"bottom",labels:{font:{family:"Cairo",size:11},boxWidth:10,color:"rgba(255,255,255,0.6)",padding:16}}, tooltip:{callbacks:{label:(c)=>` ${c.dataset.label}: ${c.parsed.y??0} ${UNIT_LABELS[unit]||""}`}} },
+        plugins:{ legend:{position:"bottom",labels:{font:{family:"Cairo",size:11},boxWidth:10,color:"rgba(255,255,255,0.6)",padding:16}}, tooltip:{callbacks:{label:(c)=>` ${c.dataset.label}: ${c.parsed.y??0} ${getUnitLabel(unit, language)}`}} },
         scales:{ x:{grid:{display:false},border:{display:false},ticks:{font:{family:"Cairo",weight:"700"},color:"rgba(255,255,255,0.5)"}}, y:{beginAtZero:true,grid:{color:"rgba(255,255,255,0.05)"},border:{display:false},ticks:{font:{family:"Cairo"},color:"rgba(255,255,255,0.5)",callback:(v)=>v>=1e6?`${v/1e6}M`:v>=1000?`${v/1000}K`:v}} },
       },
     });
@@ -1220,8 +1498,8 @@ const CountryLineChart = ({
   return (
     <Card>
       <CardHeader
-        title="تطوّر الإنتاج التعديني"
-        subtitle={`${country} — جميع السنوات${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`}
+        title={labels.productionTrend}
+        subtitle={labels.productionTrendSubtitle(getCountryDisplayName(country, language), mineralFilter)}
       >
         <div className="flex items-center gap-2">
           <button
@@ -1241,7 +1519,7 @@ const CountryLineChart = ({
                   }
             }
           >
-            ألف طن
+            {labels.thousandTon}
           </button>
           <button
             type="button"
@@ -1260,7 +1538,7 @@ const CountryLineChart = ({
                   }
             }
           >
-            كجم
+            {labels.kilograms}
           </button>
         </div>
 
@@ -1275,7 +1553,7 @@ const CountryLineChart = ({
             outline: "none",
           }}
         >
-          {MINERAL_FILTER_OPTIONS.map((opt) => (
+          {mineralOptions.map((opt) => (
             <option key={opt.value} value={opt.value} style={{ color: "#082721" }}>
               {opt.label}
             </option>
@@ -1299,6 +1577,8 @@ const CountryBarChart = ({
   onMineralFilterChange,
   onUnitChange,
 }) => {
+  const { labels, language } = useCountriesI18n();
+  const mineralOptions = buildMineralFilterOptions(language);
   const [noData, setNoData] = useState(false);
   const slices = getMineralShareForYear(country, selectedYear, mineralFilter, unit).sort((a,b)=>b.value-a.value);
   const total  = slices.reduce((s,d)=>s+d.value, 0);
@@ -1309,7 +1589,7 @@ const CountryBarChart = ({
     const colors = slices.map((_,i)=>{ const t=i/Math.max(slices.length-1,1); return `rgb(${Math.round(201+(16-201)*t)},${Math.round(168+(185-168)*t)},${Math.round(76+(129-76)*t)})`; });
     return new Chart(canvas, {
       type:"bar",
-      data:{ labels:slices.map(d=>d.mineral), datasets:[{ label:`الإنتاج — ${selectedYear}`, data:slices.map(d=>d.value), backgroundColor:colors, borderColor:colors, borderWidth:0, borderRadius:6, borderSkipped:false }] },
+      data:{ labels:slices.map(d=>d.mineral), datasets:[{ label:`${labels.miningProduction} — ${selectedYear}`, data:slices.map(d=>d.value), backgroundColor:colors, borderColor:colors, borderWidth:0, borderRadius:6, borderSkipped:false }] },
       options:{ indexAxis:"y", responsive:true, maintainAspectRatio:false,
         plugins:{ legend:{display:false}, tooltip:{rtl:true,bodyFont:{family:"Cairo"},callbacks:{label:(c)=>{ const e=slices[c.dataIndex]; const pct=total>0?((e.value/total)*100).toFixed(1):0; const fmt=e.value>=1e6?`${(e.value/1e6).toFixed(2)} M`:e.value>=1000?`${(e.value/1000).toFixed(1)} K`:e.value; return ` ${fmt} ${e.unit}  (${pct}%)`; }}} },
         scales:{ x:{beginAtZero:true,grid:{color:"rgba(255,255,255,0.05)"},border:{display:false},ticks:{color:"rgba(255,255,255,0.4)",font:{family:"Cairo",size:11},callback:(v)=>v>=1e6?`${v/1e6}M`:v>=1000?`${v/1000}K`:v}}, y:{grid:{display:false},border:{display:false},ticks:{color:"rgba(255,255,255,0.75)",font:{family:"Cairo",size:12,weight:"700"}}} },
@@ -1321,7 +1601,7 @@ const CountryBarChart = ({
 
   return (
     <Card>
-      <CardHeader title="انتاج الخامات بالحجم حسب السنة " subtitle={`${country} — سنة ${selectedYear}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""} (${UNIT_LABELS[unit]||""})`}>
+      <CardHeader title={labels.yearlyProduction} subtitle={labels.yearlyProductionSubtitle(getCountryDisplayName(country, language), selectedYear, mineralFilter, getUnitLabel(unit, language))}>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -1340,7 +1620,7 @@ const CountryBarChart = ({
                   }
             }
           >
-            ألف طن
+            {labels.thousandTon}
           </button>
           <button
             type="button"
@@ -1359,7 +1639,7 @@ const CountryBarChart = ({
                   }
             }
           >
-            كجم
+            {labels.kilograms}
           </button>
         </div>
 
@@ -1374,7 +1654,7 @@ const CountryBarChart = ({
             outline: "none",
           }}
         >
-          {MINERAL_FILTER_OPTIONS.map((opt) => (
+          {mineralOptions.map((opt) => (
             <option key={opt.value} value={opt.value} style={{ color: "#082721" }}>
               {opt.label}
             </option>
@@ -1384,7 +1664,7 @@ const CountryBarChart = ({
       </CardHeader>
       {noData ? (
         <div className="h-[280px] flex items-center justify-center">
-          <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>لا توجد بيانات لسنة {selectedYear}</p>
+          <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.noDataForYear(selectedYear)}</p>
         </div>
       ) : (
         <div className="flex flex-col xl:flex-row gap-6">
@@ -1393,8 +1673,8 @@ const CountryBarChart = ({
           </div>
           <div className="xl:w-60 flex-shrink-0">
             <div className="rounded-xl px-4 py-2.5 mb-3 flex items-center justify-between" style={{ background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.18)" }}>
-              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(201,168,76,0.6)" }}>المجموع</span>
-              <span className="text-[15px] font-black" style={{ color:"#C9A84C" }}>{fmtVal(total)} {UNIT_LABELS[unit]||""}</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(201,168,76,0.6)" }}>{labels.total}</span>
+              <span className="text-[15px] font-black" style={{ color:"#C9A84C" }}>{fmtVal(total)} {getUnitLabel(unit, language)}</span>
             </div>
             <div className="space-y-1.5">
               {slices.map((d,i)=>{
@@ -1424,6 +1704,7 @@ const CountryBarChart = ({
 
 // ── Treemap ────────────────────────────────────────────────────────────────────
 const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
+  const { labels, language } = useCountriesI18n();
   const [noData, setNoData] = useState(false);
   const treeData = getMineralTreemapData(country, year, unit).sort((a, b) => b.value - a.value);
 
@@ -1439,7 +1720,7 @@ const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
     sorted.forEach((d,i)=>{ const hue=160-(i/Math.max(sorted.length-1,1))*100; colorMap[d.mineral]=`hsl(${hue},60%,38%)`; });
     return new Chart(canvas, {
       type:"treemap",
-      data:{ datasets:[{ label:"المعادن", tree:treeData, key:"value", groups:["mineral"],
+      data:{ datasets:[{ label:labels.mineralDistribution, tree:treeData, key:"value", groups:["mineral"],
         borderColor:"rgba(255,255,255,0.15)", borderWidth:1, spacing:2,
         backgroundColor(ctx){ const raw=ctx.raw; if(!raw) return"#10b981"; const d=getTreemapDatum(raw); return colorMap[d?.mineral]||"#10b981"; },
         labels:{ display:true, align:"center", position:"middle",
@@ -1457,7 +1738,7 @@ const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
       options:{ responsive:true, maintainAspectRatio:false,
         plugins:{ legend:{display:false}, tooltip:{callbacks:{
           title(items){ const raw=items[0]?.raw; const d=getTreemapDatum(raw); return d?.mineral||""; },
-          label(item){ const raw=item.raw; const d=getTreemapDatum(raw); const pct=d?.pct!=null?d.pct.toFixed(1):"—"; const val=d?.rawValue!=null?fmtVal(d.rawValue):"—"; return[`${pct}% من الإنتاج`,`${val} ${d?.unit||""}`]; },
+          label(item){ const raw=item.raw; const d=getTreemapDatum(raw); const pct=d?.pct!=null?d.pct.toFixed(1):labels.none; const val=d?.rawValue!=null?fmtVal(d.rawValue):labels.none; return[`${pct}%`,`${val} ${d?.unit||""}`]; },
         }}},
       },
     });
@@ -1465,12 +1746,12 @@ const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
 
   return (
     <Card>
-      <CardHeader title="توزيع المعادن حسب النسبة" subtitle={`${country} — ${year}`}>
+      <CardHeader title={labels.mineralDistribution} subtitle={labels.mineralDistributionSubtitle(getCountryDisplayName(country, language), year)}>
         <YearPills selectedYear={year} onYearChange={onYearChange} />
       </CardHeader>
       {noData ? (
         <div className="h-[320px] flex items-center justify-center">
-          <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>لا توجد بيانات</p>
+          <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.noData}</p>
         </div>
       ) : (
         <div className="flex flex-col xl:flex-row gap-6">
@@ -1502,6 +1783,7 @@ const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
 };
 
 const CountryTradeChart = ({ title, country, series, color }) => {
+  const { labels, language, locale } = useCountriesI18n();
   const canvasRef = useChartInit((canvas) => {
     if (!series || series.length === 0) return null;
 
@@ -1537,7 +1819,7 @@ const CountryTradeChart = ({ title, country, series, color }) => {
             callbacks: {
               label(context) {
                 const v = context.parsed.y || 0;
-                return ` ${v.toLocaleString("fr-FR", { maximumFractionDigits: 0 })} $`;
+                return ` ${v.toLocaleString(locale, { maximumFractionDigits: 0 })} ${labels.dollar}`;
               },
             },
           },
@@ -1573,7 +1855,7 @@ const CountryTradeChart = ({ title, country, series, color }) => {
 
   return (
     <Card>
-      <CardHeader title={title} subtitle={`${country} — القيمة بالدولار الأمريكي`} />
+      <CardHeader title={title} subtitle={labels.tradeValueUsd(getCountryDisplayName(country, language))} />
       {series && series.length > 0 ? (
         <div style={{ position: "relative", height: "280px", width: "100%" }}>
           <canvas
@@ -1584,7 +1866,7 @@ const CountryTradeChart = ({ title, country, series, color }) => {
       ) : (
         <div className="h-[280px] flex items-center justify-center">
           <p className="text-[13px] font-semibold" style={{ color: "rgba(255,255,255,0.25)" }}>
-            لا توجد بيانات
+            {labels.noData}
           </p>
         </div>
       )}
@@ -1619,6 +1901,7 @@ const TradeIndicatorsPanel = ({ country, exportSeries, importSeries, exportBreak
 
 // ── Main page ──────────────────────────────────────────────────────────────────
 const Countries = () => {
+  const { labels, language, isArabic } = useCountriesI18n();
   const query = typeof window!=="undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
   const initialCountryCode = query.get("country");
   const initialSelected    = initialCountryCode ? (COUNTRIES.find(c=>c.code===initialCountryCode)?.name??"—") : "—";
@@ -1697,7 +1980,7 @@ const Countries = () => {
       : {};
 
   return (
-    <div dir="rtl" className="min-h-screen" style={{ background:"white", fontFamily:"'Cairo',system-ui,sans-serif" }}>
+    <div dir={isArabic ? "rtl" : "ltr"} lang={language} className="min-h-screen" style={{ background:"white", fontFamily:"'Cairo',system-ui,sans-serif" }}>
       <style>{`
         @keyframes shimmerGold {
           0% { background-position: -300% center; }
@@ -1715,10 +1998,10 @@ const Countries = () => {
         <div className="relative z-10 max-w-3xl mx-auto px-4">
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4 text-xs font-bold uppercase tracking-widest"
                style={{ background:"rgba(201,168,76,0.12)", color:"#C9A84C", border:"1px solid rgba(201,168,76,0.25)" }}>
-            الإنتاج التعديني العربي
+            {labels.miningOutputBadge}
           </div>
-          <h1 className="text-3xl font-black text-white">ملفات الدول</h1>
-          <p className="text-sm text-slate-200 mt-2">اختر دولة لعرض بياناتها التعدينية</p>
+          <h1 className="text-3xl font-black text-white">{labels.countriesFilesTitle}</h1>
+          <p className="text-sm text-slate-200 mt-2">{labels.countriesFilesSubtitle}</p>
         </div>
       </header>
 
@@ -1728,11 +2011,11 @@ const Countries = () => {
           style={{ background:"#ffffff", border:"1px solid rgba(0,0,0,0.08)", boxShadow:"0 2px 16px rgba(0,0,0,0.06)" }}>
           <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             <div>
-              <h5 className="m-0 text-base font-bold text-slate-800">الدول العربية</h5>
-              <p className="mt-0.5 text-sm text-slate-400">اختر دولة للوصول إلى ملفها التعديني</p>
+              <h5 className="m-0 text-base font-bold text-slate-800">{labels.arabCountriesTitle}</h5>
+              <p className="mt-0.5 text-sm text-slate-400">{labels.chooseCountry}</p>
             </div>
             <a href="countries.html" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] shadow-sm ring-1 ring-[#082721]/20 hover:bg-slate-50 transition-colors">
-              <ArrowLeft size={14} strokeWidth={2.4} /><span>المزيد</span>
+              <ArrowLeft size={14} strokeWidth={2.4} /><span>{labels.more}</span>
             </a>
           </div>
           <div className="grid gap-y-5 gap-x-3 grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
@@ -1741,23 +2024,23 @@ const Countries = () => {
                       className="group flex flex-col items-center text-center transition-transform hover:-translate-y-1 focus:outline-none">
                 <div className="relative flex h-24 w-full items-center justify-center overflow-hidden rounded-lg bg-slate-50 transition-all"
                   style={{ boxShadow:selected===c.name?"0 0 0 2px #C9A84C,0 4px 12px rgba(201,168,76,0.25)":"0 1px 4px rgba(0,0,0,0.08)" }}>
-                  <img src={countryFlags[c.code]} alt={c.name} loading="lazy" decoding="async" style={{ ...FLAG_IMAGE_STYLE, padding:"2px", background:"#f8fafc" }} />
+                  <img src={countryFlags[c.code]} alt={getCountryDisplayName(c.name, language)} loading="lazy" decoding="async" style={{ ...FLAG_IMAGE_STYLE, padding:"2px", background:"#f8fafc" }} />
                   {selected===c.name && <div className="absolute inset-0 rounded-lg" style={{ background:"rgba(201,168,76,0.08)" }} />}
                 </div>
                 <p className={`mt-1.5 text-[11px] font-bold leading-tight transition-colors ${selected===c.name?"text-[#C9A84C]":"text-slate-600 group-hover:text-[#082721]"}`}>
-                  {c.name}
+                  {getCountryDisplayName(c.name, language)}
                 </p>
               </button>
             ))}
           </div>
           {selected&&selected!=="—"&&(
             <div className="mt-5 pt-4 border-t border-slate-100 flex items-center gap-2">
-              <span className="text-sm text-slate-400">الدولة المختارة:</span>
+              <span className="text-sm text-slate-400">{labels.selectedCountry}</span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-900 border border-emerald-100">
                 {selectedCountryObj&&countryFlags[selectedCountryObj.code]&&(
                   <img src={countryFlags[selectedCountryObj.code]} alt="" decoding="async" className="h-5 w-7 object-contain rounded-sm" />
                 )}
-                {selected}
+                {getCountryDisplayName(selected, language)}
               </span>
             </div>
           )}
@@ -1791,7 +2074,7 @@ const Countries = () => {
               />
             )}
 
-            <ChartSectionTitle title="المؤشرات التعدينية" />
+            <ChartSectionTitle title={labels.miningIndicators} />
             <CountryComparisonDonut key={`donut-${selected}`} selectedCountry={selected} year={donutYear} onYearChange={setDonutYear} />
 
             <CountryLineChart
@@ -1816,18 +2099,18 @@ const Countries = () => {
 
             <MineralTreemap key={`tree-${selected}`} country={selected} year={treemapYear} onYearChange={setTreemapYear} />
 
-            <ChartSectionTitle title="الصادرات والواردات" />
+            <ChartSectionTitle title={labels.tradeIndicators} />
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
               <CountryTradeChart
                 key={`export-${selected}`}
-                title="اجمالي الصادرات للمعادن "
+                title={labels.totalExportsTitle}
                 country={selected}
                 series={exportSeries}
                 color="#f59e0b"
               />
               <CountryTradeChart
                 key={`import-${selected}`}
-                title="اجمالي الواردات للمعادن"
+                title={labels.totalImportsTitle}
                 country={selected}
                 series={importSeries}
                 color="#3b82f6"

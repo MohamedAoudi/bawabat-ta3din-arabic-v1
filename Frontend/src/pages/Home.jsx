@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowLeftRight,
@@ -21,6 +21,7 @@ import {
   Ship,
   Truck,
 } from "lucide-react";
+import { LanguageContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import i7 from "../assets/i-7.png";
@@ -120,9 +121,221 @@ const officialContacts = [
   { country: "الجمهورية اليمنية", ministry: "وزارة النفط والمعادن", emails: ["info@mom-ye.com"] },
 ];
 
+const COUNTRY_LABELS = {
+  jo: { ar: "المملكة الأردنية الهاشمية", fr: "Royaume hachémite de Jordanie", en: "Hashemite Kingdom of Jordan" },
+  ae: { ar: "دولة الإمارات العربية المتحدة", fr: "Émirats arabes unis", en: "United Arab Emirates" },
+  bh: { ar: "مملكة البحرين", fr: "Royaume de Bahreïn", en: "Kingdom of Bahrain" },
+  tn: { ar: "الجمهورية التونسية", fr: "République tunisienne", en: "Tunisian Republic" },
+  dz: { ar: "الجمهورية الجزائرية الديمقراطية الشعبية", fr: "République algérienne démocratique et populaire", en: "People's Democratic Republic of Algeria" },
+  dj: { ar: "جمهورية جيبوتي", fr: "République de Djibouti", en: "Republic of Djibouti" },
+  sa: { ar: "المملكة العربية السعودية", fr: "Royaume d'Arabie saoudite", en: "Kingdom of Saudi Arabia" },
+  sd: { ar: "جمهورية السودان", fr: "République du Soudan", en: "Republic of the Sudan" },
+  sy: { ar: "الجمهورية العربية السورية", fr: "République arabe syrienne", en: "Syrian Arab Republic" },
+  so: { ar: "جمهورية الصومال", fr: "République fédérale de Somalie", en: "Federal Republic of Somalia" },
+  iq: { ar: "جمهورية العراق", fr: "République d'Irak", en: "Republic of Iraq" },
+  om: { ar: "سلطنة عُمان", fr: "Sultanat d'Oman", en: "Sultanate of Oman" },
+  ps: { ar: "دولة فلسطين", fr: "État de Palestine", en: "State of Palestine" },
+  qa: { ar: "دولة قطر", fr: "État du Qatar", en: "State of Qatar" },
+  kw: { ar: "دولة الكويت", fr: "État du Koweït", en: "State of Kuwait" },
+  lb: { ar: "الجمهورية اللبنانية", fr: "République libanaise", en: "Lebanese Republic" },
+  ly: { ar: "دولة ليبيا", fr: "État de Libye", en: "State of Libya" },
+  eg: { ar: "جمهورية مصر العربية", fr: "République arabe d'Égypte", en: "Arab Republic of Egypt" },
+  ma: { ar: "المملكة المغربية", fr: "Royaume du Maroc", en: "Kingdom of Morocco" },
+  mr: { ar: "الجمهورية الإسلامية الموريتانية", fr: "République islamique de Mauritanie", en: "Islamic Republic of Mauritania" },
+  ye: { ar: "الجمهورية اليمنية", fr: "République du Yémen", en: "Republic of Yemen" },
+};
+
+const HOME_TRANSLATIONS = {
+  ar: {
+    none: "—",
+    changeIcon: "تغيير الأيقونة",
+    open: "فتح",
+    hide: "إخفاء",
+    more: "المزيد",
+    heroBadge: "✦ المنظومة التعدينية العربية ✦",
+    heroTitleStart: "بوابة المؤشرات",
+    heroTitleAccent: "التعدينية العربية",
+    heroSubtitle: "نافذتك لبيانات ومؤشرات قطاع التعدين العربي",
+    smartSearch: "بحث ذكي",
+    searchPlaceholder: "ابحث عن معدن، دولة، أو إحصائية...",
+    portalInNumbers: "البوابة في أرقام",
+    miningIndicatorsSection: "المؤشرات التعدينية",
+    tradeIndicatorsSection: "التجارة التعدينية",
+    miningProductionTag: "الإنتاج التعديني",
+    goToIndicators: "الانتقال للمؤشرات",
+    productionSummary: (count) => `${count} مؤشرات تفاعلية شاملة للإنتاج العربي`,
+    updatedDataSummary: (minYear, maxYear, countryCount) => `البيانات محدّثة — ${minYear} إلى ${maxYear} — ${countryCount} دولة عربية`,
+    tradeTag: "الصادرات والواردات",
+    allTradeIndicators: "جميع مؤشرات التجارة",
+    tradeTotals: (exports, imports) => `إجمالي الصادرات: ${exports} دولار — إجمالي الواردات: ${imports} دولار`,
+    memberStates: "الدول الأعضاء",
+    arabCountriesTitle: "الدول العربية",
+    chooseCountry: "اختر دولة للوصول إلى مؤشراتها التعدينية",
+    viewAll: "عرض الكل",
+    selectedCountry: "الدولة المختارة:",
+    referencesTag: "المراجع",
+    referencesTitle: "المراجع والمصادر",
+    assistantAvailable: "مساعد ذكي متاح الآن",
+    intelligentAssistant: "المساعد الذكي",
+    assistantSubtitle: "اطرح أسئلتك عن المؤشرات والبيانات والمعلومات التعدينية وسيجيبك فوراً",
+    startChat: "ابدأ المحادثة",
+    chatbotAlert: "Chat Bot — محلل البيانات الذكي (واجهة تجريبية).",
+    floatingBotTitle: "Chat Bot",
+    floatingBotSubtitle: "محلّل البيانات الذكي",
+    indicatorProductionVolumeTitle: "حجم الإنتاج التعديني",
+    indicatorProductionVolumeDesc: "لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة الزمنية.",
+    indicatorProductionTrendTitle: "تطور الإنتاج التعديني",
+    indicatorProductionTrendDesc: "تتبّع تطور الإنتاج عبر السنوات مع إبراز الاتجاهات وأهم التغيرات السنوية.",
+    indicatorArabicProductionTrendTitle: "تطور الإنتاج التعديني العربي",
+    indicatorArabicProductionTrendDesc: "مقارنة أداء الدول العربية في الإنتاج عبر أكثر من خام وفترات زمنية مختلفة.",
+    indicatorProductionComparisonTitle: "نسبة الإنتاج العربي مقارنة بالإنتاج العالمي",
+    indicatorProductionComparisonDesc: "قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري تفاعلي.",
+    tradeExportsTitle: "الصادرات التعدينية",
+    tradeExportsDesc: "تحليل تدفقات الصادرات التعدينية حسب الدولة والوجهة والقيمة المالية.",
+    tradeImportsTitle: "الواردات التعدينية",
+    tradeImportsDesc: "رصد حجم وقيمة الواردات من المواد الخام والمنتجات التعدينية المعالجة.",
+    donutArabProduction: "الإنتاج العربي",
+    donutWorld: "العالم",
+    kpiMiningDataUnit: "معلومة تعدينية",
+    kpiMiningDataBadge: "بيانات تعدينية",
+    kpiCountriesUnit: "دولة عربية",
+    kpiCountriesBadge: "نطاق عربي شامل",
+    kpiPeriodUnit: "الفترة الزمنية للبيانات",
+    kpiPeriodBadge: "الفترة الزمنية",
+    kpiDiversityUnit: "خام / منتج تعديني",
+    kpiDiversityBadge: "تنوع معدني",
+  },
+  fr: {
+    none: "Aucun",
+    changeIcon: "Changer l'icône",
+    open: "Ouvrir",
+    hide: "Masquer",
+    more: "Voir plus",
+    heroBadge: "✦ Écosystème minier arabe ✦",
+    heroTitleStart: "Portail des indicateurs",
+    heroTitleAccent: "miniers arabes",
+    heroSubtitle: "Votre portail vers les données et indicateurs du secteur minier arabe.",
+    smartSearch: "Recherche intelligente",
+    searchPlaceholder: "Rechercher un minerai, un pays ou une statistique...",
+    portalInNumbers: "Le portail en chiffres",
+    miningIndicatorsSection: "Indicateurs miniers",
+    tradeIndicatorsSection: "Commerce minier",
+    miningProductionTag: "Production minière",
+    goToIndicators: "Accéder aux indicateurs",
+    productionSummary: (count) => `${count} indicateurs interactifs couvrant la production arabe`,
+    updatedDataSummary: (minYear, maxYear, countryCount) => `Données mises à jour — ${minYear} à ${maxYear} — ${countryCount} pays arabes`,
+    tradeTag: "Exportations et importations",
+    allTradeIndicators: "Tous les indicateurs commerciaux",
+    tradeTotals: (exports, imports) => `Total exportations : ${exports} USD — Total importations : ${imports} USD`,
+    memberStates: "États membres",
+    arabCountriesTitle: "Pays arabes",
+    chooseCountry: "Choisissez un pays pour accéder à ses indicateurs miniers",
+    viewAll: "Voir tout",
+    selectedCountry: "Pays sélectionné :",
+    referencesTag: "Références",
+    referencesTitle: "Références et sources",
+    assistantAvailable: "Assistant intelligent disponible",
+    intelligentAssistant: "Assistant intelligent",
+    assistantSubtitle: "Posez vos questions sur les indicateurs, les données et les informations minières et obtenez une réponse immédiate.",
+    startChat: "Démarrer la conversation",
+    chatbotAlert: "Chat Bot — analyste intelligent des données (interface expérimentale).",
+    floatingBotTitle: "Chat Bot",
+    floatingBotSubtitle: "Analyste intelligent des données",
+    indicatorProductionVolumeTitle: "Volume de production minière",
+    indicatorProductionVolumeDesc: "Tableau interactif de la production minière par pays, minerai et période.",
+    indicatorProductionTrendTitle: "Évolution de la production minière",
+    indicatorProductionTrendDesc: "Suivi de l'évolution de la production au fil des années avec mise en avant des tendances.",
+    indicatorArabicProductionTrendTitle: "Évolution de la production minière arabe",
+    indicatorArabicProductionTrendDesc: "Comparaison des performances des pays arabes sur plusieurs minerais et périodes.",
+    indicatorProductionComparisonTitle: "Part de la production arabe dans la production mondiale",
+    indicatorProductionComparisonDesc: "Mesure de la contribution arabe à la production mondiale via une vue circulaire interactive.",
+    tradeExportsTitle: "Exportations minières",
+    tradeExportsDesc: "Analyse des flux d'exportation minière par pays, destination et valeur financière.",
+    tradeImportsTitle: "Importations minières",
+    tradeImportsDesc: "Suivi du volume et de la valeur des importations de matières premières et produits miniers transformés.",
+    donutArabProduction: "Production arabe",
+    donutWorld: "Monde",
+    kpiMiningDataUnit: "informations minières",
+    kpiMiningDataBadge: "Données minières",
+    kpiCountriesUnit: "pays arabes",
+    kpiCountriesBadge: "Couverture arabe complète",
+    kpiPeriodUnit: "période couverte",
+    kpiPeriodBadge: "Période",
+    kpiDiversityUnit: "minerais / produits miniers",
+    kpiDiversityBadge: "Diversité minérale",
+  },
+  en: {
+    none: "None",
+    changeIcon: "Change icon",
+    open: "Open",
+    hide: "Hide",
+    more: "Learn more",
+    heroBadge: "✦ Arab Mining Ecosystem ✦",
+    heroTitleStart: "Mining Indicators",
+    heroTitleAccent: "Arab Portal",
+    heroSubtitle: "Your gateway to Arab mining sector data and indicators.",
+    smartSearch: "Smart Search",
+    searchPlaceholder: "Search for a mineral, country, or statistic...",
+    portalInNumbers: "Portal in Numbers",
+    miningIndicatorsSection: "Mining Indicators",
+    tradeIndicatorsSection: "Mining Trade",
+    miningProductionTag: "Mining Production",
+    goToIndicators: "Go to indicators",
+    productionSummary: (count) => `${count} interactive indicators covering Arab production`,
+    updatedDataSummary: (minYear, maxYear, countryCount) => `Updated data — ${minYear} to ${maxYear} — ${countryCount} Arab countries`,
+    tradeTag: "Exports and imports",
+    allTradeIndicators: "All trade indicators",
+    tradeTotals: (exports, imports) => `Total exports: ${exports} USD — Total imports: ${imports} USD`,
+    memberStates: "Member states",
+    arabCountriesTitle: "Arab Countries",
+    chooseCountry: "Choose a country to access its mining indicators",
+    viewAll: "View all",
+    selectedCountry: "Selected country:",
+    referencesTag: "References",
+    referencesTitle: "References and Sources",
+    assistantAvailable: "Smart assistant available now",
+    intelligentAssistant: "Smart Assistant",
+    assistantSubtitle: "Ask about indicators, datasets, and mining information and get an instant answer.",
+    startChat: "Start chat",
+    chatbotAlert: "Chat Bot — smart data analyst (experimental interface).",
+    floatingBotTitle: "Chat Bot",
+    floatingBotSubtitle: "Smart data analyst",
+    indicatorProductionVolumeTitle: "Mining production volume",
+    indicatorProductionVolumeDesc: "Interactive dashboard showing mining production by country, mineral, and time period.",
+    indicatorProductionTrendTitle: "Mining production trend",
+    indicatorProductionTrendDesc: "Track production over time with emphasis on major annual shifts and trends.",
+    indicatorArabicProductionTrendTitle: "Arab mining production trend",
+    indicatorArabicProductionTrendDesc: "Compare Arab country performance across multiple minerals and time ranges.",
+    indicatorProductionComparisonTitle: "Arab production share vs global output",
+    indicatorProductionComparisonDesc: "Measure Arab contribution to world production through an interactive circular view.",
+    tradeExportsTitle: "Mining exports",
+    tradeExportsDesc: "Analyze mining export flows by country, destination, and monetary value.",
+    tradeImportsTitle: "Mining imports",
+    tradeImportsDesc: "Monitor the volume and value of imported raw materials and processed mining products.",
+    donutArabProduction: "Arab production",
+    donutWorld: "World",
+    kpiMiningDataUnit: "mining insights",
+    kpiMiningDataBadge: "Mining data",
+    kpiCountriesUnit: "Arab countries",
+    kpiCountriesBadge: "Full Arab coverage",
+    kpiPeriodUnit: "data time span",
+    kpiPeriodBadge: "Time period",
+    kpiDiversityUnit: "minerals / mining products",
+    kpiDiversityBadge: "Mineral diversity",
+  },
+};
+
+const NUMBER_LOCALES = {
+  ar: "ar-SA",
+  fr: "fr-FR",
+  en: "en-US",
+};
+
+const getCountryLabel = (code, language) => COUNTRY_LABELS[code]?.[language] || COUNTRY_LABELS[code]?.ar || code;
+
 const shortText = (text, max = 95) => (text && text.length > max ? `${text.slice(0, max)}...` : text);
 
-const formatInt = (n) => new Intl.NumberFormat("fr-FR").format(Math.round(n || 0));
+const formatInt = (n, locale = "fr-FR") => new Intl.NumberFormat(locale).format(Math.round(n || 0));
 
 const parseFlexibleNumber = (value) => {
   if (value == null) return null;
@@ -207,14 +420,14 @@ const buildPortalStats = () => {
   };
 };
 
-const buildKpiData = (stats) => [
+const buildKpiData = (labels) => [
   {
     icon: "fa-books",
     altIcon: "fa-chart-column",
     num: "3000",
-    unit: "معلومة تعدينية",
+    unit: labels.kpiMiningDataUnit,
     label: "",
-    badge: "بيانات تعدينية",
+    badge: labels.kpiMiningDataBadge,
     details: "",
     color: "#c9a84c",
   },
@@ -222,9 +435,9 @@ const buildKpiData = (stats) => [
     icon: "fa-earth-africa",
     altIcon: "fa-flag",
     num: "21",
-    unit: "دولة عربية",
+    unit: labels.kpiCountriesUnit,
     label: "",
-    badge: "نطاق عربي شامل",
+    badge: labels.kpiCountriesBadge,
     details: "",
     color: "#6fcba5",
   },
@@ -232,9 +445,9 @@ const buildKpiData = (stats) => [
     icon: "fa-calendar-days",
     altIcon: "fa-layer-group",
     num: "2010 - 2024",
-    unit: "الفترة الزمنية للبيانات",
+    unit: labels.kpiPeriodUnit,
     label: "",
-    badge: "الفترة الزمنية",
+    badge: labels.kpiPeriodBadge,
     details: "",
     color: "#e8a87c",
   },
@@ -242,9 +455,9 @@ const buildKpiData = (stats) => [
     icon: "fa-gem",
     altIcon: "fa-gem",
     num: "111",
-    unit: "خام / منتج تعديني",
+    unit: labels.kpiDiversityUnit,
     label: "",
-    badge: "تنوع معدني",
+    badge: labels.kpiDiversityBadge,
     details: "",
     color: "#93c5fd",
   },
@@ -303,16 +516,16 @@ const TRADE_CARDS = [
   {
     icon: "fa-ship",
     altIcon: "fa-right-left",
-    title: "الصادرات التعدينية",
-    desc: "تحليل تدفقات الصادرات التعدينية حسب الدولة والوجهة والقيمة المالية.",
+    titleKey: "tradeExportsTitle",
+    descKey: "tradeExportsDesc",
     href: "/m5",
     Chart: MiniTradeLine,
   },
   {
     icon: "fa-truck-ramp-box",
     altIcon: "fa-ship",
-    title: "الواردات التعدينية",
-    desc: "رصد حجم وقيمة الواردات من المواد الخام والمنتجات التعدينية المعالجة.",
+    titleKey: "tradeImportsTitle",
+    descKey: "tradeImportsDesc",
     href: "/m6",
     Chart: MiniTradeBar,
   },
@@ -443,7 +656,7 @@ const MiniGroupedBar = ({ active }) => {
   );
 };
 
-const MiniDonut = ({ active }) => (
+const MiniDonut = ({ active, labels }) => (
   <div style={{ height:140, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", gap:16 }}>
     <div style={{
       width:68, height:68, borderRadius:"50%", flexShrink:0,
@@ -458,7 +671,7 @@ const MiniDonut = ({ active }) => (
       </div>
     </div>
     <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-      {[["#c9a84c","الإنتاج العربي"],["rgba(255,255,255,0.2)","العالم"]].map(([c,l],i) => (
+      {[["#c9a84c", labels.donutArabProduction],["rgba(255,255,255,0.2)", labels.donutWorld]].map(([c,l],i) => (
         <div key={i} style={{ display:"flex", alignItems:"center", gap:5 }}>
           <div style={{ width:8, height:8, borderRadius:2, background:c, flexShrink:0 }} />
           <span style={{ fontSize:"0.65rem", color:"rgba(255,255,255,0.5)" }}>{l}</span>
@@ -472,16 +685,16 @@ const MiniDonut = ({ active }) => (
    INDICATOR CONFIG
 ───────────────────────────────────────────── */
 const INDICATOR_CARDS = [
-  { icon:"fa-chart-column", altIcon:"fa-layer-group", tagColor:"#c9a84c", title:"حجم الإنتاج التعديني",           desc:"لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة الزمنية.", href:"/m1", Chart:MiniBarChart },
-  { icon:"fa-chart-line",   altIcon:"fa-chart-column", tagColor:"#7ee0c0", title:"تطور الإنتاج التعديني",           desc:"تتبّع تطور الإنتاج عبر السنوات مع إبراز الاتجاهات وأهم التغيرات السنوية.",    href:"/m2", Chart:MiniLineChart },
-  { icon:"fa-layer-group",  altIcon:"fa-chart-line", tagColor:"#93c5fd", title:"تطور الإنتاج التعديني العربي",    desc:"مقارنة أداء الدول العربية في الإنتاج عبر أكثر من خام وفترات زمنية مختلفة.",   href:"/m3", Chart:MiniGroupedBar },
-  { icon:"fa-circle-notch", altIcon:"fa-gem", tagColor:"#fbbf24", title:"نسبة الإنتاج العربي مقارنة بالإنتاج العالمي", desc:"قياس مساهمة الإنتاج العربي في الإنتاج العالمي عبر تمثيل دائري تفاعلي.",      href:"/m4", Chart:MiniDonut },
+  { icon:"fa-chart-column", altIcon:"fa-layer-group", tagColor:"#c9a84c", titleKey:"indicatorProductionVolumeTitle", descKey:"indicatorProductionVolumeDesc", href:"/m1", Chart:MiniBarChart },
+  { icon:"fa-chart-line",   altIcon:"fa-chart-column", tagColor:"#7ee0c0", titleKey:"indicatorProductionTrendTitle", descKey:"indicatorProductionTrendDesc", href:"/m2", Chart:MiniLineChart },
+  { icon:"fa-layer-group",  altIcon:"fa-chart-line", tagColor:"#93c5fd", titleKey:"indicatorArabicProductionTrendTitle", descKey:"indicatorArabicProductionTrendDesc", href:"/m3", Chart:MiniGroupedBar },
+  { icon:"fa-circle-notch", altIcon:"fa-gem", tagColor:"#fbbf24", titleKey:"indicatorProductionComparisonTitle", descKey:"indicatorProductionComparisonDesc", href:"/m4", Chart:MiniDonut },
 ];
 
 /* ─────────────────────────────────────────────
    INDICATOR ROW CARD  (self-contained hover)
 ───────────────────────────────────────────── */
-const IndicatorRowCard = ({ card }) => {
+const IndicatorRowCard = ({ card, labels }) => {
   const [hovered, setHovered] = useState(false);
   const [inView, setInView] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -510,7 +723,9 @@ const IndicatorRowCard = ({ card }) => {
 
   const chartActive = hovered || inView || expanded;
   const shownIcon = iconAlt ? (card.altIcon || card.icon) : card.icon;
-  const shownDesc = expanded ? card.desc : shortText(card.desc, 86);
+  const title = labels[card.titleKey];
+  const description = labels[card.descKey];
+  const shownDesc = expanded ? description : shortText(description, 86);
 
   return (
     <div
@@ -554,12 +769,12 @@ const IndicatorRowCard = ({ card }) => {
           </div>
           <div style={{ flex:1 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, marginBottom:6, flexWrap:"wrap" }}>
-              <p style={{ fontSize:"1.15rem", fontWeight:800, color:"white", margin:0 }}>{card.title}</p>
+              <p style={{ fontSize:"1.15rem", fontWeight:800, color:"white", margin:0 }}>{title}</p>
               <div style={{ display:"inline-flex", alignItems:"center", gap:6 }}>
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); setIconAlt((v) => !v); }}
-                  title="تغيير الأيقونة"
+                  title={labels.changeIcon}
                   style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.15)", color:"rgba(255,255,255,0.8)", borderRadius:8, padding:"4px 8px", cursor:"pointer" }}
                 >
                   <AppIcon name="fa-right-left" size={12} strokeWidth={2.4} />
@@ -567,7 +782,7 @@ const IndicatorRowCard = ({ card }) => {
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v); }}
-                  title={expanded ? "إخفاء" : "فتح"}
+                  title={expanded ? labels.hide : labels.open}
                   style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.15)", color:"rgba(255,255,255,0.8)", borderRadius:8, padding:"4px 8px", cursor:"pointer", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition:"transform 220ms ease" }}
                 >
                   <ChevronDown size={12} strokeWidth={2.4} />
@@ -577,7 +792,7 @@ const IndicatorRowCard = ({ card }) => {
             <p style={{ fontSize:"0.9rem", color:"rgba(255,255,255,0.5)", lineHeight:1.75, margin:"0 0 14px" }}>{shownDesc}</p>
             {expanded && (
               <a href={card.href} onClick={(e) => e.stopPropagation()} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${card.tagColor}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:card.tagColor, letterSpacing:"0.04em", textDecoration:"none", background:`${card.tagColor}12` }}>
-                <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> المزيد
+                <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> {labels.more}
               </a>
             )}
           </div>
@@ -586,7 +801,7 @@ const IndicatorRowCard = ({ card }) => {
         {/* Right — chart */}
         {(expanded || hovered || inView) && (
           <div style={{ flex:"0 0 320px", minWidth:260, alignSelf:"center", height:140 }}>
-            <Chart active={chartActive} />
+            <Chart active={chartActive} labels={labels} />
           </div>
         )}
 
@@ -598,7 +813,7 @@ const IndicatorRowCard = ({ card }) => {
 /* ─────────────────────────────────────────────
    KPI CARD  (self-contained hover)
 ───────────────────────────────────────────── */
-const KpiCard = ({ k }) => {
+const KpiCard = ({ k, labels }) => {
   const [hovered, setHovered] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [iconAlt, setIconAlt] = useState(false);
@@ -639,7 +854,7 @@ const KpiCard = ({ k }) => {
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); setIconAlt((v) => !v); }}
-            title="تغيير الأيقونة"
+            title={labels.changeIcon}
             style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.15)", color:"rgba(255,255,255,0.8)", borderRadius:8, padding:"4px 8px", cursor:"pointer" }}
           >
             <AppIcon name="fa-right-left" size={12} strokeWidth={2.4} />
@@ -678,7 +893,7 @@ const KpiCard = ({ k }) => {
 /* ─────────────────────────────────────────────
    TRADE CARD  (self-contained hover + mini chart)
 ───────────────────────────────────────────── */
-const TradeCard = ({ card, accent }) => {
+const TradeCard = ({ card, accent, labels }) => {
   const [hovered, setHovered] = useState(false);
   const [inView, setInView] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -698,7 +913,9 @@ const TradeCard = ({ card, accent }) => {
 
   const chartActive = hovered || inView || expanded;
   const shownIcon = iconAlt ? (card.altIcon || card.icon) : card.icon;
-  const shownDesc = expanded ? card.desc : shortText(card.desc, 96);
+  const title = labels[card.titleKey];
+  const description = labels[card.descKey];
+  const shownDesc = expanded ? description : shortText(description, 96);
 
   return (
     <div
@@ -734,11 +951,11 @@ const TradeCard = ({ card, accent }) => {
           </div>
           <div>
             <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap", marginBottom:6 }}>
-              <p style={{ fontSize:"1.05rem", fontWeight:800, color:"white", margin:0 }}>{card.title}</p>
+              <p style={{ fontSize:"1.05rem", fontWeight:800, color:"white", margin:0 }}>{title}</p>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); setIconAlt((v) => !v); }}
-                title="تغيير الأيقونة"
+                title={labels.changeIcon}
                 style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.15)", color:"rgba(255,255,255,0.8)", borderRadius:8, padding:"3px 7px", cursor:"pointer" }}
               >
                 <AppIcon name="fa-right-left" size={11} strokeWidth={2.4} />
@@ -756,7 +973,7 @@ const TradeCard = ({ card, accent }) => {
         {/* CTA */}
         <div style={{ display:"flex", alignItems:"center", marginRight:"auto" }}>
           <a href={card.href} onClick={(e) => e.stopPropagation()} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${accent}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:accent, letterSpacing:"0.04em", textDecoration:"none", background:`${accent}12`, whiteSpace:"nowrap", opacity: expanded ? 1 : 0.92 }}>
-            <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> المزيد
+            <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> {labels.more}
           </a>
         </div>
       </div>
@@ -810,11 +1027,15 @@ const useReveal = () => {
    HOME PAGE
 ───────────────────────────────────────────── */
 const Home = () => {
-  const [selectedCountry, setSelectedCountry] = useState("—");
+  const { language } = useContext(LanguageContext);
+  const labels = HOME_TRANSLATIONS[language] || HOME_TRANSLATIONS.ar;
+  const numberLocale = NUMBER_LOCALES[language] || NUMBER_LOCALES.ar;
+  const isArabic = language === "ar";
+  const [selectedCountryCode, setSelectedCountryCode] = useState(null);
   const [sponsorSlide, setSponsorSlide]       = useState(0);
   const [searchFocused, setSearchFocused]     = useState(false);
   const portalStats = useMemo(() => buildPortalStats(), []);
-  const kpiData = useMemo(() => buildKpiData(portalStats), [portalStats]);
+  const kpiData = useMemo(() => buildKpiData(labels), [labels]);
 
   useReveal();
 
@@ -847,10 +1068,10 @@ const Home = () => {
     });
   }, [sponsorSlides.length]);
 
-  const handleChatbotClick = () => alert("Chat Bote — محلل البيانات الذكي (واجهة تجريبية).");
+  const handleChatbotClick = () => alert(labels.chatbotAlert);
 
   return (
-    <div className="min-h-screen" dir="rtl" lang="ar"
+    <div className="min-h-screen" dir={isArabic ? "rtl" : "ltr"} lang={language}
       style={{ background:"#f5f3ef", fontFamily:"'Cairo','Amiri',Georgia,serif" }}>
 
       {/* ═══════════════════════ GLOBAL STYLES ═══════════════════════ */}
@@ -994,37 +1215,38 @@ border-radius:13px !important;
           {/* Badge */}
           <div className="hero-title" style={{ marginBottom:24 }}>
             <span style={{ display:"inline-block", background:"rgba(201,168,76,0.15)", border:"1px solid rgba(201,168,76,0.4)", color:"var(--gold-light)", padding:"4px 20px", fontSize:"0.75rem", fontWeight:700, letterSpacing:"0.15em", borderRadius:2, textTransform:"uppercase" }}>
-              ✦ المنظومة التعدينية العربية ✦
+              {labels.heroBadge}
             </span>
           </div>
 
           {/* Headline */}
           <h1 className="hero-title text-white"
             style={{ fontSize:"clamp(2rem,5vw,4rem)", fontWeight:900, lineHeight:1.15, letterSpacing:"-0.02em", textShadow:"0 4px 40px rgba(0,0,0,0.4)", maxWidth:800, margin:"0 0 1rem" }}>
-            بوابة المؤشرات{" "}
+            {labels.heroTitleStart}{" "}
             <span style={{ display:"inline-block", background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
-              التعدينية العربية
+              {labels.heroTitleAccent}
             </span>
           </h1>
 
           {/* Sub */}
           <p className="hero-sub"
             style={{ color:"rgba(255,255,255,0.72)", fontSize:"clamp(0.9rem,1.8vw,1.15rem)", maxWidth:560, lineHeight:1.8, margin:"0 0 2.5rem" }}>
-نافذتك لبيانات ومؤشرات قطاع التعدين العربي           </p>
+            {labels.heroSubtitle}
+          </p>
 
           {/* Search */}
           <div className="hero-search w-full" style={{ maxWidth:580 }}>
             <div className={`search-box flex items-center gap-3 rounded-sm px-5 py-3 ${searchFocused?"focused":""}`}
               style={{ borderRadius:13 }}>
               <button type="button" style={{ background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:"#fff", padding:"8px 22px", borderRadius:13, fontSize:"0.82rem", fontWeight:800, letterSpacing:"0.04em", whiteSpace:"nowrap", border:"none", cursor:"pointer" }}>
-                بحث ذكي
+                {labels.smartSearch}
               </button>
               <input
                 type="text"
-                placeholder="ابحث عن معدن، دولة، أو إحصائية..."
+                placeholder={labels.searchPlaceholder}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                style={{ flex:1, background:"transparent", border:"none", outline:"none", color:"#000", fontSize:"0.9rem", textAlign:"right", caretColor:"#000" }}
+                style={{ flex:1, background:"transparent", border:"none", outline:"none", color:"#000", fontSize:"0.9rem", textAlign:isArabic ? "right" : "left", caretColor:"#000" }}
               />
               <AppIcon name="fa-search" size={16} style={{ color:"rgba(201,168,76,0.7)" }} />
             </div>
@@ -1043,13 +1265,13 @@ border-radius:13px !important;
           <div style={{ textAlign:"center", marginBottom:12, background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)", borderRadius:13, padding:"40px 36px", boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)" }}>
             <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white", margin:"0" }}>
               <span style={{ background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
-                البوابة في أرقام
+                {labels.portalInNumbers}
               </span>
             </h3>
           </div>
 
           <div className="divf9" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:16, borderRadius:13 }}>
-            {kpiData.map((k, i) => <KpiCard key={i} k={k} />)}
+            {kpiData.map((k, i) => <KpiCard key={i} k={k} labels={labels} />)}
           </div>
         </section>
 
@@ -1061,7 +1283,7 @@ border-radius:13px !important;
             boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)",
           }}> <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white" }}>
                   <span style={{  background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
-                    المؤشرات التعدينية
+                    {labels.miningIndicatorsSection}
                   </span>
                 </h3></section>
         <section className="reveal d3" style={{ marginTop:16 }}>
@@ -1082,13 +1304,13 @@ border-radius:13px !important;
             <div style={{ position:"relative", zIndex:1, display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:32, flexWrap:"wrap", gap:12 }}>
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center",marginBottom:"20px", gap:8, padding:"5px 16px", background:"rgba(201,168,76,0.12)", color:"white", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
-                  <AppIcon name="fa-pickaxe" size={15} strokeWidth={2.2} /> الإنتاج التعديني
+                  <AppIcon name="fa-pickaxe" size={15} strokeWidth={2.2} /> {labels.miningProductionTag}
                 </span>
                <br />
-                <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", margin:0 }}>{`${formatInt(portalStats.productionIndicatorCount)} مؤشرات تفاعلية شاملة للإنتاج العربي`}</p>
+                <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.4)", margin:0 }}>{labels.productionSummary(formatInt(portalStats.productionIndicatorCount, numberLocale))}</p>
               </div>
               <a href="/m1" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
-                <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> الانتقال للمؤشرات
+                <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> {labels.goToIndicators}
               </a>
             </div>
 
@@ -1097,14 +1319,14 @@ border-radius:13px !important;
 
             {/* Cards */}
             <div style={{ display:"flex", flexDirection:"column", gap:14, position:"relative", zIndex:1 }}>
-              {INDICATOR_CARDS.map((card, i) => <IndicatorRowCard key={i} card={card} />)}
+              {INDICATOR_CARDS.map((card, i) => <IndicatorRowCard key={i} card={card} labels={labels} />)}
             </div>
 
             {/* Footer */}
             <div style={{ position:"relative", zIndex:1, marginTop:28, paddingTop:20, borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", gap:10 }}>
               <span style={{ width:8, height:8, borderRadius:"50%", background:"#4ade80", display:"inline-block", boxShadow:"0 0 8px rgba(74,222,128,0.5)" }} />
               <span style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>
-                {`البيانات محدّثة — ${portalStats.minYear} إلى ${portalStats.maxYear} — ${formatInt(portalStats.countryCount)} دولة عربية`}
+                {labels.updatedDataSummary(portalStats.minYear, portalStats.maxYear, formatInt(portalStats.countryCount, numberLocale))}
               </span>
             </div>
           </div>
@@ -1116,7 +1338,7 @@ border-radius:13px !important;
             boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)",
           }}> <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white" }}>
                   <span style={{  background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
-                   التجارة التعدينية
+                   {labels.tradeIndicatorsSection}
                   </span>
                 </h3></section>
         {/* ── TRADE ── */}
@@ -1140,13 +1362,13 @@ border-radius:13px !important;
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 16px", background:"rgba(201,168,76,0.12)", color:"white", border:"1px solid rgba(201,168,76,0.3)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, letterSpacing:"0.08em" }}>
                   <AppIcon name="fa-right-left" size={15} strokeWidth={2.2} />
-                  الصادرات والواردات
+                  {labels.tradeTag}
                 </span>
                 <br />
                
               </div>
               <a href="/trade-indicators" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"7px 20px", border:"1px solid rgba(201,168,76,0.35)", borderRadius:13, fontSize:"0.78rem", fontWeight:700, color:"var(--gold)", letterSpacing:"0.04em", textDecoration:"none", background:"rgba(201,168,76,0.08)" }}>
-                <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> جميع مؤشرات التجارة
+                <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> {labels.allTradeIndicators}
               </a>
             </div>
 
@@ -1157,7 +1379,7 @@ border-radius:13px !important;
             <div style={{ display:"flex", flexDirection:"column", gap:14, position:"relative", zIndex:1 }}>
               {TRADE_CARDS.map((card, i) => {
                 const accent = i === 0 ? "#c9a84c" : "#7ee0c0";
-                return <TradeCard key={i} card={card} accent={accent} />;
+                return <TradeCard key={i} card={card} accent={accent} labels={labels} />;
               })}
             </div>
 
@@ -1165,7 +1387,7 @@ border-radius:13px !important;
             <div style={{ position:"relative", zIndex:1, marginTop:28, paddingTop:20, borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", gap:10 }}>
               <span style={{ width:8, height:8, borderRadius:"50%", background:"#4ade80", display:"inline-block", boxShadow:"0 0 8px rgba(74,222,128,0.5)" }} />
               <span style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>
-                {`إجمالي الصادرات: ${formatInt(portalStats.exportTotal)} دولار — إجمالي الواردات: ${formatInt(portalStats.importTotal)} دولار`}
+                {labels.tradeTotals(formatInt(portalStats.exportTotal, numberLocale), formatInt(portalStats.importTotal, numberLocale))}
               </span>
             </div>
           </div>
@@ -1206,12 +1428,12 @@ border-radius:13px !important;
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:8, flexWrap:"wrap", gap:12 }}>
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
-                  <AppIcon name="fa-flag" size={14} strokeWidth={2.2} /> الدول الأعضاء
+                  <AppIcon name="fa-flag" size={14} strokeWidth={2.2} /> {labels.memberStates}
                 </span>
-                <h5 style={{ fontSize:"1.2rem", fontWeight:900, color:"var(--forest)", margin:"10px 0 4px" }}>الدول العربية</h5>
-                <p style={{ fontSize:"0.8rem", color:"var(--muted)", margin:0 }}>اختر دولة للوصول إلى مؤشراتها التعدينية</p>
+                <h5 style={{ fontSize:"1.2rem", fontWeight:900, color:"var(--forest)", margin:"10px 0 4px" }}>{labels.arabCountriesTitle}</h5>
+                <p style={{ fontSize:"0.8rem", color:"var(--muted)", margin:0 }}>{labels.chooseCountry}</p>
               </div>
-              <a href="/countries" className="ind-link"><AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> عرض الكل</a>
+              <a href="/countries" className="ind-link"><AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> {labels.viewAll}</a>
             </div>
 
             <GoldDivider />
@@ -1219,21 +1441,21 @@ border-radius:13px !important;
             <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:"24px 12px" }}>
               {countries.map(c => (
                 <a key={c.code} href={`/countries?country=${c.code}`} className="country-btn"
-                  onClick={() => setSelectedCountry(c.name)}
+                  onClick={() => setSelectedCountryCode(c.code)}
                   style={{ background:"none", border:"none", cursor:"pointer", textAlign:"center", padding:0 }}>
                   <div className="flag-frame" style={{ width:"100%", aspectRatio:"3/2" }}>
-                    <img src={countryFlags[c.code]} alt={c.name}
+                    <img src={countryFlags[c.code]} alt={getCountryLabel(c.code, language)}
                       style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
                       loading="lazy" />
                   </div>
-                  <p className="country-name" style={{ margin:"8px 0 0", fontSize:"0.68rem", lineHeight:1.4 }}>{c.name}</p>
+                  <p className="country-name" style={{ margin:"8px 0 0", fontSize:"0.68rem", lineHeight:1.4 }}>{getCountryLabel(c.code, language)}</p>
                 </a>
               ))}
             </div>
 
             <div style={{ marginTop:20, paddingTop:16, borderTop:"1px solid rgba(8,39,33,0.08)", fontSize:"0.8rem", color:"var(--muted)" }}>
-              الدولة المختارة:{" "}
-              <span style={{ fontWeight:800, color:"var(--forest)" }}>{selectedCountry}</span>
+              {labels.selectedCountry}{" "}
+              <span style={{ fontWeight:800, color:"var(--forest)" }}>{selectedCountryCode ? getCountryLabel(selectedCountryCode, language) : labels.none}</span>
             </div>
           </div>
         </section>
@@ -1244,9 +1466,9 @@ border-radius:13px !important;
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12 }}>
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
-                  <AppIcon name="fa-books" size={14} strokeWidth={2.2} /> المراجع
+                  <AppIcon name="fa-books" size={14} strokeWidth={2.2} /> {labels.referencesTag}
                 </span>
-                <h2 style={{ fontSize:"1.2rem", fontWeight:900, color:"var(--forest)", margin:"10px 0 0" }}>المراجع والمصادر</h2>
+                <h2 style={{ fontSize:"1.2rem", fontWeight:900, color:"var(--forest)", margin:"10px 0 0" }}>{labels.referencesTitle}</h2>
               </div>
             </div>
 
@@ -1302,20 +1524,20 @@ border-radius:13px !important;
             <div style={{ position:"relative", zIndex:1 }}>
               <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(201,168,76,0.12)", border:"1px solid rgba(201,168,76,0.3)", color:"var(--gold)", padding:"4px 16px", borderRadius:13, fontSize:"0.72rem", fontWeight:700, letterSpacing:"0.1em", marginBottom:20 }}>
                 <span className="online-dot" style={{ width:6, height:6, borderRadius:"50%", background:"#4ade80", display:"inline-block" }} />
-                مساعد ذكي متاح الآن
+                {labels.assistantAvailable}
               </div>
               <h2 style={{ fontSize:"1.8rem", fontWeight:900, color:"white", margin:"0 0 12px" }}>
                {" "}
                 <span style={{ background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
-                  المساعد الذكي
+                  {labels.intelligentAssistant}
                 </span>
               </h2>
               <p style={{ color:"rgba(255,255,255,0.6)", fontSize:"0.88rem", maxWidth:460, margin:"0 auto 28px", lineHeight:1.8 }}>
-                اطرح أسئلتك عن المؤشرات والبيانات والمعلومات التعدينية وسيجيبك فوراً
+                {labels.assistantSubtitle}
               </p>
               <button type="button" onClick={handleChatbotClick}
                 style={{ display:"inline-flex", alignItems:"center", gap:10, background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:"var(--forest)", padding:"12px 32px", borderRadius:13, border:"none", cursor:"pointer", fontSize:"0.88rem", fontWeight:800, letterSpacing:"0.04em", boxShadow:"0 8px 24px rgba(201,168,76,0.3)" }}>
-                <AppIcon name="fa-robot" size={16} strokeWidth={2.2} /> ابدأ المحادثة
+                <AppIcon name="fa-robot" size={16} strokeWidth={2.2} /> {labels.startChat}
               </button>
             </div>
           </div>
@@ -1327,15 +1549,15 @@ border-radius:13px !important;
       <div className="reveal d5"><Footer /></div>
 
       {/* ── FLOATING BOT BUTTON ── */}
-      <button type="button" onClick={handleChatbotClick} title="محلّل البيانات الذكي" className="float-btn"
-        style={{ position:"fixed", bottom:24, right:24, zIndex:50, display:"flex", alignItems:"center", gap:12, padding:"10px 16px 10px 12px", borderRadius:13, cursor:"pointer" }}>
+      <button type="button" onClick={handleChatbotClick} title={labels.floatingBotSubtitle} className="float-btn"
+        style={{ position:"fixed", bottom:24, [isArabic ? "right" : "left"]:24, zIndex:50, display:"flex", alignItems:"center", gap:12, padding:"10px 16px 10px 12px", borderRadius:13, cursor:"pointer" }}>
         <span className="online-dot" style={{ position:"absolute", top:8, right:8, width:8, height:8, borderRadius:"50%", background:"#4ade80", boxShadow:"0 0 0 3px rgba(74,222,128,0.25)" }} />
         <div style={{ width:42, height:42, borderRadius:13, background:"linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08))", border:"1px solid rgba(201,168,76,0.4)", display:"flex", alignItems:"center", justifyContent:"center", color:"var(--gold)", fontSize:"1.1rem" }}>
           <AppIcon name="fa-robot" size={18} strokeWidth={2.2} />
         </div>
-        <div style={{ display:"flex", flexDirection:"column", textAlign:"right" }}>
-          <span style={{ fontSize:"0.82rem", fontWeight:800, color:"var(--gold)", lineHeight:1 }}>Chat Bote</span>
-          <span style={{ fontSize:"0.7rem", color:"rgba(255,255,255,0.5)", marginTop:2 }}>محلّل البيانات الذكي</span>
+        <div style={{ display:"flex", flexDirection:"column", textAlign:isArabic ? "right" : "left" }}>
+          <span style={{ fontSize:"0.82rem", fontWeight:800, color:"var(--gold)", lineHeight:1 }}>{labels.floatingBotTitle}</span>
+          <span style={{ fontSize:"0.7rem", color:"rgba(255,255,255,0.5)", marginTop:2 }}>{labels.floatingBotSubtitle}</span>
         </div>
       </button>
 

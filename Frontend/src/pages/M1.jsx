@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDownWideNarrow, CalendarDays, Search } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
+import { LanguageContext } from "../App";
 
 export const dataByMineral = {
   "الذهب": {
@@ -302,14 +303,130 @@ export const mineralUnits = {
   "الأسمنت": "ألف طن",
 };
 
+const PAGE_TRANSLATIONS = {
+  ar: {
+    pageTitle: "حجم الإنتاج التعديني",
+    pageSubtitle: "لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة الزمنية",
+    annualEvolution: "التطور السنوي",
+    productionByCountry: "الإنتاج حسب الدولة",
+    yearLabel: "السنة",
+    ranking: "ترتيب",
+    searchPlaceholder: "بحث داخل الدول...",
+    country: "الدولة",
+    production: "الإنتاج",
+    noResults: "لا توجد نتائج مطابقة.",
+    sources: "المصادر",
+    arabEconomicReport: "التقرير الاقتصادي العربي الموحد",
+  },
+  fr: {
+    pageTitle: "Volume de la production miniere",
+    pageSubtitle: "Tableau de bord interactif de la production miniere par pays, minerai et periode.",
+    annualEvolution: "Evolution annuelle",
+    productionByCountry: "Production par pays",
+    yearLabel: "Annee",
+    ranking: "Classement",
+    searchPlaceholder: "Rechercher un pays...",
+    country: "Pays",
+    production: "Production",
+    noResults: "Aucun resultat correspondant.",
+    sources: "Sources",
+    arabEconomicReport: "Rapport economique arabe unifie",
+  },
+  en: {
+    pageTitle: "Mining production volume",
+    pageSubtitle: "Interactive dashboard showing mining production by country, mineral, and period.",
+    annualEvolution: "Annual trend",
+    productionByCountry: "Production by country",
+    yearLabel: "Year",
+    ranking: "Ranking",
+    searchPlaceholder: "Search countries...",
+    country: "Country",
+    production: "Production",
+    noResults: "No matching results.",
+    sources: "Sources",
+    arabEconomicReport: "Unified Arab Economic Report",
+  },
+};
+
+const MINERAL_LABELS = {
+  "الذهب": { ar: "الذهب", fr: "Or", en: "Gold" },
+  "التلك": { ar: "التلك", fr: "Talc", en: "Talc" },
+  "الجبس": { ar: "الجبس", fr: "Gypse", en: "Gypsum" },
+  "الحديد (محتوى الحديد Fe-Content)": {
+    ar: "الحديد (محتوى الحديد Fe-Content)",
+    fr: "Fer (teneur en Fe)",
+    en: "Iron (Fe content)",
+  },
+  "الباريت": { ar: "الباريت", fr: "Barytine", en: "Baryte" },
+  "الأسمنت": { ar: "الاسمنت", fr: "Ciment", en: "Cement" },
+};
+
+const UNIT_LABELS = {
+  "كجم": { ar: "كجم", fr: "kg", en: "kg" },
+  "طن": { ar: "طن", fr: "tonnes", en: "tons" },
+  "ألف طن": { ar: "الف طن", fr: "milliers de tonnes", en: "thousand tons" },
+};
+
+const COUNTRY_LABELS = {
+  "الجمهورية الإسلامية الموريتانية": {
+    ar: "الجمهورية الاسلامية الموريتانية",
+    fr: "Republique islamique de Mauritanie",
+    en: "Islamic Republic of Mauritania",
+  },
+  "الجمهورية الجزائرية الديمقراطية الشعبية": {
+    ar: "الجمهورية الجزائرية الديمقراطية الشعبية",
+    fr: "Republique algerienne democratique et populaire",
+    en: "People's Democratic Republic of Algeria",
+  },
+  "المملكة العربية السعودية": {
+    ar: "المملكة العربية السعودية",
+    fr: "Royaume d'Arabie saoudite",
+    en: "Kingdom of Saudi Arabia",
+  },
+  "المملكة المغربية": {
+    ar: "المملكة المغربية",
+    fr: "Royaume du Maroc",
+    en: "Kingdom of Morocco",
+  },
+  "جمهورية السودان": {
+    ar: "جمهورية السودان",
+    fr: "Republique du Soudan",
+    en: "Republic of the Sudan",
+  },
+  "جمهورية مصر العربية": {
+    ar: "جمهورية مصر العربية",
+    fr: "Republique arabe d'Egypte",
+    en: "Arab Republic of Egypt",
+  },
+};
+
+const NUMBER_LOCALES = {
+  ar: "ar-MA",
+  fr: "fr-FR",
+  en: "en-US",
+};
+
 const mineralYears = (mineral) =>
   Object.keys(dataByMineral[mineral] || {})
     .map(Number)
     .sort((a, b) => a - b);
 
-function formatNumber(n) {
-  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+function formatNumber(n, language = "ar") {
+  const locale = NUMBER_LOCALES[language] || NUMBER_LOCALES.ar;
+  return new Intl.NumberFormat(locale).format(n);
 }
+
+const getLocalizedMineral = (mineral, language) =>
+  MINERAL_LABELS[mineral]?.[language] || mineral;
+
+const getLocalizedUnit = (unit, language) =>
+  UNIT_LABELS[unit]?.[language] || unit;
+
+const getLocalizedMineralUnit = (mineral, language) =>
+  getLocalizedUnit(mineralUnits[mineral], language);
+
+const getLocalizedCountry = (country, language) =>
+  COUNTRY_LABELS[country]?.[language] || country;
 
 const wrapLabel = (text, maxCharsPerLine = 12) => {
   const words = String(text || "").split(/\s+/).filter(Boolean);
@@ -432,7 +549,7 @@ const linePointCountryLabelPlugin = {
 };
 
 // ── Line chart: evolution over all years for selected mineral ──────────────
-function LineChartPanel({ mineral }) {
+function LineChartPanel({ mineral, language, annualEvolutionLabel }) {
   const canvasRef = useRef(null);
   const instanceRef = useRef(null);
 
@@ -456,7 +573,7 @@ function LineChartPanel({ mineral }) {
     ];
 
     const datasets = countries.map((country, i) => ({
-      label: country,
+      label: getLocalizedCountry(country, language),
       data: years.map((y) => {
         const row = (dataByMineral[mineral][y] || []).find(
           (r) => r.country === country
@@ -492,7 +609,7 @@ function LineChartPanel({ mineral }) {
           tooltip: {
             callbacks: {
               label: (c) =>
-                ` ${c.dataset.label}: ${formatNumber(c.parsed.y)} ${mineralUnits[mineral]}`,
+                ` ${c.dataset.label}: ${formatNumber(c.parsed.y, language)} ${getLocalizedMineralUnit(mineral, language)}`,
             },
           },
         },
@@ -526,12 +643,12 @@ function LineChartPanel({ mineral }) {
       instanceRef.current?.destroy();
       instanceRef.current = null;
     };
-  }, [mineral]);
+  }, [mineral, language]);
 
   return (
     <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
       <h3 className="mb-2 text-base font-extrabold text-slate-800">
-        التطور السنوي — {mineral}
+        {annualEvolutionLabel} - {getLocalizedMineral(mineral, language)}
       </h3>
       <div className="h-[280px]">
         <canvas ref={canvasRef} />
@@ -541,6 +658,9 @@ function LineChartPanel({ mineral }) {
 }
 
 export default function M1Page() {
+  const { language } = useContext(LanguageContext);
+  const t = PAGE_TRANSLATIONS[language] || PAGE_TRANSLATIONS.ar;
+
   const minerals = Object.keys(dataByMineral);
   const [activeMineral, setActiveMineral] = useState(minerals[0]);
   const [activeYear, setActiveYear] = useState(() => {
@@ -569,8 +689,13 @@ export default function M1Page() {
 
   const filteredRows = useMemo(() => {
     if (!search.trim()) return baseRows;
-    return baseRows.filter((r) => r.country.includes(search.trim()));
-  }, [baseRows, search]);
+    const query = search.trim().toLowerCase();
+    return baseRows.filter((r) => {
+      const localizedCountry = getLocalizedCountry(r.country, language).toLowerCase();
+      const rawCountry = r.country.toLowerCase();
+      return localizedCountry.includes(query) || rawCountry.includes(query);
+    });
+  }, [baseRows, search, language]);
 
   // ── Bar chart (per year) ─────────────────────────────────────────────────
   const barCanvasRef = useRef(null);
@@ -581,7 +706,7 @@ export default function M1Page() {
     if (!ctx) return;
     if (barInstanceRef.current) barInstanceRef.current.destroy();
 
-    const labels = baseRows.map((r) => r.country);
+    const labels = baseRows.map((r) => getLocalizedCountry(r.country, language));
     const values = baseRows.map((r) => r.value);
 
     barInstanceRef.current = new Chart(ctx, {
@@ -590,7 +715,7 @@ export default function M1Page() {
         labels,
         datasets: [
           {
-            label: "الإنتاج",
+            label: t.production,
             data: values,
             backgroundColor: "rgba(8, 39, 33, 0.82)",
             borderRadius: 10,
@@ -605,7 +730,7 @@ export default function M1Page() {
           tooltip: {
             callbacks: {
               label: (c) =>
-                ` ${formatNumber(c.parsed.y)} ${mineralUnits[activeMineral]}`,
+                ` ${formatNumber(c.parsed.y, language)} ${getLocalizedMineralUnit(activeMineral, language)}`,
             },
           },
         },
@@ -643,10 +768,10 @@ export default function M1Page() {
       barInstanceRef.current?.destroy();
       barInstanceRef.current = null;
     };
-  }, [baseRows, activeMineral]);
+  }, [baseRows, activeMineral, language, t.production]);
 
   return (
-    <div className="" dir="rtl">
+    <div className="" dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
       <Menu />
       <main className="min-h-screen py-6 sm:py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -654,10 +779,11 @@ export default function M1Page() {
           {/* Header */}
           <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
             <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
-              حجم الإنتاج التعديني
+              {t.pageTitle}
             </h1>
             <p className="text-sm text-slate-100/80">
-لوحة تفاعلية لعرض حجم الإنتاج التعديني حسب الدولة، الخام، والفترة الزمنية            </p>
+              {t.pageSubtitle}
+            </p>
           </header>
 
           {/* Filters */}
@@ -676,9 +802,9 @@ export default function M1Page() {
                       : "border-slate-200 bg-white text-[#082721] hover:bg-slate-50"
                   }`}
                 >
-                  {m}
+                  {getLocalizedMineral(m, language)}
                   <span className="mr-2 text-[10px] opacity-60">
-                    ({mineralUnits[m]})
+                    ({getLocalizedMineralUnit(m, language)})
                   </span>
                 </button>
               ))}
@@ -711,11 +837,11 @@ export default function M1Page() {
               <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
                   <h3 className="text-base font-extrabold text-slate-800">
-                    الإنتاج حسب الدولة
+                    {t.productionByCountry}
                   </h3>
                   <div className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
                     <CalendarDays size={14} strokeWidth={2.2} />
-                    <span>السنة: {activeYear}</span>
+                    <span>{t.yearLabel}: {activeYear}</span>
                   </div>
                 </div>
                 <div className="mt-1 h-[320px] sm:h-[360px]">
@@ -729,11 +855,11 @@ export default function M1Page() {
               <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <h3 className="text-sm font-extrabold text-slate-800">
-                    الإنتاج حسب الدولة
+                    {t.productionByCountry}
                   </h3>
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-[11px] font-extrabold text-amber-900">
                     <ArrowDownWideNarrow size={13} strokeWidth={2.2} />
-                    ترتيب
+                    {t.ranking}
                   </span>
                 </div>
 
@@ -744,18 +870,18 @@ export default function M1Page() {
                       type="text"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      placeholder="بحث داخل الدول..."
+                      placeholder={t.searchPlaceholder}
                       className="w-full border-none bg-transparent text-xs font-bold text-slate-700 outline-none focus:ring-0"
                     />
                   </div>
 
                   <div className="max-h-72 overflow-y-auto rounded-xl bg-white">
-                    <table className="min-w-full text-left text-xs">
+                    <table className={`min-w-full text-xs ${language === "ar" ? "text-right" : "text-left"}`}>
                       <thead className="bg-slate-50 text-[11px] font-extrabold text-[#082721]">
                         <tr>
-                          <th className="px-3 py-2">الدولة</th>
+                          <th className="px-3 py-2">{t.country}</th>
                           <th className="px-3 py-2">
-                            الإنتاج ({mineralUnits[activeMineral]})
+                            {t.production} ({getLocalizedMineralUnit(activeMineral, language)})
                           </th>
                         </tr>
                       </thead>
@@ -765,8 +891,8 @@ export default function M1Page() {
                             key={r.country}
                             className="border-t border-slate-100 text-xs text-slate-700"
                           >
-                            <td className="px-3 py-1.5 font-bold">{r.country}</td>
-                            <td className="px-3 py-1.5">{formatNumber(r.value)}</td>
+                            <td className="px-3 py-1.5 font-bold">{getLocalizedCountry(r.country, language)}</td>
+                            <td className="px-3 py-1.5">{formatNumber(r.value, language)}</td>
                           </tr>
                         ))}
                         {filteredRows.length === 0 && (
@@ -775,7 +901,7 @@ export default function M1Page() {
                               colSpan={2}
                               className="px-3 py-3 text-center text-xs text-slate-400"
                             >
-                              لا توجد نتائج مطابقة.
+                              {t.noResults}
                             </td>
                           </tr>
                         )}
@@ -787,14 +913,14 @@ export default function M1Page() {
 
               {/* Sources */}
               <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
-                <h3 className="mb-2 text-sm font-extrabold text-slate-800">المصادر</h3>
+                <h3 className="mb-2 text-sm font-extrabold text-slate-800">{t.sources}</h3>
                 <div className="space-y-2 rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
                   <div className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 text-xs">
                     <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#082721]" />
                     <div>
                       <div className="font-bold">BGS & IOCFWMC</div>
                       <div className="text-[11px] text-slate-500">
-                        التقرير الاقتصادي العربي الموحد
+                        {t.arabEconomicReport}
                       </div>
                     </div>
                   </div>
@@ -814,7 +940,11 @@ export default function M1Page() {
 
           {/* Line chart — full width below */}
           <section className="mt-4">
-            <LineChartPanel mineral={activeMineral} />
+            <LineChartPanel
+              mineral={activeMineral}
+              language={language}
+              annualEvolutionLabel={t.annualEvolution}
+            />
           </section>
 
         </div>
