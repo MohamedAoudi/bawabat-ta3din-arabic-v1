@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Scale, Weight } from "lucide-react";
+import { CalendarRange, Gem, Globe2, Scale, TrendingUp, Weight, Filter, ChevronDown, List } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
@@ -32,11 +32,11 @@ const COUNTRIES = [
   { name: "الجمهورية اليمنية", code: "ye" },
 ];
 
-const countryNameAr = Object.fromEntries(COUNTRIES.map(c => [c.code, c.name]));
+const countryNameAr = Object.fromEntries(COUNTRIES.map((c) => [c.code, c.name]));
 
 const DEFAULT_COUNTRY = "ma";
 
-const availableCountries = COUNTRIES.map(c => c.code);
+const availableCountries = COUNTRIES.map((c) => c.code);
 
 function unitLabelFor() {
   return "دولار أمريكي";
@@ -117,7 +117,31 @@ export default function M5Page() {
       .reduce((sum, row) => sum + (row.value_usd || 0), 0);
   }, []);
 
-  const countryYears = useMemo(() => yearlyUsdData.map((item) => item.year), []);
+  const countryYears = useMemo(() => yearlyUsdData.map((item) => item.year), [yearlyUsdData]);
+
+  const latestYear = useMemo(
+    () => (countryYears.length ? countryYears[countryYears.length - 1] : null),
+    [countryYears]
+  );
+
+  const latestYearValue = useMemo(() => {
+    if (!latestYear) return 0;
+    return yearlyUsdData.find((item) => item.year === latestYear)?.value || 0;
+  }, [latestYear, yearlyUsdData]);
+
+  const avgYearlyValue = useMemo(() => {
+    if (!yearlyUsdData.length) return 0;
+    return totalUsd / yearlyUsdData.length;
+  }, [totalUsd, yearlyUsdData]);
+
+  const yoyChange = useMemo(() => {
+    if (yearlyUsdData.length < 2) return null;
+    const current = yearlyUsdData[yearlyUsdData.length - 1]?.value || 0;
+    const previous = yearlyUsdData[yearlyUsdData.length - 2]?.value || 0;
+    if (!previous) return null;
+    return ((current - previous) / previous) * 100;
+  }, [yearlyUsdData]);
+
   const countryPack = useMemo(
     () => ({
       table: [
@@ -143,73 +167,49 @@ export default function M5Page() {
   const donutCanvasRef = useRef(null);
   const donutChartRef = useRef(null);
 
+  // تحسين إعدادات الرسم البياني (Colors & Fonts)
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
+    if (chartRef.current) chartRef.current.destroy();
 
-    if (chartRef.current) {
-      chartRef.current.destroy();
-      chartRef.current = null;
-    }
-
-    const labelText =
-      selectedMineral === "all"
-        ? `${countryNameAr[DEFAULT_COUNTRY] || DEFAULT_COUNTRY}`
-        : `${translateMineral(selectedMineral)} - ${countryNameAr[DEFAULT_COUNTRY] || DEFAULT_COUNTRY}`;
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, "rgba(221, 188, 107, 0.9)");
+    gradient.addColorStop(1, "rgba(8, 39, 33, 0.9)");
 
     chartRef.current = new Chart(ctx, {
       type: "bar",
       data: {
         labels: barYears,
-        datasets: [
-          {
-            label: labelText,
-            data: chartValues,
-            borderWidth: 0,
-            borderRadius: 8,
-            backgroundColor: "rgba(8, 39, 33, .85)",
-          },
-        ],
+        datasets: [{
+          label: selectedMineral === "all" ? "إجمالي الصادرات" : translateMineral(selectedMineral),
+          data: chartValues,
+          backgroundColor: gradient,
+          borderRadius: 12,
+          hoverBackgroundColor: "#ddbc6b",
+        }],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            position: "top",
-            labels: { font: { family: "Cairo", weight: "700" } },
-          },
+          legend: { display: false }, // إخفاء الليجند لتبسيط الواجهة
           tooltip: {
-            callbacks: {
-              label: (c) =>
-                ` ${c.dataset.label}: ${formatUsd(c.parsed.y)} ${unitLabelFor()}`,
-            },
-          },
+            backgroundColor: "#082721",
+            titleFont: { family: "Cairo", size: 14 },
+            bodyFont: { family: "Cairo", size: 13 },
+            padding: 12,
+            cornerRadius: 10,
+          }
         },
         scales: {
-          x: {
-            grid: { color: "rgba(0,0,0,.08)" },
-            ticks: { font: { family: "Cairo", weight: "700" } },
-          },
-          y: {
-            beginAtZero: true,
-            grid: { color: "rgba(0,0,0,.10)" },
-            ticks: {
-              font: { family: "Cairo" },
-              callback: (v) => (v === 0 ? "0" : formatUsd(v)),
-            },
-          },
-        },
-      },
-    });
-
-    return () => {
-      if (chartRef.current) {
-        chartRef.current.destroy();
-        chartRef.current = null;
+          x: { grid: { display: false }, ticks: { font: { family: "Cairo" } } },
+          y: { grid: { color: "rgba(0,0,0,0.05)" }, ticks: { font: { family: "Cairo" } } }
+        }
       }
-    };
-  }, [barYears, chartValues]);
+    });
+    return () => chartRef.current?.destroy();
+  }, [barYears, chartValues, selectedMineral]);
 
   useEffect(() => {
     const ctx = donutCanvasRef.current?.getContext("2d");
@@ -245,10 +245,7 @@ export default function M5Page() {
         maintainAspectRatio: false,
         onClick: () => setSelectedCountry(DEFAULT_COUNTRY),
         plugins: {
-          legend: {
-            position: "top",
-            labels: { font: { family: "Cairo", weight: "700" } },
-          },
+          legend: { display: false },
           tooltip: {
             callbacks: {
               label: (c) => {
@@ -270,216 +267,179 @@ export default function M5Page() {
   }, [countryPack]);
 
   return (
-    <div dir="rtl">
+    <div dir="rtl" className="min-h-screen bg-[#F4F7F5] font-['Cairo'] text-slate-800">
       <Menu />
-      <main className="min-h-screen py-6 sm:py-8">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
-            <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
-              الصادرات التعدينية
-            </h1>
-            <p className="text-sm text-slate-100/80">
-تحليل تدفقات الصادرات التعدينية حسب الدولة والوجهة والقيمة المالية.            </p>
-          </header>
+      
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-[#082721] pb-32 pt-16 text-white">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ddbc6b 1px, transparent 1px)', size: '20px 20px' }}></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <span className="inline-block px-4 py-1.5 mb-4 text-xs font-bold tracking-widest uppercase bg-[#ddbc6b]/20 border border-[#ddbc6b]/30 rounded-full text-[#ddbc6b]">
+            البيانات التعدينية العربية
+          </span>
+          <h1 className="text-4xl md:text-5xl font-black mb-4">الصادرات التعدينية <span className="text-[#ddbc6b]">الاستراتيجية</span></h1>
+          <p className="max-w-2xl mx-auto text-slate-300 text-sm md:text-base leading-relaxed">
+            منصة تحليلية ذكية لرصد وتتبع تدفقات المعادن الحرجة في المنطقة العربية، توفر نظرة شاملة على القيم الاقتصادية والتوجهات السنوية.
+          </p>
+        </div>
+      </div>
 
-          <section className="grid gap-4 lg:grid-cols-12">
-            <div className="lg:col-span-9">
-              <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
-                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-base font-extrabold text-slate-800">
-                    اجمالي الصادرات التعدينية للدول العربية حسب السنة والخام والمنتج
-                  </div>
-                  <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
-                    <Scale size={14} strokeWidth={2.2} />
-                    وحدة القيمة: <span className="font-extrabold">{unitLabelFor()}</span>
-                  </span>
-                </div>
-
-                <div className="h-[340px] sm:h-[440px]">
-                  <canvas ref={canvasRef} />
-                </div>
+      <main className="container mx-auto px-4 -mt-24 pb-12 relative z-20">
+        
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: "أحدث سنة", value: latestYear, icon: <CalendarRange />, color: "bg-blue-500" },
+            { label: "قيمة آخر سنة", value: formatUsd(latestYearValue), sub: "دولار أمريكي", icon: <Gem />, color: "bg-[#ddbc6b]" },
+            { label: "المتوسط السنوي", value: formatUsd(avgYearlyValue), sub: `عبر ${countryYears.length} سنوات`, icon: <Globe2 />, color: "bg-emerald-500" },
+            { label: "التغير السنوي", value: yoyChange ? `${yoyChange.toFixed(1)}%` : "-", icon: <TrendingUp />, color: yoyChange > 0 ? "bg-green-500" : "bg-red-500" },
+          ].map((card, i) => (
+            <div key={i} className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-white flex items-center gap-5 transition-transform hover:-translate-y-1">
+              <div className={`${card.color} p-4 rounded-2xl text-white shadow-lg shadow-inherit`}>
+                {card.icon}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-400 mb-1">{card.label}</p>
+                <p className="text-xl font-black text-slate-800">{card.value}</p>
+                {card.sub && <p className="text-[10px] text-slate-500">{card.sub}</p>}
               </div>
             </div>
-
-            <div className="space-y-4 lg:col-span-3">
-              <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
-                <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
-                  <div className="rounded-2xl border border-slate-200 bg-white p-3">
-                    <div className="mb-2 text-xs font-extrabold text-slate-500">
-                      الدولة
-                    </div>
-                    <select
-                      value={effectiveCountry}
-                      onChange={(e) => setSelectedCountry(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 outline-none"
-                    >
-                      {availableCountries.map((c) => (
-                        <option key={c} value={c}>
-                          {countryNameAr[c] || c}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3">
-                    <div className="mb-2 text-xs font-extrabold text-slate-500">
-                      المعدن
-                    </div>
-                    <select
-                      value={selectedMineral}
-                      onChange={(e) => setSelectedMineral(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 outline-none"
-                    >
-                      {mineralOptions.map((mineral) => (
-                        <option key={mineral} value={mineral}>
-                          {translateMineral(mineral)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3">
-                    <div className="mb-2 text-xs font-extrabold text-slate-500">
-                      وحدة القيمة
-                    </div>
-                    <div className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700">
-                      {unitLabelFor()}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="mt-10 grid gap-4 lg:grid-cols-12">
-            <div className="lg:col-span-8">
-              <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
-                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-base font-extrabold text-slate-800">
-                    توزيع الصادرات حسب الدولة العربية
-                  </div>
-                  <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
-                    <Weight size={14} strokeWidth={2.2} />
-                    وحدة: <span className="font-extrabold">{unitLabelFor()}</span>
-                  </span>
-                </div>
-
-                <div className="flex h-[320px] items-center justify-center sm:h-[420px]">
-                  <div className="h-full w-full max-w-[520px]">
-                    <canvas ref={donutCanvasRef} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-4">
-              <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
-                <div className="mb-3 text-sm font-extrabold text-slate-800">
-                  مقارنة دولة مختارة مع باقي الدول
-                </div>
-
-                <div className="mb-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
-                  <div className="mb-2 text-xs font-extrabold text-slate-500">
-                    الدولة
-                  </div>
-                  <select
-                    value={effectiveCountry}
-                    onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 outline-none"
-                  >
-                    {availableCountries.map((c) => (
-                      <option key={c} value={c}>
-                        {countryNameAr[c] || c}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mb-3 flex gap-2 overflow-x-auto rounded-2xl border border-slate-100 bg-slate-50 px-2 py-2 shadow-sm">
-                  {countryYears.map((y) => (
-                    <button
-                      key={y}
-                      type="button"
-                      onClick={() => setCountryYear(y)}
-                      className={`min-w-[56px] rounded-2xl border px-3 py-1 text-xs font-extrabold transition ${
-                        y === countryYear
-                          ? "border-[#082721] bg-[#082721] text-white"
-                          : "border-transparent bg-white text-[#082721] hover:border-slate-200 hover:bg-slate-50"
-                      }`}
-                    >
-                      {y}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="mb-2 text-sm font-extrabold text-slate-800">
-                  مجموع الصادرات حسب الدول
-                </div>
-
-                <div className="mb-2 rounded-xl bg-[#ddbc6b]/10 px-3 py-2 text-xs font-bold text-[#082721]">
-                  الدولة المختارة: {countryNameAr[effectiveCountry] || effectiveCountry || "-"}
-                </div>
-
-                <div className="max-h-[260px] overflow-y-auto rounded-2xl border border-slate-100 bg-white">
-                  <table className="min-w-full text-xs">
-                    <thead className="sticky top-0 bg-slate-50 text-[11px] font-extrabold text-[#082721]">
-                      <tr>
-                        <th className="px-3 py-2">الدولة</th>
-                        <th className="px-3 py-2">مجموع الصادرات (دولار أمريكي)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {countryPack?.table?.map((r) => (
-                        <tr
-                          key={r.c}
-                          onClick={() => setSelectedCountry(r.c)}
-                          className={`border-t text-slate-700 cursor-pointer transition-colors ${
-                            r.c === effectiveCountry
-                              ? "border-[#082721]/20 bg-[#082721]/10"
-                              : "border-slate-100 hover:bg-slate-50"
-                          }`}
-                        >
-                          <td className="px-3 py-1.5 font-bold">
-                            {countryNameAr[r.c] || r.c}
-                          </td>
-                          <td className="px-3 py-1.5">{formatUsd(r.v)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="mt-3 rounded-xl bg-[#082721]/5 px-3 py-2 text-xs font-bold text-[#082721]">
-                  مجموع كل السنوات: {formatUsd(totalUsd)} دولار أمريكي
-                </div>
-                <div className="mt-2 rounded-xl bg-[#082721]/8 px-3 py-2 text-xs font-bold text-[#082721]">
-                  مجموع الذهب + القصدير: {formatUsd(totalGoldTin)} دولار أمريكي
-                </div>
-              </div>
-            </div>
-          </section>
+          ))}
         </div>
 
-          <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70 mt-6 max-w-full overflow-hidden">
-            <div className="mb-2 text-sm font-extrabold text-slate-800">المصادر</div>
-            <div className="space-y-2 rounded-2xl border border-slate-100 bg-slate-50/50 p-3 w-full overflow-hidden">
-              <div className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 text-xs overflow-hidden">
+        <div className="grid lg:grid-cols-12 gap-8">
+          {/* Main Chart Section */}
+          <div className="lg:col-span-8 space-y-8">
+            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-xl shadow-slate-200/60 border border-slate-100">
+              <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
                 <div>
-                  <div className="font-bold">المملكة المغربية</div>
-                  <div className="text-[11px] text-slate-500">
-                    التجارة في المعادن الحرجة — الذهب — القيمة (دولار أمريكي)
+                  <h3 className="text-xl font-bold flex items-center gap-2">
+                    <TrendingUp className="text-[#ddbc6b]" size={20} />
+                    تحليل الاتجاه الزمني
+                  </h3>
+                  <p className="text-xs text-slate-400">تطور قيم الصادرات حسب الخام المختار</p>
+                </div>
+                <div className="flex gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+                   <button className="px-4 py-2 text-xs font-bold rounded-xl bg-white shadow-sm text-[#082721]">قيمة الصادرات</button>
+                   <button className="px-4 py-2 text-xs font-bold rounded-xl text-slate-400 hover:text-slate-600">الكميات (قريباً)</button>
+                </div>
+              </div>
+              <div className="h-[400px]">
+                <canvas ref={canvasRef} />
+              </div>
+            </div>
+
+            {/* Comparison Table */}
+            <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/60 border border-slate-100">
+               <div className="p-6 border-b border-slate-50 flex justify-between items-center">
+                  <h3 className="font-bold flex items-center gap-2">
+                    <List className="text-[#ddbc6b]" size={20} />
+                    تفاصيل الصادرات حسب الدولة
+                  </h3>
+                  <span className="text-[10px] bg-slate-100 px-3 py-1 rounded-full font-bold uppercase tracking-wider text-slate-500">سنة {countryYear}</span>
+               </div>
+               <div className="overflow-x-auto">
+                 <table className="w-full text-right">
+                   <thead className="bg-slate-50/50 text-slate-400 text-[11px] uppercase font-black">
+                     <tr>
+                       <th className="px-6 py-4">الدولة العربية</th>
+                       <th className="px-6 py-4 text-left">قيمة الصادرات</th>
+                       <th className="px-6 py-4 text-center">الحصة</th>
+                     </tr>
+                   </thead>
+                   <tbody className="divide-y divide-slate-50 text-sm font-bold">
+                     {countryPack?.table?.map((r) => (
+                        <tr key={r.c} className="hover:bg-slate-50/80 transition-colors group">
+                          <td className="px-6 py-4 flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] group-hover:bg-[#ddbc6b]/20 group-hover:text-[#082721] transition-colors">{r.c.toUpperCase()}</div>
+                            {countryNameAr[r.c]}
+                          </td>
+                          <td className="px-6 py-4 text-left font-black text-[#082721]">{formatUsd(r.v)} $</td>
+                          <td className="px-6 py-4">
+                             <div className="w-24 h-1.5 bg-slate-100 rounded-full mx-auto overflow-hidden">
+                                <div className="h-full bg-[#ddbc6b]" style={{width: '100%'}}></div>
+                             </div>
+                          </td>
+                        </tr>
+                     ))}
+                   </tbody>
+                 </table>
+               </div>
+            </div>
+          </div>
+
+          {/* Sidebar Controls */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="bg-[#082721] rounded-[2.5rem] p-8 text-white shadow-2xl shadow-emerald-900/20 relative overflow-hidden group">
+              <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#ddbc6b]/10 rounded-full blur-3xl group-hover:bg-[#ddbc6b]/20 transition-all"></div>
+              
+              <h3 className="text-lg font-bold mb-6 flex items-center gap-3">
+                <Filter size={20} className="text-[#ddbc6b]" />
+                أدوات التصفية
+              </h3>
+
+              <div className="space-y-6 relative z-10">
+                <div>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">اختر الدولة</label>
+                  <div className="relative">
+                    <select 
+                      value={effectiveCountry} 
+                      onChange={(e) => setSelectedCountry(e.target.value)}
+                      className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:border-[#ddbc6b] appearance-none transition-all"
+                    >
+                      {availableCountries.map(c => <option key={c} value={c} className="text-slate-800">{countryNameAr[c]}</option>)}
+                    </select>
+                    <ChevronDown className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
                   </div>
-                  <button
-                    type="button"
-                    className="mt-1 text-[11px] font-bold text-sky-800 underline">
-                    ملف البيانات المرفوع
-                  </button>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">نوع المعدن</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {mineralOptions.slice(0, 6).map(m => (
+                      <button 
+                        key={m}
+                        onClick={() => setSelectedMineral(m)}
+                        className={`px-3 py-3 rounded-xl text-[11px] font-bold border transition-all ${selectedMineral === m ? 'bg-[#ddbc6b] border-[#ddbc6b] text-[#082721]' : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'}`}
+                      >
+                        {translateMineral(m)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">السنة المرجعية</label>
+                  <div className="flex flex-wrap gap-2">
+                    {countryYears.map(y => (
+                      <button 
+                        key={y}
+                        onClick={() => setCountryYear(y)}
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center text-xs font-black transition-all ${y === countryYear ? 'bg-white text-[#082721] scale-110 shadow-lg' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
+                      >
+                        {y}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Donut Chart Card */}
+            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/60 border border-slate-100">
+              <h3 className="text-base font-black mb-6 text-center">التوزيع النسبي للصادرات</h3>
+              <div className="h-[250px] relative">
+                <canvas ref={donutCanvasRef} />
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                   <span className="text-xs text-slate-400 font-bold">إجمالي الحصة</span>
+                   <span className="text-2xl font-black text-[#082721]">100%</span>
                 </div>
               </div>
             </div>
           </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}

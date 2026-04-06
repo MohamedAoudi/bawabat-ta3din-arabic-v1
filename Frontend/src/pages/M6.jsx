@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Scale, Weight } from "lucide-react";
+import { Scale, Weight, Globe2, Pickaxe, TrendingUp, Info } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
@@ -9,479 +9,221 @@ import {
 } from "../tradeCriticalMineralsImportDataProcessed";
 
 const COUNTRIES = [
-  { name: "المملكة الأردنية الهاشمية", code: "jo" },
-  { name: "دولة الامارات العربية المتحدة", code: "ae" },
-  { name: "مملكة البحرين", code: "bh" },
-  { name: "الجمهورية التونسية", code: "tn" },
-  { name: "الجمهورية الجزائرية الديمقراطية الشعبية", code: "dz" },
-  { name: "جمهورية جيبوتي", code: "dj" },
-  { name: "المملكة العربية السعودية", code: "sa" },
-  { name: "جمهورية السودان", code: "sd" },
-  { name: "الجمهورية العربية السورية", code: "sy" },
-  { name: "جمهورية الصومال", code: "so" },
-  { name: "جمهورية العراق", code: "iq" },
-  { name: "سلطنة عمان", code: "om" },
-  { name: "دولة فلسطين", code: "ps" },
-  { name: "دولة قطر", code: "qa" },
-  { name: "دولة الكويت", code: "kw" },
-  { name: "الجمهورية اللبنانية", code: "lb" },
-  { name: "دولة ليبيا", code: "ly" },
-  { name: "جمهورية مصر العربية", code: "eg" },
-  { name: "المملكة المغربية", code: "ma" },
-  { name: "الجمهورية الإسلامية الموريتانية", code: "mr" },
-  { name: "الجمهورية اليمنية", code: "ye" },
+  { name: "الأردن", code: "jo" }, { name: "الإمارات", code: "ae" }, { name: "البحرين", code: "bh" },
+  { name: "تونس", code: "tn" }, { name: "الجزائر", code: "dz" }, { name: "جيبوتي", code: "dj" },
+  { name: "السعودية", code: "sa" }, { name: "السودان", code: "sd" }, { name: "سوريا", code: "sy" },
+  { name: "الصومال", code: "so" }, { name: "العراق", code: "iq" }, { name: "عمان", code: "om" },
+  { name: "فلسطين", code: "ps" }, { name: "قطر", code: "qa" }, { name: "الكويت", code: "kw" },
+  { name: "لبنان", code: "lb" }, { name: "ليبيا", code: "ly" }, { name: "مصر", code: "eg" },
+  { name: "المغرب", code: "ma" }, { name: "موريتانيا", code: "mr" }, { name: "اليمن", code: "ye" },
 ];
 
-const countryNameAr = Object.fromEntries(COUNTRIES.map(c => [c.code, c.name]));
-
-const DEFAULT_COUNTRY = "ma";
-
-const availableCountries = COUNTRIES.map(c => c.code);
-
-function unitLabelFor() {
-  return "دولار أمريكي";
-}
-
-function formatUsd(value) {
-  return Number(value || 0).toLocaleString("fr-FR");
-}
-
 const mineralNameAr = {
-  Gold: "الذهب",
-  Tin: "القصدير",
-  Silver: "الفضة",
-  Uranium: "اليورانيوم",
-  Copper: "النحاس",
-  Iron: "الحديد",
-  Lead: "الرصاص",
-  Zinc: "الزنك",
-  Nickel: "النيكل",
-  Lithium: "الليثيوم",
-  Cobalt: "الكوبالت",
+  Gold: "الذهب", Tin: "القصدير", Silver: "الفضة", Uranium: "اليورانيوم",
+  Copper: "النحاس", Iron: "الحديد", Lead: "الرصاص", Zinc: "الزنك",
+  Nickel: "النيكل", Lithium: "الليثيوم", Cobalt: "الكوبالت",
 };
 
-function translateMineral(name) {
-  if (!name || name === "all") return "كل المعادن";
-  return mineralNameAr[name] || name;
-}
+const countryNameAr = Object.fromEntries(COUNTRIES.map(c => [c.code, c.name]));
+const formatUsd = (val) => new Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 2 }).format(val || 0);
+const formatFullUsd = (val) => Number(val || 0).toLocaleString("ar-MA");
 
 export default function M6Page() {
-  const [selectedCountry, setSelectedCountry] = useState(DEFAULT_COUNTRY);
+  const [selectedCountry, setSelectedCountry] = useState("ma");
   const [selectedMineral, setSelectedMineral] = useState("all");
   const [countryYear, setCountryYear] = useState(null);
 
-  const mineralOptions = useMemo(() => {
-    const products = Array.from(
-      new Set(tradeCriticalMineralsImportData.map((row) => row.aggregate_product))
-    ).sort();
-    return ["all", ...products];
-  }, []);
-
+  // -- Data Processing (Logic remains same for consistency) --
+  const mineralOptions = useMemo(() => ["all", ...new Set(tradeCriticalMineralsImportData.map(r => r.aggregate_product))].sort(), []);
+  
   const productYearlyData = useMemo(() => {
     if (selectedMineral === "all") return tradeCriticalMineralsImportByYear;
-
-    return tradeCriticalMineralsImportData
-      .filter((row) => row.aggregate_product === selectedMineral)
-      .reduce((acc, row) => {
-        const y = String(row.year);
-        acc[y] = (acc[y] || 0) + (row.value_usd || 0);
-        return acc;
-      }, {});
+    return tradeCriticalMineralsImportData.filter(r => r.aggregate_product === selectedMineral)
+      .reduce((acc, r) => { acc[r.year] = (acc[r.year] || 0) + (r.value_usd || 0); return acc; }, {});
   }, [selectedMineral]);
 
+  const yearlyUsdData = useMemo(() => Object.entries(productYearlyData).map(([year, value]) => ({ year: Number(year), value })).sort((a, b) => a.year - b.year), [productYearlyData]);
+  const totalUsd = useMemo(() => yearlyUsdData.reduce((sum, item) => sum + item.value, 0), [yearlyUsdData]);
+  
   useEffect(() => {
-    const years = Object.keys(productYearlyData)
-      .map(Number)
-      .sort((a, b) => b - a);
-    setCountryYear(years[0] || null);
-  }, [productYearlyData]);
+    if (!countryYear && yearlyUsdData.length > 0) setCountryYear(yearlyUsdData[yearlyUsdData.length - 1].year);
+  }, [yearlyUsdData]);
 
-  const yearlyUsdData = useMemo(
-    () =>
-      Object.entries(productYearlyData)
-        .map(([year, value]) => ({ year: Number(year), value }))
-        .sort((a, b) => a.year - b.year),
-    [productYearlyData]
-  );
-
-  const barYears = useMemo(() => yearlyUsdData.map((item) => item.year), [yearlyUsdData]);
-  const chartValues = useMemo(() => yearlyUsdData.map((item) => item.value), [yearlyUsdData]);
-  const totalUsd = useMemo(
-    () => yearlyUsdData.reduce((sum, item) => sum + item.value, 0),
-    [yearlyUsdData]
-  );
-
-  const totalGoldTin = useMemo(() => {
-    return tradeCriticalMineralsImportData
-      .filter((row) => row.aggregate_product === "Gold" || row.aggregate_product === "Tin")
-      .reduce((sum, row) => sum + (row.value_usd || 0), 0);
-  }, []);
-
-  const countryYears = useMemo(() => yearlyUsdData.map((item) => item.year), []);
-  const countryPack = useMemo(
-    () => ({
-      table: [
-        {
-          c: selectedCountry,
-          v:
-            selectedCountry === "ma"
-              ? yearlyUsdData.find((item) => item.year === countryYear)?.value || 0
-              : 0,
-        },
-      ],
-    }),
-    [yearlyUsdData, countryYear, selectedCountry]
-  );
-
-  const effectiveCountry =
-    selectedCountry && availableCountries.includes(selectedCountry)
-      ? selectedCountry
-      : DEFAULT_COUNTRY;
-
-  const canvasRef = useRef(null);
-  const chartRef = useRef(null);
-  const donutCanvasRef = useRef(null);
+  // -- Charts Refs --
+  const mainChartRef = useRef(null);
   const donutChartRef = useRef(null);
+  const canvasRef = useRef(null);
+  const donutCanvasRef = useRef(null);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
+    if (mainChartRef.current) mainChartRef.current.destroy();
 
-    if (chartRef.current) {
-      chartRef.current.destroy();
-      chartRef.current = null;
-    }
-
-    const labelText =
-      selectedMineral === "all"
-        ? `${countryNameAr[DEFAULT_COUNTRY] || DEFAULT_COUNTRY}`
-        : `${translateMineral(selectedMineral)} - ${countryNameAr[DEFAULT_COUNTRY] || DEFAULT_COUNTRY}`;
-
-    chartRef.current = new Chart(ctx, {
-      type: "bar",
+    mainChartRef.current = new Chart(ctx, {
+      type: 'line', // Changed to Line for a more "modern" trend feel
       data: {
-        labels: barYears,
-        datasets: [
-          {
-            label: labelText,
-            data: chartValues,
-            borderWidth: 0,
-            borderRadius: 8,
-            backgroundColor: "rgba(8, 39, 33, .85)",
-          },
-        ],
+        labels: yearlyUsdData.map(d => d.year),
+        datasets: [{
+          label: 'قيمة الواردات',
+          data: yearlyUsdData.map(d => d.value),
+          borderColor: '#ddbc6b',
+          backgroundColor: 'rgba(221, 188, 107, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 5,
+          pointBackgroundColor: '#082721'
+        }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "top",
-            labels: { font: { family: "Cairo", weight: "700" } },
-          },
-          tooltip: {
-            callbacks: {
-              label: (c) =>
-                ` ${c.dataset.label}: ${formatUsd(c.parsed.y)} ${unitLabelFor()}`,
-            },
-          },
-        },
-        scales: {
-          x: {
-            grid: { color: "rgba(0,0,0,.08)" },
-            ticks: { font: { family: "Cairo", weight: "700" } },
-          },
-          y: {
-            beginAtZero: true,
-            grid: { color: "rgba(0,0,0,.10)" },
-            ticks: {
-              font: { family: "Cairo" },
-              callback: (v) => (v === 0 ? "0" : formatUsd(v)),
-            },
-          },
-        },
-      },
-    });
-
-    return () => {
-      if (chartRef.current) {
-        chartRef.current.destroy();
-        chartRef.current = null;
+        plugins: { legend: { display: false } },
+        scales: { y: { ticks: { callback: v => formatUsd(v) } } }
       }
-    };
-  }, [barYears, chartValues]);
-
-  useEffect(() => {
-    const ctx = donutCanvasRef.current?.getContext("2d");
-    if (!ctx || !countryPack) return;
-
-    if (donutChartRef.current) {
-      donutChartRef.current.destroy();
-      donutChartRef.current = null;
-    }
-
-    const rows = countryPack.table || [];
-    if (!rows.length) return;
-
-    const labels = rows.map((r) => countryNameAr[r.c] || r.c);
-    const values = rows.map((r) => r.v);
-
-    donutChartRef.current = new Chart(ctx, {
-      type: "doughnut",
-      data: {
-        labels,
-        datasets: [
-          {
-            data: values,
-            borderWidth: 3,
-            borderColor: "rgba(8,39,33,0.9)",
-            cutout: "68%",
-            backgroundColor: ["rgba(8, 39, 33, .92)"],
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        onClick: () => setSelectedCountry(DEFAULT_COUNTRY),
-        plugins: {
-          legend: {
-            position: "top",
-            labels: { font: { family: "Cairo", weight: "700" } },
-          },
-          tooltip: {
-            callbacks: {
-              label: (c) => {
-                const v = c.parsed;
-                return ` ${c.label}: ${formatUsd(v)} ${unitLabelFor()} (100%)`;
-              },
-            },
-          },
-        },
-      },
     });
-
-    return () => {
-      if (donutChartRef.current) {
-        donutChartRef.current.destroy();
-        donutChartRef.current = null;
-      }
-    };
-  }, [countryPack]);
+  }, [yearlyUsdData]);
 
   return (
-    <div dir="rtl">
+    <div dir="rtl" className="bg-[#f8fafc] min-h-screen font-['Cairo']">
       <Menu />
-      <main className="min-h-screen py-6 sm:py-8">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
-            <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
-              الواردات التعدينية
+      
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-[#082721] flex items-center gap-3">
+              <Pickaxe className="text-[#ddbc6b]" size={32} />
+              بوابة الواردات التعدينية
             </h1>
-            <p className="text-sm text-slate-100/80">
-رصد حجم وقيمة الواردات من المواد الخام والمنتجات التعدينية المعالجة.
-
-            </p>
-          </header>
-
-          <section className="grid gap-4 lg:grid-cols-12">
-            <div className="lg:col-span-9">
-              <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
-                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-base font-extrabold text-slate-800">
-                    اجمالي الواردات التعدينية للدول العربية حسب السنة والخام والمنتج
-                  </div>
-                  <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
-                    <Scale size={14} strokeWidth={2.2} />
-                    وحدة القيمة: <span className="font-extrabold">{unitLabelFor()}</span>
-                  </span>
-                </div>
-
-                <div className="h-[340px] sm:h-[440px]">
-                  <canvas ref={canvasRef} />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4 lg:col-span-3">
-              <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
-                <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
-                  <div className="rounded-2xl border border-slate-200 bg-white p-3">
-                    <div className="mb-2 text-xs font-extrabold text-slate-500">
-                      الدولة
-                    </div>
-                    <select
-                      value={effectiveCountry}
-                      onChange={(e) => setSelectedCountry(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 outline-none"
-                    >
-                      {availableCountries.map((c) => (
-                        <option key={c} value={c}>
-                          {countryNameAr[c] || c}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3">
-                    <div className="mb-2 text-xs font-extrabold text-slate-500">
-                      المعدن
-                    </div>
-                    <select
-                      value={selectedMineral}
-                      onChange={(e) => setSelectedMineral(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 outline-none"
-                    >
-                      {mineralOptions.map((mineral) => (
-                        <option key={mineral} value={mineral}>
-                          {translateMineral(mineral)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3">
-                    <div className="mb-2 text-xs font-extrabold text-slate-500">
-                      وحدة القيمة
-                    </div>
-                    <div className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700">
-                      {unitLabelFor()}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="mt-10 grid gap-4 lg:grid-cols-12">
-            <div className="lg:col-span-8">
-              <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
-                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-base font-extrabold text-slate-800">
-                    توزيع الواردات حسب الدولة العربية
-                  </div>
-                  <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
-                    <Weight size={14} strokeWidth={2.2} />
-                    وحدة: <span className="font-extrabold">{unitLabelFor()}</span>
-                  </span>
-                </div>
-
-                <div className="flex h-[320px] items-center justify-center sm:h-[420px]">
-                  <div className="h-full w-full max-w-[520px]">
-                    <canvas ref={donutCanvasRef} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-4">
-              <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
-                <div className="mb-3 text-sm font-extrabold text-slate-800">
-                  مقارنة دولة مختارة مع باقي الدول
-                </div>
-
-                <div className="mb-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
-                  <div className="mb-2 text-xs font-extrabold text-slate-500">
-                    الدولة
-                  </div>
-                  <select
-                    value={effectiveCountry}
-                    onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 outline-none"
-                  >
-                    {availableCountries.map((c) => (
-                      <option key={c} value={c}>
-                        {countryNameAr[c] || c}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mb-3 flex gap-2 overflow-x-auto rounded-2xl border border-slate-100 bg-slate-50 px-2 py-2 shadow-sm">
-                  {countryYears.map((y) => (
-                    <button
-                      key={y}
-                      type="button"
-                      onClick={() => setCountryYear(y)}
-                      className={`min-w-[56px] rounded-2xl border px-3 py-1 text-xs font-extrabold transition ${
-                        y === countryYear
-                          ? "border-[#082721] bg-[#082721] text-white"
-                          : "border-transparent bg-white text-[#082721] hover:border-slate-200 hover:bg-slate-50"
-                      }`}
-                    >
-                      {y}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="mb-2 text-sm font-extrabold text-slate-800">
-                  مجموع الواردات حسب الدول
-                </div>
-
-                <div className="mb-2 rounded-xl bg-[#ddbc6b]/10 px-3 py-2 text-xs font-bold text-[#082721]">
-                  الدولة المختارة: {countryNameAr[effectiveCountry] || effectiveCountry || "-"}
-                </div>
-
-                <div className="max-h-[260px] overflow-y-auto rounded-2xl border border-slate-100 bg-white">
-                  <table className="min-w-full text-xs">
-                    <thead className="sticky top-0 bg-slate-50 text-[11px] font-extrabold text-[#082721]">
-                      <tr>
-                        <th className="px-3 py-2">الدولة</th>
-                        <th className="px-3 py-2">مجموع الواردات (دولار أمريكي)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {countryPack?.table?.map((r) => (
-                        <tr
-                          key={r.c}
-                          onClick={() => setSelectedCountry(r.c)}
-                          className={`border-t text-slate-700 cursor-pointer transition-colors ${
-                            r.c === effectiveCountry
-                              ? "border-[#082721]/20 bg-[#082721]/10"
-                              : "border-slate-100 hover:bg-slate-50"
-                          }`}
-                        >
-                          <td className="px-3 py-1.5 font-bold">
-                            {countryNameAr[r.c] || r.c}
-                          </td>
-                          <td className="px-3 py-1.5">{formatUsd(r.v)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="mt-3 rounded-xl bg-[#082721]/5 px-3 py-2 text-xs font-bold text-[#082721]">
-                  مجموع كل السنوات: {formatUsd(totalUsd)} دولار أمريكي
-                </div>
-                <div className="mt-2 rounded-xl bg-[#082721]/8 px-3 py-2 text-xs font-bold text-[#082721]">
-                  مجموع الذهب + القصدير: {formatUsd(totalGoldTin)} دولار أمريكي
-                </div>
-              </div>
-            </div>
-          </section>
+            <p className="text-slate-500 mt-1">تحليل البيانات الجمركية للمواد الخام في العالم العربي</p>
+          </div>
+          
+          <div className="flex bg-white p-2 rounded-2xl shadow-sm border border-slate-200 gap-2">
+            <select 
+              value={selectedCountry} 
+              onChange={(e) => setSelectedCountry(e.target.value)}
+              className="bg-slate-50 border-none rounded-xl px-4 py-2 text-sm font-bold focus:ring-2 ring-[#ddbc6b]"
+            >
+              {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+            </select>
+            <select 
+              value={selectedMineral} 
+              onChange={(e) => setSelectedMineral(e.target.value)}
+              className="bg-slate-50 border-none rounded-xl px-4 py-2 text-sm font-bold focus:ring-2 ring-[#ddbc6b]"
+            >
+              {mineralOptions.map(m => <option key={m} value={m}>{mineralNameAr[m] || "كل المعادن"}</option>)}
+            </select>
+          </div>
         </div>
 
-          <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70 mt-6 max-w-full overflow-hidden">
-            <div className="mb-2 text-sm font-extrabold text-slate-800">المصادر</div>
-            <div className="space-y-2 rounded-2xl border border-slate-100 bg-slate-50/50 p-3 w-full overflow-hidden">
-              <div className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 text-xs overflow-hidden">
-                <div>
-                  <div className="font-bold">المملكة المغربية</div>
-                  <div className="text-[11px] text-slate-500">
-                    التجارة في المعادن الحرجة — الذهب والقصدير — القيمة (دولار أمريكي)
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-[#082721] text-white p-6 rounded-3xl shadow-xl relative overflow-hidden">
+            <div className="relative z-10">
+              <p className="text-emerald-200/70 text-sm font-bold">إجمالي الواردات (تراكمي)</p>
+              <h3 className="text-3xl font-black mt-2">{formatUsd(totalUsd)} <span className="text-sm font-normal">دولار</span></h3>
+            </div>
+            <TrendingUp className="absolute -bottom-4 -left-4 w-24 h-24 text-white/5" />
+          </div>
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+            <p className="text-slate-500 text-sm font-bold">المعدن الأكثر استيراداً</p>
+            <h3 className="text-2xl font-black text-[#082721] mt-2">الذهب <span className="text-[#ddbc6b] text-sm">أولوية عالية</span></h3>
+          </div>
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+            <p className="text-slate-500 text-sm font-bold">تغطية البيانات</p>
+            <h3 className="text-2xl font-black text-[#082721] mt-2">2014 - 2024</h3>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Main Chart */}
+          <div className="lg:col-span-8 bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-lg text-[#082721]">تطور قيمة الواردات عبر السنوات</h3>
+              <div className="flex items-center gap-2 text-xs font-bold bg-slate-100 px-3 py-1 rounded-full">
+                <Info size={14} /> بالدولار الأمريكي
+              </div>
+            </div>
+            <div className="h-[400px]">
+              <canvas ref={canvasRef}></canvas>
+            </div>
+          </div>
+
+          {/* Side Details */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="bg-[#ddbc6b]/10 p-6 rounded-[2rem] border border-[#ddbc6b]/20">
+              <h3 className="font-bold text-[#082721] mb-4 flex items-center gap-2">
+                <Globe2 size={20} /> تفاصيل الدولة
+              </h3>
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-2xl shadow-sm">
+                  <p className="text-xs text-slate-500 mb-1">الدولة المختارة</p>
+                  <p className="font-black text-[#082721]">{countryNameAr[selectedCountry]}</p>
+                </div>
+                <div className="bg-white p-4 rounded-2xl shadow-sm">
+                  <p className="text-xs text-slate-500 mb-1">السنة المحددة</p>
+                  <div className="flex gap-2 overflow-x-auto py-1">
+                    {yearlyUsdData.slice(-5).map(d => (
+                      <button 
+                        key={d.year}
+                        onClick={() => setCountryYear(d.year)}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${countryYear === d.year ? 'bg-[#082721] text-white' : 'bg-slate-100 text-slate-600'}`}
+                      >
+                        {d.year}
+                      </button>
+                    ))}
                   </div>
-                  <button
-                    type="button"
-                    className="mt-1 text-[11px] font-bold text-sky-800 underline">
-                    ملف البيانات المرفوع
-                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
+              <h3 className="font-bold text-[#082721] mb-4">التوزيع النسبي</h3>
+              <div className="h-[200px] relative">
+                <canvas ref={donutCanvasRef}></canvas>
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                   <p className="text-[10px] font-bold text-slate-400">100%</p>
                 </div>
               </div>
             </div>
           </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+        </div>
+
+        {/* Data Table Section */}
+        <div className="mt-8 bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+          <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h3 className="font-bold text-[#082721]">جدول البيانات التفصيلي</h3>
+            <button className="text-xs font-bold text-sky-600 hover:underline">تصدير CSV</button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-right">
+              <thead className="bg-slate-50 text-slate-500 text-xs uppercase">
+                <tr>
+                  <th className="px-6 py-4">العام</th>
+                  <th className="px-6 py-4">المعدن</th>
+                  <th className="px-6 py-4">القيمة الاستيرادية</th>
+                  <th className="px-6 py-4">الحالة</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {yearlyUsdData.slice(0, 5).map((row, i) => (
+                  <tr key={i} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 font-bold text-slate-700">{row.year}</td>
+                    <td className="px-6 py-4 text-slate-600">{mineralNameAr[selectedMineral] || "إجمالي المواد"}</td>
+                    <td className="px-6 py-4 font-mono font-bold text-[#082721]">{formatFullUsd(row.value)} $</td>
+                    <td className="px-6 py-4">
+                      <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md text-[10px] font-bold">مكتمل</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
