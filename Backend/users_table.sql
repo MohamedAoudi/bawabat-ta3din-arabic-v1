@@ -29,6 +29,10 @@ CREATE TABLE IF NOT EXISTS users (
   -- Photo / Photo / الصورة
   photo VARCHAR(500),
   
+  -- Status / Statut / الحالة
+  -- false = pending admin approval, true = accepted
+  is_accepted BOOLEAN DEFAULT FALSE,
+  
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

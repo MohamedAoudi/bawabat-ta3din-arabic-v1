@@ -6,6 +6,7 @@ const { authenticateToken, authorizeRole } = require("../middleware/authMiddlewa
 // Public routes (no authentication required)
 router.post("/login", userController.loginUser);
 router.post("/register", userController.createUser);
+router.post("/google-login", userController.googleLogin);
 
 // Protected routes - requires authentication
 router.get("/", authenticateToken, userController.getAllUsers);
@@ -14,5 +15,9 @@ router.get("/:id", authenticateToken, userController.getUserById);
 // Protected routes - requires admin role
 router.put("/:id", authenticateToken, authorizeRole("admin"), userController.updateUser);
 router.delete("/:id", authenticateToken, authorizeRole("admin"), userController.deleteUser);
+
+// Admin routes for user approval
+router.put("/:id/accept", authenticateToken, authorizeRole("admin"), userController.acceptUser);
+router.put("/:id/reject", authenticateToken, authorizeRole("admin"), userController.rejectUser);
 
 module.exports = router;

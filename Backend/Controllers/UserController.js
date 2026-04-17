@@ -23,6 +23,11 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    // Check if user is accepted (except for admins)
+    if (!user.is_accepted && user.role !== 'admin') {
+      return res.status(403).json({ message: "Account pending approval by admin" });
+    }
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
@@ -118,6 +123,90 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// Google Login - Create or get user from Google
+const googleLogin = async (req, res) => {
+  try {
+    const { email, displayName, photoURL, uid } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    // Check if user exists
+    let user = await userModel.getUserByEmail(email);
+
+    if (!user) {
+      // Create new user from Google data
+      // Parse display name to get first name and last name
+      const nameParts = displayName ? displayName.split(" ") : ["", ""];
+      const prenom = nameParts[0] || "";
+      const nom = nameParts.slice(1).join(" ") || "";
+
+      user = await userModel.createUser({
+        nom_ar: nom,
+        nom_en: nom,
+        nom_fr: nom,
+        prenom_ar: prenom,
+        prenom_en: prenom,
+        prenom_fr: prenom,
+        email: email,
+        password: "google-oauth-placeholder", // Placeholder - not used for Google users
+        role: "user",
+        photo: photoURL || null,
+        is_accepted: false // New users need admin approval
+      });
+    }
+
+    // Check if user is accepted (except for admins)
+    if (!user.is_accepted && user.role !== 'admin') {
+      return res.status(403).json({ message: "Account pending approval by admin" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    const { password: _, ...userWithoutPassword } = user;
+    res.json({ token, user: userWithoutPassword });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Accept user (admin approves)
+const acceptUser = async (req, res) => {
+  try {
+    const user = await userModel.getUserById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const updatedUser = await userModel.updateUser(req.params.id, { is_accepted: true });
+    const { password: _, ...userWithoutPassword } = updatedUser;
+    res.json({ message: "User accepted successfully", user: userWithoutPassword });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Reject user (admin rejects)
+const rejectUser = async (req, res) => {
+  try {
+    const user = await userModel.getUserById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await userModel.deleteUser(req.params.id);
+    res.json({ message: "User rejected and deleted" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   loginUser,
   getAllUsers,
@@ -125,4 +214,7 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  googleLogin,
+  acceptUser,
+  rejectUser,
 };

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { signInWithGoogle, logoutGoogle } from "./firebase";
 
 const API_URL = "http://localhost:5000/api/users";
 
@@ -59,4 +60,51 @@ export const isAuthenticated = () => {
 export const isAdmin = () => {
   const user = getCurrentUser();
   return user && user.role === "admin";
+};
+
+// Login with Google
+export const loginWithGoogle = async () => {
+  try {
+    const googleUser = await signInWithGoogle();
+    
+    // Send Google user data to backend to create or get user
+    const response = await axios.post(`${API_URL}/google-login`, {
+      email: googleUser.email,
+      displayName: googleUser.displayName,
+      photoURL: googleUser.photoURL,
+      uid: googleUser.uid
+    });
+    
+    if (response.data.token) {
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.setItem("token", response.data.token);
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Google login error:", error);
+    throw error;
+  }
+};
+
+// Logout including Google
+export const logoutWithGoogle = async () => {
+  try {
+    await logoutGoogle();
+  } catch (error) {
+    console.error("Google logout error:", error);
+  }
+  logout();
+};
+
+// Accept user (admin)
+export const acceptUser = async (userId) => {
+  const response = await axios.put(`${API_URL}/${userId}/accept`);
+  return response.data;
+};
+
+// Reject user (admin)
+export const rejectUser = async (userId) => {
+  const response = await axios.put(`${API_URL}/${userId}/reject`);
+  return response.data;
 };
