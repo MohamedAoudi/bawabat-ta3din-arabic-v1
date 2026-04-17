@@ -62,6 +62,20 @@ export const isAdmin = () => {
   return user && user.role === "admin";
 };
 
+// Refresh current user data from server (to get updated photo)
+export const refreshCurrentUser = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/me`);
+    if (response.data) {
+      localStorage.setItem("user", JSON.stringify(response.data));
+      return response.data;
+    }
+  } catch (error) {
+    console.error("Error refreshing user:", error);
+    return getCurrentUser();
+  }
+};
+
 // Login with Google
 export const loginWithGoogle = async () => {
   try {

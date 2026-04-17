@@ -51,6 +51,20 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+// Get current user (logged in user)
+const getCurrentUser = async (req, res) => {
+  try {
+    const user = await userModel.getUserById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const { password: _, ...userWithoutPassword } = user;
+    res.json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Get user by ID
 const getUserById = async (req, res) => {
   try {
@@ -210,6 +224,7 @@ const rejectUser = async (req, res) => {
 module.exports = {
   loginUser,
   getAllUsers,
+  getCurrentUser,
   getUserById,
   createUser,
   updateUser,

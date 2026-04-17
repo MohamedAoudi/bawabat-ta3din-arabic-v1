@@ -10,6 +10,7 @@ router.post("/google-login", userController.googleLogin);
 
 // Protected routes - requires authentication
 router.get("/", authenticateToken, userController.getAllUsers);
+router.get("/me", authenticateToken, userController.getCurrentUser);
 router.get("/:id", authenticateToken, userController.getUserById);
 
 // Protected routes - requires admin role

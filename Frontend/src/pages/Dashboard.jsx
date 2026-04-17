@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
-import { getCurrentUser, isAdmin } from "../services/authService";
+import { getCurrentUser, isAdmin, refreshCurrentUser } from "../services/authService";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { User, Shield, Users } from "lucide-react";
 
@@ -81,13 +81,18 @@ export default function Dashboard() {
   const t = TRANSLATIONS[language] || TRANSLATIONS.ar;
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
-      navigate("/login");
-    } else {
-      setUser(currentUser);
-    }
-    setLoading(false);
+    const loadUser = async () => {
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        navigate("/login");
+      } else {
+        // Refresh user data from server to get latest photo
+        const updatedUser = await refreshCurrentUser();
+        setUser(updatedUser || currentUser);
+      }
+      setLoading(false);
+    };
+    loadUser();
   }, [navigate]);
 
   if (loading) {
@@ -118,20 +123,45 @@ export default function Dashboard() {
       <div className="p-6 lg:p-8">
         {/* Welcome Header */}
         <div className={`mb-8 ${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl p-6 shadow-sm`}>
-          <h1 className={`text-3xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-            {t.welcome}, {user.prenom_ar || user.prenom_en || user.prenom_fr || user.nom_ar || user.nom_en || user.nom_fr || "User"}!
-          </h1>
-          <p className={`mt-2 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-            {language === "ar" ? "هذه هي لوحة التحكم الخاصة بك" : language === "fr" ? "Ceci est votre tableau de bord" : "This is your dashboard"}
-          </p>
+          <div className="flex items-center gap-4">
+            {user.photo ? (
+              <img 
+                src={user.photo} 
+                alt="Profile" 
+                className="w-16 h-16 rounded-full object-cover border-2 border-blue-500"
+              />
+            ) : (
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isDarkMode ? "bg-blue-900" : "bg-blue-100"}`}>
+                <User className={`w-8 h-8 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
+              </div>
+            )}
+            <div>
+              <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                {t.welcome}, {user.prenom_ar || user.prenom_en || user.prenom_fr || user.nom_ar || user.nom_en || user.nom_fr || "User"}!
+              </h1>
+              <p className={`mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                {language === "ar" ? "هذه هي لوحة التحكم الخاصة بك" : language === "fr" ? "Ceci est votre tableau de bord" : "This is your dashboard"}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Profile Card */}
           <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl p-6 shadow-sm`}>
-            <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${isDarkMode ? "bg-blue-900" : "bg-blue-100"}`}>
-              <User className={`w-6 h-6 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
+            <div className="flex items-center gap-4 mb-4">
+              {user.photo ? (
+                <img 
+                  src={user.photo} 
+                  alt="Profile" 
+                  className="w-16 h-16 rounded-full object-cover border-2 border-blue-500"
+                />
+              ) : (
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isDarkMode ? "bg-blue-900" : "bg-blue-100"}`}>
+                  <User className={`w-8 h-8 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
+                </div>
+              )}
             </div>
             <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
               {t.profile}

@@ -1,7 +1,7 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
-import { getCurrentUser, logout, isAdmin } from "../services/authService";
+import { getCurrentUser, logout, isAdmin, refreshCurrentUser } from "../services/authService";
 import { 
   User, LogOut, Settings, Users, BarChart3, 
   Shield, Home, FileText, X, Menu, PieChart, TrendingUp
@@ -158,6 +158,18 @@ export default function Sidebar({ isOpen, onClose, children }) {
   const isRTL = language === "ar";
   const isUserAdmin = isAdmin();
 
+  // Refresh user data from server to get latest photo
+  useEffect(() => {
+    const loadUser = async () => {
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        const updatedUser = await refreshCurrentUser();
+        setUser(updatedUser || currentUser);
+      }
+    };
+    loadUser();
+  }, []);
+
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -201,10 +213,18 @@ export default function Sidebar({ isOpen, onClose, children }) {
         {/* User Info Section */}
         <div className={`p-6 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}>
           <div className="flex items-center gap-4">
-            <div className={`w-14 h-14 rounded-full flex items-center justify-center 
-              ${isDarkMode ? "bg-blue-900" : "bg-blue-100"}`}>
-              <User className={`w-7 h-7 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
-            </div>
+            {user?.photo ? (
+              <img 
+                src={user.photo} 
+                alt="Profile" 
+                className="w-14 h-14 rounded-full object-cover border-2 border-blue-500"
+              />
+            ) : (
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center 
+                ${isDarkMode ? "bg-blue-900" : "bg-blue-100"}`}>
+                <User className={`w-7 h-7 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <h3 className={`text-sm font-semibold truncate ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                 {getUserName()}
