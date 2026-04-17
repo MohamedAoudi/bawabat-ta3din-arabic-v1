@@ -89,7 +89,7 @@ export default function Register() {
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("user");
+  const role = "user"; // Default role - users cannot select their own role
   
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -122,7 +122,6 @@ export default function Register() {
         prenom_fr,
         email,
         password,
-        role,
       });
       
       setSuccess(t.success);
@@ -288,22 +287,6 @@ export default function Register() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-          </div>
-
-          {/* Role */}
-          <div>
-            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
-              {t.role}
-            </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className={`w-full px-4 py-3 rounded-lg border ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-            >
-              <option value="user">{t.roles.user}</option>
-              <option value="admin">{t.roles.admin}</option>
-              <option value="editor">{t.roles.editor}</option>
-            </select>
           </div>
 
           {/* Submit Button */}
