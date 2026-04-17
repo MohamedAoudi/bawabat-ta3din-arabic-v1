@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
+import { getCurrentUser, logout, isAuthenticated, isAdmin } from "../services/authService";
+import { User } from "lucide-react";
 
 // ─── Replace with your real imports ──────────────────────────────────────────
 import logoAmip from "../assets/logo n v.png";
@@ -539,6 +542,29 @@ const Menu = () => {
                 </div>
 
                 <div className="w-px h-6 bg-white/15 mx-0.5 flex-shrink-0" />
+
+                {/* User Menu */}
+                {isAuthenticated() ? (
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center gap-2 rounded-full px-3 py-2 text-[13px] font-semibold
+                               text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
+                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
+                  >
+                    <User size={16} />
+                    <span>{language === "ar" ? "لوحة التحكم" : language === "fr" ? "Tableau de bord" : "Dashboard"}</span>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="flex items-center gap-2 rounded-full px-3 py-2 text-[13px] font-semibold
+                               text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
+                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
+                  >
+                    <LoginIcon className="w-3.5 h-3.5" />
+                    <span>{language === "ar" ? "دخول" : language === "fr" ? "Connexion" : "Login"}</span>
+                  </Link>
+                )}
 
                 <a href="https://aidsmo.org" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
                   <img

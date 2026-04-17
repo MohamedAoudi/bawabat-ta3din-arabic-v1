@@ -12,6 +12,9 @@ import M6Page from "./pages/M6";
 import M7Page from "./pages/M7";
 import M8Page from "./pages/M8";
 import Rapport from "./pages/Rapport";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 
 export const LanguageContext = createContext();
 export const ThemeContext = createContext();
@@ -72,6 +75,9 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/about" element={<About />} />
             <Route path="/countries" element={<Countries />} />
             <Route path="/m1" element={<M1Page />} />
