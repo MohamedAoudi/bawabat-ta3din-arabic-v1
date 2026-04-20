@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, isAdmin, refreshCurrentUser } from "../services/authService";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
-import { User, Shield, Users, Edit, Trash2, X, Check, Search } from "lucide-react";
+import { User, Shield, Users, Edit, Trash2, X, Check, Search, CheckCircle, XCircle, ToggleLeft, ToggleRight } from "lucide-react";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const TRANSLATIONS = {
@@ -39,6 +39,19 @@ const TRANSLATIONS = {
       user: "مستخدم",
       editor: "محرر",
     },
+    status: "الحالة",
+    accepted: "مقبول",
+    pending: "في الانتظار",
+    accept: "قبول",
+    reject: "رفض",
+    userAccepted: "تم قبول المستخدم بنجاح",
+    userRejected: "تم رفض المستخدم وحذفه",
+    active: "نشط",
+    inactive: "غير نشط",
+    activate: "تفعيل",
+    deactivate: "إلغاء التفعيل",
+    userActivated: "تم تفعيل المستخدم بنجاح",
+    userDeactivated: "تم إلغاء تفعيل المستخدم بنجاح",
   },
   fr: {
     dashboard: "Tableau de bord",
@@ -72,6 +85,19 @@ const TRANSLATIONS = {
       user: "Utilisateur",
       editor: "Éditeur",
     },
+    status: "Statut",
+    accepted: "Accepté",
+    pending: "En attente",
+    accept: "Accepter",
+    reject: "Rejeter",
+    userAccepted: "Utilisateur accepté avec succès",
+    userRejected: "Utilisateur rejeté et supprimé",
+    active: "Actif",
+    inactive: "Inactif",
+    activate: "Activer",
+    deactivate: "Désactiver",
+    userActivated: "Utilisateur activé avec succès",
+    userDeactivated: "Utilisateur désactivé avec succès",
   },
   en: {
     dashboard: "Dashboard",
@@ -105,6 +131,19 @@ const TRANSLATIONS = {
       user: "User",
       editor: "Editor",
     },
+    status: "Status",
+    accepted: "Accepted",
+    pending: "Pending",
+    accept: "Accept",
+    reject: "Reject",
+    userAccepted: "User accepted successfully",
+    userRejected: "User rejected and deleted",
+    active: "Active",
+    inactive: "Inactive",
+    activate: "Activate",
+    deactivate: "Deactivate",
+    userActivated: "User activated successfully",
+    userDeactivated: "User deactivated successfully",
   },
 };
 
@@ -120,6 +159,9 @@ export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingUser, setEditingUser] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+  const [showAcceptConfirm, setShowAcceptConfirm] = useState(null);
+  const [showRejectConfirm, setShowRejectConfirm] = useState(null);
+  const [showActivateConfirm, setShowActivateConfirm] = useState(null);
 
   const t = TRANSLATIONS[language] || TRANSLATIONS.ar;
   const isUserAdmin = currentUser?.role === "admin";
@@ -217,6 +259,68 @@ export default function UsersPage() {
     }
   };
 
+  const handleAccept = async (userId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:5000/api/users/${userId}/accept`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        fetchUsers();
+        setShowAcceptConfirm(null);
+      }
+    } catch (error) {
+      console.error("Error accepting user:", error);
+    }
+  };
+
+  const handleReject = async (userId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:5000/api/users/${userId}/reject`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        fetchUsers();
+        setShowRejectConfirm(null);
+      }
+    } catch (error) {
+      console.error("Error rejecting user:", error);
+    }
+  };
+
+  const handleToggleActive = async (user) => {
+    try {
+      const token = localStorage.getItem("token");
+      const newIsAccepted = !user.is_accepted;
+      const response = await fetch(`http://localhost:5000/api/users/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          is_accepted: newIsAccepted,
+        }),
+      });
+
+      if (response.ok) {
+        fetchUsers();
+        setShowActivateConfirm(null);
+      }
+    } catch (error) {
+      console.error("Error toggling user active status:", error);
+    }
+  };
+
   const getUserName = (user) => {
     if (language === "ar") {
       return `${user.prenom_ar || ""} ${user.nom_ar || ""}`.trim();
@@ -301,6 +405,9 @@ export default function UsersPage() {
                     {t.role}
                   </th>
                   <th className={`px-6 py-4 text-${language === "ar" ? "right" : "left"} text-sm font-semibold ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                    {t.status}
+                  </th>
+                  <th className={`px-6 py-4 text-${language === "ar" ? "right" : "left"} text-sm font-semibold ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
                     {t.createdAt}
                   </th>
                   <th className={`px-6 py-4 text-center text-sm font-semibold ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
@@ -311,7 +418,7 @@ export default function UsersPage() {
               <tbody className={`divide-y ${isDarkMode ? "divide-gray-700" : "divide-gray-200"}`}>
                 {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className={`px-6 py-8 text-center ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                    <td colSpan="6" className={`px-6 py-8 text-center ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
                       {t.noUsers}
                     </td>
                   </tr>
@@ -346,11 +453,59 @@ export default function UsersPage() {
                           {t.roles[user.role] || user.role}
                         </span>
                       </td>
+                      <td className="px-6 py-4">
+                        {user.role !== "admin" && (
+                          <div className="flex items-center gap-2">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium
+                              ${user.is_accepted 
+                                ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" 
+                                : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
+                              }`}>
+                              {user.is_accepted ? t.active : t.pending}
+                            </span>
+                            {user.is_accepted ? (
+                              <button
+                                onClick={() => setShowActivateConfirm({ id: user.id, is_accepted: true })}
+                                className={`p-1 rounded-lg ${isDarkMode ? "hover:bg-gray-600 text-orange-400" : "hover:bg-orange-50 text-orange-600"}`}
+                                title={t.deactivate}
+                              >
+                                <ToggleRight size={20} />
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setShowActivateConfirm({ id: user.id, is_accepted: false })}
+                                className={`p-1 rounded-lg ${isDarkMode ? "hover:bg-gray-600 text-green-400" : "hover:bg-green-50 text-green-600"}`}
+                                title={t.activate}
+                              >
+                                <ToggleLeft size={20} />
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </td>
                       <td className={`px-6 py-4 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
                         {user.created_at ? new Date(user.created_at).toLocaleDateString() : "-"}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
+                          {!user.is_accepted && user.role !== "admin" && (
+                            <>
+                              <button
+                                onClick={() => setShowAcceptConfirm(user.id)}
+                                className={`p-2 rounded-lg ${isDarkMode ? "hover:bg-gray-600 text-green-400" : "hover:bg-green-50 text-green-600"}`}
+                                title={t.accept}
+                              >
+                                <CheckCircle size={18} />
+                              </button>
+                              <button
+                                onClick={() => setShowRejectConfirm(user.id)}
+                                className={`p-2 rounded-lg ${isDarkMode ? "hover:bg-gray-600 text-red-400" : "hover:bg-red-50 text-red-600"}`}
+                                title={t.reject}
+                              >
+                                <XCircle size={18} />
+                              </button>
+                            </>
+                          )}
                           <button
                             onClick={() => handleEdit(user)}
                             className={`p-2 rounded-lg ${isDarkMode ? "hover:bg-gray-600 text-blue-400" : "hover:bg-blue-50 text-blue-600"}`}
@@ -560,6 +715,109 @@ export default function UsersPage() {
                   className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
                 >
                   {t.delete}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Accept User Confirmation Modal */}
+      {showAcceptConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl w-full max-w-md p-6`}>
+            <div className="text-center">
+              <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${isDarkMode ? "bg-green-900" : "bg-green-100"}`}>
+                <CheckCircle className={`w-8 h-8 ${isDarkMode ? "text-green-400" : "text-green-600"}`} />
+              </div>
+              <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                {t.accept}
+              </h3>
+              <p className={`mb-6 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                {t.userAccepted}
+              </p>
+              <div className="flex justify-center gap-3">
+                <button
+                  onClick={() => setShowAcceptConfirm(null)}
+                  className={`px-6 py-2 rounded-lg ${isDarkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+                >
+                  {t.cancel}
+                </button>
+                <button
+                  onClick={() => handleAccept(showAcceptConfirm)}
+                  className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {t.accept}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject User Confirmation Modal */}
+      {showRejectConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl w-full max-w-md p-6`}>
+            <div className="text-center">
+              <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${isDarkMode ? "bg-red-900" : "bg-red-100"}`}>
+                <XCircle className={`w-8 h-8 ${isDarkMode ? "text-red-400" : "text-red-600"}`} />
+              </div>
+              <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                {t.reject}
+              </h3>
+              <p className={`mb-6 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                {t.userRejected}
+              </p>
+              <div className="flex justify-center gap-3">
+                <button
+                  onClick={() => setShowRejectConfirm(null)}
+                  className={`px-6 py-2 rounded-lg ${isDarkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+                >
+                  {t.cancel}
+                </button>
+                <button
+                  onClick={() => handleReject(showRejectConfirm)}
+                  className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
+                >
+                  {t.reject}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Activate/Deactivate User Confirmation Modal */}
+      {showActivateConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl w-full max-w-md p-6`}>
+            <div className="text-center">
+              <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${isDarkMode ? "bg-orange-900" : "bg-orange-100"}`}>
+                {showActivateConfirm.is_accepted ? (
+                  <ToggleRight className={`w-8 h-8 ${isDarkMode ? "text-orange-400" : "text-orange-600"}`} />
+                ) : (
+                  <ToggleLeft className={`w-8 h-8 ${isDarkMode ? "text-green-400" : "text-green-600"}`} />
+                )}
+              </div>
+              <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                {showActivateConfirm.is_accepted ? t.deactivate : t.activate}
+              </h3>
+              <p className={`mb-6 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                {showActivateConfirm.is_accepted ? t.userDeactivated : t.userActivated}
+              </p>
+              <div className="flex justify-center gap-3">
+                <button
+                  onClick={() => setShowActivateConfirm(null)}
+                  className={`px-6 py-2 rounded-lg ${isDarkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+                >
+                  {t.cancel}
+                </button>
+                <button
+                  onClick={() => handleToggleActive(showActivateConfirm)}
+                  className={`px-6 py-2 rounded-lg ${showActivateConfirm.is_accepted ? "bg-orange-600 hover:bg-orange-700" : "bg-green-600 hover:bg-green-700"} text-white`}
+                >
+                  {showActivateConfirm.is_accepted ? t.deactivate : t.activate}
                 </button>
               </div>
             </div>
