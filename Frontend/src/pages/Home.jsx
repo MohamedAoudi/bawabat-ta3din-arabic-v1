@@ -1205,6 +1205,8 @@ border-radius:13px !important;
         html.theme-dark .home-page .sponsor-hover {
           background: rgba(7,22,17,0.96) !important;
         }
+          html.theme-dark input, html.theme-dark select, html.theme-dark textarea{
+            background: rgba(255,255,255,0.06) !important;}
         html.theme-dark .home-page .country-name {
           color: #efe8d4;
         }
@@ -1283,10 +1285,11 @@ border-radius:13px !important;
               </button>
               <input
                 type="text"
-                placeholder={labels.searchPlaceholder}
+                                placeholder={labels.searchPlaceholder}
+
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                style={{ flex:1, background:"transparent", border:"none", outline:"none", color:"#000", fontSize:"0.9rem", textAlign:isArabic ? "right" : "left", caretColor:"#000" }}
+                style={{ flex:1, border:"none", outline:"none", color:"#000 !important", fontSize:"0.9rem", textAlign:isArabic ? "right" : "left", caretColor:"#000" }}
               />
               <AppIcon name="fa-search" size={16} style={{ color:"rgba(201,168,76,0.7)" }} />
             </div>
