@@ -4,7 +4,7 @@ import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, logout, isAdmin, refreshCurrentUser } from "../services/authService";
 import { 
   User, LogOut, Settings, Users, BarChart3, 
-  Shield, Home, FileText, X, Menu, PieChart, TrendingUp, Globe
+  Shield, Home, FileText, X, Menu, PieChart, TrendingUp, Globe, Sun, Moon, Gem
 } from "lucide-react";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
@@ -32,6 +32,9 @@ const TRANSLATIONS = {
     countries: "الدول العربية",
     about: "عن البوابة",
     language: "اللغة",
+    theme: "المظهر",
+    lightMode: "فاتح",
+    darkMode: "داكن",
     roles: {
       admin: "مدير",
       user: "مستخدم",
@@ -61,6 +64,9 @@ const TRANSLATIONS = {
     countries: "Pays Arabes",
     about: "À Propos",
     language: "Langue",
+    theme: "Thème",
+    lightMode: "Clair",
+    darkMode: "Sombre",
     roles: {
       admin: "Administrateur",
       user: "Utilisateur",
@@ -90,6 +96,9 @@ const TRANSLATIONS = {
     countries: "Arab Countries",
     about: "About",
     language: "Language",
+    theme: "Theme",
+    lightMode: "Light",
+    darkMode: "Dark",
     roles: {
       admin: "Admin",
       user: "User",
@@ -161,6 +170,41 @@ export default function Sidebar({ isOpen, onClose, children }) {
   const isRTL = language === "ar";
   const isUserAdmin = isAdmin();
 
+  // Color palette matching Home/Login page - elegant gold & forest theme
+  const colors = isDarkMode ? {
+    bg: "#071611",
+    bgLight: "#0c2620",
+    bgLighter: "#0a221c",
+    forest: "#efe8d4",
+    forestMid: "#d1c7ad",
+    gold: "#d3b468",
+    goldLight: "#efdba2",
+    goldPale: "#1a332d",
+    cream: "#071611",
+    parchment: "#0c2620",
+    ink: "#efe8d4",
+    muted: "#b8b09d",
+    border: "rgba(201,168,76,0.22)",
+    accent: "#7ee0c0",
+    cardBg: "#0d2b24",
+  } : {
+    bg: "#f5f3ef",
+    bgLight: "#ede9df",
+    bgLighter: "#ffffff",
+    forest: "#082721",
+    forestMid: "#0d3d34",
+    gold: "#c9a84c",
+    goldLight: "#e8d08a",
+    goldPale: "#f7f0dc",
+    cream: "#f5f3ef",
+    parchment: "#ede9df",
+    ink: "#1a1510",
+    muted: "#7a7060",
+    border: "rgba(8,39,33,0.08)",
+    accent: "#0d3d34",
+    cardBg: "#ffffff",
+  };
+
   // Refresh user data from server to get latest photo
   useEffect(() => {
     const loadUser = async () => {
@@ -195,44 +239,67 @@ export default function Sidebar({ isOpen, onClose, children }) {
   const userRole = user?.role || "user";
 
   return (
-    <div className={`flex min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-gray-100"}`}>
+    <div className={`flex min-h-screen ${isDarkMode ? "bg-[#071611]" : "bg-[#f5f3ef]"}`}>
       {/* Sidebar */}
       <div 
         className={`fixed lg:static inset-y-0 ${isRTL ? "right-0 left-auto" : "left-0 right-auto"} z-50 
           transform ${isOpen ? "translate-x-0" : isRTL ? "translate-x-full" : "-translate-x-full"} 
           lg:translate-x-0 transition-transform duration-300 ease-in-out 
-          ${isDarkMode ? "bg-gray-800" : "bg-white"} w-72 min-h-screen shadow-xl`}
+          ${isDarkMode ? "bg-[#0c2620]" : "bg-white"} w-72 min-h-screen shadow-2xl`}
+        style={{ 
+          backgroundImage: isDarkMode 
+            ? 'linear-gradient(180deg, #0c2620 0%, #071611 100%)' 
+            : 'linear-gradient(180deg, #ffffff 0%, #f9f7f2 100%)',
+        }}
       >
+        {/* Gold accent line at top */}
+        <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${colors.gold} 0%, ${colors.goldLight} 50%, ${colors.gold} 100%)` }} />
+
         {/* Close button for mobile */}
-        <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+        <div className="lg:hidden flex items-center justify-between p-4" style={{ borderBottom: `1px solid ${colors.border}` }}>
+          <h2 className="text-lg font-bold" style={{ color: colors.ink }}>
             {t.dashboard}
           </h2>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-            <X size={20} className={isDarkMode ? "text-gray-300" : "text-gray-600"} />
+          <button onClick={onClose} className="p-2 rounded-lg transition-colors" style={{ background: colors.goldPale }}>
+            <X size={20} style={{ color: colors.forest }} />
           </button>
         </div>
 
+        {/* Logo/Brand Section */}
+        <div className="p-6 text-center" style={{ borderBottom: `1px solid ${colors.border}` }}>
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-3" 
+            style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)` }}>
+            <Gem size={32} style={{ color: colors.forest }} />
+          </div>
+          <h1 className="text-xl font-bold" style={{ color: colors.gold }}>
+            {t.dashboard}
+          </h1>
+          <p className="text-xs mt-1" style={{ color: colors.muted }}>
+            {t.indicators}
+          </p>
+        </div>
+
         {/* User Info Section */}
-        <div className={`p-6 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}>
-          <div className="flex items-center gap-4">
+        <div className="p-4 mx-4 mt-4 rounded-xl" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
+          <div className="flex items-center gap-3">
             {user?.photo ? (
               <img 
                 src={user.photo} 
                 alt="Profile" 
-                className="w-14 h-14 rounded-full object-cover border-2 border-blue-500"
+                className="w-12 h-12 rounded-full object-cover border-2"
+                style={{ borderColor: colors.gold }}
               />
             ) : (
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center 
-                ${isDarkMode ? "bg-blue-900" : "bg-blue-100"}`}>
-                <User className={`w-7 h-7 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center border-2" 
+                style={{ borderColor: colors.gold, background: colors.goldPale }}>
+                <User className="w-6 h-6" style={{ color: colors.forest }} />
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h3 className={`text-sm font-semibold truncate ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+              <h3 className="text-sm font-semibold truncate" style={{ color: colors.ink }}>
                 {getUserName()}
               </h3>
-              <p className={`text-xs truncate ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+              <p className="text-xs truncate" style={{ color: colors.muted }}>
                 {user?.email}
               </p>
               <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium
@@ -247,7 +314,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
         </div>
 
         {/* Navigation Menu */}
-        <nav className="p-4 space-y-1">
+        <nav className="p-4 space-y-2">
           {MENU_ITEMS.map((item) => {
             const Icon = item.icon;
             const isExpanded = expandedMenus[item.key];
@@ -263,22 +330,22 @@ export default function Sidebar({ isOpen, onClose, children }) {
                   <>
                     <button
                       onClick={() => toggleMenu(item.key)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors
-                        ${isItemActive || isExpanded
-                          ? isDarkMode 
-                            ? "bg-blue-900/50 text-blue-400" 
-                            : "bg-blue-50 text-blue-600"
-                          : isDarkMode 
-                            ? "hover:bg-gray-700 text-gray-300" 
-                            : "hover:bg-gray-100 text-gray-700"
-                        }`}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+                      style={{ 
+                        background: isItemActive || isExpanded 
+                          ? `linear-gradient(135deg, ${colors.goldPale} 0%, ${isDarkMode ? 'rgba(201,168,76,0.15)' : 'rgba(201,168,76,0.25)'} 100%)`
+                          : 'transparent',
+                        color: isItemActive || isExpanded ? colors.forest : colors.ink,
+                        border: `1px solid ${isItemActive || isExpanded ? colors.gold : 'transparent'}`,
+                      }}
                     >
-                      <Icon size={20} />
+                      <Icon size={20} style={{ color: isItemActive || isExpanded ? colors.gold : colors.muted }} />
                       <span className="flex-1 text-start text-sm font-medium">{t[item.labelKey]}</span>
                       {hasChildren && (
                         <svg 
                           className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
                           fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                          style={{ color: colors.muted }}
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
@@ -287,20 +354,16 @@ export default function Sidebar({ isOpen, onClose, children }) {
                     
                     {/* Submenu */}
                     {isExpanded && (
-                      <div className="mt-1 ml-4 space-y-1">
+                      <div className="mt-1 ml-4 space-y-1 pl-2" style={{ borderLeft: `2px solid ${colors.gold}40` }}>
                         {item.children.map((child) => (
                           <a
                             key={child.key}
                             href={child.href}
-                            className={`block px-4 py-2 rounded-lg text-sm transition-colors
-                              ${location.pathname === child.href
-                                ? isDarkMode 
-                                  ? "bg-blue-800/50 text-blue-300" 
-                                  : "bg-blue-100 text-blue-700"
-                                : isDarkMode 
-                                  ? "text-gray-400 hover:bg-gray-700 hover:text-gray-300" 
-                                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
-                              }`}
+                            className="block px-4 py-2 rounded-lg text-sm transition-all duration-200"
+                            style={{ 
+                              background: location.pathname === child.href ? colors.goldPale : 'transparent',
+                              color: location.pathname === child.href ? colors.forest : colors.muted,
+                            }}
                           >
                             {t[child.labelKey]}
                           </a>
@@ -312,17 +375,14 @@ export default function Sidebar({ isOpen, onClose, children }) {
                   // Simple menu item
                   <a
                     href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors
-                      ${isItemActive
-                        ? isDarkMode 
-                          ? "bg-blue-900/50 text-blue-400" 
-                          : "bg-blue-50 text-blue-600"
-                        : isDarkMode 
-                          ? "hover:bg-gray-700 text-gray-300" 
-                          : "hover:bg-gray-100 text-gray-700"
-                      }`}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+                    style={{ 
+                      background: isItemActive ? colors.goldPale : 'transparent',
+                      color: isItemActive ? colors.forest : colors.ink,
+                      border: `1px solid ${isItemActive ? colors.gold : 'transparent'}`,
+                    }}
                   >
-                    <Icon size={20} />
+                    <Icon size={20} style={{ color: isItemActive ? colors.gold : colors.muted }} />
                     <span className="text-sm font-medium">{t[item.labelKey]}</span>
                   </a>
                 )}
@@ -332,9 +392,8 @@ export default function Sidebar({ isOpen, onClose, children }) {
 
           {/* Admin Section */}
           {isUserAdmin && (
-            <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className={`px-4 text-xs font-semibold uppercase tracking-wider mb-2 
-                ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
+            <div className="pt-4 mt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
+              <p className="px-4 text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: colors.gold }}>
                 {t.adminPanel}
               </p>
               {ADMIN_MENU_ITEMS.map((item) => {
@@ -343,13 +402,14 @@ export default function Sidebar({ isOpen, onClose, children }) {
                   <button
                     key={item.key}
                     onClick={() => navigate("/users")}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors
-                      ${isDarkMode 
-                        ? "hover:bg-gray-700 text-gray-300" 
-                        : "hover:bg-gray-100 text-gray-700"
-                      }`}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+                    style={{ 
+                      background: colors.cardBg,
+                      color: colors.ink,
+                      border: `1px solid ${colors.border}`,
+                    }}
                   >
-                    <Icon size={20} />
+                    <Icon size={20} style={{ color: colors.gold }} />
                     <span className="text-sm font-medium">{t[item.labelKey]}</span>
                   </button>
                 );
@@ -359,57 +419,59 @@ export default function Sidebar({ isOpen, onClose, children }) {
 
           {/* Settings */}
           <button
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors
-              ${isDarkMode 
-                ? "hover:bg-gray-700 text-gray-300" 
-                : "hover:bg-gray-100 text-gray-700"
-              }`}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+            style={{ 
+              color: colors.muted,
+            }}
           >
             <Settings size={20} />
             <span className="text-sm font-medium">{t.settings}</span>
           </button>
 
           {/* Language Selector */}
-          <div className={`mt-4 pt-4 border-t ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}>
+          <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
             <div className="px-4">
-              <div className={`flex items-center gap-2 mb-2 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}> 
+              <div className="flex items-center gap-2 mb-2" style={{ color: colors.muted }}> 
                 <Globe size={16} />
                 <span className="text-xs font-medium">{t.language || "Langue"}</span>
               </div>
               <div className="flex gap-2 mb-3">
                 <button
                   onClick={() => changeLanguage("ar")}
-                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors
-                    ${language === "ar" 
-                      ? "bg-blue-600 text-white" 
-                      : isDarkMode 
-                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600" 
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
+                  className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105"
+                  style={{ 
+                    background: language === "ar" 
+                      ? `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`
+                      : colors.cardBg,
+                    color: language === "ar" ? colors.forest : colors.ink,
+                    border: `1px solid ${colors.border}`,
+                  }}
                 >
                   العربية
                 </button>
                 <button
                   onClick={() => changeLanguage("fr")}
-                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors
-                    ${language === "fr" 
-                      ? "bg-blue-600 text-white" 
-                      : isDarkMode 
-                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600" 
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
+                  className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105"
+                  style={{ 
+                    background: language === "fr" 
+                      ? `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`
+                      : colors.cardBg,
+                    color: language === "fr" ? colors.forest : colors.ink,
+                    border: `1px solid ${colors.border}`,
+                  }}
                 >
                   Français
                 </button>
                 <button
                   onClick={() => changeLanguage("en")}
-                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors
-                    ${language === "en" 
-                      ? "bg-blue-600 text-white" 
-                      : isDarkMode 
-                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600" 
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
+                  className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105"
+                  style={{ 
+                    background: language === "en" 
+                      ? `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`
+                      : colors.cardBg,
+                    color: language === "en" ? colors.forest : colors.ink,
+                    border: `1px solid ${colors.border}`,
+                  }}
                 >
                   English
                 </button>
@@ -418,23 +480,29 @@ export default function Sidebar({ isOpen, onClose, children }) {
               <div className="flex gap-2">
                 <button
                   onClick={() => { if (isDarkMode) toggleTheme(); }}
-                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors
-                    ${!isDarkMode
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                    }`}
+                  className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105"
+                  style={{ 
+                    background: !isDarkMode 
+                      ? `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`
+                      : colors.cardBg,
+                    color: !isDarkMode ? colors.forest : colors.ink,
+                    border: `1px solid ${colors.border}`,
+                  }}
                 >
-                  Light Mode
+                  Light
                 </button>
                 <button
                   onClick={() => { if (!isDarkMode) toggleTheme(); }}
-                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors
-                    ${isDarkMode
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                    }`}
+                  className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105"
+                  style={{ 
+                    background: isDarkMode 
+                      ? `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`
+                      : colors.cardBg,
+                    color: isDarkMode ? colors.forest : colors.ink,
+                    border: `1px solid ${colors.border}`,
+                  }}
                 >
-                  Dark Mode
+                  Dark
                 </button>
               </div>
             </div>
@@ -442,14 +510,15 @@ export default function Sidebar({ isOpen, onClose, children }) {
         </nav>
 
         {/* Logout Button */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="absolute bottom-0 left-0 right-0 p-4" style={{ borderTop: `1px solid ${colors.border}` }}>
           <button
             onClick={handleLogout}
-            className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-colors
-              ${isDarkMode 
-                ? "bg-red-900/30 hover:bg-red-900/50 text-red-400" 
-                : "bg-red-50 hover:bg-red-100 text-red-600"
-              }`}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+            style={{ 
+              background: isDarkMode ? 'rgba(220,38,38,0.15)' : 'rgba(220,38,38,0.08)',
+              color: isDarkMode ? '#fca5a5' : '#dc2626',
+              border: `1px solid ${isDarkMode ? 'rgba(220,38,38,0.3)' : 'rgba(220,38,38,0.2)'}`,
+            }}
           >
             <LogOut size={20} />
             <span className="text-sm font-medium">{t.logout}</span>
