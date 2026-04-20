@@ -152,7 +152,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { language, changeLanguage } = useContext(LanguageContext);
-  const { isDarkMode } = useContext(ThemeContext);
+  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
 
   const [user, setUser] = useState(() => getCurrentUser());
   const [expandedMenus, setExpandedMenus] = useState({});
@@ -372,11 +372,11 @@ export default function Sidebar({ isOpen, onClose, children }) {
           {/* Language Selector */}
           <div className={`mt-4 pt-4 border-t ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}>
             <div className="px-4">
-              <div className={`flex items-center gap-2 mb-2 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+              <div className={`flex items-center gap-2 mb-2 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}> 
                 <Globe size={16} />
                 <span className="text-xs font-medium">{t.language || "Langue"}</span>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 mb-3">
                 <button
                   onClick={() => changeLanguage("ar")}
                   className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors
@@ -412,6 +412,29 @@ export default function Sidebar({ isOpen, onClose, children }) {
                     }`}
                 >
                   English
+                </button>
+              </div>
+              {/* Dark/Light Mode Toggle */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { if (isDarkMode) toggleTheme(); }}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors
+                    ${!isDarkMode
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                    }`}
+                >
+                  Light Mode
+                </button>
+                <button
+                  onClick={() => { if (!isDarkMode) toggleTheme(); }}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors
+                    ${isDarkMode
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                    }`}
+                >
+                  Dark Mode
                 </button>
               </div>
             </div>
