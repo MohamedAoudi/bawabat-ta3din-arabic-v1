@@ -79,6 +79,42 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   const t = TRANSLATIONS[language] || TRANSLATIONS.ar;
+  const isRTL = language === "ar";
+
+  // Color palette matching Home/Login/Sidebar
+  const colors = isDarkMode ? {
+    bg: "#071611",
+    bgLight: "#0c2620",
+    bgLighter: "#0a221c",
+    forest: "#efe8d4",
+    forestMid: "#d1c7ad",
+    gold: "#d3b468",
+    goldLight: "#efdba2",
+    goldPale: "#1a332d",
+    cream: "#071611",
+    parchment: "#0c2620",
+    ink: "#efe8d4",
+    muted: "#b8b09d",
+    border: "rgba(201,168,76,0.22)",
+    accent: "#7ee0c0",
+    cardBg: "#0d2b24",
+  } : {
+    bg: "#f5f3ef",
+    bgLight: "#ede9df",
+    bgLighter: "#ffffff",
+    forest: "#082721",
+    forestMid: "#0d3d34",
+    gold: "#c9a84c",
+    goldLight: "#e8d08a",
+    goldPale: "#f7f0dc",
+    cream: "#f5f3ef",
+    parchment: "#ede9df",
+    ink: "#1a1510",
+    muted: "#7a7060",
+    border: "rgba(8,39,33,0.08)",
+    accent: "#0d3d34",
+    cardBg: "#ffffff",
+  };
 
   useEffect(() => {
     const loadUser = async () => {
@@ -97,8 +133,8 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? "bg-gray-900" : "bg-gray-100"}`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: colors.bg }}>
+        <div className="animate-spin rounded-full h-12 w-12" style={{ borderBottom: `2px solid ${colors.gold}` }}></div>
       </div>
     );
   }
@@ -120,26 +156,32 @@ export default function Dashboard() {
       />
 
       {/* Main Content */}
-      <div className="p-6 lg:p-8">
+      <div className="p-6 lg:p-8" style={{ background: colors.bg, minHeight: "100vh" }}>
         {/* Welcome Header */}
-        <div className={`mb-8 ${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl p-6 shadow-sm`}>
+        <div className="mb-8 rounded-2xl p-6 shadow-lg" 
+          style={{ 
+            background: `linear-gradient(135deg, ${colors.cardBg} 0%, ${isDarkMode ? '#0d2b24' : '#f9f7f2'} 100%)`,
+            border: `1px solid ${colors.border}`,
+          }}>
           <div className="flex items-center gap-4">
             {user.photo ? (
               <img 
                 src={user.photo} 
                 alt="Profile" 
-                className="w-16 h-16 rounded-full object-cover border-2 border-blue-500"
+                className="w-16 h-16 rounded-full object-cover border-2"
+                style={{ borderColor: colors.gold }}
               />
             ) : (
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isDarkMode ? "bg-blue-900" : "bg-blue-100"}`}>
-                <User className={`w-8 h-8 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
+              <div className="w-16 h-16 rounded-full flex items-center justify-center border-2" 
+                style={{ borderColor: colors.gold, background: colors.goldPale }}>
+                <User className="w-8 h-8" style={{ color: colors.forest }} />
               </div>
             )}
             <div>
-              <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+              <h1 className="text-2xl font-bold" style={{ color: colors.ink }}>
                 {t.welcome}, {user.prenom_ar || user.prenom_en || user.prenom_fr || user.nom_ar || user.nom_en || user.nom_fr || "User"}!
               </h1>
-              <p className={`mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              <p className="mt-1" style={{ color: colors.muted }}>
                 {language === "ar" ? "هذه هي لوحة التحكم الخاصة بك" : language === "fr" ? "Ceci est votre tableau de bord" : "This is your dashboard"}
               </p>
             </div>
@@ -149,40 +191,51 @@ export default function Dashboard() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Profile Card */}
-          <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl p-6 shadow-sm`}>
+          <div className="rounded-2xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
+            style={{ 
+              background: colors.cardBg,
+              border: `1px solid ${colors.border}`,
+            }}>
             <div className="flex items-center gap-4 mb-4">
               {user.photo ? (
                 <img 
                   src={user.photo} 
                   alt="Profile" 
-                  className="w-16 h-16 rounded-full object-cover border-2 border-blue-500"
+                  className="w-16 h-16 rounded-full object-cover border-2"
+                  style={{ borderColor: colors.gold }}
                 />
               ) : (
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isDarkMode ? "bg-blue-900" : "bg-blue-100"}`}>
-                  <User className={`w-8 h-8 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
+                <div className="w-16 h-16 rounded-full flex items-center justify-center border-2" 
+                  style={{ borderColor: colors.gold, background: colors.goldPale }}>
+                  <User className="w-8 h-8" style={{ color: colors.forest }} />
                 </div>
               )}
             </div>
-            <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+            <h3 className="text-lg font-semibold" style={{ color: colors.ink }}>
               {t.profile}
             </h3>
-            <p className={`mt-1 text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+            <p className="mt-1 text-sm" style={{ color: colors.muted }}>
               {t.email}: {user.email}
             </p>
-            <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+            <p className="text-sm" style={{ color: colors.muted }}>
               {t.role}: {t.roles[userRole] || userRole}
             </p>
           </div>
 
           {/* Role Card */}
-          <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl p-6 shadow-sm`}>
-            <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${isDarkMode ? "bg-purple-900" : "bg-purple-100"}`}>
-              <Shield className={`w-6 h-6 ${isDarkMode ? "text-purple-400" : "text-purple-600"}`} />
+          <div className="rounded-2xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
+            style={{ 
+              background: colors.cardBg,
+              border: `1px solid ${colors.border}`,
+            }}>
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" 
+              style={{ background: colors.goldPale }}>
+              <Shield className="w-6 h-6" style={{ color: colors.gold }} />
             </div>
-            <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+            <h3 className="text-lg font-semibold" style={{ color: colors.ink }}>
               {t.role}
             </h3>
-            <p className={`mt-1 text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+            <p className="mt-1 text-sm" style={{ color: colors.muted }}>
               {isUserAdmin 
                 ? (language === "ar" ? "لديك صلاحيات المدير" : language === "fr" ? "Vous avez les droits d'administrateur" : "You have admin privileges")
                 : (language === "ar" ? "لديك صلاحيات المستخدم" : language === "fr" ? "Vous avez les droits d'utilisateur" : "You have user privileges")
@@ -192,14 +245,19 @@ export default function Dashboard() {
 
           {/* Admin Panel Access */}
           {isUserAdmin && (
-            <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl p-6 shadow-sm border-2 border-purple-500`}>
-              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${isDarkMode ? "bg-purple-900" : "bg-purple-100"}`}>
-                <Users className={`w-6 h-6 ${isDarkMode ? "text-purple-400" : "text-purple-600"}`} />
+            <div className="rounded-2xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
+              style={{ 
+                background: `linear-gradient(135deg, ${colors.goldPale} 0%, ${colors.cardBg} 100%)`,
+                border: `2px solid ${colors.gold}`,
+              }}>
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" 
+                style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)` }}>
+                <Users className="w-6 h-6" style={{ color: colors.forest }} />
               </div>
-              <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+              <h3 className="text-lg font-semibold" style={{ color: colors.ink }}>
                 {t.adminPanel}
               </h3>
-              <p className={`mt-1 text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              <p className="mt-1 text-sm" style={{ color: colors.muted }}>
                 {language === "ar" ? "لديك الوصول الكامل" : language === "fr" ? "Vous avez un accès complet" : "You have full access"}
               </p>
             </div>
@@ -207,26 +265,46 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl p-6 shadow-sm`}>
-          <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+        <div className="rounded-2xl p-6 shadow-lg"
+          style={{ 
+            background: colors.cardBg,
+            border: `1px solid ${colors.border}`,
+          }}>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: colors.ink }}>
             {language === "ar" ? "إجراءات سريعة" : language === "fr" ? "Actions rapides" : "Quick Actions"}
           </h3>
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => navigate("/")}
-              className={`px-4 py-2 rounded-lg ${isDarkMode ? "bg-blue-900 text-blue-400 hover:bg-blue-800" : "bg-blue-100 text-blue-600 hover:bg-blue-200"}`}
+              className="px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
+              style={{ 
+                background: colors.goldPale,
+                color: colors.forest,
+                border: `1px solid ${colors.border}`,
+              }}
             >
               {language === "ar" ? "الرئيسية" : language === "fr" ? "Accueil" : "Home"}
             </button>
             <button
               onClick={() => navigate("/rapport")}
-              className={`px-4 py-2 rounded-lg ${isDarkMode ? "bg-green-900 text-green-400 hover:bg-green-800" : "bg-green-100 text-green-600 hover:bg-green-200"}`}
+              className="px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
+              style={{ 
+                background: isDarkMode ? "rgba(126,224,192,0.15)" : "rgba(8,39,33,0.08)",
+                color: colors.forest,
+                border: `1px solid ${colors.border}`,
+              }}
             >
               {t.reports}
             </button>
             {isUserAdmin && (
               <button
-                className={`px-4 py-2 rounded-lg ${isDarkMode ? "bg-purple-900 text-purple-400 hover:bg-purple-800" : "bg-purple-100 text-purple-600 hover:bg-purple-200"}`}
+                onClick={() => navigate("/users")}
+                className="px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
+                style={{ 
+                  background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`,
+                  color: colors.forest,
+                  border: `1px solid ${colors.gold}`,
+                }}
               >
                 {t.users}
               </button>

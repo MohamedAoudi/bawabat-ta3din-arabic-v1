@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, logout, isAdmin, refreshCurrentUser } from "../services/authService";
 import { 
@@ -356,9 +356,9 @@ export default function Sidebar({ isOpen, onClose, children }) {
                     {isExpanded && (
                       <div className="mt-1 ml-4 space-y-1 pl-2" style={{ borderLeft: `2px solid ${colors.gold}40` }}>
                         {item.children.map((child) => (
-                          <a
+                          <Link
                             key={child.key}
-                            href={child.href}
+                            to={child.href}
                             className="block px-4 py-2 rounded-lg text-sm transition-all duration-200"
                             style={{ 
                               background: location.pathname === child.href ? colors.goldPale : 'transparent',
@@ -366,15 +366,15 @@ export default function Sidebar({ isOpen, onClose, children }) {
                             }}
                           >
                             {t[child.labelKey]}
-                          </a>
+                          </Link>
                         ))}
                       </div>
                     )}
                   </>
                 ) : (
                   // Simple menu item
-                  <a
-                    href={item.href}
+                  <Link
+                    to={item.href}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
                     style={{ 
                       background: isItemActive ? colors.goldPale : 'transparent',
@@ -384,7 +384,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
                   >
                     <Icon size={20} style={{ color: isItemActive ? colors.gold : colors.muted }} />
                     <span className="text-sm font-medium">{t[item.labelKey]}</span>
-                  </a>
+                  </Link>
                 )}
               </div>
             );
@@ -418,7 +418,8 @@ export default function Sidebar({ isOpen, onClose, children }) {
           )}
 
           {/* Settings */}
-          <button
+          <Link
+            to="/settings"
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
             style={{ 
               color: colors.muted,
@@ -426,7 +427,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
           >
             <Settings size={20} />
             <span className="text-sm font-medium">{t.settings}</span>
-          </button>
+          </Link>
 
           {/* Language Selector */}
           <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
@@ -548,16 +549,40 @@ export function MobileHeader({ onMenuClick, title }) {
   const { isDarkMode } = useContext(ThemeContext);
   const t = TRANSLATIONS[language] || TRANSLATIONS.ar;
 
+  const colors = isDarkMode ? {
+    bg: "#071611",
+    bgLight: "#0c2620",
+    gold: "#d3b468",
+    goldLight: "#efdba2",
+    goldPale: "#1a332d",
+    forest: "#efe8d4",
+    ink: "#efe8d4",
+    border: "rgba(201,168,76,0.22)",
+  } : {
+    bg: "#f5f3ef",
+    bgLight: "#ede9df",
+    gold: "#c9a84c",
+    goldLight: "#e8d08a",
+    goldPale: "#f7f0dc",
+    forest: "#082721",
+    ink: "#1a1510",
+    border: "rgba(8,39,33,0.08)",
+  };
+
   return (
-    <div className={`lg:hidden flex items-center justify-between p-4 
-      ${isDarkMode ? "bg-gray-800" : "bg-white"} shadow-md`}>
+    <div className="lg:hidden flex items-center justify-between p-4 shadow-md"
+      style={{ 
+        background: isDarkMode ? colors.bgLight : colors.bgLight,
+        borderBottom: `1px solid ${colors.border}`,
+      }}>
       <button 
         onClick={onMenuClick}
-        className={`p-2 rounded-lg ${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
+        className="p-2 rounded-lg transition-colors"
+        style={{ background: colors.goldPale }}
       >
-        <Menu size={24} className={isDarkMode ? "text-white" : "text-gray-800"} />
+        <Menu size={24} style={{ color: colors.forest }} />
       </button>
-      <h1 className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+      <h1 className="text-lg font-bold" style={{ color: colors.ink }}>
         {title || t.dashboard}
       </h1>
       <div className="w-10"></div>

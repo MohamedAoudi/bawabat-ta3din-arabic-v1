@@ -16,6 +16,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import UsersPage from "./pages/Users";
+import Settings from "./pages/Settings";
 
 export const LanguageContext = createContext();
 export const ThemeContext = createContext();
@@ -91,6 +92,7 @@ export default function App() {
             <Route path="/m7" element={<M7Page />} />
             <Route path="/m8" element={<M8Page />} />
             <Route path="/rapport" element={<Rapport />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </BrowserRouter>
       </LanguageProvider>
