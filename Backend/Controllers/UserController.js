@@ -221,6 +221,57 @@ const rejectUser = async (req, res) => {
   }
 };
 
+// Update user profile (own profile)
+const updateUserProfile = async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const currentUserId = req.user.id;
+    
+    // Users can only update their own profile (unless admin)
+    if (userId !== currentUserId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: "You can only update your own profile" });
+    }
+
+    const { nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr } = req.body;
+    
+    const updatedUser = await userModel.updateUser(userId, {
+      nom_ar,
+      nom_en,
+      nom_fr,
+      prenom_ar,
+      prenom_en,
+      prenom_fr,
+    });
+
+    const { password: _, ...userWithoutPassword } = updatedUser;
+    res.json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Upload user photo
+const uploadPhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const userId = req.user.id;
+    
+    // Get the file path
+    const photoUrl = `/uploads/${req.file.filename}`;
+    
+    // Update user photo in database
+    const updatedUser = await userModel.updateUser(userId, { photo: photoUrl });
+    
+    const { password: _, ...userWithoutPassword } = updatedUser;
+    res.json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   loginUser,
   getAllUsers,
@@ -232,4 +283,6 @@ module.exports = {
   googleLogin,
   acceptUser,
   rejectUser,
+  updateUserProfile,
+  uploadPhoto,
 };

@@ -1,9 +1,12 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
+
+// Importer l'URL du backend depuis .env
+const API_URL = import.meta.env.VITE_API_URL;
 import { useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, updateUser, refreshCurrentUser } from "../services/authService";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
-import { User, Mail, Lock, Save, Camera, ArrowRight } from "lucide-react";
+import { User, Mail, Lock, Save, Camera, ArrowRight, Upload, X } from "lucide-react";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const TRANSLATIONS = {
@@ -104,6 +107,9 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -181,6 +187,74 @@ export default function Settings() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setMessage({ type: "error", text: language === "ar" ? "الملف يجب أن يكون صورة" : language === "fr" ? "Le fichier doit être une image" : "File must be an image" });
+        return;
+      }
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        setMessage({ type: "error", text: language === "ar" ? "حجم الصورة يجب أن يكون أقل من 2 ميجابايت" : language === "fr" ? "La taille de l'image doit être inférieure à 2 Mo" : "Image size must be less than 2MB" });
+        return;
+      }
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleUploadImage = async () => {
+    if (!selectedImage) return;
+    
+    setUploading(true);
+    try {
+      // Convert base64 to blob
+      const response = await fetch(selectedImage);
+      const blob = await response.blob();
+      
+      // Create form data
+      const formData = new FormData();
+      formData.append('photo', blob, 'profile-photo.jpg');
+      formData.append('userId', user.id);
+      
+      // Upload to backend
+      const uploadResponse = await fetch('http://localhost:5000/api/users/upload-photo', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: formData,
+      });
+      
+      if (uploadResponse.ok) {
+        const data = await uploadResponse.json();
+        setUser(data);
+        localStorage.setItem("user", JSON.stringify(data));
+        setMessage({ type: "success", text: t.success });
+        setSelectedImage(null);
+      } else {
+        setMessage({ type: "error", text: t.error });
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      setMessage({ type: "error", text: t.error });
+    }
+    setUploading(false);
   };
 
   const handleSubmit = async (e) => {
@@ -272,27 +346,47 @@ export default function Settings() {
               {/* Profile Photo */}
               <div className="flex items-center gap-6 mb-8 pb-6" style={{ borderBottom: `1px solid ${colors.border}` }}>
                 <div className="relative">
-                  {user.photo ? (
-                    <img 
-                      src={user.photo} 
-                      alt="Profile" 
+                  {selectedImage || user.photo ? (
+                    <img
+                      src={
+                        selectedImage ||
+                        (user.photo
+                          ? user.photo.startsWith("http")
+                            ? user.photo
+                            : `${API_URL}${user.photo}`
+                          : undefined)
+                      }
+                      alt="Profile"
                       className="w-24 h-24 rounded-full object-cover border-4"
                       style={{ borderColor: colors.gold }}
                     />
                   ) : (
-                    <div className="w-24 h-24 rounded-full flex items-center justify-center border-4" 
+                    <div className="w-24 h-24 rounded-full flex items-center justify-center border-4"
                       style={{ borderColor: colors.gold, background: colors.goldPale }}>
                       <User className="w-12 h-12" style={{ color: colors.forest }} />
                     </div>
                   )}
                   {isEditing && (
-                    <button className="absolute bottom-0 right-0 p-2 rounded-full"
-                      style={{ background: colors.gold, color: colors.forest }}>
-                      <Camera size={16} />
-                    </button>
+                    <>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageSelect}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="absolute bottom-0 right-0 p-2 rounded-full transition-all duration-200 hover:scale-110"
+                        style={{ background: colors.gold, color: colors.forest }}
+                      >
+                        <Camera size={16} />
+                      </button>
+                    </>
                   )}
                 </div>
-                <div>
+                <div className="flex-1">
                   <h3 className="text-lg font-semibold" style={{ color: colors.ink }}>
                     {user.prenom_ar || user.prenom_en || user.prenom_fr || ""} {user.nom_ar || user.nom_en || user.nom_fr || ""}
                   </h3>
@@ -301,6 +395,40 @@ export default function Settings() {
                     style={{ background: colors.goldPale, color: colors.forest }}>
                     {t.roles[userRole] || userRole}
                   </span>
+                  
+                  {/* Image Upload Actions */}
+                  {selectedImage && (
+                    <div className="flex items-center gap-2 mt-4">
+                      <button
+                        type="button"
+                        onClick={handleUploadImage}
+                        disabled={uploading}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
+                        style={{ 
+                          background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`,
+                          color: colors.forest,
+                        }}
+                      >
+                        {uploading ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
+                        ) : (
+                          <Upload size={16} />
+                        )}
+                        {language === "ar" ? "رفع" : language === "fr" ? "Télécharger" : "Upload"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="p-2 rounded-lg transition-all duration-200 hover:scale-110"
+                        style={{ 
+                          background: 'rgba(220,38,38,0.1)',
+                          color: '#dc2626',
+                        }}
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 

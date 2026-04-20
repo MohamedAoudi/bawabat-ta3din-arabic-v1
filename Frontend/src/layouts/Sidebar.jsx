@@ -1,4 +1,7 @@
 import { useState, useContext, useEffect } from "react";
+
+// Importer l'URL du backend depuis .env
+const API_URL = import.meta.env.VITE_API_URL;
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, logout, isAdmin, refreshCurrentUser } from "../services/authService";
@@ -283,14 +286,18 @@ export default function Sidebar({ isOpen, onClose, children }) {
         <div className="p-4 mx-4 mt-4 rounded-xl" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div className="flex items-center gap-3">
             {user?.photo ? (
-              <img 
-                src={user.photo} 
-                alt="Profile" 
+              <img
+                src={
+                  user.photo.startsWith("http")
+                    ? user.photo
+                    : `${API_URL}${user.photo}`
+                }
+                alt="Profile"
                 className="w-12 h-12 rounded-full object-cover border-2"
                 style={{ borderColor: colors.gold }}
               />
             ) : (
-              <div className="w-12 h-12 rounded-full flex items-center justify-center border-2" 
+              <div className="w-12 h-12 rounded-full flex items-center justify-center border-2"
                 style={{ borderColor: colors.gold, background: colors.goldPale }}>
                 <User className="w-6 h-6" style={{ color: colors.forest }} />
               </div>

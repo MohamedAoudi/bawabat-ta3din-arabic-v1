@@ -1,4 +1,7 @@
 import { useState, useContext, useEffect } from "react";
+
+// Importer l'URL du backend depuis .env
+const API_URL = import.meta.env.VITE_API_URL;
 import { useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, isAdmin, refreshCurrentUser } from "../services/authService";
@@ -165,14 +168,18 @@ export default function Dashboard() {
           }}>
           <div className="flex items-center gap-4">
             {user.photo ? (
-              <img 
-                src={user.photo} 
-                alt="Profile" 
+              <img
+                src={
+                  user.photo.startsWith("http")
+                    ? user.photo
+                    : `${API_URL}${user.photo}`
+                }
+                alt="Profile"
                 className="w-16 h-16 rounded-full object-cover border-2"
                 style={{ borderColor: colors.gold }}
               />
             ) : (
-              <div className="w-16 h-16 rounded-full flex items-center justify-center border-2" 
+              <div className="w-16 h-16 rounded-full flex items-center justify-center border-2"
                 style={{ borderColor: colors.gold, background: colors.goldPale }}>
                 <User className="w-8 h-8" style={{ color: colors.forest }} />
               </div>
@@ -198,14 +205,18 @@ export default function Dashboard() {
             }}>
             <div className="flex items-center gap-4 mb-4">
               {user.photo ? (
-                <img 
-                  src={user.photo} 
-                  alt="Profile" 
+                <img
+                  src={
+                    user.photo.startsWith("http")
+                      ? user.photo
+                      : `${API_URL}${user.photo}`
+                  }
+                  alt="Profile"
                   className="w-16 h-16 rounded-full object-cover border-2"
                   style={{ borderColor: colors.gold }}
                 />
               ) : (
-                <div className="w-16 h-16 rounded-full flex items-center justify-center border-2" 
+                <div className="w-16 h-16 rounded-full flex items-center justify-center border-2"
                   style={{ borderColor: colors.gold, background: colors.goldPale }}>
                   <User className="w-8 h-8" style={{ color: colors.forest }} />
                 </div>
