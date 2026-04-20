@@ -1,7 +1,8 @@
 import axios from "axios";
 import { signInWithGoogle, logoutGoogle } from "./firebase";
 
-const API_URL = "http://localhost:5000/api/users";
+// Importer l'URL du backend depuis .env
+const API_URL = `${import.meta.env.VITE_API_URL}/api/users`;
 
 // Configure axios interceptor to add token to requests
 axios.interceptors.request.use(

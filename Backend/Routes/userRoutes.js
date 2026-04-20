@@ -44,7 +44,7 @@ router.post("/google-login", userController.googleLogin);
 router.get("/", authenticateToken, userController.getAllUsers);
 router.get("/me", authenticateToken, userController.getCurrentUser);
 router.get("/:id", authenticateToken, userController.getUserById);
-router.put("/:id", authenticateToken, userController.updateUserProfile);
+router.put("/:id", authenticateToken, userController.updateUser);
 router.post("/upload-photo", authenticateToken, upload.single("photo"), userController.uploadPhoto);
 
 // Protected routes - requires admin role

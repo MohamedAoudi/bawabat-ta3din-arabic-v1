@@ -51,23 +51,53 @@ const createUser = async (user) => {
 // Update user (trilingual)
 const updateUser = async (id, user) => {
   const { nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, password, role, photo, is_accepted } = user;
-  const query = `
-    UPDATE users 
-    SET nom_ar = COALESCE($1, nom_ar),
-        nom_en = COALESCE($2, nom_en),
-        nom_fr = COALESCE($3, nom_fr),
-        prenom_ar = COALESCE($4, prenom_ar),
-        prenom_en = COALESCE($5, prenom_en),
-        prenom_fr = COALESCE($6, prenom_fr),
-        email = COALESCE($7, email),
-        password = COALESCE($8, password),
-        role = COALESCE($9, role),
-        photo = COALESCE($10, photo),
-        is_accepted = COALESCE($11, is_accepted)
-    WHERE id = $12
-    RETURNING id, nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, role, photo, is_accepted, created_at
-  `;
-  const result = await pool.query(query, [nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, password, role, photo, is_accepted, id]);
+  
+  console.log("User model updateUser called:", { id, is_accepted, type: typeof is_accepted });
+  
+  // Build dynamic query - handle is_accepted separately to allow setting to false
+  let query;
+  let params;
+  
+  // Check if is_accepted is being updated (explicitly provided)
+  const hasIsAccepted = is_accepted !== undefined && is_accepted !== null;
+  
+  console.log("hasIsAccepted:", hasIsAccepted, "is_accepted value:", is_accepted);
+  
+  if (hasIsAccepted) {
+    // If is_accepted is explicitly provided, use it directly (not COALESCE)
+    // Only update is_accepted, keep other fields as they are
+    const boolValue = is_accepted === true || is_accepted === 'true' || is_accepted === 1 || is_accepted === '1';
+    query = `
+      UPDATE users 
+      SET is_accepted = $1
+      WHERE id = $2
+      RETURNING id, nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, role, photo, is_accepted, created_at
+    `;
+    params = [boolValue, id];
+ 
+  } else {
+    // Original behavior for other updates
+    query = `
+      UPDATE users 
+      SET nom_ar = COALESCE($1, nom_ar),
+          nom_en = COALESCE($2, nom_en),
+          nom_fr = COALESCE($3, nom_fr),
+          prenom_ar = COALESCE($4, prenom_ar),
+          prenom_en = COALESCE($5, prenom_en),
+          prenom_fr = COALESCE($6, prenom_fr),
+          email = COALESCE($7, email),
+          password = COALESCE($8, password),
+          role = COALESCE($9, role),
+          photo = COALESCE($10, photo),
+          is_accepted = COALESCE($11, is_accepted)
+      WHERE id = $12
+      RETURNING id, nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, role, photo, is_accepted, created_at
+    `;
+    params = [nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, password, role, photo, is_accepted, id];
+  }
+  
+  const result = await pool.query(query, params);
+  console.log("Query result:", result.rows[0]);
   return result.rows[0];
 };
 

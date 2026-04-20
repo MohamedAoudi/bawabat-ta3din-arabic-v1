@@ -5,6 +5,9 @@ import { getCurrentUser, isAdmin, refreshCurrentUser } from "../services/authSer
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { User, Shield, Users, Edit, Trash2, X, Check, Search, CheckCircle, XCircle, ToggleLeft, ToggleRight } from "lucide-react";
 
+// Importer l'URL du backend depuis .env
+const API_URL = import.meta.env.VITE_API_URL;
+
 // ─── Translations ─────────────────────────────────────────────────────────────
 const TRANSLATIONS = {
   ar: {
@@ -192,7 +195,7 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/users", {
+      const response = await fetch(`${API_URL}/api/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -213,7 +216,7 @@ export default function UsersPage() {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/users/${editingUser.id}`, {
+      const response = await fetch(`${API_URL}/api/users/${editingUser.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -243,7 +246,7 @@ export default function UsersPage() {
   const handleDelete = async (userId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+      const response = await fetch(`${API_URL}/api/users/${userId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -262,7 +265,7 @@ export default function UsersPage() {
   const handleAccept = async (userId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/accept`, {
+      const response = await fetch(`${API_URL}/api/users/${userId}/accept`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -281,7 +284,7 @@ export default function UsersPage() {
   const handleReject = async (userId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/reject`, {
+      const response = await fetch(`${API_URL}/api/users/${userId}/reject`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -300,21 +303,30 @@ export default function UsersPage() {
   const handleToggleActive = async (user) => {
     try {
       const token = localStorage.getItem("token");
-      const newIsAccepted = !user.is_accepted;
-      const response = await fetch(`http://localhost:5000/api/users/${user.id}`, {
+      // Toggle: if currently accepted, deactivate (false), otherwise activate (true)
+      const newIsAccepted = user.is_accepted === true ? false : true;
+      console.log("Toggling user:", user.id, "from", user.is_accepted, "to", newIsAccepted, "type:", typeof newIsAccepted);
+      
+      const response = await fetch(`${API_URL}/api/users/${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          is_accepted: newIsAccepted,
+          is_accepted: Boolean(newIsAccepted),
         }),
       });
 
+      const responseData = await response.json();
+      console.log("Response:", response.status, responseData);
+
       if (response.ok) {
+        console.log("Toggle successful, refreshing users...");
         fetchUsers();
         setShowActivateConfirm(null);
+      } else {
+        console.error("Toggle failed:", response.status, response.statusText, responseData);
       }
     } catch (error) {
       console.error("Error toggling user active status:", error);
@@ -428,7 +440,17 @@ export default function UsersPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           {user.photo ? (
-                            <img src={user.photo} alt="Profile" className="w-10 h-10 rounded-full object-cover" />
+                            <img 
+                              src={
+                                user.photo
+                                  ? user.photo.startsWith("http")
+                                    ? user.photo
+                                    : `${API_URL}${user.photo}`
+                                  : undefined
+                              } 
+                              alt="Profile" 
+                              className="w-10 h-10 rounded-full object-cover" 
+                            />
                           ) : (
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? "bg-blue-900" : "bg-blue-100"}`}>
                               <User className={`w-5 h-5 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
