@@ -248,7 +248,8 @@ export default function Sidebar({ isOpen, onClose, children }) {
         className={`fixed lg:static inset-y-0 ${isRTL ? "right-0 left-auto" : "left-0 right-auto"} z-50 
           transform ${isOpen ? "translate-x-0" : isRTL ? "translate-x-full" : "-translate-x-full"} 
           lg:translate-x-0 transition-transform duration-300 ease-in-out 
-          ${isDarkMode ? "bg-[#0c2620]" : "bg-white"} w-64 sm:w-72 min-h-screen shadow-2xl`}
+          ${isDarkMode ? "bg-[#0c2620]" : "bg-white"} w-64 sm:w-72 min-h-screen shadow-2xl
+          overflow-y-auto lg:overflow-visible`}
         style={{ 
           backgroundImage: isDarkMode 
             ? 'linear-gradient(180deg, #0c2620 0%, #071611 100%)' 
@@ -259,32 +260,32 @@ export default function Sidebar({ isOpen, onClose, children }) {
         <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${colors.gold} 0%, ${colors.goldLight} 50%, ${colors.gold} 100%)` }} />
 
         {/* Close button for mobile */}
-        <div className="lg:hidden flex items-center justify-between p-4" style={{ borderBottom: `1px solid ${colors.border}` }}>
-          <h2 className="text-lg font-bold" style={{ color: colors.ink }}>
+        <div className="lg:hidden flex items-center justify-between p-3 sm:p-4" style={{ borderBottom: `1px solid ${colors.border}` }}>
+          <h2 className="text-base sm:text-lg font-bold" style={{ color: colors.ink }}>
             {t.dashboard}
           </h2>
-          <button onClick={onClose} className="p-2 rounded-lg transition-colors" style={{ background: colors.goldPale }}>
-            <X size={20} style={{ color: colors.forest }} />
+          <button onClick={onClose} className="p-1.5 sm:p-2 rounded-lg transition-colors" style={{ background: colors.goldPale }}>
+            <X size={18} sm:size={20} style={{ color: colors.forest }} />
           </button>
         </div>
 
         {/* Logo/Brand Section */}
-        <div className="p-6 text-center" style={{ borderBottom: `1px solid ${colors.border}` }}>
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-3" 
+        <div className="p-4 sm:p-6 text-center" style={{ borderBottom: `1px solid ${colors.border}` }}>
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl mb-2 sm:mb-3" 
             style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)` }}>
-            <Gem size={32} style={{ color: colors.forest }} />
+            <Gem size={24} sm:size={32} style={{ color: colors.forest }} />
           </div>
-          <h1 className="text-xl font-bold" style={{ color: colors.gold }}>
+          <h1 className="text-lg sm:text-xl font-bold" style={{ color: colors.gold }}>
             {t.dashboard}
           </h1>
-          <p className="text-xs mt-1" style={{ color: colors.muted }}>
+          <p className="text-xs mt-0.5 sm:mt-1 hidden sm:block" style={{ color: colors.muted }}>
             {t.indicators}
           </p>
         </div>
 
         {/* User Info Section */}
-        <div className="p-4 mx-4 mt-4 rounded-xl" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
-          <div className="flex items-center gap-3">
+        <div className="p-3 sm:p-4 mx-3 sm:mx-4 mt-3 sm:mt-4 rounded-lg sm:rounded-xl" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
+          <div className="flex items-center gap-2 sm:gap-3">
             {user?.photo ? (
               <img
                 src={
@@ -293,23 +294,23 @@ export default function Sidebar({ isOpen, onClose, children }) {
                     : `${API_URL}${user.photo}`
                 }
                 alt="Profile"
-                className="w-12 h-12 rounded-full object-cover border-2"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2"
                 style={{ borderColor: colors.gold }}
               />
             ) : (
-              <div className="w-12 h-12 rounded-full flex items-center justify-center border-2"
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2"
                 style={{ borderColor: colors.gold, background: colors.goldPale }}>
-                <User className="w-6 h-6" style={{ color: colors.forest }} />
+                <User className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: colors.forest }} />
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold truncate" style={{ color: colors.ink }}>
+              <h3 className="text-xs sm:text-sm font-semibold truncate" style={{ color: colors.ink }}>
                 {getUserName()}
               </h3>
-              <p className="text-xs truncate" style={{ color: colors.muted }}>
+              <p className="text-xs truncate hidden sm:block" style={{ color: colors.muted }}>
                 {user?.email}
               </p>
-              <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium
+              <span className={`inline-block mt-0.5 sm:mt-1 px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-medium
                 ${isUserAdmin 
                   ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300" 
                   : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
@@ -321,7 +322,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
         </div>
 
         {/* Navigation Menu */}
-        <nav className="p-4 space-y-2">
+        <nav className="p-2 sm:p-4 space-y-1 sm:space-y-2">
           {MENU_ITEMS.map((item) => {
             const Icon = item.icon;
             const isExpanded = expandedMenus[item.key];
@@ -337,7 +338,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
                   <>
                     <button
                       onClick={() => toggleMenu(item.key)}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+                      className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200"
                       style={{ 
                         background: isItemActive || isExpanded 
                           ? `linear-gradient(135deg, ${colors.goldPale} 0%, ${isDarkMode ? 'rgba(201,168,76,0.15)' : 'rgba(201,168,76,0.25)'} 100%)`
@@ -346,8 +347,8 @@ export default function Sidebar({ isOpen, onClose, children }) {
                         border: `1px solid ${isItemActive || isExpanded ? colors.gold : 'transparent'}`,
                       }}
                     >
-                      <Icon size={20} style={{ color: isItemActive || isExpanded ? colors.gold : colors.muted }} />
-                      <span className="flex-1 text-start text-sm font-medium">{t[item.labelKey]}</span>
+                      <Icon size={18} sm:size={20} style={{ color: isItemActive || isExpanded ? colors.gold : colors.muted }} />
+                      <span className="flex-1 text-start text-xs sm:text-sm font-medium">{t[item.labelKey]}</span>
                       {hasChildren && (
                         <svg 
                           className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
@@ -361,12 +362,12 @@ export default function Sidebar({ isOpen, onClose, children }) {
                     
                     {/* Submenu */}
                     {isExpanded && (
-                      <div className="mt-1 ml-4 space-y-1 pl-2" style={{ borderLeft: `2px solid ${colors.gold}40` }}>
+                      <div className="mt-1 ml-3 sm:ml-4 space-y-1 pl-2" style={{ borderLeft: `2px solid ${colors.gold}40` }}>
                         {item.children.map((child) => (
                           <Link
                             key={child.key}
                             to={child.href}
-                            className="block px-4 py-2 rounded-lg text-sm transition-all duration-200"
+                            className="block px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm transition-all duration-200"
                             style={{ 
                               background: location.pathname === child.href ? colors.goldPale : 'transparent',
                               color: location.pathname === child.href ? colors.forest : colors.muted,
@@ -382,15 +383,15 @@ export default function Sidebar({ isOpen, onClose, children }) {
                   // Simple menu item
                   <Link
                     to={item.href}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+                    className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200"
                     style={{ 
                       background: isItemActive ? colors.goldPale : 'transparent',
                       color: isItemActive ? colors.forest : colors.ink,
                       border: `1px solid ${isItemActive ? colors.gold : 'transparent'}`,
                     }}
                   >
-                    <Icon size={20} style={{ color: isItemActive ? colors.gold : colors.muted }} />
-                    <span className="text-sm font-medium">{t[item.labelKey]}</span>
+                    <Icon size={18} sm:size={20} style={{ color: isItemActive ? colors.gold : colors.muted }} />
+                    <span className="text-xs sm:text-sm font-medium">{t[item.labelKey]}</span>
                   </Link>
                 )}
               </div>
@@ -399,8 +400,8 @@ export default function Sidebar({ isOpen, onClose, children }) {
 
           {/* Admin Section */}
           {isUserAdmin && (
-            <div className="pt-4 mt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
-              <p className="px-4 text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: colors.gold }}>
+            <div className="pt-3 sm:pt-4 mt-3 sm:mt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
+              <p className="px-3 sm:px-4 text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2" style={{ color: colors.gold }}>
                 {t.adminPanel}
               </p>
               {ADMIN_MENU_ITEMS.map((item) => {
@@ -409,15 +410,15 @@ export default function Sidebar({ isOpen, onClose, children }) {
                   <button
                     key={item.key}
                     onClick={() => navigate("/users")}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+                    className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
                     style={{ 
                       background: colors.cardBg,
                       color: colors.ink,
                       border: `1px solid ${colors.border}`,
                     }}
                   >
-                    <Icon size={20} style={{ color: colors.gold }} />
-                    <span className="text-sm font-medium">{t[item.labelKey]}</span>
+                    <Icon size={18} sm:size={20} style={{ color: colors.gold }} />
+                    <span className="text-xs sm:text-sm font-medium">{t[item.labelKey]}</span>
                   </button>
                 );
               })}
@@ -427,26 +428,26 @@ export default function Sidebar({ isOpen, onClose, children }) {
           {/* Settings */}
           <Link
             to="/settings"
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+            className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200"
             style={{ 
               color: colors.muted,
             }}
           >
-            <Settings size={20} />
-            <span className="text-sm font-medium">{t.settings}</span>
+            <Settings size={18} sm:size={20} />
+            <span className="text-xs sm:text-sm font-medium">{t.settings}</span>
           </Link>
 
           {/* Language Selector */}
-          <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
-            <div className="px-4">
-              <div className="flex items-center gap-2 mb-2" style={{ color: colors.muted }}> 
-                <Globe size={16} />
+          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
+            <div className="px-2 sm:px-4">
+              <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2" style={{ color: colors.muted }}> 
+                <Globe size={14} sm:size={16} />
                 <span className="text-xs font-medium">{t.language || "Langue"}</span>
               </div>
-              <div className="flex gap-2 mb-3">
+              <div className="flex gap-1 sm:gap-2 mb-2 sm:mb-3">
                 <button
                   onClick={() => changeLanguage("ar")}
-                  className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105"
+                  className="flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 hover:scale-105"
                   style={{ 
                     background: language === "ar" 
                       ? `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`
@@ -459,7 +460,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
                 </button>
                 <button
                   onClick={() => changeLanguage("fr")}
-                  className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105"
+                  className="flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 hover:scale-105"
                   style={{ 
                     background: language === "fr" 
                       ? `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`
@@ -472,7 +473,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
                 </button>
                 <button
                   onClick={() => changeLanguage("en")}
-                  className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105"
+                  className="flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 hover:scale-105"
                   style={{ 
                     background: language === "en" 
                       ? `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`
@@ -485,10 +486,10 @@ export default function Sidebar({ isOpen, onClose, children }) {
                 </button>
               </div>
               {/* Dark/Light Mode Toggle */}
-              <div className="flex gap-2">
+              <div className="flex gap-1 sm:gap-2">
                 <button
                   onClick={() => { if (isDarkMode) toggleTheme(); }}
-                  className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105"
+                  className="flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 hover:scale-105"
                   style={{ 
                     background: !isDarkMode 
                       ? `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`
@@ -501,7 +502,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
                 </button>
                 <button
                   onClick={() => { if (!isDarkMode) toggleTheme(); }}
-                  className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105"
+                  className="flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 hover:scale-105"
                   style={{ 
                     background: isDarkMode 
                       ? `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`
@@ -518,18 +519,18 @@ export default function Sidebar({ isOpen, onClose, children }) {
         </nav>
 
         {/* Logout Button */}
-        <div className="absolute bottom-0 left-0 right-0 p-4" style={{ borderTop: `1px solid ${colors.border}` }}>
+        <div className="p-2 sm:p-4 mt-2 sm:mt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+            className="w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
             style={{ 
               background: isDarkMode ? 'rgba(220,38,38,0.15)' : 'rgba(220,38,38,0.08)',
               color: isDarkMode ? '#fca5a5' : '#dc2626',
               border: `1px solid ${isDarkMode ? 'rgba(220,38,38,0.3)' : 'rgba(220,38,38,0.2)'}`,
             }}
           >
-            <LogOut size={20} />
-            <span className="text-sm font-medium">{t.logout}</span>
+            <LogOut size={18} sm:size={20} />
+            <span className="text-xs sm:text-sm font-medium">{t.logout}</span>
           </button>
         </div>
       </div>
@@ -577,22 +578,22 @@ export function MobileHeader({ onMenuClick, title }) {
   };
 
   return (
-    <div className="lg:hidden flex items-center justify-between p-4 shadow-md"
+    <div className="lg:hidden flex items-center justify-between p-3 sm:p-4 shadow-md"
       style={{ 
         background: isDarkMode ? colors.bgLight : colors.bgLight,
         borderBottom: `1px solid ${colors.border}`,
       }}>
       <button 
         onClick={onMenuClick}
-        className="p-2 rounded-lg transition-colors"
+        className="p-1.5 sm:p-2 rounded-lg transition-colors"
         style={{ background: colors.goldPale }}
       >
-        <Menu size={24} style={{ color: colors.forest }} />
+        <Menu size={20} sm:size={24} style={{ color: colors.forest }} />
       </button>
-      <h1 className="text-lg font-bold" style={{ color: colors.ink }}>
+      <h1 className="text-base sm:text-lg font-bold" style={{ color: colors.ink }}>
         {title || t.dashboard}
       </h1>
-      <div className="w-10"></div>
+      <div className="w-8 sm:w-10"></div>
     </div>
   );
 }
