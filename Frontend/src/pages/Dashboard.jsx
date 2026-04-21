@@ -23,10 +23,26 @@ export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
+  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [chartKey, setChartKey] = useState(0);
   const barChartInstance = useRef(null);
   const pieChartInstance = useRef(null);
   const lineChartInstance = useRef(null);
   const t = TRANSLATIONS[language] || TRANSLATIONS.ar;
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Update chartKey when window size changes to re-render charts
+  useEffect(() => {
+    setChartKey(prev => prev + 1);
+  }, [windowSize.width]);
 
   const colors = isDarkMode ? { bg: "#071611", bgLight: "#0c2620", forest: "#efe8d4", forestMid: "#7a9a8c", gold: "#d3b468", goldLight: "#efdba2", goldPale: "#1a332d", ink: "#efe8d4", muted: "#b8b09d", border: "rgba(201,168,76,0.22)", accent: "#7ee0c0", cardBg: "#0d2b24" } : { bg: "#f5f3ef", bgLight: "#ede9df", forest: "#082721", forestMid: "#3d6b5c", gold: "#c9a84c", goldLight: "#e8d08a", goldPale: "#f7f0dc", ink: "#1a1510", muted: "#7a7060", border: "rgba(8,39,33,0.08)", accent: "#0d3d34", cardBg: "#ffffff" };
 
@@ -69,14 +85,72 @@ export default function Dashboard() {
       
       const textColor = isDarkMode ? "#efe8d4" : "#1a1510";
       const gridColor = isDarkMode ? "rgba(201,168,76,0.15)" : "rgba(8,39,33,0.08)";
+      const isMobile = windowSize.width < 640;
       
-      barChartInstance.current = new Chart(barCanvas, { type: "bar", data: { labels: stats.topProducts.map(p => p.name), datasets: [{ label: t.totalValue, data: stats.topProducts.map(p => p.value), backgroundColor: [colors.gold, colors.goldLight, colors.accent, colors.forestMid, colors.muted], borderColor: colors.gold, borderWidth: 1, borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `$${c.raw.toLocaleString()}` } } }, scales: { x: { ticks: { color: textColor }, grid: { color: gridColor } }, y: { ticks: { color: textColor, callback: (v) => `$${(v / 1000000).toFixed(1)}M` }, grid: { color: gridColor } } } } });
-      pieChartInstance.current = new Chart(pieCanvas, { type: "doughnut", data: { labels: [t.exports, t.imports], datasets: [{ data: [stats.flowData.exports, stats.flowData.imports], backgroundColor: [colors.gold, colors.accent], borderColor: isDarkMode ? "#0c2620" : "#ffffff", borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { color: textColor } }, tooltip: { callbacks: { label: (c) => `$${c.raw.toLocaleString()}` } } } } });
-      lineChartInstance.current = new Chart(lineCanvas, { type: "line", data: { labels: stats.yearlyData.map(d => d.year), datasets: [{ label: t.exports, data: stats.yearlyData.map(d => d.exports), borderColor: colors.gold, backgroundColor: `${colors.gold}30`, fill: true, tension: 0.4 }, { label: t.imports, data: stats.yearlyData.map(d => d.imports), borderColor: colors.accent, backgroundColor: `${colors.accent}30`, fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { color: textColor } }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: $${c.raw.toLocaleString()}` } } }, scales: { x: { ticks: { color: textColor }, grid: { color: gridColor } }, y: { ticks: { color: textColor, callback: (v) => `$${(v / 1000000).toFixed(1)}M` }, grid: { color: gridColor } } } } });
+      // Chart options with responsive settings for mobile
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { 
+            enabled: true,
+            callbacks: { label: (c) => `$${c.raw.toLocaleString()}` }
+          }
+        },
+        scales: {
+          x: { 
+            ticks: { color: textColor, font: { size: isMobile ? 10 : 12 } }, 
+            grid: { color: gridColor } 
+          },
+          y: { 
+            ticks: { color: textColor, callback: (v) => `$${(v / 1000000).toFixed(1)}M`, font: { size: isMobile ? 10 : 12 } }, 
+            grid: { color: gridColor } 
+          }
+        }
+      };
+      
+      const pieOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { 
+            position: isMobile ? 'right' : 'bottom', 
+            labels: { color: textColor, font: { size: isMobile ? 10 : 12 }, boxWidth: isMobile ? 12 : 20 } 
+          },
+          tooltip: { callbacks: { label: (c) => `$${c.raw.toLocaleString()}` } }
+        }
+      };
+      
+      const lineOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { 
+            position: isMobile ? 'top' : 'bottom', 
+            labels: { color: textColor, font: { size: isMobile ? 10 : 12 }, boxWidth: isMobile ? 12 : 20 } 
+          },
+          tooltip: { callbacks: { label: (c) => `${c.dataset.label}: $${c.raw.toLocaleString()}` } }
+        },
+        scales: {
+          x: { 
+            ticks: { color: textColor, font: { size: isMobile ? 10 : 12 } }, 
+            grid: { color: gridColor } 
+          },
+          y: { 
+            ticks: { color: textColor, callback: (v) => `$${(v / 1000000).toFixed(1)}M`, font: { size: isMobile ? 10 : 12 } }, 
+            grid: { color: gridColor } 
+          }
+        }
+      };
+      
+      barChartInstance.current = new Chart(barCanvas, { type: "bar", data: { labels: stats.topProducts.map(p => p.name), datasets: [{ label: t.totalValue, data: stats.topProducts.map(p => p.value), backgroundColor: [colors.gold, colors.goldLight, colors.accent, colors.forestMid, colors.muted], borderColor: colors.gold, borderWidth: 1, borderRadius: 8 }] }, options: chartOptions });
+      pieChartInstance.current = new Chart(pieCanvas, { type: "doughnut", data: { labels: [t.exports, t.imports], datasets: [{ data: [stats.flowData.exports, stats.flowData.imports], backgroundColor: [colors.gold, colors.accent], borderColor: isDarkMode ? "#0c2620" : "#ffffff", borderWidth: 2 }] }, options: pieOptions });
+      lineChartInstance.current = new Chart(lineCanvas, { type: "line", data: { labels: stats.yearlyData.map(d => d.year), datasets: [{ label: t.exports, data: stats.yearlyData.map(d => d.exports), borderColor: colors.gold, backgroundColor: `${colors.gold}30`, fill: true, tension: 0.4 }, { label: t.imports, data: stats.yearlyData.map(d => d.imports), borderColor: colors.accent, backgroundColor: `${colors.accent}30`, fill: true, tension: 0.4 }] }, options: lineOptions });
     };
     
     createCharts();
-  }, [stats, isDarkMode, language, t]);
+  }, [stats, isDarkMode, language, t, windowSize]);
 
   // Cleanup charts on unmount
   useEffect(() => {
@@ -101,18 +175,18 @@ export default function Dashboard() {
               <div className="text-center sm:text-start"><h1 className="text-xl sm:text-2xl font-bold" style={{ color: colors.ink }}>{t.welcome}, {user.prenom_ar || user.prenom_en || user.prenom_fr || user.nom_ar || user.nom_en || user.nom_fr || "User"}!</h1><p className="mt-1 text-sm" style={{ color: colors.muted }}>{language === "ar" ? "هذه هي لوحة التحكم الخاصة بك" : language === "fr" ? "Ceci est votre tableau de bord" : "This is your dashboard"}</p></div>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <div className="rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mb-3 sm:mb-4" style={{ background: colors.goldPale }}><TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: colors.gold }} /></div><p className="text-xs sm:text-sm" style={{ color: colors.muted }}>{t.totalExports}</p><h3 className="text-lg sm:text-xl font-bold" style={{ color: colors.ink }}>{stats ? formatCurrency(stats.totalExports) : "$0"}</h3></div>
-            <div className="rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mb-3 sm:mb-4" style={{ background: isDarkMode ? "rgba(126,224,192,0.15)" : "rgba(8,39,33,0.08)" }}><TrendingDown className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: colors.accent }} /></div><p className="text-xs sm:text-sm" style={{ color: colors.muted }}>{t.totalImports}</p><h3 className="text-lg sm:text-xl font-bold" style={{ color: colors.ink }}>{stats ? formatCurrency(stats.totalImports) : "$0"}</h3></div>
-            <div className="rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mb-3 sm:mb-4" style={{ background: `linear-gradient(135deg, ${colors.gold}20, ${colors.goldLight}20)` }}><DollarSign className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: colors.gold }} /></div><p className="text-xs sm:text-sm" style={{ color: colors.muted }}>{t.totalValue}</p><h3 className="text-lg sm:text-xl font-bold" style={{ color: colors.ink }}>{stats ? formatCurrency(stats.totalValue) : "$0"}</h3></div>
-            {isUserAdmin && <div className="rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]" style={{ background: `linear-gradient(135deg, ${colors.goldPale} 0%, ${colors.cardBg} 100%)`, border: `2px solid ${colors.gold}` }}><div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mb-3 sm:mb-4" style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)` }}><Users className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: colors.forest }} /></div><p className="text-xs sm:text-sm" style={{ color: colors.muted }}>{t.adminPanel}</p><h3 className="text-lg sm:text-xl font-bold" style={{ color: colors.ink }}>{language === "ar" ? "وصول كامل" : language === "fr" ? "Accès complet" : "Full Access"}</h3></div>}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-6 mb-4 sm:mb-8">
+            <div className="rounded-xl sm:rounded-2xl p-2 sm:p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] touch-manipulation" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="w-6 h-6 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mb-1 sm:mb-4" style={{ background: colors.goldPale }}><TrendingUp className="w-3 h-3 sm:w-6 sm:h-6" style={{ color: colors.gold }} /></div><p className="text-[10px] sm:text-sm" style={{ color: colors.muted }}>{t.totalExports}</p><h3 className="text-xs sm:text-xl font-bold" style={{ color: colors.ink }}>{stats ? formatCurrency(stats.totalExports) : "$0"}</h3></div>
+            <div className="rounded-xl sm:rounded-2xl p-2 sm:p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] touch-manipulation" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="w-6 h-6 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mb-1 sm:mb-4" style={{ background: isDarkMode ? "rgba(126,224,192,0.15)" : "rgba(8,39,33,0.08)" }}><TrendingDown className="w-3 h-3 sm:w-6 sm:h-6" style={{ color: colors.accent }} /></div><p className="text-[10px] sm:text-sm" style={{ color: colors.muted }}>{t.totalImports}</p><h3 className="text-xs sm:text-xl font-bold" style={{ color: colors.ink }}>{stats ? formatCurrency(stats.totalImports) : "$0"}</h3></div>
+            <div className="rounded-xl sm:rounded-2xl p-2 sm:p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] touch-manipulation" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="w-6 h-6 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mb-1 sm:mb-4" style={{ background: `linear-gradient(135deg, ${colors.gold}20, ${colors.goldLight}20)` }}><DollarSign className="w-3 h-3 sm:w-6 sm:h-6" style={{ color: colors.gold }} /></div><p className="text-[10px] sm:text-sm" style={{ color: colors.muted }}>{t.totalValue}</p><h3 className="text-xs sm:text-xl font-bold" style={{ color: colors.ink }}>{stats ? formatCurrency(stats.totalValue) : "$0"}</h3></div>
+            {isUserAdmin && <div className="rounded-xl sm:rounded-2xl p-2 sm:p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] touch-manipulation" style={{ background: `linear-gradient(135deg, ${colors.goldPale} 0%, ${colors.cardBg} 100%)`, border: `2px solid ${colors.gold}` }}><div className="w-6 h-6 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mb-1 sm:mb-4" style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)` }}><Users className="w-3 h-3 sm:w-6 sm:h-6" style={{ color: colors.forest }} /></div><p className="text-[10px] sm:text-sm" style={{ color: colors.muted }}>{t.adminPanel}</p><h3 className="text-xs sm:text-xl font-bold" style={{ color: colors.ink }}>{language === "ar" ? "وصول كامل" : language === "fr" ? "Accès complet" : "Full Access"}}</h3></div>}
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <div className="rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="flex items-center gap-2 mb-4"><BarChart3 className="w-5 h-5" style={{ color: colors.gold }} /><h3 className="text-base sm:text-lg font-semibold" style={{ color: colors.ink }}>{t.topProducts}</h3></div><div className="h-64"><canvas id="bar-chart"></canvas></div></div>
-            <div className="rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="flex items-center gap-2 mb-4"><PieChart className="w-5 h-5" style={{ color: colors.gold }} /><h3 className="text-base sm:text-lg font-semibold" style={{ color: colors.ink }}>{t.byFlowType}</h3></div><div className="h-64"><canvas id="pie-chart"></canvas></div></div>
+          <div className="grid grid-cols-1 gap-3 sm:gap-6 mb-4 sm:mb-8">
+            <div className="rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-lg" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="flex items-center gap-2 mb-3 sm:mb-4"><BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: colors.gold }} /><h3 className="text-sm sm:text-lg font-semibold" style={{ color: colors.ink }}>{t.topProducts}</h3></div><div className="h-48 sm:h-64"><canvas id="bar-chart" key={`bar-${chartKey}`}></canvas></div></div>
+            <div className="rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-lg" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="flex items-center gap-2 mb-3 sm:mb-4"><PieChart className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: colors.gold }} /><h3 className="text-sm sm:text-lg font-semibold" style={{ color: colors.ink }}>{t.byFlowType}</h3></div><div className="h-48 sm:h-64"><canvas id="pie-chart" key={`pie-${chartKey}`}></canvas></div></div>
           </div>
-          <div className="rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg mb-6 sm:mb-8" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="flex items-center gap-2 mb-4"><Activity className="w-5 h-5" style={{ color: colors.gold }} /><h3 className="text-base sm:text-lg font-semibold" style={{ color: colors.ink }}>{t.yearlyTrend}</h3></div><div className="h-64"><canvas id="line-chart"></canvas></div></div>
-          <div className="rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: colors.ink }}>{t.quickActions}</h3><div className="flex flex-wrap gap-2 sm:gap-3"><button onClick={() => navigate("/")} className="px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 text-xs sm:text-sm" style={{ background: colors.goldPale, color: colors.forest, border: `1px solid ${colors.border}` }}>{t.home}</button><button onClick={() => navigate("/rapport")} className="px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 text-xs sm:text-sm" style={{ background: isDarkMode ? "rgba(126,224,192,0.15)" : "rgba(8,39,33,0.08)", color: colors.forest, border: `1px solid ${colors.border}` }}>{t.reports}</button><button onClick={() => navigate("/m1")} className="px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 text-xs sm:text-sm" style={{ background: isDarkMode ? "rgba(126,224,192,0.15)" : "rgba(8,39,33,0.08)", color: colors.forest, border: `1px solid ${colors.border}` }}>{language === "ar" ? "الإنتاج التعديني" : language === "fr" ? "Production minière" : "Mining Production"}</button>{isUserAdmin && <button onClick={() => navigate("/users")} className="px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 text-xs sm:text-sm" style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`, color: colors.forest, border: `1px solid ${colors.gold}` }}>{t.users}</button>}</div></div>
+          <div className="rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-lg mb-4 sm:mb-8" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><div className="flex items-center gap-2 mb-3 sm:mb-4"><Activity className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: colors.gold }} /><h3 className="text-sm sm:text-lg font-semibold" style={{ color: colors.ink }}>{t.yearlyTrend}</h3></div><div className="h-48 sm:h-64"><canvas id="line-chart" key={`line-${chartKey}`}></canvas></div></div>
+          <div className="rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-lg" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}><h3 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-4" style={{ color: colors.ink }}>{t.quickActions}</h3><div className="flex flex-wrap gap-2"><button onClick={() => navigate("/")} className="px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 text-xs sm:text-sm touch-manipulation" style={{ background: colors.goldPale, color: colors.forest, border: `1px solid ${colors.border}` }}>{t.home}</button><button onClick={() => navigate("/rapport")} className="px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 text-xs sm:text-sm touch-manipulation" style={{ background: isDarkMode ? "rgba(126,224,192,0.15)" : "rgba(8,39,33,0.08)", color: colors.forest, border: `1px solid ${colors.border}` }}>{t.reports}</button><button onClick={() => navigate("/m1")} className="px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 text-xs sm:text-sm touch-manipulation" style={{ background: isDarkMode ? "rgba(126,224,192,0.15)" : "rgba(8,39,33,0.08)", color: colors.forest, border: `1px solid ${colors.border}` }}>{language === "ar" ? "الإنتاج التعديني" : language === "fr" ? "Production minière" : "Mining Production"}</button>{isUserAdmin && <button onClick={() => navigate("/users")} className="px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 text-xs sm:text-sm touch-manipulation" style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`, color: colors.forest, border: `1px solid ${colors.gold}` }}>{t.users}</button>}</div></div>
         </div>
       </>
     </Sidebar>

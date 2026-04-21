@@ -285,9 +285,12 @@ export default function Sidebar({ isOpen, onClose, children }) {
 
         {/* Logo/Brand Section - Clickable to Dashboard */}
         <Link to="/dashboard" className="block p-4 sm:p-6 text-center" style={{ borderBottom: `1px solid ${colors.border}` }}>
-          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl mb-2 sm:mb-3" 
-            style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)` }}>
-            <Gem size={24} sm:size={32} style={{ color: colors.forest }} />
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl mb-2 sm:mb-3 overflow-hidden">
+            <img 
+              src="/src/assets/LOGO_ARAB MINING grand.svg" 
+              alt="Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <h1 className="text-lg sm:text-xl font-bold" style={{ color: colors.gold }}>
             {t.dashboard}
