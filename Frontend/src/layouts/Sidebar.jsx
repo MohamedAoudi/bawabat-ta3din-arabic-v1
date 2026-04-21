@@ -248,7 +248,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
         className={`fixed lg:static inset-y-0 ${isRTL ? "right-0 left-auto" : "left-0 right-auto"} z-50 
           transform ${isOpen ? "translate-x-0" : isRTL ? "translate-x-full" : "-translate-x-full"} 
           lg:translate-x-0 transition-transform duration-300 ease-in-out 
-          ${isDarkMode ? "bg-[#0c2620]" : "bg-white"} w-72 min-h-screen shadow-2xl`}
+          ${isDarkMode ? "bg-[#0c2620]" : "bg-white"} w-64 sm:w-72 min-h-screen shadow-2xl`}
         style={{ 
           backgroundImage: isDarkMode 
             ? 'linear-gradient(180deg, #0c2620 0%, #071611 100%)' 
