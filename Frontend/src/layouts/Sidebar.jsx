@@ -14,6 +14,7 @@ import {
 const TRANSLATIONS = {
   ar: {
     dashboard: "لوحة التحكم",
+    home: "الرئيسية",
     welcome: "مرحباً",
     profile: "الملف الشخصي",
     settings: "الإعدادات",
@@ -26,7 +27,6 @@ const TRANSLATIONS = {
     role: "الدور",
     email: "البريد الإلكتروني",
     createdAt: "تاريخ الإنشاء",
-    home: "الرئيسية",
     indicators: "المؤشرات التعدينية",
     miningProduction: "الإنتاج التعديني",
     miningTrade: "التجارة التعدينية",
@@ -46,6 +46,7 @@ const TRANSLATIONS = {
   },
   fr: {
     dashboard: "Tableau de bord",
+    home: "Accueil",
     welcome: "Bienvenue",
     profile: "Profil",
     settings: "Paramètres",
@@ -58,7 +59,6 @@ const TRANSLATIONS = {
     role: "Rôle",
     email: "E-mail",
     createdAt: "Date de création",
-    home: "Accueil",
     indicators: "Indicateurs Miniers",
     miningProduction: "Production Minière",
     miningTrade: "Commerce Minier",
@@ -78,6 +78,7 @@ const TRANSLATIONS = {
   },
   en: {
     dashboard: "Dashboard",
+    home: "Home",
     welcome: "Welcome",
     profile: "Profile",
     settings: "Settings",
@@ -90,7 +91,6 @@ const TRANSLATIONS = {
     role: "Role",
     email: "Email",
     createdAt: "Created at",
-    home: "Home",
     indicators: "Mining Indicators",
     miningProduction: "Mining Production",
     miningTrade: "Mining Trade",
@@ -112,6 +112,7 @@ const TRANSLATIONS = {
 
 // ─── Menu Items Configuration ───────────────────────────────────────────────
 const MENU_ITEMS = [
+ 
   {
     key: "home",
     icon: Home,
@@ -152,10 +153,23 @@ const MENU_ITEMS = [
 ];
 
 const ADMIN_MENU_ITEMS = [
+   {
+    key: "dashboard",
+    icon: BarChart3,
+    href: "/dashboard",
+    labelKey: "dashboard",
+  },
   {
     key: "users",
     icon: Users,
+    href: "/users",
     labelKey: "users",
+  },
+  {
+    key: "settings",
+    icon: Settings,
+    href: "/settings",
+    labelKey: "settings",
   },
 ];
 
@@ -269,8 +283,8 @@ export default function Sidebar({ isOpen, onClose, children }) {
           </button>
         </div>
 
-        {/* Logo/Brand Section */}
-        <div className="p-4 sm:p-6 text-center" style={{ borderBottom: `1px solid ${colors.border}` }}>
+        {/* Logo/Brand Section - Clickable to Dashboard */}
+        <Link to="/dashboard" className="block p-4 sm:p-6 text-center" style={{ borderBottom: `1px solid ${colors.border}` }}>
           <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl mb-2 sm:mb-3" 
             style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)` }}>
             <Gem size={24} sm:size={32} style={{ color: colors.forest }} />
@@ -281,7 +295,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
           <p className="text-xs mt-0.5 sm:mt-1 hidden sm:block" style={{ color: colors.muted }}>
             {t.indicators}
           </p>
-        </div>
+        </Link>
 
         {/* User Info Section */}
         <div className="p-3 sm:p-4 mx-3 sm:mx-4 mt-3 sm:mt-4 rounded-lg sm:rounded-xl" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
@@ -407,9 +421,9 @@ export default function Sidebar({ isOpen, onClose, children }) {
               {ADMIN_MENU_ITEMS.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <button
+                  <Link
                     key={item.key}
-                    onClick={() => navigate("/users")}
+                    to={item.href}
                     className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
                     style={{ 
                       background: colors.cardBg,
@@ -419,23 +433,11 @@ export default function Sidebar({ isOpen, onClose, children }) {
                   >
                     <Icon size={18} sm:size={20} style={{ color: colors.gold }} />
                     <span className="text-xs sm:text-sm font-medium">{t[item.labelKey]}</span>
-                  </button>
+                  </Link>
                 );
               })}
             </div>
           )}
-
-          {/* Settings */}
-          <Link
-            to="/settings"
-            className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200"
-            style={{ 
-              color: colors.muted,
-            }}
-          >
-            <Settings size={18} sm:size={20} />
-            <span className="text-xs sm:text-sm font-medium">{t.settings}</span>
-          </Link>
 
           {/* Language Selector */}
           <div className="mt-3 sm:mt-4 pt-3 sm:pt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
