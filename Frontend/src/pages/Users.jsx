@@ -155,6 +155,41 @@ export default function UsersPage() {
   const { language } = useContext(LanguageContext);
   const { isDarkMode } = useContext(ThemeContext);
 
+  // Color palette matching Dashboard
+  const colors = isDarkMode ? {
+    bg: "#071611",
+    bgLight: "#0c2620",
+    bgLighter: "#0a221c",
+    forest: "#efe8d4",
+    forestMid: "#d1c7ad",
+    gold: "#d3b468",
+    goldLight: "#efdba2",
+    goldPale: "#1a332d",
+    cream: "#071611",
+    parchment: "#0c2620",
+    ink: "#efe8d4",
+    muted: "#b8b09d",
+    border: "rgba(201,168,76,0.22)",
+    accent: "#7ee0c0",
+    cardBg: "#0d2b24",
+  } : {
+    bg: "#f5f3ef",
+    bgLight: "#ede9df",
+    bgLighter: "#ffffff",
+    forest: "#082721",
+    forestMid: "#0d3d34",
+    gold: "#c9a84c",
+    goldLight: "#e8d08a",
+    goldPale: "#f7f0dc",
+    cream: "#f5f3ef",
+    parchment: "#ede9df",
+    ink: "#1a1510",
+    muted: "#7a7060",
+    border: "rgba(8,39,33,0.08)",
+    accent: "#0d3d34",
+    cardBg: "#ffffff",
+  };
+
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -352,17 +387,17 @@ export default function UsersPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? "bg-gray-900" : "bg-gray-100"}`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: colors.bg }}>
+        <div className="animate-spin rounded-full h-12 w-12" style={{ borderBottom: `2px solid ${colors.gold}` }}></div>
       </div>
     );
   }
 
   if (!isUserAdmin) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? "bg-gray-900" : "bg-gray-100"}`}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: colors.bg }}>
         <div className="text-center">
-          <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+          <h2 className="text-xl font-bold" style={{ color: colors.ink }}>
             {t.noAccess}
           </h2>
         </div>
@@ -377,68 +412,71 @@ export default function UsersPage() {
         title={t.users} 
       />
 
-      <div className="p-6 lg:p-8">
+      <div className="p-4 sm:p-6 lg:p-8" style={{ background: colors.bg, minHeight: "100vh" }}>
         {/* Header */}
-        <div className="mb-6">
-          <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold" style={{ color: colors.ink }}>
             {t.users}
           </h1>
         </div>
 
         {/* Search */}
-        <div className={`mb-6 ${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-xl p-4 shadow-sm`}>
+        <div className="mb-4 sm:mb-6 rounded-xl p-3 sm:p-4 shadow-sm" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div className="relative">
-            <Search className={`absolute ${language === "ar" ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`} size={20} />
+            <Search className={`absolute ${language === "ar" ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2`} size={20} style={{ color: colors.muted }} />
             <input
               type="text"
               placeholder={`${t.search}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full ${language === "ar" ? "pr-10" : "pl-10"} py-3 rounded-lg border 
-                ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-50 border-gray-200 text-gray-800"}
-                focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`w-full ${language === "ar" ? "pr-10" : "pl-10"} py-3 rounded-lg border text-sm sm:text-base`}
+              style={{ 
+                background: colors.bg, 
+                color: colors.ink, 
+                border: `1px solid ${colors.border}` 
+              }}
             />
           </div>
         </div>
 
         {/* Users Table */}
-        <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-xl shadow-sm overflow-hidden`}>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
+        <div className="rounded-xl shadow-sm overflow-hidden" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
+          <div className="overflow-x-auto scrollbar-thin">
+            <table className="w-full min-w-[100px] sm:min-w-[600px]">
+              <thead style={{ background: colors.goldPale }}>
                 <tr>
-                  <th className={`px-6 py-4 text-${language === "ar" ? "right" : "left"} text-sm font-semibold ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                  <th className={`px-2 sm:px-6 py-2 sm:py-4 text-${language === "ar" ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>
                     {t.profile}
                   </th>
-                  <th className={`px-6 py-4 text-${language === "ar" ? "right" : "left"} text-sm font-semibold ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                  <th className={`px-2 sm:px-6 py-2 sm:py-4 text-${language === "ar" ? "right" : "left"} text-xs font-semibold hidden md:table-cell`} style={{ color: colors.forest }}>
                     {t.email}
                   </th>
-                  <th className={`px-6 py-4 text-${language === "ar" ? "right" : "left"} text-sm font-semibold ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                  <th className={`px-2 sm:px-6 py-2 sm:py-4 text-${language === "ar" ? "right" : "left"} text-xs font-semibold hidden sm:table-cell`} style={{ color: colors.forest }}>
                     {t.role}
                   </th>
-                  <th className={`px-6 py-4 text-${language === "ar" ? "right" : "left"} text-sm font-semibold ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                  <th className={`px-2 sm:px-6 py-2 sm:py-4 text-${language === "ar" ? "right" : "left"} text-xs font-semibold hidden sm:table-cell`} style={{ color: colors.forest }}>
                     {t.status}
                   </th>
-                  <th className={`px-6 py-4 text-${language === "ar" ? "right" : "left"} text-sm font-semibold ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                  <th className={`px-2 sm:px-6 py-2 sm:py-4 text-${language === "ar" ? "right" : "left"} text-xs font-semibold hidden lg:table-cell`} style={{ color: colors.forest }}>
                     {t.createdAt}
                   </th>
-                  <th className={`px-6 py-4 text-center text-sm font-semibold ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                  <th className={`px-2 sm:px-6 py-2 sm:py-4 text-center text-xs font-semibold`} style={{ color: colors.forest }}>
                     {t.actions}
                   </th>
                 </tr>
               </thead>
-              <tbody className={`divide-y ${isDarkMode ? "divide-gray-700" : "divide-gray-200"}`}>
+              <tbody style={{ borderColor: colors.border }}>
                 {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className={`px-6 py-8 text-center ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
-                      {t.noUsers}
-                    </td>
-                  </tr>
-                ) : (
-                  filteredUsers.map((user) => (
-                    <tr key={user.id} className={`${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}`}>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
+                      <td colSpan="6" className="px-2 sm:px-6 py-6 sm:py-8 text-center" style={{ color: colors.muted }}>
+                        {t.noUsers}
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredUsers.map((user) => (
+                      <tr key={user.id} className="transition-all duration-200 hover:opacity-80" style={{ borderBottom: `1px solid ${colors.border}` }}>
+                        <td className="px-2 sm:px-6 py-2 sm:py-4">
+                          <div className="flex items-center gap-2">
                           {user.photo ? (
                             <img 
                               src={
@@ -449,98 +487,103 @@ export default function UsersPage() {
                                   : undefined
                               } 
                               alt="Profile" 
-                              className="w-10 h-10 rounded-full object-cover" 
+                              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2"
+                              style={{ borderColor: colors.gold }}
                             />
                           ) : (
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? "bg-blue-900" : "bg-blue-100"}`}>
-                              <User className={`w-5 h-5 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2" style={{ borderColor: colors.gold, background: colors.goldPale }}>
+                              <User className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: colors.forest }} />
                             </div>
                           )}
-                          <span className={`font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                          <span className="font-medium text-xs sm:text-sm" style={{ color: colors.ink }}>
                             {getUserName(user)}
                           </span>
                         </div>
                       </td>
-                      <td className={`px-6 py-4 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                      <td className="px-2 sm:px-6 py-2 sm:py-4 text-xs hidden md:table-cell" style={{ color: colors.muted }}>
                         {user.email}
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium
-                          ${user.role === "admin" 
-                            ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300" 
-                            : user.role === "editor"
-                            ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
-                            : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                          }`}>
+                      <td className="px-2 sm:px-6 py-2 sm:py-4 hidden sm:table-cell">
+                        <span className="px-2 py-1 rounded-full text-xs font-medium"
+                          style={{ 
+                            background: colors.goldPale, 
+                            color: colors.forest 
+                          }}>
                           {t.roles[user.role] || user.role}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-2 sm:px-6 py-2 sm:py-4 hidden sm:table-cell">
                         {user.role !== "admin" && (
-                          <div className="flex items-center gap-2">
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium
-                              ${user.is_accepted 
-                                ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" 
-                                : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
-                              }`}>
+                          <div className="flex items-center gap-1">
+                            <span className="px-2 py-1 rounded-full text-xs font-medium"
+                              style={{ 
+                                background: colors.goldPale, 
+                                color: colors.forest 
+                              }}>
                               {user.is_accepted ? t.active : t.pending}
                             </span>
                             {user.is_accepted ? (
                               <button
                                 onClick={() => setShowActivateConfirm({ id: user.id, is_accepted: true })}
-                                className={`p-1 rounded-lg ${isDarkMode ? "hover:bg-gray-600 text-orange-400" : "hover:bg-orange-50 text-orange-600"}`}
+                                className="p-1 rounded-lg transition-all duration-200 hover:scale-110"
+                                style={{ color: colors.gold }}
                                 title={t.deactivate}
                               >
-                                <ToggleRight size={20} />
+                                <ToggleRight size={16} />
                               </button>
                             ) : (
                               <button
                                 onClick={() => setShowActivateConfirm({ id: user.id, is_accepted: false })}
-                                className={`p-1 rounded-lg ${isDarkMode ? "hover:bg-gray-600 text-green-400" : "hover:bg-green-50 text-green-600"}`}
+                                className="p-1 rounded-lg transition-all duration-200 hover:scale-110"
+                                style={{ color: colors.accent }}
                                 title={t.activate}
                               >
-                                <ToggleLeft size={20} />
+                                <ToggleLeft size={16} />
                               </button>
                             )}
                           </div>
                         )}
                       </td>
-                      <td className={`px-6 py-4 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
-                        {user.created_at ? new Date(user.created_at).toLocaleDateString() : "-"}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-center gap-2">
-                          {!user.is_accepted && user.role !== "admin" && (
+                        <td className="px-2 sm:px-6 py-2 sm:py-4 text-xs hidden lg:table-cell" style={{ color: colors.muted }}>
+                          {user.created_at ? new Date(user.created_at).toLocaleDateString() : "-"}
+                        </td>
+                        <td className="px-2 sm:px-6 py-2 sm:py-4">
+                          <div className="flex items-center justify-center gap-1">
+                            {!user.is_accepted && user.role !== "admin" && (
                             <>
                               <button
                                 onClick={() => setShowAcceptConfirm(user.id)}
-                                className={`p-2 rounded-lg ${isDarkMode ? "hover:bg-gray-600 text-green-400" : "hover:bg-green-50 text-green-600"}`}
+                                className="p-1.5 rounded-lg transition-all duration-200 hover:scale-110"
+                                style={{ color: colors.accent }}
                                 title={t.accept}
                               >
-                                <CheckCircle size={18} />
+                                <CheckCircle size={16} />
                               </button>
                               <button
                                 onClick={() => setShowRejectConfirm(user.id)}
-                                className={`p-2 rounded-lg ${isDarkMode ? "hover:bg-gray-600 text-red-400" : "hover:bg-red-50 text-red-600"}`}
+                                className="p-1.5 rounded-lg transition-all duration-200 hover:scale-110"
+                                style={{ color: '#dc2626' }}
                                 title={t.reject}
                               >
-                                <XCircle size={18} />
+                                <XCircle size={16} />
                               </button>
                             </>
                           )}
                           <button
                             onClick={() => handleEdit(user)}
-                            className={`p-2 rounded-lg ${isDarkMode ? "hover:bg-gray-600 text-blue-400" : "hover:bg-blue-50 text-blue-600"}`}
+                            className="p-1.5 rounded-lg transition-all duration-200 hover:scale-110"
+                            style={{ color: colors.gold }}
                             title={t.edit}
                           >
-                            <Edit size={18} />
+                            <Edit size={16} />
                           </button>
                           <button
                             onClick={() => setShowDeleteConfirm(user.id)}
-                            className={`p-2 rounded-lg ${isDarkMode ? "hover:bg-gray-600 text-red-400" : "hover:bg-red-50 text-red-600"}`}
+                            className="p-1.5 rounded-lg transition-all duration-200 hover:scale-110"
+                            style={{ color: '#dc2626' }}
                             title={t.delete}
                           >
-                            <Trash2 size={18} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -555,135 +598,160 @@ export default function UsersPage() {
 
       {/* Edit Modal */}
       {editingUser && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto`}>
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-2 sm:mx-0 my-4" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <div className="p-4 sm:p-6" style={{ borderBottom: `1px solid ${colors.border}` }}>
               <div className="flex items-center justify-between">
-                <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                <h2 className="text-lg sm:text-xl font-bold" style={{ color: colors.ink }}>
                   {t.editUser}
                 </h2>
                 <button
                   onClick={() => setEditingUser(null)}
-                  className={`p-2 rounded-lg ${isDarkMode ? "hover:bg-gray-700 text-gray-400" : "hover:bg-gray-100 text-gray-500"}`}
+                  className="p-2 rounded-lg transition-all duration-200 hover:scale-110"
+                  style={{ color: colors.muted }}
                 >
                   <X size={20} />
                 </button>
               </div>
             </div>
             
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-4">
               {/* Name Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: colors.muted }}>
                     {t.firstName} (العربية)
                   </label>
                   <input
                     type="text"
                     value={editingUser.prenom_ar || ""}
                     onChange={(e) => setEditingUser({ ...editingUser, prenom_ar: e.target.value })}
-                    className={`w-full px-4 py-2 rounded-lg border 
-                      ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-50 border-gray-200 text-gray-800"}
-                      focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    className="w-full px-3 sm:px-4 py-2 rounded-lg border text-sm sm:text-base"
+                    style={{ 
+                      background: colors.bg, 
+                      color: colors.ink, 
+                      border: `1px solid ${colors.border}` 
+                    }}
                   />
                 </div>
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: colors.muted }}>
                     {t.lastName} (العربية)
                   </label>
                   <input
                     type="text"
                     value={editingUser.nom_ar || ""}
                     onChange={(e) => setEditingUser({ ...editingUser, nom_ar: e.target.value })}
-                    className={`w-full px-4 py-2 rounded-lg border 
-                      ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-50 border-gray-200 text-gray-800"}
-                      focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    className="w-full px-3 sm:px-4 py-2 rounded-lg border text-sm sm:text-base"
+                    style={{ 
+                      background: colors.bg, 
+                      color: colors.ink, 
+                      border: `1px solid ${colors.border}` 
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: colors.muted }}>
                     {t.firstName} (English)
                   </label>
                   <input
                     type="text"
                     value={editingUser.prenom_en || ""}
                     onChange={(e) => setEditingUser({ ...editingUser, prenom_en: e.target.value })}
-                    className={`w-full px-4 py-2 rounded-lg border 
-                      ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-50 border-gray-200 text-gray-800"}
-                      focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    className="w-full px-3 sm:px-4 py-2 rounded-lg border text-sm sm:text-base"
+                    style={{ 
+                      background: colors.bg, 
+                      color: colors.ink, 
+                      border: `1px solid ${colors.border}` 
+                    }}
                   />
                 </div>
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: colors.muted }}>
                     {t.lastName} (English)
                   </label>
                   <input
                     type="text"
                     value={editingUser.nom_en || ""}
                     onChange={(e) => setEditingUser({ ...editingUser, nom_en: e.target.value })}
-                    className={`w-full px-4 py-2 rounded-lg border 
-                      ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-50 border-gray-200 text-gray-800"}
-                      focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    className="w-full px-3 sm:px-4 py-2 rounded-lg border text-sm sm:text-base"
+                    style={{ 
+                      background: colors.bg, 
+                      color: colors.ink, 
+                      border: `1px solid ${colors.border}` 
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: colors.muted }}>
                     {t.firstName} (Français)
                   </label>
                   <input
                     type="text"
                     value={editingUser.prenom_fr || ""}
                     onChange={(e) => setEditingUser({ ...editingUser, prenom_fr: e.target.value })}
-                    className={`w-full px-4 py-2 rounded-lg border 
-                      ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-50 border-gray-200 text-gray-800"}
-                      focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    className="w-full px-3 sm:px-4 py-2 rounded-lg border text-sm sm:text-base"
+                    style={{ 
+                      background: colors.bg, 
+                      color: colors.ink, 
+                      border: `1px solid ${colors.border}` 
+                    }}
                   />
                 </div>
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                  <label className="block text-sm font-medium mb-2" style={{ color: colors.muted }}>
                     {t.lastName} (Français)
                   </label>
                   <input
                     type="text"
                     value={editingUser.nom_fr || ""}
                     onChange={(e) => setEditingUser({ ...editingUser, nom_fr: e.target.value })}
-                    className={`w-full px-4 py-2 rounded-lg border 
-                      ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-50 border-gray-200 text-gray-800"}
-                      focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    className="w-full px-3 sm:px-4 py-2 rounded-lg border text-sm sm:text-base"
+                    style={{ 
+                      background: colors.bg, 
+                      color: colors.ink, 
+                      border: `1px solid ${colors.border}` 
+                    }}
                   />
                 </div>
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                <label className="block text-sm font-medium mb-2" style={{ color: colors.muted }}>
                   {t.email}
                 </label>
                 <input
                   type="email"
                   value={editingUser.email || ""}
                   onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
-                  className={`w-full px-4 py-2 rounded-lg border 
-                    ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-50 border-gray-200 text-gray-800"}
-                    focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  className="w-full px-3 sm:px-4 py-2 rounded-lg border text-sm sm:text-base"
+                  style={{ 
+                    background: colors.bg, 
+                    color: colors.ink, 
+                    border: `1px solid ${colors.border}` 
+                  }}
                 />
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                <label className="block text-sm font-medium mb-2" style={{ color: colors.muted }}>
                   {t.role}
                 </label>
                 <select
                   value={editingUser.role || "user"}
                   onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
-                  className={`w-full px-4 py-2 rounded-lg border 
-                    ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-50 border-gray-200 text-gray-800"}
-                    focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  className="w-full px-3 sm:px-4 py-2 rounded-lg border text-sm sm:text-base"
+                  style={{ 
+                    background: colors.bg, 
+                    color: colors.ink, 
+                    border: `1px solid ${colors.border}` 
+                  }}
                 >
                   <option value="user">{t.roles.user}</option>
                   <option value="editor">{t.roles.editor}</option>
@@ -692,16 +760,25 @@ export default function UsersPage() {
               </div>
             </div>
 
-            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+            <div className="p-4 sm:p-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3" style={{ borderTop: `1px solid ${colors.border}` }}>
               <button
                 onClick={() => setEditingUser(null)}
-                className={`px-6 py-2 rounded-lg ${isDarkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+                className="px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base"
+                style={{ 
+                  background: colors.bg, 
+                  color: colors.ink, 
+                  border: `1px solid ${colors.border}` 
+                }}
               >
                 {t.cancel}
               </button>
               <button
                 onClick={handleSave}
-                className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+                className="px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base flex items-center gap-2"
+                style={{ 
+                  background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`,
+                  color: colors.forest,
+                }}
               >
                 <Check size={18} />
                 {t.save}
@@ -713,28 +790,34 @@ export default function UsersPage() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl w-full max-w-md p-6`}>
-            <div className="text-center">
-              <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${isDarkMode ? "bg-red-900" : "bg-red-100"}`}>
-                <Trash2 className={`w-8 h-8 ${isDarkMode ? "text-red-400" : "text-red-600"}`} />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+          <div className="rounded-2xl w-full max-w-sm mx-2 sm:mx-0 my-4" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <div className="p-4 sm:p-6 text-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center" style={{ background: 'rgba(220,38,38,0.15)' }}>
+                <Trash2 className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: '#dc2626' }} />
               </div>
-              <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+              <h3 className="text-base sm:text-lg font-bold mb-2" style={{ color: colors.ink }}>
                 {t.delete}
               </h3>
-              <p className={`mb-6 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              <p className="mb-4 sm:mb-6 text-sm sm:text-base" style={{ color: colors.muted }}>
                 {t.confirmDelete}
               </p>
-              <div className="flex justify-center gap-3">
+              <div className="flex justify-center gap-2 sm:gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(null)}
-                  className={`px-6 py-2 rounded-lg ${isDarkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+                  className="px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base"
+                  style={{ 
+                    background: colors.bg, 
+                    color: colors.ink, 
+                    border: `1px solid ${colors.border}` 
+                  }}
                 >
                   {t.cancel}
                 </button>
                 <button
                   onClick={() => handleDelete(showDeleteConfirm)}
-                  className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
+                  className="px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base"
+                  style={{ background: '#dc2626', color: 'white' }}
                 >
                   {t.delete}
                 </button>
@@ -746,28 +829,37 @@ export default function UsersPage() {
 
       {/* Accept User Confirmation Modal */}
       {showAcceptConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl w-full max-w-md p-6`}>
-            <div className="text-center">
-              <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${isDarkMode ? "bg-green-900" : "bg-green-100"}`}>
-                <CheckCircle className={`w-8 h-8 ${isDarkMode ? "text-green-400" : "text-green-600"}`} />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+          <div className="rounded-2xl w-full max-w-sm mx-2 sm:mx-0 my-4" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <div className="p-4 sm:p-6 text-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center" style={{ background: colors.goldPale }}>
+                <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: colors.accent }} />
               </div>
-              <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+              <h3 className="text-base sm:text-lg font-bold mb-2" style={{ color: colors.ink }}>
                 {t.accept}
               </h3>
-              <p className={`mb-6 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              <p className="mb-4 sm:mb-6 text-sm sm:text-base" style={{ color: colors.muted }}>
                 {t.userAccepted}
               </p>
-              <div className="flex justify-center gap-3">
+              <div className="flex justify-center gap-2 sm:gap-3">
                 <button
                   onClick={() => setShowAcceptConfirm(null)}
-                  className={`px-6 py-2 rounded-lg ${isDarkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+                  className="px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base"
+                  style={{ 
+                    background: colors.bg, 
+                    color: colors.ink, 
+                    border: `1px solid ${colors.border}` 
+                  }}
                 >
                   {t.cancel}
                 </button>
                 <button
                   onClick={() => handleAccept(showAcceptConfirm)}
-                  className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white"
+                  className="px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`,
+                    color: colors.forest,
+                  }}
                 >
                   {t.accept}
                 </button>
@@ -779,28 +871,34 @@ export default function UsersPage() {
 
       {/* Reject User Confirmation Modal */}
       {showRejectConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl w-full max-w-md p-6`}>
-            <div className="text-center">
-              <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${isDarkMode ? "bg-red-900" : "bg-red-100"}`}>
-                <XCircle className={`w-8 h-8 ${isDarkMode ? "text-red-400" : "text-red-600"}`} />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+          <div className="rounded-2xl w-full max-w-sm mx-2 sm:mx-0 my-4" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <div className="p-4 sm:p-6 text-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center" style={{ background: 'rgba(220,38,38,0.15)' }}>
+                <XCircle className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: '#dc2626' }} />
               </div>
-              <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+              <h3 className="text-base sm:text-lg font-bold mb-2" style={{ color: colors.ink }}>
                 {t.reject}
               </h3>
-              <p className={`mb-6 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              <p className="mb-4 sm:mb-6 text-sm sm:text-base" style={{ color: colors.muted }}>
                 {t.userRejected}
               </p>
-              <div className="flex justify-center gap-3">
+              <div className="flex justify-center gap-2 sm:gap-3">
                 <button
                   onClick={() => setShowRejectConfirm(null)}
-                  className={`px-6 py-2 rounded-lg ${isDarkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+                  className="px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base"
+                  style={{ 
+                    background: colors.bg, 
+                    color: colors.ink, 
+                    border: `1px solid ${colors.border}` 
+                  }}
                 >
                   {t.cancel}
                 </button>
                 <button
                   onClick={() => handleReject(showRejectConfirm)}
-                  className="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
+                  className="px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base"
+                  style={{ background: '#dc2626', color: 'white' }}
                 >
                   {t.reject}
                 </button>
@@ -812,32 +910,41 @@ export default function UsersPage() {
 
       {/* Activate/Deactivate User Confirmation Modal */}
       {showActivateConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl w-full max-w-md p-6`}>
-            <div className="text-center">
-              <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${isDarkMode ? "bg-orange-900" : "bg-orange-100"}`}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+          <div className="rounded-2xl w-full max-w-sm mx-2 sm:mx-0 my-4" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
+            <div className="p-4 sm:p-6 text-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center" style={{ background: colors.goldPale }}>
                 {showActivateConfirm.is_accepted ? (
-                  <ToggleRight className={`w-8 h-8 ${isDarkMode ? "text-orange-400" : "text-orange-600"}`} />
+                  <ToggleRight className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: colors.gold }} />
                 ) : (
-                  <ToggleLeft className={`w-8 h-8 ${isDarkMode ? "text-green-400" : "text-green-600"}`} />
+                  <ToggleLeft className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: colors.accent }} />
                 )}
               </div>
-              <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+              <h3 className="text-base sm:text-lg font-bold mb-2" style={{ color: colors.ink }}>
                 {showActivateConfirm.is_accepted ? t.deactivate : t.activate}
               </h3>
-              <p className={`mb-6 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              <p className="mb-4 sm:mb-6 text-sm sm:text-base" style={{ color: colors.muted }}>
                 {showActivateConfirm.is_accepted ? t.userDeactivated : t.userActivated}
               </p>
-              <div className="flex justify-center gap-3">
+              <div className="flex justify-center gap-2 sm:gap-3">
                 <button
                   onClick={() => setShowActivateConfirm(null)}
-                  className={`px-6 py-2 rounded-lg ${isDarkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"}`}
+                  className="px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base"
+                  style={{ 
+                    background: colors.bg, 
+                    color: colors.ink, 
+                    border: `1px solid ${colors.border}` 
+                  }}
                 >
                   {t.cancel}
                 </button>
                 <button
                   onClick={() => handleToggleActive(showActivateConfirm)}
-                  className={`px-6 py-2 rounded-lg ${showActivateConfirm.is_accepted ? "bg-orange-600 hover:bg-orange-700" : "bg-green-600 hover:bg-green-700"} text-white`}
+                  className="px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base"
+                  style={{ 
+                    background: showActivateConfirm.is_accepted ? colors.gold : `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`,
+                    color: colors.forest,
+                  }}
                 >
                   {showActivateConfirm.is_accepted ? t.deactivate : t.activate}
                 </button>

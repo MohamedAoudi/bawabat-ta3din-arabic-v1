@@ -300,7 +300,7 @@ export default function Settings() {
         title={t.settings} 
       />
 
-      <div className="p-6 lg:p-8" style={{ background: colors.bg, minHeight: "100vh" }}>
+      <div className="p-4 sm:p-6 lg:p-8" style={{ background: colors.bg, minHeight: "100vh" }}>
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold" style={{ color: colors.gold }}>
@@ -319,21 +319,21 @@ export default function Settings() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {/* Profile Card */}
-          <div className="lg:col-span-2">
+          <div className="md:col-span-2 xl:col-span-2">
             <div className="rounded-2xl p-6 shadow-lg" 
               style={{ 
                 background: colors.cardBg,
                 border: `1px solid ${colors.border}`,
               }}>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold" style={{ color: colors.ink }}>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-6">
+                <h2 className="text-lg sm:text-xl font-bold" style={{ color: colors.ink }}>
                   {t.personalInfo}
                 </h2>
                 <button
                   onClick={() => setIsEditing(!isEditing)}
-                  className="px-4 py-2 rounded-lg transition-all duration-200"
+                  className="px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base"
                   style={{ 
                     background: isEditing ? colors.goldPale : `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`,
                     color: colors.forest,
@@ -344,7 +344,7 @@ export default function Settings() {
               </div>
 
               {/* Profile Photo */}
-              <div className="flex items-center gap-6 mb-8 pb-6" style={{ borderBottom: `1px solid ${colors.border}` }}>
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-8 pb-6" style={{ borderBottom: `1px solid ${colors.border}` }}>
                 <div className="relative">
                   {selectedImage || user.photo ? (
                     <img
@@ -386,7 +386,7 @@ export default function Settings() {
                     </>
                   )}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 text-center sm:text-left">
                   <h3 className="text-lg font-semibold" style={{ color: colors.ink }}>
                     {user.prenom_ar || user.prenom_en || user.prenom_fr || ""} {user.nom_ar || user.nom_en || user.nom_fr || ""}
                   </h3>
@@ -434,7 +434,7 @@ export default function Settings() {
 
               {/* Form */}
               <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   {/* Arabic Names */}
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: colors.muted }}>
@@ -446,7 +446,7 @@ export default function Settings() {
                       value={formData.prenom_ar}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-xl transition-all duration-200"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl transition-all duration-200 text-sm sm:text-base"
                       style={{ 
                         background: colors.bg,
                         color: colors.ink,
@@ -465,7 +465,7 @@ export default function Settings() {
                       value={formData.nom_ar}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-xl transition-all duration-200"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl transition-all duration-200 text-sm sm:text-base"
                       style={{ 
                         background: colors.bg,
                         color: colors.ink,
@@ -505,7 +505,7 @@ export default function Settings() {
                       value={formData.nom_fr}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-xl transition-all duration-200"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl transition-all duration-200 text-sm sm:text-base"
                       style={{ 
                         background: colors.bg,
                         color: colors.ink,
@@ -526,7 +526,7 @@ export default function Settings() {
                       value={formData.prenom_en}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-xl transition-all duration-200"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl transition-all duration-200 text-sm sm:text-base"
                       style={{ 
                         background: colors.bg,
                         color: colors.ink,
@@ -545,7 +545,7 @@ export default function Settings() {
                       value={formData.nom_en}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-xl transition-all duration-200"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl transition-all duration-200 text-sm sm:text-base"
                       style={{ 
                         background: colors.bg,
                         color: colors.ink,
@@ -556,7 +556,7 @@ export default function Settings() {
                   </div>
 
                   {/* Email (read-only) */}
-                  <div className="md:col-span-2">
+                  <div className="sm:col-span-2">
                     <label className="block text-sm font-medium mb-2" style={{ color: colors.muted }}>
                       {t.email}
                     </label>
@@ -565,7 +565,7 @@ export default function Settings() {
                       name="email"
                       value={formData.email}
                       disabled
-                      className="w-full px-4 py-3 rounded-xl"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl text-sm sm:text-base"
                       style={{ 
                         background: colors.bg,
                         color: colors.muted,
@@ -602,14 +602,14 @@ export default function Settings() {
           </div>
 
           {/* Sidebar Options */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Language */}
-            <div className="rounded-2xl p-6 shadow-lg" 
+            <div className="rounded-2xl p-4 sm:p-6 shadow-lg" 
               style={{ 
                 background: colors.cardBg,
                 border: `1px solid ${colors.border}`,
               }}>
-              <h3 className="text-lg font-semibold mb-4" style={{ color: colors.ink }}>
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: colors.ink }}>
                 {t.language}
               </h3>
               <div className="space-y-2">
@@ -617,7 +617,7 @@ export default function Settings() {
                   <button
                     key={lang}
                     onClick={() => changeLanguage(lang)}
-                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200"
+                    className="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 rounded-xl transition-all duration-200 text-sm sm:text-base"
                     style={{ 
                       background: language === lang ? colors.goldPale : 'transparent',
                       color: language === lang ? colors.forest : colors.ink,
@@ -632,12 +632,12 @@ export default function Settings() {
             </div>
 
             {/* Theme */}
-            <div className="rounded-2xl p-6 shadow-lg" 
+            <div className="rounded-2xl p-4 sm:p-6 shadow-lg" 
               style={{ 
                 background: colors.cardBg,
                 border: `1px solid ${colors.border}`,
               }}>
-              <h3 className="text-lg font-semibold mb-4" style={{ color: colors.ink }}>
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: colors.ink }}>
                 {t.theme}
               </h3>
               <div className="flex gap-2">
@@ -667,12 +667,12 @@ export default function Settings() {
             </div>
 
             {/* Account Info */}
-            <div className="rounded-2xl p-6 shadow-lg" 
+            <div className="rounded-2xl p-4 sm:p-6 shadow-lg" 
               style={{ 
                 background: colors.cardBg,
                 border: `1px solid ${colors.border}`,
               }}>
-              <h3 className="text-lg font-semibold mb-4" style={{ color: colors.ink }}>
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: colors.ink }}>
                 {t.profile}
               </h3>
               <div className="space-y-3">
