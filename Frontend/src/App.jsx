@@ -18,6 +18,11 @@ import Dashboard from "./pages/Dashboard";
 import UsersPage from "./pages/Users";
 import Settings from "./pages/Settings";
 import MineralsPage from "./pages/Minerals";
+import TradeExportsPage from "./pages/TradeExports";
+import TradeImportsPage from "./pages/TradeImports";
+import CountriesManagementPage from "./pages/CountriesManagement";
+import YearsManagementPage from "./pages/YearsManagement";
+import ProductionManagementPage from "./pages/ProductionManagement";
 
 export const LanguageContext = createContext();
 export const ThemeContext = createContext();
@@ -95,6 +100,11 @@ export default function App() {
             <Route path="/rapport" element={<Rapport />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/minerals" element={<MineralsPage />} />
+            <Route path="/trade-exports" element={<TradeExportsPage />} />
+            <Route path="/trade-imports" element={<TradeImportsPage />} />
+            <Route path="/countries-management" element={<CountriesManagementPage />} />
+            <Route path="/years-management" element={<YearsManagementPage />} />
+            <Route path="/production-management" element={<ProductionManagementPage />} />
           </Routes>
         </BrowserRouter>
       </LanguageProvider>
