@@ -192,7 +192,6 @@ export default function M3Page() {
           },
           tooltip: {
             callbacks: {
-              label: (c) => ` ${c.dataset.label}: ${c.parsed.y}K`,
               label: (c) =>
                 ` ${c.dataset.label}: ${formatNumber(c.parsed.y, language)} ${getUnitLabel(unit, language)}`,
             },
@@ -208,7 +207,6 @@ export default function M3Page() {
             grid: { color: "rgba(0,0,0,.10)" },
             ticks: {
               font: { family: "Cairo" },
-              callback: (v) => (v === 0 ? "0" : `${v}K`),
               callback: (v) => (v === 0 ? "0" : formatNumber(v, language)),
             },
           },
