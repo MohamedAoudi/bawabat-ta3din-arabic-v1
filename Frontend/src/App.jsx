@@ -17,6 +17,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import UsersPage from "./pages/Users";
 import Settings from "./pages/Settings";
+import MineralsPage from "./pages/Minerals";
 
 export const LanguageContext = createContext();
 export const ThemeContext = createContext();
@@ -93,6 +94,7 @@ export default function App() {
             <Route path="/m8" element={<M8Page />} />
             <Route path="/rapport" element={<Rapport />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/minerals" element={<MineralsPage />} />
           </Routes>
         </BrowserRouter>
       </LanguageProvider>
