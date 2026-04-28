@@ -6,7 +6,7 @@ const getAllUsers = async () => {
     SELECT id, 
            nom_ar, nom_en, nom_fr, 
            prenom_ar, prenom_en, prenom_fr, 
-           email, password, role, photo, is_accepted, created_at 
+           country_id, email, password, role, photo, is_accepted, created_at 
     FROM users ORDER BY created_at DESC`;
   const result = await pool.query(query);
   return result.rows;
@@ -18,7 +18,7 @@ const getUserById = async (id) => {
     SELECT id, 
            nom_ar, nom_en, nom_fr, 
            prenom_ar, prenom_en, prenom_fr, 
-           email, password, role, photo, is_accepted, created_at 
+           country_id, email, password, role, photo, is_accepted, created_at 
     FROM users WHERE id = $1`;
   const result = await pool.query(query, [id]);
   return result.rows[0];
@@ -30,7 +30,7 @@ const getUserByEmail = async (email) => {
     SELECT id, 
            nom_ar, nom_en, nom_fr, 
            prenom_ar, prenom_en, prenom_fr, 
-           email, password, role, photo, is_accepted, created_at 
+           country_id, email, password, role, photo, is_accepted, created_at 
     FROM users WHERE email = $1`;
   const result = await pool.query(query, [email]);
   return result.rows[0];
@@ -38,19 +38,19 @@ const getUserByEmail = async (email) => {
 
 // Create new user (trilingual: Arabic, English, French)
 const createUser = async (user) => {
-  const { nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, password, role, photo, is_accepted } = user;
+  const { nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, country_id, email, password, role, photo, is_accepted } = user;
   const query = `
-    INSERT INTO users (nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, password, role, photo, is_accepted)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-    RETURNING id, nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, role, photo, is_accepted, created_at
+    INSERT INTO users (nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, country_id, email, password, role, photo, is_accepted)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    RETURNING id, nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, country_id, email, role, photo, is_accepted, created_at
   `;
-  const result = await pool.query(query, [nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, password, role || 'user', photo || null, is_accepted || false]);
+  const result = await pool.query(query, [nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, country_id, email, password, role || 'user', photo || null, is_accepted || false]);
   return result.rows[0];
 };
 
 // Update user (trilingual)
 const updateUser = async (id, user) => {
-  const { nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, password, role, photo, is_accepted } = user;
+  const { nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, country_id, email, password, role, photo, is_accepted } = user;
   
   console.log("User model updateUser called:", { id, is_accepted, type: typeof is_accepted });
   
@@ -71,7 +71,7 @@ const updateUser = async (id, user) => {
       UPDATE users 
       SET is_accepted = $1
       WHERE id = $2
-      RETURNING id, nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, role, photo, is_accepted, created_at
+      RETURNING id, nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, country_id, email, role, photo, is_accepted, created_at
     `;
     params = [boolValue, id];
  
@@ -85,15 +85,16 @@ const updateUser = async (id, user) => {
           prenom_ar = COALESCE($4, prenom_ar),
           prenom_en = COALESCE($5, prenom_en),
           prenom_fr = COALESCE($6, prenom_fr),
-          email = COALESCE($7, email),
-          password = COALESCE($8, password),
-          role = COALESCE($9, role),
-          photo = COALESCE($10, photo),
-          is_accepted = COALESCE($11, is_accepted)
-      WHERE id = $12
-      RETURNING id, nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, role, photo, is_accepted, created_at
+          country_id = COALESCE($7, country_id),
+          email = COALESCE($8, email),
+          password = COALESCE($9, password),
+          role = COALESCE($10, role),
+          photo = COALESCE($11, photo),
+          is_accepted = COALESCE($12, is_accepted)
+      WHERE id = $13
+      RETURNING id, nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, country_id, email, role, photo, is_accepted, created_at
     `;
-    params = [nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, password, role, photo, is_accepted, id];
+    params = [nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, country_id, email, password, role, photo, is_accepted, id];
   }
   
   const result = await pool.query(query, params);

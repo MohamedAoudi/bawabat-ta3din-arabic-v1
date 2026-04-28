@@ -81,11 +81,11 @@ const getUserById = async (req, res) => {
 // Create new user (trilingual: Arabic, English, French)
 const createUser = async (req, res) => {
   try {
-    const { nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, email, password, role, photo } = req.body;
+    const { nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, country_id, email, password, role, photo } = req.body;
     
     // Validation
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+    if (!email || !password || !country_id) {
+      return res.status(400).json({ message: "Email, password and country_id are required" });
     }
     
     // Check if email already exists
@@ -101,6 +101,7 @@ const createUser = async (req, res) => {
     const newUser = await userModel.createUser({ 
       nom_ar, nom_en, nom_fr, 
       prenom_ar, prenom_en, prenom_fr, 
+      country_id,
       email, password: hashedPassword, role, photo 
     });
     
@@ -142,7 +143,7 @@ const deleteUser = async (req, res) => {
 // Google Login - Create or get user from Google
 const googleLogin = async (req, res) => {
   try {
-    const { email, displayName, photoURL, uid } = req.body;
+    const { email, displayName, photoURL, uid, country_id } = req.body;
 
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
@@ -152,6 +153,10 @@ const googleLogin = async (req, res) => {
     let user = await userModel.getUserByEmail(email);
 
     if (!user) {
+      if (!country_id) {
+        return res.status(400).json({ message: "country_id is required for new Google users" });
+      }
+
       // Create new user from Google data
       // Parse display name to get first name and last name
       const nameParts = displayName ? displayName.split(" ") : ["", ""];
@@ -165,6 +170,7 @@ const googleLogin = async (req, res) => {
         prenom_ar: prenom,
         prenom_en: prenom,
         prenom_fr: prenom,
+        country_id,
         email: email,
         password: "google-oauth-placeholder", // Placeholder - not used for Google users
         role: "user",
@@ -234,7 +240,7 @@ const updateUserProfile = async (req, res) => {
       return res.status(403).json({ message: "You can only update your own profile" });
     }
 
-    const { nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr } = req.body;
+    const { nom_ar, nom_en, nom_fr, prenom_ar, prenom_en, prenom_fr, country_id } = req.body;
     
     const updatedUser = await userModel.updateUser(userId, {
       nom_ar,
@@ -243,6 +249,7 @@ const updateUserProfile = async (req, res) => {
       prenom_ar,
       prenom_en,
       prenom_fr,
+      country_id,
     });
 
     const { password: _, ...userWithoutPassword } = updatedUser;
