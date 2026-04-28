@@ -232,6 +232,17 @@ export default function Sidebar({ isOpen, onClose, children }) {
       }
     };
     loadUser();
+    
+    const onUserUpdated = () => {
+      // Fast path: immediately reflect localStorage changes
+      const next = getCurrentUser();
+      if (next) setUser(next);
+      // Then refresh from server in background to keep it consistent
+      loadUser();
+    };
+
+    window.addEventListener("auth:user-updated", onUserUpdated);
+    return () => window.removeEventListener("auth:user-updated", onUserUpdated);
   }, []);
 
   const handleLogout = () => {
@@ -311,6 +322,8 @@ export default function Sidebar({ isOpen, onClose, children }) {
                     : `${API_URL}${user.photo}`
                 }
                 alt="Profile"
+                referrerPolicy="no-referrer"
+                crossOrigin="anonymous"
                 className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2"
                 style={{ borderColor: colors.gold }}
               />

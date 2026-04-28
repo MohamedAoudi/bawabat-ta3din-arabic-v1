@@ -5,6 +5,9 @@ const API_URL = "/users";
 
 const setStoredUser = (user) => {
   localStorage.setItem("user", JSON.stringify(user));
+  // Same-tab updates: storage event doesn't fire in the same window,
+  // so we emit a custom event to refresh UI (e.g., sidebar avatar).
+  window.dispatchEvent(new Event("auth:user-updated"));
 };
 
 const setAuthSession = ({ token, user }) => {

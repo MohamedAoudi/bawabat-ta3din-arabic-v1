@@ -171,7 +171,20 @@ export default function Dashboard() {
         <div className="p-4 sm:p-6 lg:p-8" style={{ background: colors.bg, minHeight: "100vh" }}>
           <div className="mb-6 sm:mb-8 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg" style={{ background: `linear-gradient(135deg, ${colors.cardBg} 0%, ${isDarkMode ? '#0d2b24' : '#f9f7f2'} 100%)`, border: `1px solid ${colors.border}` }}>
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-              {user.photo ? <img src={user.photo.startsWith("http") ? user.photo : `${API_URL}${user.photo}`} alt="Profile" className="w-16 h-16 rounded-full object-cover border-2" style={{ borderColor: colors.gold }} /> : <div className="w-16 h-16 rounded-full flex items-center justify-center border-2" style={{ borderColor: colors.gold, background: colors.goldPale }}><User className="w-8 h-8" style={{ color: colors.forest }} /></div>}
+              {user.photo ? (
+                <img
+                  src={user.photo.startsWith("http") ? user.photo : `${API_URL}${user.photo}`}
+                  alt="Profile"
+                  referrerPolicy="no-referrer"
+                  crossOrigin="anonymous"
+                  className="w-16 h-16 rounded-full object-cover border-2"
+                  style={{ borderColor: colors.gold }}
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full flex items-center justify-center border-2" style={{ borderColor: colors.gold, background: colors.goldPale }}>
+                  <User className="w-8 h-8" style={{ color: colors.forest }} />
+                </div>
+              )}
               <div className="text-center sm:text-start"><h1 className="text-xl sm:text-2xl font-bold" style={{ color: colors.ink }}>{t.welcome}, {user.prenom_ar || user.prenom_en || user.prenom_fr || user.nom_ar || user.nom_en || user.nom_fr || "User"}!</h1><p className="mt-1 text-sm" style={{ color: colors.muted }}>{language === "ar" ? "هذه هي لوحة التحكم الخاصة بك" : language === "fr" ? "Ceci est votre tableau de bord" : "This is your dashboard"}</p></div>
             </div>
           </div>

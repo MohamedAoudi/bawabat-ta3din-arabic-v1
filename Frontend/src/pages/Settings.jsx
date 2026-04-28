@@ -233,7 +233,7 @@ export default function Settings() {
       formData.append('userId', user.id);
       
       // Upload to backend
-      const uploadResponse = await fetch('http://localhost:5000/api/users/upload-photo', {
+      const uploadResponse = await fetch(`${API_URL}/api/users/upload-photo`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -245,6 +245,7 @@ export default function Settings() {
         const data = await uploadResponse.json();
         setUser(data);
         localStorage.setItem("user", JSON.stringify(data));
+        window.dispatchEvent(new Event("auth:user-updated"));
         setMessage({ type: "success", text: t.success });
         setSelectedImage(null);
       } else {
@@ -267,6 +268,7 @@ export default function Settings() {
       if (updatedUser) {
         setUser(updatedUser);
         localStorage.setItem("user", JSON.stringify(updatedUser));
+        window.dispatchEvent(new Event("auth:user-updated"));
         setMessage({ type: "success", text: t.success });
         setIsEditing(false);
       } else {
@@ -357,6 +359,8 @@ export default function Settings() {
                           : undefined)
                       }
                       alt="Profile"
+                      referrerPolicy="no-referrer"
+                      crossOrigin="anonymous"
                       className="w-24 h-24 rounded-full object-cover border-4"
                       style={{ borderColor: colors.gold }}
                     />

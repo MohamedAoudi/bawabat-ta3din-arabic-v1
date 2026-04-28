@@ -487,6 +487,8 @@ export default function UsersPage() {
                                   : undefined
                               } 
                               alt="Profile" 
+                              referrerPolicy="no-referrer"
+                              crossOrigin="anonymous"
                               className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2"
                               style={{ borderColor: colors.gold }}
                             />
