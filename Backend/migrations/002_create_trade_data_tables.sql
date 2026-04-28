@@ -59,22 +59,6 @@ CREATE TABLE IF NOT EXISTS years (
   decade INTEGER NOT NULL
 );
 
-ALTER TABLE users
-ADD COLUMN IF NOT EXISTS country_id INTEGER;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1
-    FROM pg_constraint
-    WHERE conname = 'fk_users_country_id'
-  ) THEN
-    ALTER TABLE users
-    ADD CONSTRAINT fk_users_country_id
-    FOREIGN KEY (country_id) REFERENCES countries(id) ON DELETE RESTRICT;
-  END IF;
-END $$;
-
 CREATE TABLE IF NOT EXISTS mineral_production (
   id BIGSERIAL PRIMARY KEY,
   country_id INTEGER REFERENCES countries(id) ON DELETE SET NULL,
@@ -140,7 +124,6 @@ CREATE TABLE IF NOT EXISTS country_trade_summary (
 );
 
 CREATE INDEX IF NOT EXISTS idx_countries_iso_code ON countries(iso_code);
-CREATE INDEX IF NOT EXISTS idx_users_country_id ON users(country_id);
 CREATE INDEX IF NOT EXISTS idx_minerals_category_name_ar ON minerals(category_name_ar);
 CREATE INDEX IF NOT EXISTS idx_minerals_category_name_en ON minerals(category_name_en);
 CREATE INDEX IF NOT EXISTS idx_minerals_category_name_fr ON minerals(category_name_fr);

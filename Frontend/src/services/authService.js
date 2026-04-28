@@ -1,36 +1,36 @@
-import axios from "axios";
 import { signInWithGoogle, logoutGoogle } from "./firebase";
+import apiClient from "./apiClient";
 
-// Importer l'URL du backend depuis .env
-const API_URL = `${import.meta.env.VITE_API_URL}/api/users`;
+const API_URL = "/users";
 
-// Configure axios interceptor to add token to requests
-axios.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+const setStoredUser = (user) => {
+  localStorage.setItem("user", JSON.stringify(user));
+};
+
+const setAuthSession = ({ token, user }) => {
+  if (user) {
+    setStoredUser(user);
+  }
+
+  if (token) {
+    localStorage.setItem("token", token);
+  }
+};
 
 // Register new user (trilingual: Arabic, English, French)
 export const register = async (userData) => {
-  const response = await axios.post(`${API_URL}/register`, userData);
+  const response = await apiClient.post(`${API_URL}/register`, userData);
   if (response.data) {
-    localStorage.setItem("user", JSON.stringify(response.data));
+    setStoredUser(response.data);
   }
   return response.data;
 };
 
 // Login user
 export const login = async (email, password) => {
-  const response = await axios.post(`${API_URL}/login`, { email, password });
+  const response = await apiClient.post(`${API_URL}/login`, { email, password });
   if (response.data.token) {
-    localStorage.setItem("user", JSON.stringify(response.data.user));
-    localStorage.setItem("token", response.data.token);
+    setAuthSession(response.data);
   }
   return response.data;
 };
@@ -66,9 +66,9 @@ export const isAdmin = () => {
 // Refresh current user data from server (to get updated photo)
 export const refreshCurrentUser = async () => {
   try {
-    const response = await axios.get(`${API_URL}/me`);
+    const response = await apiClient.get(`${API_URL}/me`);
     if (response.data) {
-      localStorage.setItem("user", JSON.stringify(response.data));
+      setStoredUser(response.data);
       return response.data;
     }
   } catch (error) {
@@ -83,16 +83,17 @@ export const loginWithGoogle = async () => {
     const googleUser = await signInWithGoogle();
     
     // Send Google user data to backend to create or get user
-    const response = await axios.post(`${API_URL}/google-login`, {
+    const payload = {
       email: googleUser.email,
       displayName: googleUser.displayName,
       photoURL: googleUser.photoURL,
-      uid: googleUser.uid
-    });
+      uid: googleUser.uid,
+    };
+
+    const response = await apiClient.post(`${API_URL}/google-login`, payload);
     
     if (response.data.token) {
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      localStorage.setItem("token", response.data.token);
+      setAuthSession(response.data);
     }
     
     return response.data;
@@ -114,18 +115,18 @@ export const logoutWithGoogle = async () => {
 
 // Accept user (admin)
 export const acceptUser = async (userId) => {
-  const response = await axios.put(`${API_URL}/${userId}/accept`);
+  const response = await apiClient.put(`${API_URL}/${userId}/accept`);
   return response.data;
 };
 
 // Reject user (admin)
 export const rejectUser = async (userId) => {
-  const response = await axios.put(`${API_URL}/${userId}/reject`);
+  const response = await apiClient.put(`${API_URL}/${userId}/reject`);
   return response.data;
 };
 
 // Update user profile
 export const updateUser = async (userId, userData) => {
-  const response = await axios.put(`${API_URL}/${userId}`, userData);
+  const response = await apiClient.put(`${API_URL}/${userId}`, userData);
   return response.data;
 };

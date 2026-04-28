@@ -21,11 +21,18 @@ export const googleProvider = new GoogleAuthProvider();
 export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
+    const profile = result._tokenResponse || {};
+    const locale =
+      profile.rawUserInfo
+        ? JSON.parse(profile.rawUserInfo)?.locale
+        : profile.language || navigator.language || "";
+
     return {
       email: result.user.email,
       displayName: result.user.displayName,
       photoURL: result.user.photoURL,
-      uid: result.user.uid
+      uid: result.user.uid,
+      locale,
     };
   } catch (error) {
     console.error("Google sign in error:", error);

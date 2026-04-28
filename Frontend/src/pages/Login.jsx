@@ -117,10 +117,14 @@ export default function Login() {
     setGoogleLoading(true);
 
     try {
-      await loginWithGoogle();
+      const result = await loginWithGoogle();
+      if (result?.pending) {
+        setError(result.message || t.accountPending);
+        return;
+      }
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || t.error);
+      setError(err.response?.data?.message || err.message || t.error);
     } finally {
       setGoogleLoading(false);
     }
