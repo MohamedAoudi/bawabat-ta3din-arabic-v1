@@ -3,7 +3,7 @@ const pool = require("../db");
 const getAllMineralProduction = async () => {
   const result = await pool.query(`
     SELECT id, country_id, mineral_id, year, production_quantity, normalized_quantity,
-           unit_name, conversion_factor, data_source, created_at, updated_at
+           unit_name_ar, unit_name_en, unit_name_fr, conversion_factor, data_source, created_at, updated_at
     FROM mineral_production
     ORDER BY year DESC, mineral_id ASC, country_id ASC NULLS FIRST
   `);
@@ -13,7 +13,7 @@ const getAllMineralProduction = async () => {
 const getMineralProductionById = async (id) => {
   const result = await pool.query(
     `SELECT id, country_id, mineral_id, year, production_quantity, normalized_quantity,
-            unit_name, conversion_factor, data_source, created_at, updated_at
+            unit_name_ar, unit_name_en, unit_name_fr, conversion_factor, data_source, created_at, updated_at
      FROM mineral_production
      WHERE id = $1`,
     [id]
@@ -27,17 +27,19 @@ const createMineralProduction = async ({
   year,
   production_quantity,
   normalized_quantity,
-  unit_name,
+  unit_name_ar,
+  unit_name_en,
+  unit_name_fr,
   conversion_factor,
   data_source,
 }) => {
   const result = await pool.query(
     `INSERT INTO mineral_production
-      (country_id, mineral_id, year, production_quantity, normalized_quantity, unit_name, conversion_factor, data_source)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      (country_id, mineral_id, year, production_quantity, normalized_quantity, unit_name_ar, unit_name_en, unit_name_fr, conversion_factor, data_source)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING id, country_id, mineral_id, year, production_quantity, normalized_quantity,
-               unit_name, conversion_factor, data_source, created_at, updated_at`,
-    [country_id, mineral_id, year, production_quantity, normalized_quantity, unit_name, conversion_factor, data_source]
+               unit_name_ar, unit_name_en, unit_name_fr, conversion_factor, data_source, created_at, updated_at`,
+    [country_id, mineral_id, year, production_quantity, normalized_quantity, unit_name_ar, unit_name_en, unit_name_fr, conversion_factor, data_source]
   );
   return result.rows[0];
 };
@@ -49,7 +51,9 @@ const updateMineralProduction = async (id, data) => {
     year,
     production_quantity,
     normalized_quantity,
-    unit_name,
+    unit_name_ar,
+    unit_name_en,
+    unit_name_fr,
     conversion_factor,
     data_source,
   } = data;
@@ -61,13 +65,15 @@ const updateMineralProduction = async (id, data) => {
          year = COALESCE($3, year),
          production_quantity = COALESCE($4, production_quantity),
          normalized_quantity = COALESCE($5, normalized_quantity),
-         unit_name = COALESCE($6, unit_name),
-         conversion_factor = COALESCE($7, conversion_factor),
-         data_source = COALESCE($8, data_source)
-     WHERE id = $9
+         unit_name_ar = COALESCE($6, unit_name_ar),
+         unit_name_en = COALESCE($7, unit_name_en),
+         unit_name_fr = COALESCE($8, unit_name_fr),
+         conversion_factor = COALESCE($9, conversion_factor),
+         data_source = COALESCE($10, data_source)
+     WHERE id = $11
      RETURNING id, country_id, mineral_id, year, production_quantity, normalized_quantity,
-               unit_name, conversion_factor, data_source, created_at, updated_at`,
-    [country_id, mineral_id, year, production_quantity, normalized_quantity, unit_name, conversion_factor, data_source, id]
+               unit_name_ar, unit_name_en, unit_name_fr, conversion_factor, data_source, created_at, updated_at`,
+    [country_id, mineral_id, year, production_quantity, normalized_quantity, unit_name_ar, unit_name_en, unit_name_fr, conversion_factor, data_source, id]
   );
   return result.rows[0];
 };

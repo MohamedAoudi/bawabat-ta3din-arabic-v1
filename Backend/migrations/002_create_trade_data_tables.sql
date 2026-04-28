@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS countries (
   id SERIAL PRIMARY KEY,
   name_ar VARCHAR(255) NOT NULL,
   name_en VARCHAR(255) NOT NULL,
+  name_fr VARCHAR(255) NOT NULL,
   iso_code VARCHAR(10) NOT NULL UNIQUE,
   display_order INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -20,7 +21,10 @@ CREATE TABLE IF NOT EXISTS minerals (
   id SERIAL PRIMARY KEY,
   name_ar VARCHAR(255) NOT NULL,
   name_en VARCHAR(255) NOT NULL,
-  category_name VARCHAR(255),
+  name_fr VARCHAR(255) NOT NULL,
+  category_name_ar VARCHAR(255),
+  category_name_en VARCHAR(255),
+  category_name_fr VARCHAR(255),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -28,16 +32,24 @@ CREATE TABLE IF NOT EXISTS minerals (
 CREATE TABLE IF NOT EXISTS hs_products (
   code VARCHAR(50) PRIMARY KEY,
   mineral_id INTEGER NOT NULL REFERENCES minerals(id) ON DELETE RESTRICT,
-  product_name VARCHAR(255) NOT NULL,
-  product_category VARCHAR(255),
+  product_name_ar VARCHAR(255) NOT NULL,
+  product_name_en VARCHAR(255) NOT NULL,
+  product_name_fr VARCHAR(255) NOT NULL,
+  product_category_ar VARCHAR(255),
+  product_category_en VARCHAR(255),
+  product_category_fr VARCHAR(255),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS trade_partners (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  partner_category VARCHAR(255),
+  name_ar VARCHAR(255) NOT NULL,
+  name_en VARCHAR(255) NOT NULL,
+  name_fr VARCHAR(255) NOT NULL,
+  partner_category_ar VARCHAR(255),
+  partner_category_en VARCHAR(255),
+  partner_category_fr VARCHAR(255),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -70,7 +82,9 @@ CREATE TABLE IF NOT EXISTS mineral_production (
   year INTEGER NOT NULL REFERENCES years(year) ON DELETE RESTRICT,
   production_quantity NUMERIC(20, 4),
   normalized_quantity NUMERIC(20, 4),
-  unit_name VARCHAR(100),
+  unit_name_ar VARCHAR(100),
+  unit_name_en VARCHAR(100),
+  unit_name_fr VARCHAR(100),
   conversion_factor NUMERIC(20, 8),
   data_source TEXT,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -109,7 +123,9 @@ CREATE TABLE IF NOT EXISTS country_production_summary (
   year INTEGER NOT NULL REFERENCES years(year) ON DELETE CASCADE,
   mineral_id INTEGER NOT NULL REFERENCES minerals(id) ON DELETE CASCADE,
   total_production NUMERIC(20, 4),
-  unit_name VARCHAR(100),
+  unit_name_ar VARCHAR(100),
+  unit_name_en VARCHAR(100),
+  unit_name_fr VARCHAR(100),
   PRIMARY KEY (country_id, year, mineral_id)
 );
 
@@ -125,9 +141,13 @@ CREATE TABLE IF NOT EXISTS country_trade_summary (
 
 CREATE INDEX IF NOT EXISTS idx_countries_iso_code ON countries(iso_code);
 CREATE INDEX IF NOT EXISTS idx_users_country_id ON users(country_id);
-CREATE INDEX IF NOT EXISTS idx_minerals_category_name ON minerals(category_name);
+CREATE INDEX IF NOT EXISTS idx_minerals_category_name_ar ON minerals(category_name_ar);
+CREATE INDEX IF NOT EXISTS idx_minerals_category_name_en ON minerals(category_name_en);
+CREATE INDEX IF NOT EXISTS idx_minerals_category_name_fr ON minerals(category_name_fr);
 CREATE INDEX IF NOT EXISTS idx_hs_products_mineral_id ON hs_products(mineral_id);
-CREATE INDEX IF NOT EXISTS idx_trade_partners_category ON trade_partners(partner_category);
+CREATE INDEX IF NOT EXISTS idx_trade_partners_category_ar ON trade_partners(partner_category_ar);
+CREATE INDEX IF NOT EXISTS idx_trade_partners_category_en ON trade_partners(partner_category_en);
+CREATE INDEX IF NOT EXISTS idx_trade_partners_category_fr ON trade_partners(partner_category_fr);
 CREATE INDEX IF NOT EXISTS idx_mineral_production_country_year ON mineral_production(country_id, year);
 CREATE INDEX IF NOT EXISTS idx_mineral_production_mineral_year ON mineral_production(mineral_id, year);
 CREATE INDEX IF NOT EXISTS idx_trade_transactions_country_year ON trade_transactions(country_id, year);

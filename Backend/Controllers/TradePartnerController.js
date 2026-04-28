@@ -23,12 +23,26 @@ const getTradePartnerById = async (req, res) => {
 
 const createTradePartner = async (req, res) => {
   try {
-    const { name, partner_category } = req.body;
-    if (!name) {
-      return res.status(400).json({ message: "name is required" });
+    const {
+      name_ar,
+      name_en,
+      name_fr,
+      partner_category_ar,
+      partner_category_en,
+      partner_category_fr,
+    } = req.body;
+    if (!name_ar || !name_en || !name_fr) {
+      return res.status(400).json({ message: "name_ar, name_en and name_fr are required" });
     }
 
-    const partner = await tradePartnerModel.createTradePartner({ name, partner_category });
+    const partner = await tradePartnerModel.createTradePartner({
+      name_ar,
+      name_en,
+      name_fr,
+      partner_category_ar,
+      partner_category_en,
+      partner_category_fr,
+    });
     res.status(201).json(partner);
   } catch (error) {
     res.status(500).json({ error: error.message });

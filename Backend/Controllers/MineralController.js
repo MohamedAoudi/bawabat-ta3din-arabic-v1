@@ -23,12 +23,19 @@ const getMineralById = async (req, res) => {
 
 const createMineral = async (req, res) => {
   try {
-    const { name_ar, name_en, category_name } = req.body;
-    if (!name_ar || !name_en) {
-      return res.status(400).json({ message: "name_ar and name_en are required" });
+    const { name_ar, name_en, name_fr, category_name_ar, category_name_en, category_name_fr } = req.body;
+    if (!name_ar || !name_en || !name_fr) {
+      return res.status(400).json({ message: "name_ar, name_en and name_fr are required" });
     }
 
-    const mineral = await mineralModel.createMineral({ name_ar, name_en, category_name });
+    const mineral = await mineralModel.createMineral({
+      name_ar,
+      name_en,
+      name_fr,
+      category_name_ar,
+      category_name_en,
+      category_name_fr,
+    });
     res.status(201).json(mineral);
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -23,12 +23,30 @@ const getHSProductByCode = async (req, res) => {
 
 const createHSProduct = async (req, res) => {
   try {
-    const { code, mineral_id, product_name, product_category } = req.body;
-    if (!code || !mineral_id || !product_name) {
-      return res.status(400).json({ message: "code, mineral_id and product_name are required" });
+    const {
+      code,
+      mineral_id,
+      product_name_ar,
+      product_name_en,
+      product_name_fr,
+      product_category_ar,
+      product_category_en,
+      product_category_fr,
+    } = req.body;
+    if (!code || !mineral_id || !product_name_ar || !product_name_en || !product_name_fr) {
+      return res.status(400).json({ message: "code, mineral_id, product_name_ar, product_name_en and product_name_fr are required" });
     }
 
-    const product = await hsProductModel.createHSProduct({ code, mineral_id, product_name, product_category });
+    const product = await hsProductModel.createHSProduct({
+      code,
+      mineral_id,
+      product_name_ar,
+      product_name_en,
+      product_name_fr,
+      product_category_ar,
+      product_category_en,
+      product_category_fr,
+    });
     res.status(201).json(product);
   } catch (error) {
     res.status(500).json({ error: error.message });
