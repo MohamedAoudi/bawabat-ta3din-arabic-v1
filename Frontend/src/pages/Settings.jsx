@@ -35,7 +35,7 @@ const TRANSLATIONS = {
     roles: {
       admin: "مدير",
       user: "مستخدم",
-      editor: "محرر",
+      
     },
   },
   fr: {
@@ -63,7 +63,6 @@ const TRANSLATIONS = {
     roles: {
       admin: "Administrateur",
       user: "Utilisateur",
-      editor: "Éditeur",
     },
   },
   en: {
@@ -91,7 +90,6 @@ const TRANSLATIONS = {
     roles: {
       admin: "Admin",
       user: "User",
-      editor: "Editor",
     },
   },
 };
