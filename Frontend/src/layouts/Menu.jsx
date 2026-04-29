@@ -85,13 +85,13 @@ const NewSplitMenu = () => {
     return (
       <Link
         to={to}
-        className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 group
+        className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl transition-all duration-300 group
           ${isActive 
-            ? 'bg-[#C9A84C] text-[#082721]' 
+            ? 'bg-[#C9A84C] text-white' 
             : 'text-[#C9A84C] hover:bg-[#C9A84C]/10'}`}
       >
         <Icon size={18} className={isActive ? '' : 'group-hover:scale-110 transition-transform'} />
-        <span className="font-bold text-sm uppercase tracking-wide">{label}</span>
+        <span className="font-bold text-xs lg:text-sm uppercase tracking-wide whitespace-nowrap">{label}</span>
       </Link>
     );
   };
@@ -122,68 +122,57 @@ const NewSplitMenu = () => {
       <header className="fixed top-0 left-0 right-0 z-[100] font-cairo" dir={isRTL ? "rtl" : "ltr"}>
         
         {/* --- PARTIE 1: HEADER UTILITAIRE --- */}
-        <div className="top-utility-bar h-14 flex items-center transition-transform duration-300">
-          <div className="max-w-7xl mx-auto w-full px-6 flex justify-between items-center">
+        <div className="top-utility-bar h-12 sm:h-14 flex items-center transition-transform duration-300">
+          <div className="max-w-7xl mx-auto w-full px-2 sm:px-6 flex justify-between items-center gap-2">
             
-            {/* Gauche: Lien AIDSMO (Prend 1/3 de l'espace) */}
-            <div className="flex items-center justify-start flex-1">
+            {/* Gauche: Lien AIDSMO */}
+            <div className="flex items-center justify-start flex-shrink-0">
               <a href="https://aidsmo.org" target="_blank" rel="noreferrer" className="hover:opacity-80 transition-opacity">
-                <img src={logoAidsmo} alt="AIDSMO" className="h-12 w-12 rounded-full bg-white p-0.5" />
+                <img 
+                  src={logoAidsmo} 
+                  alt="AIDSMO" 
+                  className={`h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 rounded-full p-0.5 transition-colors ${isDarkMode ? 'bg-white' : 'bg-transparent'}`} 
+                />
               </a>
             </div>
 
-            {/* Centre: Recherche parfaitement au milieu (Prend 1/3 de l'espace) */}
-            <div className="hidden md:flex items-center justify-center flex-1">
-              <div className={`relative flex items-center transition-all duration-300 ${searchFocused ? 'w-64' : 'w-48'}`}>
+            {/* Centre: Recherche (Responsive) */}
+            <div className="hidden sm:flex items-center justify-center flex-1 max-w-[200px] md:max-w-md">
+              <div className={`relative flex items-center transition-all duration-300 w-full ${searchFocused ? 'md:w-64' : 'md:w-48'}`}>
                 <Search size={14} className={`absolute text-[#C9A84C] ${isRTL ? 'right-3' : 'left-3'}`} />
                 <input 
                   type="text" 
                   placeholder={t("quickSearch")}
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setSearchFocused(false)}
-                  className={`bg-white/5 border border-white/10 rounded-full py-1 text-xs text-white focus:outline-none focus:border-[#C9A84C]/50 transition-all w-full placeholder:text-white/40 ${isRTL ? 'pr-9 pl-4' : 'pl-9 pr-4'}`}
+                  className={`bg-white/5 border border-white/10 rounded-full py-1 sm:py-1.5 text-xs text-white focus:outline-none focus:border-[#C9A84C]/50 transition-all w-full placeholder:text-white/40 ${isRTL ? 'pr-9 pl-4' : 'pl-9 pr-4'}`}
                 />
               </div>
             </div>
 
-            {/* Droite: Paramètres & Profil (Prend 1/3 de l'espace) */}
-            <div className="flex items-center justify-end gap-3 text-xs flex-1">
-              <div className="flex items-center border-x border-white/10 px-3 gap-3">
-                <button onClick={toggleTheme} className="p-1 text-white/60 hover:text-[#C9A84C] transition-colors rounded-full hover:bg-white/5">
+            {/* Droite: Paramètres & Profil */}
+            <div className="flex items-center justify-end gap-1 sm:gap-3 text-xs flex-shrink-0">
+              <div className="flex items-center sm:border-x border-white/10 px-1 sm:px-3 gap-1 sm:gap-2">
+                <button onClick={toggleTheme} className="p-1 sm:p-1.5 text-white/60 hover:text-[#C9A84C] transition-colors rounded-full hover:bg-white/5">
                   {isDarkMode ? <Sun size={14} /> : <Moon size={14} />}
                 </button>
                 
                 <div className="flex items-center bg-white/5 rounded-md p-0.5 border border-white/10">
-                  <button
-                    onClick={() => changeLanguage('ar')}
-                    className={`px-2 py-0.5 rounded text-[10px] font-black transition-all ${language === 'ar' ? 'bg-[#C9A84C] text-[#082721]' : 'text-white/50 hover:text-[#C9A84C]'}`}
-                  >
-                    AR
-                  </button>
-                  <button
-                    onClick={() => changeLanguage('fr')}
-                    className={`px-2 py-0.5 rounded text-[10px] font-black transition-all ${language === 'fr' ? 'bg-[#C9A84C] text-[#082721]' : 'text-white/50 hover:text-[#C9A84C]'}`}
-                  >
-                    FR
-                  </button>
-                  <button
-                    onClick={() => changeLanguage('en')}
-                    className={`px-2 py-0.5 rounded text-[10px] font-black transition-all ${language === 'en' ? 'bg-[#C9A84C] text-[#082721]' : 'text-white/50 hover:text-[#C9A84C]'}`}
-                  >
-                    EN
-                  </button>
+                  <button onClick={() => changeLanguage('ar')} className={`px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black transition-all ${language === 'ar' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>AR</button>
+                  <button onClick={() => changeLanguage('fr')} className={`px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black transition-all ${language === 'fr' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>FR</button>
+                  <button onClick={() => changeLanguage('en')} className={`px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black transition-all ${language === 'en' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>EN</button>
                 </div>
               </div>
 
               {isAuthenticated() ? (
-                <Link to="/dashboard" className="flex items-center gap-1.5 text-white/90 hover:text-[#C9A84C] font-bold px-2">
+                <Link to="/dashboard" className="hidden sm:flex items-center gap-1.5 text-white/90 hover:text-[#C9A84C] font-bold px-1 sm:px-2 whitespace-nowrap">
                   <User size={14} />
-                  <span>{t("dashboard")}</span>
+                  <span className="hidden md:block">{t("dashboard")}</span>
                 </Link>
               ) : (
-                <Link to="/login" className="flex items-center gap-1.5 text-[#C9A84C] hover:text-white font-bold px-2 transition-colors">
+                <Link to="/login" className="hidden sm:flex items-center gap-1.5 text-[#C9A84C] hover:text-white font-bold px-1 sm:px-2 transition-colors whitespace-nowrap">
                   <LogIn size={14} />
-                  <span>{t("login")}</span>
+                  <span className="hidden md:block">{t("login")}</span>
                 </Link>
               )}
             </div>
@@ -192,23 +181,24 @@ const NewSplitMenu = () => {
         </div>
 
         {/* --- PARTIE 2: MENU PRINCIPAL --- */}
-        <div className={`transition-all duration-500 w-full ${scrolled ? 'mt-2 px-4' : 'mt-0 px-0'}`}>
-          <div className={`max-w-7xl mx-auto transition-all duration-500 main-nav-glass ${scrolled ? 'py-2 px-6 rounded-2xl' : 'py-4 px-6 rounded-none'}`}>
+        <div className={`transition-all duration-500 w-full ${scrolled ? 'md:mt-2 px-2 md:px-4' : 'mt-0 px-0'}`}>
+          <div className={`max-w-7xl mx-auto transition-all duration-500 main-nav-glass ${scrolled ? 'py-2 px-3 md:px-6 rounded-none md:rounded-2xl' : 'py-3 md:py-4 px-3 md:px-6 rounded-none'}`}>
             <div className="flex items-center justify-between">
               
               <Link to="/" className="flex-shrink-0">
                 <img 
                   src={logoAmip} 
                   alt="AMIP" 
-                  className={`transition-all duration-500 object-contain ${scrolled ? 'h-10' : 'h-16'}`} 
+                  className={`transition-all duration-500 object-contain ${scrolled ? 'h-8 sm:h-10' : 'h-10 sm:h-14'} ${isDarkMode ? 'bg-white p-1 rounded-xl' : ''}`} 
                 />
               </Link>
 
-              <nav className="hidden lg:flex items-center gap-1">
+              {/* Navigation Desktop (Cachée sur tablettes et mobiles, affichée sur grands écrans) */}
+              <nav className="hidden xl:flex items-center gap-1">
                 <NavItem to="/" icon={LayoutGrid} label={t("home")} />
                 
                 <div className="relative group">
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-all font-bold text-sm uppercase">
+                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-all font-bold text-sm uppercase whitespace-nowrap">
                     <BarChart3 size={18} />
                     {t("indicators")}
                     <ChevronDown size={14} className="group-hover:rotate-180 transition-transform" />
@@ -244,18 +234,23 @@ const NewSplitMenu = () => {
                 <NavItem to="/about" icon={Info} label={t("about")} />
               </nav>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 md:gap-3">
                 <Link 
                   to="/rapport"
-                  className="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#C9A84C] to-[#e0c268] text-[#082721] font-black text-sm hover:shadow-[0_4px_20px_rgba(201,168,76,0.4)] transition-all hover:-translate-y-0.5"
+                  className="hidden md:flex items-center gap-2 px-4 lg:px-6 py-2 md:py-2.5 rounded-xl bg-gradient-to-r from-[#C9A84C] to-[#e0c268] text-white font-black text-xs md:text-sm hover:shadow-[0_4px_20px_rgba(201,168,76,0.4)] transition-all hover:-translate-y-0.5 whitespace-nowrap"
                 >
-                  <FileText size={18} />
+                  <FileText size={16} />
                   <span>{t("smartReports")}</span>
                 </Link>
 
+                {/* Icône de recherche sur mobile (remplace la barre complète) */}
+                <button className="flex sm:hidden p-2 text-[#C9A84C]">
+                  <Search size={20} />
+                </button>
+
                 <button 
                   onClick={() => setMobileOpen(true)}
-                  className="lg:hidden p-2 bg-[#C9A84C]/10 rounded-lg border border-[#C9A84C]/20 text-[#C9A84C]"
+                  className="xl:hidden p-2 bg-[#C9A84C]/10 rounded-lg border border-[#C9A84C]/20 text-[#C9A84C]"
                 >
                   <MenuIcon size={20} />
                 </button>
@@ -273,16 +268,20 @@ const NewSplitMenu = () => {
             onClick={() => setMobileOpen(false)}
         />
         
-        <div className={`absolute top-0 bottom-0 ${isRTL ? 'right-0' : 'left-0'} w-[85%] max-w-sm bg-[#082721] shadow-2xl transition-transform duration-500 ease-out flex flex-col ${mobileOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}`}>
+        <div className={`absolute top-0 bottom-0 ${isRTL ? 'right-0' : 'left-0'} w-[85%] sm:w-[320px] bg-[#082721] shadow-2xl transition-transform duration-500 ease-out flex flex-col ${mobileOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}`}>
           
-          <div className="p-6 flex justify-between items-center border-b border-white/10">
-            <img src={logoAmip} alt="AMIP" className="h-10" />
+          <div className="p-4 sm:p-6 flex justify-between items-center border-b border-white/10">
+            <img 
+              src={logoAmip} 
+              alt="AMIP" 
+              className={`h-8 sm:h-10 transition-colors ${isDarkMode ? 'bg-white p-1 rounded-lg' : ''}`} 
+            />
             <button onClick={() => setMobileOpen(false)} className="p-2 text-white/50 hover:text-[#C9A84C] transition-colors rounded-full hover:bg-white/5">
               <X size={24} />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-2">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-1 sm:gap-2">
             {[
               { to: "/", label: t("home"), icon: LayoutGrid },
               { to: "/indicators", label: t("indicators"), icon: BarChart3 },
@@ -293,62 +292,47 @@ const NewSplitMenu = () => {
                 key={idx} 
                 to={link.to} 
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-4 p-4 rounded-xl transition-colors ${location.pathname === link.to ? 'bg-[#C9A84C] text-[#082721]' : 'text-[#C9A84C] hover:bg-white/5'}`}
+                className={`flex items-center gap-4 p-3 sm:p-4 rounded-xl transition-colors ${location.pathname === link.to ? 'bg-[#C9A84C] text-white' : 'text-[#C9A84C] hover:bg-white/5'}`}
               >
-                <link.icon size={22} className={location.pathname === link.to ? '' : 'text-[#C9A84C]/70'} />
-                <span className="text-lg font-bold">{link.label}</span>
+                <link.icon size={20} className={location.pathname === link.to ? '' : 'text-[#C9A84C]/70'} />
+                <span className="text-base sm:text-lg font-bold">{link.label}</span>
               </Link>
             ))}
 
-            <div className="my-4 h-[1px] bg-white/10"></div>
+            <div className="my-2 sm:my-4 h-[1px] bg-white/10"></div>
 
             {isAuthenticated() ? (
-              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 p-4 text-white hover:bg-white/5 rounded-xl transition-colors">
-                <User size={22} className="text-[#C9A84C]" />
-                <span className="text-lg font-bold">{t("dashboard")}</span>
+              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 p-3 sm:p-4 text-white hover:bg-white/5 rounded-xl transition-colors">
+                <User size={20} className="text-[#C9A84C]" />
+                <span className="text-base sm:text-lg font-bold">{t("dashboard")}</span>
               </Link>
             ) : (
-              <Link to="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 p-4 text-white hover:bg-white/5 rounded-xl transition-colors">
-                <LogIn size={22} className="text-[#C9A84C]" />
-                <span className="text-lg font-bold">{t("login")}</span>
+              <Link to="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 p-3 sm:p-4 text-white hover:bg-white/5 rounded-xl transition-colors">
+                <LogIn size={20} className="text-[#C9A84C]" />
+                <span className="text-base sm:text-lg font-bold">{t("login")}</span>
               </Link>
             )}
           </div>
 
-          <div className="p-6 bg-black/20 flex flex-col gap-4">
+          <div className="p-4 sm:p-6 bg-black/20 flex flex-col gap-3 sm:gap-4">
             <Link 
                 to="/rapport" 
                 onClick={() => setMobileOpen(false)} 
-                className="flex items-center justify-center gap-2 w-full py-4 bg-[#C9A84C] text-[#082721] rounded-xl font-black shadow-lg"
+                className="flex items-center justify-center gap-2 w-full py-3 sm:py-4 bg-[#C9A84C] text-white rounded-xl font-black shadow-lg"
             >
-                <FileText size={20} />
+                <FileText size={18} />
                 {t("smartReports")}
             </Link>
             
-            <div className="flex justify-between items-center px-2">
-                <button onClick={toggleTheme} className="text-white flex items-center gap-2">
-                    {isDarkMode ? <Sun /> : <Moon />} Theme
+            <div className="flex justify-between items-center px-1 sm:px-2">
+                <button onClick={toggleTheme} className="text-white flex items-center gap-2 text-sm">
+                    {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
                 
                 <div className="flex items-center bg-white/5 rounded-lg p-1 border border-white/10">
-                  <button
-                    onClick={() => changeLanguage('ar')}
-                    className={`px-3 py-1 rounded-md text-xs font-black transition-all ${language === 'ar' ? 'bg-[#C9A84C] text-[#082721]' : 'text-white/50 hover:text-[#C9A84C]'}`}
-                  >
-                    AR
-                  </button>
-                  <button
-                    onClick={() => changeLanguage('fr')}
-                    className={`px-3 py-1 rounded-md text-xs font-black transition-all ${language === 'fr' ? 'bg-[#C9A84C] text-[#082721]' : 'text-white/50 hover:text-[#C9A84C]'}`}
-                  >
-                    FR
-                  </button>
-                  <button
-                    onClick={() => changeLanguage('en')}
-                    className={`px-3 py-1 rounded-md text-xs font-black transition-all ${language === 'en' ? 'bg-[#C9A84C] text-[#082721]' : 'text-white/50 hover:text-[#C9A84C]'}`}
-                  >
-                    EN
-                  </button>
+                  <button onClick={() => changeLanguage('ar')} className={`px-2 sm:px-3 py-1 rounded-md text-xs font-black transition-all ${language === 'ar' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>AR</button>
+                  <button onClick={() => changeLanguage('fr')} className={`px-2 sm:px-3 py-1 rounded-md text-xs font-black transition-all ${language === 'fr' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>FR</button>
+                  <button onClick={() => changeLanguage('en')} className={`px-2 sm:px-3 py-1 rounded-md text-xs font-black transition-all ${language === 'en' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>EN</button>
                 </div>
 
             </div>
@@ -356,7 +340,7 @@ const NewSplitMenu = () => {
         </div>
       </div>
 
-      <div className="h-32 lg:h-36" />
+      <div className="h-28 sm:h-32 lg:h-36" />
     </>
   );
 };
