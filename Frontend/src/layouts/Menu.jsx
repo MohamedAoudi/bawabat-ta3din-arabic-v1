@@ -169,7 +169,7 @@ const DesktopSubMenu = ({ section, t }) => {
       className="flex items-center justify-between rounded-xl px-4 py-2.5 cursor-pointer
                  hover:bg-[#C9A84C]/10 transition-colors group/row"
     >
-      <span dir="rtl" className="text-[14px] font-bold text-black">{t(section.labelKey)}</span>
+      <span dir="rtl" className="text-[14px] font-bold text-[#C9A84C]">{t(section.labelKey)}</span>
       <ChevronLeft className="w-3 h-3 text-[#C9A84C]/40 group-hover/row:text-[#C9A84C] transition-colors flex-shrink-0" />
     </div>
     {/* Sub-panel — positioned to the END (left in RTL) */}
@@ -189,8 +189,8 @@ const DesktopSubMenu = ({ section, t }) => {
           <li key={item.href}>
             <a
               href={item.href}
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-[13px] text-black
-                         hover:bg-[#C9A84C]/15 hover:text-[#000000] transition-colors"
+              className="flex items-center gap-2 rounded-xl px-3 py-2 text-[13px] text-[#C9A84C]
+                         hover:bg-[#C9A84C]/15 hover:text-[#C9A84C] transition-colors"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C]/50 flex-shrink-0" />
               {t(item.labelKey)}
@@ -241,7 +241,7 @@ const MobileAccordion = ({ label, children, level = 0 }) => {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`w-full flex items-center justify-between rounded-xl ${rowCls} font-bold
-                    text-black hover:bg-[#C9A84C]/10 hover:text-[#C9A84C] transition-colors`}
+                    text-[#C9A84C] hover:bg-[#C9A84C]/10 hover:text-[#C9A84C] transition-colors`}
       >
         <span>{label}</span>
         <ChevronDown
@@ -407,7 +407,7 @@ const Menu = () => {
               <img
                 src={logoAmip}
                 alt="AMIP"
-                className="h-[50px] w-auto object-contain"
+                className={`${scrolled ? 'h-[50px]' : 'h-[60px]'} w-auto object-contain`}
                 style={{ filter: isDarkMode ? "brightness(1.02) contrast(1.02)" : "none" }}
               />
             </a>
@@ -609,7 +609,7 @@ const Menu = () => {
                   <img
                     src={logoAidsmo}
                     alt="AIDSMO"
-                    className="h-10 w-auto object-contain rounded-full p-1"
+                    className={`${scrolled ? 'h-10' : 'h-12'} w-auto object-contain rounded-full p-1`}
                     style={{
                       background: "#ffffff",
                       boxShadow: isDarkMode
@@ -667,7 +667,7 @@ const Menu = () => {
                     <a
                       key={item.href}
                       href={item.href}
-                      className="flex items-center gap-2 rounded-lg px-2 py-2 text-[13px] text-black
+                      className="flex items-center gap-2 rounded-lg px-2 py-2 text-[13px] text-[#C9A84C]
                                  hover:text-[#C9A84C] hover:bg-white/5 transition-colors"
                     >
                       <span className="w-1 h-1 rounded-full bg-[#C9A84C]/50 flex-shrink-0" />
@@ -766,7 +766,7 @@ const Menu = () => {
                 <img
                   src={logoAidsmo}
                   alt="AIDSMO"
-                  className="h-10 w-auto object-contain rounded-full p-1"
+                  className={`${scrolled ? 'h-10' : 'h-12'} w-auto object-contain rounded-full p-1`}
                   style={{
                     background: "#ffffff",
                     boxShadow: isDarkMode
