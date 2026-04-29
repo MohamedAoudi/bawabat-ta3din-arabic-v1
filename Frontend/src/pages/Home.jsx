@@ -1238,7 +1238,7 @@ border-radius:13px !important;
 
       {/* ═══════════════════════ HERO ═══════════════════════ */}
       <header className="relative overflow-hidden"
-        style={{ height:"100vh", minHeight:600, maxHeight:800, marginTop:5 }}>
+        style={{ height:"100vh", minHeight:600, maxHeight:800 }}>
 
         <video
           className="absolute inset-0 h-full w-full object-cover"
