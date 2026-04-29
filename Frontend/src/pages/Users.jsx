@@ -40,7 +40,6 @@ const TRANSLATIONS = {
     roles: {
       admin: "مدير",
       user: "مستخدم",
-      editor: "محرر",
     },
     status: "الحالة",
     accepted: "مقبول",
@@ -86,7 +85,6 @@ const TRANSLATIONS = {
     roles: {
       admin: "Administrateur",
       user: "Utilisateur",
-      editor: "Éditeur",
     },
     status: "Statut",
     accepted: "Accepté",
@@ -132,7 +130,6 @@ const TRANSLATIONS = {
     roles: {
       admin: "Admin",
       user: "User",
-      editor: "Editor",
     },
     status: "Status",
     accepted: "Accepted",
@@ -511,7 +508,7 @@ export default function UsersPage() {
                             background: colors.goldPale, 
                             color: colors.forest 
                           }}>
-                          {t.roles[user.role] || user.role}
+                          {user.role === "admin" ? t.roles.admin : t.roles.user}
                         </span>
                       </td>
                       <td className="px-2 sm:px-6 py-2 sm:py-4 hidden sm:table-cell">
@@ -756,7 +753,6 @@ export default function UsersPage() {
                   }}
                 >
                   <option value="user">{t.roles.user}</option>
-                  <option value="editor">{t.roles.editor}</option>
                   <option value="admin">{t.roles.admin}</option>
                 </select>
               </div>

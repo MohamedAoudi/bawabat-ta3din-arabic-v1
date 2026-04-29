@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { createContext, useState, useEffect } from "react";
+import { isAuthenticated, isAdmin } from "./services/authService";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Countries from "./pages/Countries";
@@ -76,6 +77,19 @@ export function ThemeProvider({ children }) {
   );
 }
 
+function RequireAdmin({ children }) {
+  // Non-authenticated users -> login
+  if (!isAuthenticated()) return <Navigate to="/login" replace />;
+  // Authenticated but not admin -> only Rapport
+  if (!isAdmin()) return <Navigate to="/rapport" replace />;
+  return children;
+}
+
+function RequireAuth({ children }) {
+  if (!isAuthenticated()) return <Navigate to="/login" replace />;
+  return children;
+}
+
 export default function App() {
   return (
     <ThemeProvider>
@@ -85,8 +99,8 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/users" element={<UsersPage />} />
+            <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
+            <Route path="/users" element={<RequireAdmin><UsersPage /></RequireAdmin>} />
             <Route path="/about" element={<About />} />
             <Route path="/countries" element={<Countries />} />
             <Route path="/m1" element={<M1Page />} />
@@ -97,14 +111,14 @@ export default function App() {
             <Route path="/m6" element={<M6Page />} />
             <Route path="/m7" element={<M7Page />} />
             <Route path="/m8" element={<M8Page />} />
-            <Route path="/rapport" element={<Rapport />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/minerals" element={<MineralsPage />} />
-            <Route path="/trade-exports" element={<TradeExportsPage />} />
-            <Route path="/trade-imports" element={<TradeImportsPage />} />
-            <Route path="/countries-management" element={<CountriesManagementPage />} />
-            <Route path="/years-management" element={<YearsManagementPage />} />
-            <Route path="/production-management" element={<ProductionManagementPage />} />
+            <Route path="/rapport" element={<RequireAuth><Rapport /></RequireAuth>} />
+            <Route path="/settings" element={<RequireAdmin><Settings /></RequireAdmin>} />
+            <Route path="/minerals" element={<RequireAdmin><MineralsPage /></RequireAdmin>} />
+            <Route path="/trade-exports" element={<RequireAdmin><TradeExportsPage /></RequireAdmin>} />
+            <Route path="/trade-imports" element={<RequireAdmin><TradeImportsPage /></RequireAdmin>} />
+            <Route path="/countries-management" element={<RequireAdmin><CountriesManagementPage /></RequireAdmin>} />
+            <Route path="/years-management" element={<RequireAdmin><YearsManagementPage /></RequireAdmin>} />
+            <Route path="/production-management" element={<RequireAdmin><ProductionManagementPage /></RequireAdmin>} />
           </Routes>
         </BrowserRouter>
       </LanguageProvider>

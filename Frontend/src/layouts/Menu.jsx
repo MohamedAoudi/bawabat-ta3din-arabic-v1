@@ -29,6 +29,7 @@ const TRANSLATIONS = {
     language: "اللغة",
     darkMode: "الوضع الليلي",
     lightMode: "الوضع النهاري",
+    signOut: "تسجيل الخروج",
   },
   fr: {
     home: "Accueil",
@@ -49,6 +50,7 @@ const TRANSLATIONS = {
     language: "Langue",
     darkMode: "Mode Nuit",
     lightMode: "Mode Jour",
+    signOut: "Se déconnecter",
   },
   en: {
     home: "Home",
@@ -69,6 +71,7 @@ const TRANSLATIONS = {
     language: "Language",
     darkMode: "Dark Mode",
     lightMode: "Light Mode",
+    signOut: "Sign out",
   },
 };
 
@@ -259,6 +262,7 @@ const MobileAccordion = ({ label, children, level = 0 }) => {
 const Menu = () => {
   const { language, changeLanguage } = useContext(LanguageContext);
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled,   setScrolled]   = useState(false);
   const [isHome,     setIsHome]     = useState(true);
@@ -545,15 +549,27 @@ const Menu = () => {
 
                 {/* User Menu */}
                 {isAuthenticated() ? (
-                  <Link
-                    to="/dashboard"
-                    className="flex items-center gap-2 rounded-full px-3 py-2 text-[13px] font-semibold
+                  isAdmin() ? (
+                    <Link
+                      to="/dashboard"
+                      className="flex items-center gap-2 rounded-full px-3 py-2 text-[13px] font-semibold
                                text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
                                hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
-                  >
-                    <User size={16} />
-                    <span>{language === "ar" ? "لوحة التحكم" : language === "fr" ? "Tableau de bord" : "Dashboard"}</span>
-                  </Link>
+                    >
+                      <User size={16} />
+                      <span>{language === "ar" ? "لوحة التحكم" : language === "fr" ? "Tableau de bord" : "Dashboard"}</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/rapport"
+                      className="flex items-center gap-2 rounded-full px-3 py-2 text-[13px] font-semibold
+                               text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
+                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
+                    >
+                      <DocIcon className="w-4 h-4 flex-shrink-0" />
+                      <span>{t("smartReports")}</span>
+                    </Link>
+                  )
                 ) : (
                   <Link
                     to="/login"
@@ -564,6 +580,23 @@ const Menu = () => {
                     <LoginIcon className="w-3.5 h-3.5" />
                     <span>{language === "ar" ? "دخول" : language === "fr" ? "Connexion" : "Login"}</span>
                   </Link>
+                )}
+
+                {/* Sign out button (only when logged in) */}
+                {isAuthenticated() && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      navigate("/login");
+                    }}
+                    className="flex items-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-semibold
+                               text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
+                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
+                    style={{ marginLeft: 8 }}
+                  >
+                    <span>{t("signOut")}</span>
+                  </button>
                 )}
 
                 <a href="https://aidsmo.org" target="_blank" rel="noopener noreferrer" className="flex-shrink-0">

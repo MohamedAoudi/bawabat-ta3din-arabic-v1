@@ -23,9 +23,9 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Check if user is accepted (except for admins)
-    if (!user.is_accepted && user.role !== 'admin') {
-      return res.status(403).json({ message: "Account pending approval by admin" });
+    // Always accept non-admin users (disable pending approval blocking).
+    if (user.role !== "admin" && user.is_accepted === false) {
+      user = await userModel.updateUser(user.id, { is_accepted: true });
     }
 
     const token = jwt.sign(
@@ -101,7 +101,8 @@ const createUser = async (req, res) => {
     const newUser = await userModel.createUser({ 
       nom_ar, nom_en, nom_fr, 
       prenom_ar, prenom_en, prenom_fr, 
-      email, password: hashedPassword, role, photo 
+      email, password: hashedPassword, role, photo,
+      is_accepted: true,
     });
     
     const { password: _, ...userWithoutPassword } = newUser;
@@ -176,8 +177,8 @@ const googleLogin = async (req, res) => {
         password: hashedPlaceholderPassword, // Placeholder - not used for Google users
         role: "user",
         photo: photoURL || null,
-        // Pending approval by default (same policy as normal registration).
-        is_accepted: false
+        // Always accepted (disable admin approval blocking).
+        is_accepted: true
       });
     } else if (photoURL && !user.photo) {
       // Non-blocking profile enrichment: keep existing users' photo up to date.
@@ -185,16 +186,9 @@ const googleLogin = async (req, res) => {
       user = await userModel.getUserByEmail(email);
     }
 
-    // Check if user is accepted (except for admins)
-    if (!user.is_accepted && user.role !== 'admin') {
-      const { password: _, ...userWithoutPassword } = user;
-      // Return a successful response so the frontend can show a "pending" message
-      // without treating it as a hard failure (403).
-      return res.status(200).json({
-        pending: true,
-        message: "Account pending approval by admin",
-        user: userWithoutPassword,
-      });
+    // Always accept non-admin users (disable pending approval blocking).
+    if (user.role !== "admin" && user.is_accepted === false) {
+      user = await userModel.updateUser(user.id, { is_accepted: true });
     }
 
     // Generate JWT token
