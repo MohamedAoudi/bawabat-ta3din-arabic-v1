@@ -5,7 +5,7 @@ import { getCurrentUser, logout, isAuthenticated, isAdmin } from "../services/au
 import { User } from "lucide-react";
 
 // ─── Replace with your real imports ──────────────────────────────────────────
-import logoAmip from "../assets/logo n v.png";
+import logoAmip from "../assets/logo_n_v-removebg-preview.png";
 import logoAidsmo from "../assets/aidsmo logo sans bg 800x 800.png";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
@@ -169,7 +169,7 @@ const DesktopSubMenu = ({ section, t }) => {
       className="flex items-center justify-between rounded-xl px-4 py-2.5 cursor-pointer
                  hover:bg-[#C9A84C]/10 transition-colors group/row"
     >
-      <span dir="rtl" className="text-[14px] font-bold text-white/90">{t(section.labelKey)}</span>
+      <span dir="rtl" className="text-[14px] font-bold text-black">{t(section.labelKey)}</span>
       <ChevronLeft className="w-3 h-3 text-[#C9A84C]/40 group-hover/row:text-[#C9A84C] transition-colors flex-shrink-0" />
     </div>
     {/* Sub-panel — positioned to the END (left in RTL) */}
@@ -189,8 +189,8 @@ const DesktopSubMenu = ({ section, t }) => {
           <li key={item.href}>
             <a
               href={item.href}
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-[13px] text-white/80
-                         hover:bg-[#C9A84C]/15 hover:text-white transition-colors"
+              className="flex items-center gap-2 rounded-xl px-3 py-2 text-[13px] text-black
+                         hover:bg-[#C9A84C]/15 hover:text-[#000000] transition-colors"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C]/50 flex-shrink-0" />
               {t(item.labelKey)}
@@ -241,7 +241,7 @@ const MobileAccordion = ({ label, children, level = 0 }) => {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`w-full flex items-center justify-between rounded-xl ${rowCls} font-bold
-                    text-white/90 hover:bg-[#C9A84C]/10 hover:text-[#C9A84C] transition-colors`}
+                    text-black hover:bg-[#C9A84C]/10 hover:text-[#C9A84C] transition-colors`}
       >
         <span>{label}</span>
         <ChevronDown
@@ -321,6 +321,16 @@ const Menu = () => {
       : "bg-transparent"
     : "bg-[#082721] shadow-[0_2px_20px_rgba(0,0,0,0.4)]";
 
+  const navTextClass = scrolled ? "text-[#C9A84C]" : "text-black";
+
+  const logoStyle = !scrolled && isHome
+    ? { background: "transparent", border: "none", boxShadow: "none" }
+    : {
+        background: "#ffffff",
+        border: isDarkMode ? "1px solid rgba(201,168,76,0.28)" : "1px solid rgba(8,39,33,0.08)",
+        boxShadow: "0 4px 14px rgba(8,39,33,0.08)",
+      };
+
   return (
     <>
       <style>{`
@@ -391,11 +401,7 @@ const Menu = () => {
             {/* ── Logo ─────────────────────────────────────────────────────── */}
             <div
               className="flex items-center gap-3 rounded-full px-4 py-2 transition-colors"
-              style={{
-                background: "#ffffff",
-                border: isDarkMode ? "1px solid rgba(201,168,76,0.28)" : "1px solid rgba(8,39,33,0.08)",
-                boxShadow: "0 4px 14px rgba(8,39,33,0.08)",
-              }}
+              style={logoStyle}
             >
             <a href="/" aria-label="AMIP" className="flex-shrink-0 ">
               <img
@@ -412,7 +418,7 @@ const Menu = () => {
               {/* Nav links */}
               <ul className="flex items-center gap-0 flex-shrink-0">
                 <li className="nav-sep">
-                  <a href="/" className="nav-link inline-block px-3 py-1.5 text-[15px] font-bold text-white/90 hover:text-[#C9A84C] transition-colors">
+                  <a href="/" className={`nav-link inline-block px-3 py-1.5 text-[15px] font-bold ${navTextClass} hover:text-[#C9A84C] transition-colors`}>
                     {t("home")}
                   </a>
                 </li>
@@ -426,7 +432,7 @@ const Menu = () => {
                   <button
                     type="button"
                     dir="ltr"
-                    className="nav-link inline-flex items-center gap-1.5 px-3 py-1.5 text-[15px] font-bold text-white/90 hover:text-[#C9A84C] transition-colors"
+                    className={`nav-link inline-flex items-center gap-1.5 px-3 py-1.5 text-[15px] font-bold ${navTextClass} hover:text-[#C9A84C] transition-colors`}
                   >
                     <ChevronDown className="w-2.5 h-2.5 opacity-60" />
                     <span dir={language === "ar" ? "rtl" : "ltr"}>{t("indicators")}</span>
@@ -455,13 +461,13 @@ const Menu = () => {
                 </li>
 
                 <li className="nav-sep">
-                  <a href="/countries" className="nav-link inline-block px-3 py-1.5 text-[15px] font-bold text-white/90 hover:text-[#C9A84C] transition-colors">
+                  <a href="/countries" className={`nav-link inline-block px-3 py-1.5 text-[15px] font-bold ${navTextClass} hover:text-[#C9A84C] transition-colors`}>
                     {t("arabCountries")}
                   </a>
                 </li>
 
                 <li className="nav-sep">
-                  <a href="/about" className="nav-link inline-block px-3 py-1.5 text-[15px] font-bold text-white/90 hover:text-[#C9A84C] transition-colors">
+                  <a href="/about" className={`nav-link inline-block px-3 py-1.5 text-[15px] font-bold ${navTextClass} hover:text-[#C9A84C] transition-colors`}>
                     {t("about")}
                   </a>
                 </li>
@@ -472,9 +478,9 @@ const Menu = () => {
                 <button
                   type="button"
                   onClick={openSearch}
-                  className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-semibold
-                             text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
-                             hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
+                  className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-semibold
+                             ${navTextClass} border border-[#C9A84C]/25 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
+                             hover:bg-[#C9A84C]/10 transition-all whitespace-nowrap`}
                 >
                   <SearchIcon className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>{t("quickSearch")}</span>
@@ -483,9 +489,9 @@ const Menu = () => {
                 <button
                   type="button"
                   onClick={toggleTheme}
-                  className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-semibold
-                             text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
-                             hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
+                  className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-semibold
+                             ${navTextClass} border border-[#C9A84C]/25 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
+                             hover:bg-[#C9A84C]/10 transition-all whitespace-nowrap`}
                   title={isDarkMode ? t("lightMode") : t("darkMode")}
                 >
                   {isDarkMode ? (
@@ -509,13 +515,13 @@ const Menu = () => {
                   <span>{t("smartReports")}</span>
                 </a>
 
-                <div className="flex items-center gap-1 border border-white/20 rounded-full p-1 flex-shrink-0 bg-white/5">
+                <div className="flex items-center gap-1 border border-[#C9A84C]/25 rounded-full p-1 flex-shrink-0 bg-white/5">
                   <button
                     onClick={() => changeLanguage("ar")}
                     className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
                       language === "ar"
                         ? "bg-[#C9A84C] text-slate-800"
-                        : "text-white/70 hover:text-[#C9A84C]"
+                      : `${navTextClass} hover:text-[#C9A84C]`
                     }`}
                     title="العربية"
                   >
@@ -526,7 +532,7 @@ const Menu = () => {
                     className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
                       language === "fr"
                         ? "bg-[#C9A84C] text-slate-800"
-                        : "text-white/70 hover:text-[#C9A84C]"
+                      : `${navTextClass} hover:text-[#C9A84C]`
                     }`}
                     title="Français"
                   >
@@ -537,7 +543,7 @@ const Menu = () => {
                     className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
                       language === "en"
                         ? "bg-[#C9A84C] text-slate-800"
-                        : "text-white/70 hover:text-[#C9A84C]"
+                      : `${navTextClass} hover:text-[#C9A84C]`
                     }`}
                     title="English"
                   >
@@ -552,9 +558,9 @@ const Menu = () => {
                   isAdmin() ? (
                     <Link
                       to="/dashboard"
-                      className="flex items-center gap-2 rounded-full px-3 py-2 text-[13px] font-semibold
-                               text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
-                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
+                      className={`flex items-center gap-2 rounded-full px-3 py-2 text-[13px] font-semibold
+                               ${navTextClass} border border-[#C9A84C]/25 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
+                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap`}
                     >
                       <User size={16} />
                       <span>{language === "ar" ? "لوحة التحكم" : language === "fr" ? "Tableau de bord" : "Dashboard"}</span>
@@ -562,9 +568,9 @@ const Menu = () => {
                   ) : (
                     <Link
                       to="/rapport"
-                      className="flex items-center gap-2 rounded-full px-3 py-2 text-[13px] font-semibold
-                               text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
-                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
+                      className={`flex items-center gap-2 rounded-full px-3 py-2 text-[13px] font-semibold
+                               ${navTextClass} border border-[#C9A84C]/25 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
+                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap`}
                     >
                       <DocIcon className="w-4 h-4 flex-shrink-0" />
                       <span>{t("smartReports")}</span>
@@ -573,9 +579,9 @@ const Menu = () => {
                 ) : (
                   <Link
                     to="/login"
-                    className="flex items-center gap-2 rounded-full px-3 py-2 text-[13px] font-semibold
-                               text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
-                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
+                    className={`flex items-center gap-2 rounded-full px-3 py-2 text-[13px] font-semibold
+                               ${navTextClass} border border-[#C9A84C]/25 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
+                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap`}
                   >
                     <LoginIcon className="w-3.5 h-3.5" />
                     <span>{language === "ar" ? "دخول" : language === "fr" ? "Connexion" : "Login"}</span>
@@ -590,9 +596,9 @@ const Menu = () => {
                       logout();
                       navigate("/login");
                     }}
-                    className="flex items-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-semibold
-                               text-white/80 border border-white/20 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
-                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap"
+                    className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-semibold
+                               ${navTextClass} border border-[#C9A84C]/25 hover:border-[#C9A84C]/60 hover:text-[#C9A84C]
+                               hover:bg-[#C9A84C]/5 transition-all whitespace-nowrap`}
                     style={{ marginLeft: 8 }}
                   >
                     <span>{t("signOut")}</span>
@@ -649,7 +655,7 @@ const Menu = () => {
           <div className="px-4 pt-3 pb-6 space-y-1">
 
             <a href="/"
-               className="block rounded-xl px-4 py-3 text-[15px] font-bold text-white/90
+               className="block rounded-xl px-4 py-3 text-[15px] font-bold text-black
                           hover:bg-[#C9A84C]/10 hover:text-[#C9A84C] transition-colors">
               {t("home")}
             </a>
@@ -661,7 +667,7 @@ const Menu = () => {
                     <a
                       key={item.href}
                       href={item.href}
-                      className="flex items-center gap-2 rounded-lg px-2 py-2 text-[13px] text-white/70
+                      className="flex items-center gap-2 rounded-lg px-2 py-2 text-[13px] text-black
                                  hover:text-[#C9A84C] hover:bg-white/5 transition-colors"
                     >
                       <span className="w-1 h-1 rounded-full bg-[#C9A84C]/50 flex-shrink-0" />
@@ -673,13 +679,13 @@ const Menu = () => {
             </MobileAccordion>
 
             <a href="/countries"
-               className="block rounded-xl px-4 py-3 text-[15px] font-bold text-white/90
+               className="block rounded-xl px-4 py-3 text-[15px] font-bold text-black
                           hover:bg-[#C9A84C]/10 hover:text-[#C9A84C] transition-colors">
               {t("arabCountries")}
             </a>
 
             <a href="/about"
-               className="block rounded-xl px-4 py-3 text-[15px] font-bold text-white/90
+               className="block rounded-xl px-4 py-3 text-[15px] font-bold text-black
                           hover:bg-[#C9A84C]/10 hover:text-[#C9A84C] transition-colors">
               {t("about")}
             </a>
@@ -690,7 +696,7 @@ const Menu = () => {
                 type="button"
                 onClick={openSearch}
                 className="flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold
-                           border border-white/20 text-white/80 hover:border-[#C9A84C]/60 hover:text-[#C9A84C] transition-all"
+                           border border-[#C9A84C]/25 text-black hover:border-[#C9A84C]/60 hover:text-[#C9A84C] transition-all"
               >
                 <SearchIcon className="w-3.5 h-3.5 flex-shrink-0" />
                 <span>{t("quickSearch")}</span>
@@ -700,7 +706,7 @@ const Menu = () => {
                 type="button"
                 onClick={toggleTheme}
                 className="flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold
-                           border border-white/20 text-white/80 hover:border-[#C9A84C]/60 hover:text-[#C9A84C] transition-all"
+                           border border-[#C9A84C]/25 text-black hover:border-[#C9A84C]/60 hover:text-[#C9A84C] transition-all"
                 title={isDarkMode ? t("lightMode") : t("darkMode")}
               >
                 {isDarkMode ? (
@@ -720,13 +726,13 @@ const Menu = () => {
                 <span>{t("smartReports")}</span>
               </a>
 
-              <div className="flex items-center gap-1 border border-white/20 rounded-full p-1 bg-white/5">
+              <div className="flex items-center gap-1 border border-[#C9A84C]/25 rounded-full p-1 bg-white/5">
                 <button
                   onClick={() => changeLanguage("ar")}
                   className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
                     language === "ar"
                       ? "bg-[#C9A84C] text-slate-800"
-                      : "text-white/70 hover:text-[#C9A84C]"
+                      : "text-black hover:text-[#C9A84C]"
                   }`}
                   title="العربية"
                 >
@@ -737,7 +743,7 @@ const Menu = () => {
                   className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
                     language === "fr"
                       ? "bg-[#C9A84C] text-slate-800"
-                      : "text-white/70 hover:text-[#C9A84C]"
+                      : "text-black hover:text-[#C9A84C]"
                   }`}
                   title="Français"
                 >
@@ -748,7 +754,7 @@ const Menu = () => {
                   className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
                     language === "en"
                       ? "bg-[#C9A84C] text-slate-800"
-                      : "text-white/70 hover:text-[#C9A84C]"
+                      : "text-black hover:text-[#C9A84C]"
                   }`}
                   title="English"
                 >

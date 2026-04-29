@@ -28,7 +28,7 @@ import i7 from "../assets/i-7.png";
 import im1 from "../assets/وزارة-الصناعة-والمعادن-دولة-ليبيا-removebg-preview.png";
 import im2 from "../assets/وزارة-الصناعة-والتجارة-الجمهورية-اليمنية-removebg-preview.png";
 
-import bgHeaderVideo from "../assets/bg 7.mp4";
+import bgHeaderVideo from "../assets/bg.mp4";
 import mapImg from "../assets/map.png";
 import flagJordan from "../assets/flags/jordan.webp";
 import flagUae from "../assets/flags/uae.webp";
@@ -1238,7 +1238,7 @@ border-radius:13px !important;
 
       {/* ═══════════════════════ HERO ═══════════════════════ */}
       <header className="relative overflow-hidden"
-        style={{ height:"100vh", minHeight:600, maxHeight:800, marginTop:-90 }}>
+        style={{ height:"100vh", minHeight:600, maxHeight:800, marginTop:5 }}>
 
         <video
           className="absolute inset-0 h-full w-full object-cover"
