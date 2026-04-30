@@ -1138,17 +1138,39 @@ border-radius:13px !important;
 
         /* Search bar */
         .search-box {
-          background:rgba(255,255,255,0.83);
-          backdrop-filter:blur(20px);
-          border:none;
-          transition:all 0.4s cubic-bezier(.16,1,.3,1);
+          background:rgba(255,255,255,0.82);
+          backdrop-filter:blur(22px);
+          border:1px solid rgba(201,168,76,0.16);
+          box-shadow:0 18px 50px rgba(0,0,0,0.12);
+          transition:transform 0.3s ease,background 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease;
         }
         .search-box.focused {
-          background:rgb(255,255,255);
-          box-shadow:0 0 0 4px rgba(201,168,76,0.12),0 20px 60px rgba(8,39,33,0.4);
+          background:rgba(255,255,255,0.98);
+          border-color:rgba(201,168,76,0.32);
+          box-shadow:0 22px 68px rgba(8,39,33,0.18);
+          transform:translateY(-1px);
         }
-        .search-box input::placeholder { color:rgba(0,0,0,0.45); }
-        .search-box input { color:#000; }
+        .search-box button {
+          background:linear-gradient(135deg,#c9a84c,#f0d98a);
+          border:none;
+          color:#082721;
+          font-weight:700;
+          padding:10px 24px;
+          border-radius:999px;
+          cursor:pointer;
+          transition:transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .search-box button:hover {
+          transform:translateY(-1px);
+          box-shadow:0 12px 24px rgba(201,168,76,0.25);
+        }
+        .search-box input::placeholder {
+          color:rgba(8,39,33,0.45);
+          opacity:1;
+        }
+        .search-box input {
+          color:#082721;
+        }
 
         /* Shared link style */
         .ind-link {
@@ -1280,9 +1302,9 @@ border-radius:13px !important;
 
           {/* Search */}
           <div className="hero-search w-full" style={{ maxWidth:580 }}>
-            <div className={`search-box flex items-center gap-3 rounded-sm px-5 py-3 ${searchFocused?"focused":""}`}
-              style={{ borderRadius:13, background:"rgba(255,255,255,0.95)", boxShadow: searchFocused ? "0 0 0 3px rgba(201,168,76,0.4)" : "0 10px 30px rgba(0,0,0,0.2)", transition:"all 0.3s ease" }}>
-              <button type="button" style={{ background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:"#082721", padding:"8px 22px", borderRadius:13, fontSize:"0.82rem", fontWeight:800, letterSpacing:"0.04em", whiteSpace:"nowrap", border:"none", cursor:"pointer" }}>
+            <div className={`search-box flex items-center gap-3 rounded-full px-5 py-3 ${searchFocused?"focused":""}`}
+              style={{ borderRadius:999, background:"rgba(255,255,255,0.92)", boxShadow: searchFocused ? "0 20px 60px rgba(8,39,33,0.18)" : "0 16px 48px rgba(0,0,0,0.12)", transition:"all 0.3s ease" }}>
+              <button type="button" style={{ background:"linear-gradient(135deg,#c9a84c,#f0d98a)", color:"#082721", padding:"10px 24px", borderRadius:999, fontSize:"0.9rem", fontWeight:800, letterSpacing:"0.04em", whiteSpace:"nowrap", border:"none", cursor:"pointer" }}>
                 {labels.smartSearch}
               </button>
               <input
@@ -1290,9 +1312,9 @@ border-radius:13px !important;
                 placeholder={labels.searchPlaceholder}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                style={{ flex:1, border:"none", background:"transparent", outline:"none", color:"#000 !important", fontSize:"0.9rem", textAlign:isArabic ? "right" : "left", caretColor:"#c9a84c" }}
+                style={{ flex:1, minWidth:0, border:"none", background:"transparent", outline:"none", color:"#082721", fontSize:"0.95rem", textAlign:isArabic ? "right" : "left", caretColor:"#c9a84c" }}
               />
-              <AppIcon name="fa-search" size={16} style={{ color:"rgba(201,168,76,0.7)" }} />
+              <AppIcon name="fa-search" size={18} style={{ color:"rgba(8,39,33,0.65)" }} />
             </div>
           </div>
           
@@ -1329,19 +1351,18 @@ border-radius:13px !important;
       <main style={{ maxWidth:1400, margin:"0 auto", padding:"0 24px 80px", background:"transparent" }}>
 
         {/* ── KPIs ── */}
-        <section className="reveal d2" style={{ marginTop:"20px", position:"relative", zIndex:10, borderRadius:13 }}>
-          <div style={{ textAlign:"center", marginBottom:12, background:"linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)", borderRadius:13, padding:"40px 36px", boxShadow:"0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)" }}>
-            <h3 style={{ fontSize:"1.6rem", fontWeight:900, color:"white", margin:"0" }}>
-              <span style={{ background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
-                {labels.portalInNumbers}
-              </span>
-            </h3>
-          </div>
-
-          <div className="divf9" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:16, borderRadius:13 }}>
-            {kpiData.map((k, i) => <KpiCard key={i} k={k} labels={labels} />)}
-          </div>
-        </section>
+      <section className="reveal d2" style={{ marginTop: "-210px", position: "relative", zIndex: 100, padding: "0 16px" }}>
+  <div className="divf9" style={{ 
+    display: "grid", 
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", 
+    gap: "20px", 
+    backdropFilter: "blur(12px)", // Effet de flou
+    WebkitBackdropFilter: "blur(12px)", // Support pour Safari
+    padding: "24px",
+  }}>
+    {kpiData.map((k, i) => <KpiCard key={i} k={k} labels={labels} />)}
+  </div>
+</section>
 
         {/* ── PRODUCTION INDICATORS ── */}
         <section className="reveal d3"  style={{textAlign:"center",
