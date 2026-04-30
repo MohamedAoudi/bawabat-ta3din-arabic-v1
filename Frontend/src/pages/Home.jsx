@@ -1237,14 +1237,15 @@ border-radius:13px !important;
       <Menu />
 
       {/* ═══════════════════════ HERO ═══════════════════════ */}
-      <header className="relative overflow-hidden"
-        style={{ height:"100vh", minHeight:600, maxHeight:800 }}>
+<header className="relative overflow-hidden" style={{ height:"100vh", minHeight:600, maxHeight:800 }}>
 
+        {/* --- VIDÉO & OVERLAYS --- */}
         <video
           className="absolute inset-0 h-full w-full object-cover"
           src={bgHeaderVideo} autoPlay loop muted playsInline
         />
-        <div className="hero-overlay absolute inset-0" />
+        
+        <div className="hero-overlay absolute inset-0 bg-black/40" />
 
         {/* Grid overlay */}
         <div className="absolute inset-0 pointer-events-none" style={{
@@ -1252,11 +1253,12 @@ border-radius:13px !important;
           backgroundSize:"80px 80px",
         }} />
 
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+        {/* --- CONTENU PRINCIPAL --- */}
+        <div className="relative z-20 h-full flex flex-col items-center justify-center text-center px-6">
 
           {/* Badge */}
           <div className="hero-title" style={{ marginBottom:24 }}>
-            <span style={{ display:"inline-block", background:"rgba(201,168,76,0.15)", border:"1px solid rgba(201,168,76,0.4)", color:"var(--gold-light)", padding:"4px 20px", fontSize:"0.75rem", fontWeight:700, letterSpacing:"0.15em", borderRadius:2, textTransform:"uppercase" }}>
+            <span style={{ display:"inline-block", background:"rgba(201,168,76,0.15)", border:"1px solid rgba(201,168,76,0.4)", color:"#c9a84c", padding:"4px 20px", fontSize:"0.75rem", fontWeight:700, letterSpacing:"0.15em", borderRadius:2, textTransform:"uppercase" }}>
               {labels.heroBadge}
             </span>
           </div>
@@ -1279,26 +1281,49 @@ border-radius:13px !important;
           {/* Search */}
           <div className="hero-search w-full" style={{ maxWidth:580 }}>
             <div className={`search-box flex items-center gap-3 rounded-sm px-5 py-3 ${searchFocused?"focused":""}`}
-              style={{ borderRadius:13 }}>
-              <button type="button" style={{ background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:"#fff", padding:"8px 22px", borderRadius:13, fontSize:"0.82rem", fontWeight:800, letterSpacing:"0.04em", whiteSpace:"nowrap", border:"none", cursor:"pointer" }}>
+              style={{ borderRadius:13, background:"rgba(255,255,255,0.95)", boxShadow: searchFocused ? "0 0 0 3px rgba(201,168,76,0.4)" : "0 10px 30px rgba(0,0,0,0.2)", transition:"all 0.3s ease" }}>
+              <button type="button" style={{ background:"linear-gradient(135deg,#c9a84c,#e8d08a)", color:"#082721", padding:"8px 22px", borderRadius:13, fontSize:"0.82rem", fontWeight:800, letterSpacing:"0.04em", whiteSpace:"nowrap", border:"none", cursor:"pointer" }}>
                 {labels.smartSearch}
               </button>
               <input
                 type="text"
-                                placeholder={labels.searchPlaceholder}
-
+                placeholder={labels.searchPlaceholder}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                style={{ flex:1, border:"none", outline:"none", color:"#000 !important", fontSize:"0.9rem", textAlign:isArabic ? "right" : "left", caretColor:"#000" }}
+                style={{ flex:1, border:"none", background:"transparent", outline:"none", color:"#000 !important", fontSize:"0.9rem", textAlign:isArabic ? "right" : "left", caretColor:"#c9a84c" }}
               />
               <AppIcon name="fa-search" size={16} style={{ color:"rgba(201,168,76,0.7)" }} />
             </div>
           </div>
-
-          {/* Scroll hint */}
-         
+          
         </div>
-      </header>
+
+        {/* --- SHAPE DIVIDER (VAGUE DYNAMIQUE CLAIR/SOMBRE) --- */}
+        {/* Le translateY(2px) empêche de voir une fine ligne de coupure avec la section suivante */}
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20" style={{ transform: "translateY(2px)" }}>
+          {/* L'attribut preserveAspectRatio="none" permet à la vague de s'étirer sur toute la largeur */}
+          <svg className="relative block w-full h-[60px] md:h-[100px] lg:h-[140px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            
+            {/* Couche 1 : Vague arrière (semi-transparente pour la profondeur) */}
+            <path 
+              fill={isDarkMode ? "#082721" : "#ffffff"} 
+              fillOpacity="0.3" 
+              className="transition-colors duration-500"
+              d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
+            </path>
+            
+            {/* Couche 2 : Vague principale (solide) */}
+            <path 
+              fill={isDarkMode ? "#082721" : "#ffffff"} 
+              fillOpacity="1" 
+              className="transition-colors duration-500"
+              d="M0,128L48,149.3C96,171,192,213,288,229.3C384,245,480,256,576,234.7C672,213,768,160,864,144C960,128,1056,149,1152,165.3C1248,181,1344,181,1392,181.3L1440,181.3L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
+            </path>
+            
+          </svg>
+        </div>
+
+    </header>
 
       {/* ═══════════════════════ MAIN ═══════════════════════ */}
       <main style={{ maxWidth:1400, margin:"0 auto", padding:"0 24px 80px" }}>
