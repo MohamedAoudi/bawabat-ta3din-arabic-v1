@@ -1073,7 +1073,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen home-page" dir={isArabic ? "rtl" : "ltr"} lang={language}
-      style={{ background:isDarkMode ? "#071611" : "#f5f3ef", fontFamily:"'Cairo','Amiri',Georgia,serif" }}>
+      style={{ background:isDarkMode ? "#071611" : "white", fontFamily:"'Cairo','Amiri',Georgia,serif" }}>
 
       {/* ═══════════════════════ GLOBAL STYLES ═══════════════════════ */}
       <style>{`
@@ -1326,7 +1326,7 @@ border-radius:13px !important;
     </header>
 
       {/* ═══════════════════════ MAIN ═══════════════════════ */}
-      <main style={{ maxWidth:1400, margin:"0 auto", padding:"0 24px 80px" }}>
+      <main style={{ maxWidth:1400, margin:"0 auto", padding:"0 24px 80px", background:"transparent" }}>
 
         {/* ── KPIs ── */}
         <section className="reveal d2" style={{ marginTop:"20px", position:"relative", zIndex:10, borderRadius:13 }}>
