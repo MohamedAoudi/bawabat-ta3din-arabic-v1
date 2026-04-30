@@ -145,7 +145,7 @@ const NewSplitMenu = () => {
                   placeholder={t("quickSearch")}
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setSearchFocused(false)}
-                  className={`bg-white/5 border border-white/10 rounded-full py-1 sm:py-1.5 text-xs text-white focus:outline-none focus:border-[#C9A84C]/50 transition-all w-full placeholder:text-white/40 ${isRTL ? 'pr-9 pl-4' : 'pl-9 pr-4'}`}
+                  className={`rounded-full py-1 sm:py-1.5 text-xs focus:outline-none focus:border-[#C9A84C]/50 transition-all w-full ${isDarkMode ? 'bg-white/5 border border-white/10 text-white placeholder:text-white/40' : 'bg-white border border-slate-200 text-[#082721] placeholder:text-slate-400'} ${isRTL ? 'pr-9 pl-4' : 'pl-9 pr-4'}`}
                 />
               </div>
             </div>
