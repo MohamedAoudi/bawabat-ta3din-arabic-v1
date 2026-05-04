@@ -119,7 +119,7 @@ const NewSplitMenu = () => {
         }
       `}</style>
 
-      <header className="fixed top-0 left-0 right-0 z-[100] font-cairo" dir={isRTL ? "rtl" : "ltr"}>
+      <header className="fixed top-0 left-0 right-0 z-[900] font-cairo" dir={isRTL ? "rtl" : "ltr"}>
         
         {/* --- PARTIE 1: HEADER UTILITAIRE --- */}
         <div className="top-utility-bar h-12 sm:h-14 flex items-center transition-transform duration-300">
