@@ -1241,7 +1241,13 @@ border-radius:13px !important;
           border-color: rgba(201,168,76,0.6);
           color: #efdba2;
         }
-
+          html.theme-dark section {
+          background: none !important;
+          }
+           html.theme-dark main {
+          background: none !important;
+          }
+       
         /* Chatbot CTA */
         .chat-cta { background:linear-gradient(135deg,var(--forest) 0%,#0d3d34 60%,#102e28 100%); border:1px solid rgba(201,168,76,0.25); position:relative; overflow:hidden; }
         .chat-cta::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 70% 50%,rgba(201,168,76,0.07) 0%,transparent 60%); animation:floatSlow 8s ease-in-out infinite; }
@@ -1336,7 +1342,7 @@ border-radius:13px !important;
             
             {/* Couche 2 : Vague principale (solide) */}
             <path 
-              fill={isDarkMode ? "#082721" : "#ffffff"} 
+              fill={isDarkMode ? "rgb(7, 22, 17)" : "#ffffff"} 
               fillOpacity="1" 
               className="transition-colors duration-500"
               d="M0,128L48,149.3C96,171,192,213,288,229.3C384,245,480,256,576,234.7C672,213,768,160,864,144C960,128,1056,149,1152,165.3C1248,181,1344,181,1392,181.3L1440,181.3L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
@@ -1348,16 +1354,16 @@ border-radius:13px !important;
     </header>
 
       {/* ═══════════════════════ MAIN ═══════════════════════ */}
-      <main style={{ maxWidth:1400, margin:"0 auto", padding:"0 24px 80px", background:"transparent" }}>
+      <main style={{ maxWidth:1400, margin:"0 auto", padding:"0 24px 80px" }}>
 
         {/* ── KPIs ── */}
+   
       <section className="reveal d2" style={{ marginTop: "-210px", position: "relative", zIndex: 100, padding: "0 16px" }}>
   <div className="divf9" style={{ 
     display: "grid", 
     gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", 
     gap: "20px", 
-    backdropFilter: "blur(12px)", // Effet de flou
-    WebkitBackdropFilter: "blur(12px)", // Support pour Safari
+ 
     padding: "24px",
   }}>
     {kpiData.map((k, i) => <KpiCard key={i} k={k} labels={labels} />)}
@@ -1429,7 +1435,8 @@ border-radius:13px !important;
                   <span style={{  background:"linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)", backgroundSize:"300% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", animation:"shimmerGold 6s linear infinite" }}>
                    {labels.tradeIndicatorsSection}
                   </span>
-                </h3></section>
+                </h3>
+                </section>
         {/* ── TRADE ── */}
         <section className="reveal d3" style={{ marginTop:16 }}>
           <div style={{
