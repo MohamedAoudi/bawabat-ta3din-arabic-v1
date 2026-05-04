@@ -5,7 +5,7 @@ import { isAuthenticated } from "../services/authService";
 import { 
   User, Search, Moon, Sun, FileText, 
   LogIn, ChevronDown, LayoutGrid, 
-  BarChart3, Map, Info, Menu as MenuIcon, X 
+  BarChart3, Map, Info, Menu as MenuIcon, X, Mail
 } from "lucide-react";
 
 import logoAmip from "../assets/logo_n_v-removebg-preview.png";
@@ -17,6 +17,7 @@ const TRANSLATIONS = {
     indicators: "المؤشرات",
     arabCountries: "الدول العربية",
     about: "عن البوابة",
+    contact: "اتصل بنا",
     quickSearch: "بحث...",
     smartReports: "التقارير الذكية",
     login: "دخول",
@@ -32,8 +33,7 @@ const TRANSLATIONS = {
     home: "Accueil",
     indicators: "Indicateurs",
     arabCountries: "Pays Arabes",
-    about: "À Propos",
-    quickSearch: "Recherche...",
+    about: "À Propos",    contact: "Contactez-nous",    quickSearch: "Recherche...",
     smartReports: "Rapports IA",
     login: "Connexion",
     dashboard: "Tableau de bord",
@@ -49,6 +49,7 @@ const TRANSLATIONS = {
     indicators: "Indicators",
     arabCountries: "Arab Countries",
     about: "About Us",
+    contact: "Contact Us",
     quickSearch: "Search...",
     smartReports: "Smart Reports",
     login: "Login",
@@ -239,6 +240,7 @@ const NewSplitMenu = () => {
 
                 <NavItem to="/countries" icon={Map} label={t("arabCountries")} />
                 <NavItem to="/about" icon={Info} label={t("about")} />
+                <NavItem to="/contact" icon={Mail} label={t("contact")} />
               </nav>
 
               <div className="flex items-center gap-2 md:gap-3">
@@ -294,6 +296,7 @@ const NewSplitMenu = () => {
               { to: "/indicators", label: t("indicators"), icon: BarChart3 },
               { to: "/countries", label: t("arabCountries"), icon: Map },
               { to: "/about", label: t("about"), icon: Info },
+              { to: "/contact", label: t("contact"), icon: Mail },
             ].map((link, idx) => (
               <Link 
                 key={idx} 

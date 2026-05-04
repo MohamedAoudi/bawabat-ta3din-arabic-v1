@@ -76,7 +76,7 @@ const Footer = () => {
   const relatedLinks = [
     { l: t.apfm, h: "#" },
     { l: t.library, h: "#" },
-    { l: t.contact, h: "#" },
+    { l: t.contact, h: "/contact" },
   ];
 
   return (

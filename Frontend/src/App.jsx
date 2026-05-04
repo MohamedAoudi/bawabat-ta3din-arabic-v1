@@ -3,6 +3,7 @@ import { createContext, useState, useEffect } from "react";
 import { isAuthenticated, isAdmin } from "./services/authService";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
 import Countries from "./pages/Countries";
 import M1Page from "./pages/M1";
 import M2Page from "./pages/M2";
@@ -102,6 +103,7 @@ export default function App() {
             <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
             <Route path="/users" element={<RequireAdmin><UsersPage /></RequireAdmin>} />
             <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/countries" element={<Countries />} />
             <Route path="/m1" element={<M1Page />} />
             <Route path="/m2" element={<M2Page />} />
