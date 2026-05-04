@@ -1241,13 +1241,21 @@ border-radius:13px !important;
           border-color: rgba(201,168,76,0.6);
           color: #efdba2;
         }
+
+        html.theme-dark .home-page .divf9 {
+          background: rgb(7, 22, 17) !important;
+        }
           html.theme-dark section {
           background: none !important;
           }
            html.theme-dark main {
           background: none !important;
           }
-       
+          .d2 p{
+          color: rgb(7, 22, 17) !important;}
+       .divf9 p {
+          color: rgba(255, 255, 255, 0.4) !important;
+        }
         /* Chatbot CTA */
         .chat-cta { background:linear-gradient(135deg,var(--forest) 0%,#0d3d34 60%,#102e28 100%); border:1px solid rgba(201,168,76,0.25); position:relative; overflow:hidden; }
         .chat-cta::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 70% 50%,rgba(201,168,76,0.07) 0%,transparent 60%); animation:floatSlow 8s ease-in-out infinite; }
@@ -1363,8 +1371,8 @@ border-radius:13px !important;
     display: "grid", 
     gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", 
     gap: "20px", 
- 
     padding: "24px",
+    
   }}>
     {kpiData.map((k, i) => <KpiCard key={i} k={k} labels={labels} />)}
   </div>
