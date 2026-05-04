@@ -497,7 +497,7 @@ const MiniTradeBar = ({ active, color = "#7ee0c0" }) => {
       {bars.map((v, i) => (
         <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", height:"100%" }}>
           <div style={{
-            width:"100%", borderRadius:"2px 2px 0 0",
+            width:"100%", borderRadius:"8px 8px 0 0",
             background:`linear-gradient(to top,${color}88,${color})`,
             minHeight:3,
             height: active ? `${v}%` : "0%",
@@ -595,7 +595,7 @@ const MiniBarChart = ({ active }) => {
       {bars.map((v, i) => (
         <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", height:"100%" }}>
           <div style={{
-            width:"100%", borderRadius:"2px 2px 0 0",
+            width:"100%", borderRadius:"8px 8px 0 0",
             background:"linear-gradient(to top,#c9a84c,#e8d08a)",
             minHeight:3,
             height: active ? `${v}%` : "0%",
@@ -644,10 +644,10 @@ const MiniGroupedBar = ({ active }) => {
     <div style={{ height:140, width:"100%", background:"rgba(255,255,255,0.06)", borderRadius:8, padding:"10px 8px 4px", display:"flex", alignItems:"flex-end", gap:2 }}>
       {a.map((v,i) => (
         <div key={i} style={{ flex:1, display:"flex", alignItems:"flex-end", justifyContent:"center", gap:1, height:"100%" }}>
-          <div style={{ width:"45%", borderRadius:"2px 2px 0 0", background:"rgba(255,255,255,0.55)",
+          <div style={{ width:"45%", borderRadius:"8px 8px 0 0", background:"rgba(255,255,255,0.55)",
             height: active?`${v}%`:"0%", opacity: active?1:0.2,
             transition: active?`height 700ms cubic-bezier(.16,1,.3,1) ${i*38}ms,opacity 350ms ease ${i*38}ms`:"height 250ms ease,opacity 250ms ease" }} />
-          <div style={{ width:"45%", borderRadius:"2px 2px 0 0", background:"#49c7a2",
+          <div style={{ width:"45%", borderRadius:"8px 8px 0 0", background:"#49c7a2",
             height: active?`${b[i]}%`:"0%", opacity: active?1:0.2,
             transition: active?`height 700ms cubic-bezier(.16,1,.3,1) ${i*38+75}ms,opacity 350ms ease ${i*38+75}ms`:"height 250ms ease,opacity 250ms ease" }} />
         </div>
@@ -673,7 +673,7 @@ const MiniDonut = ({ active, labels }) => (
     <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
       {[["#c9a84c", labels.donutArabProduction],["rgba(255,255,255,0.2)", labels.donutWorld]].map(([c,l],i) => (
         <div key={i} style={{ display:"flex", alignItems:"center", gap:5 }}>
-          <div style={{ width:8, height:8, borderRadius:2, background:c, flexShrink:0 }} />
+          <div style={{ width:8, height:8, borderRadius:8, background:c, flexShrink:0 }} />
           <span style={{ fontSize:"0.65rem", color:"rgba(255,255,255,0.5)" }}>{l}</span>
         </div>
       ))}
@@ -760,7 +760,7 @@ const IndicatorRowCard = ({ card, labels }) => {
           <div style={{
             width:88, height:"100%", marginTop:2, flexShrink:0, alignSelf:"stretch",
             background:`${card.tagColor}20`, border:`1px solid ${card.tagColor}50`,
-            borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center",
+            borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center",
             color:card.tagColor,
             transform: hovered?"scale(1.1) rotate(-5deg)":"scale(1) rotate(0deg)",
             transition:"transform 0.32s cubic-bezier(.16,1,.3,1)",
@@ -791,7 +791,7 @@ const IndicatorRowCard = ({ card, labels }) => {
             </div>
             <p style={{ fontSize:"0.9rem", color:"rgba(255,255,255,0.5)", lineHeight:1.75, margin:"0 0 14px" }}>{shownDesc}</p>
             {expanded && (
-              <a href={card.href} onClick={(e) => e.stopPropagation()} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${card.tagColor}40`, borderRadius:2, fontSize:"0.85rem", fontWeight:700, color:card.tagColor, letterSpacing:"0.04em", textDecoration:"none", background:`${card.tagColor}12` }}>
+              <a href={card.href} onClick={(e) => e.stopPropagation()} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 20px", border:`1px solid ${card.tagColor}40`, borderRadius:8, fontSize:"0.85rem", fontWeight:700, color:card.tagColor, letterSpacing:"0.04em", textDecoration:"none", background:`${card.tagColor}12` }}>
                 <AppIcon name="fa-arrow-left" size={14} strokeWidth={2.4} /> {labels.more}
               </a>
             )}
@@ -835,7 +835,7 @@ const KpiCard = ({ k, labels }) => {
       style={{
         background:"var(--forest)",
         border:`1px solid ${(hovered || expanded)?"rgba(201,168,76,0.6)":"rgba(201,168,76,0.2)"}`,
-        borderRadius:13, padding:"24px",
+        borderRadius:8, padding:"24px",
         transform: (hovered || expanded)?"translateY(-10px)":"translateY(0)",
         boxShadow: (hovered || expanded)?"0 30px 60px rgba(8,39,33,0.35),0 0 0 1px rgba(201,168,76,0.3)":"none",
         transition:"transform 0.4s cubic-bezier(.16,1,.3,1),box-shadow 0.4s,border-color 0.4s",
@@ -848,7 +848,7 @@ const KpiCard = ({ k, labels }) => {
           <AppIcon name={shownIcon} size={22} strokeWidth={2.2} />
         </div>
         <div style={{ display:"inline-flex", alignItems:"center", gap:6 }}>
-          <span style={{ background:`${k.color}18`, color:k.color, fontSize:"0.72rem", fontWeight:700, padding:"4px 12px", borderRadius:2, border:`1px solid ${k.color}30`, whiteSpace:"nowrap" }}>
+          <span style={{ background:`${k.color}18`, color:k.color, fontSize:"0.72rem", fontWeight:700, padding:"4px 12px", borderRadius:8, border:`1px solid ${k.color}30`, whiteSpace:"nowrap" }}>
             {k.badge}
           </span>
           <button
@@ -1253,7 +1253,7 @@ border-radius:13px !important;
           }
           .d2 p{
           color: rgb(7, 22, 17) !important;}
-       .divf9 p {
+        html.theme-dark .divf9 p {
           color: rgba(255, 255, 255, 0.4) !important;
         }
         /* Chatbot CTA */

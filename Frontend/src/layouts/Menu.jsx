@@ -85,7 +85,7 @@ const NewSplitMenu = () => {
     return (
       <Link
         to={to}
-        className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl transition-all duration-300 group
+        className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-lg transition-all duration-300 group
           ${isActive 
             ? 'bg-[#C9A84C] text-white' 
             : 'text-[#C9A84C] hover:bg-[#C9A84C]/10'}`}
@@ -164,10 +164,10 @@ const NewSplitMenu = () => {
                   {isDarkMode ? <Sun size={14} /> : <Moon size={14} />}
                 </button>
                 
-                <div className="flex items-center bg-white/5 rounded-md p-0.5 border border-white/10">
-                  <button onClick={() => changeLanguage('ar')} className={`px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black transition-all ${language === 'ar' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>AR</button>
-                  <button onClick={() => changeLanguage('fr')} className={`px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black transition-all ${language === 'fr' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>FR</button>
-                  <button onClick={() => changeLanguage('en')} className={`px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black transition-all ${language === 'en' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>EN</button>
+                <div className="flex items-center bg-white/5 rounded-lg p-0.5 border border-white/10">
+                  <button onClick={() => changeLanguage('ar')} className={`px-1.5 sm:px-2 py-0.5 rounded-lg text-[9px] sm:text-[10px] font-black transition-all ${language === 'ar' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>AR</button>
+                  <button onClick={() => changeLanguage('fr')} className={`px-1.5 sm:px-2 py-0.5 rounded-lg text-[9px] sm:text-[10px] font-black transition-all ${language === 'fr' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>FR</button>
+                  <button onClick={() => changeLanguage('en')} className={`px-1.5 sm:px-2 py-0.5 rounded-lg text-[9px] sm:text-[10px] font-black transition-all ${language === 'en' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>EN</button>
                 </div>
               </div>
 
@@ -189,14 +189,14 @@ const NewSplitMenu = () => {
 
         {/* --- PARTIE 2: MENU PRINCIPAL --- */}
         <div className={`transition-all duration-500 w-full ${scrolled ? 'md:mt-2 px-2 md:px-4' : 'mt-0 px-0'}`}>
-          <div className={`max-w-7xl mx-auto transition-all duration-500 main-nav-glass ${scrolled ? 'py-2 px-3 md:px-6 rounded-none md:rounded-2xl' : 'py-3 md:py-4 px-3 md:px-6 rounded-none'}`}>
+          <div className={`max-w-7xl mx-auto transition-all duration-500 main-nav-glass ${scrolled ? 'py-2 px-3 md:px-6 rounded-none md:rounded-lg' : 'py-3 md:py-4 px-3 md:px-6 rounded-none'}`}>
             <div className="flex items-center justify-between">
               
               <Link to="/" className="flex-shrink-0">
                 <img 
                   src={logoAmip} 
                   alt="AMIP" 
-                  className={`transition-all duration-500 object-contain ${scrolled ? 'h-8 sm:h-10' : 'h-10 sm:h-14'} ${isDarkMode ? 'bg-white p-1 rounded-xl' : ''}`} 
+                  className={`transition-all duration-500 object-contain ${scrolled ? 'h-8 sm:h-10' : 'h-10 sm:h-14'} ${isDarkMode ? 'bg-white p-1 rounded-lg' : ''}`} 
                 />
               </Link>
 
@@ -205,14 +205,14 @@ const NewSplitMenu = () => {
                 <NavItem to="/" icon={LayoutGrid} label={t("home")} />
                 
                 <div className="relative group">
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-all font-bold text-sm uppercase whitespace-nowrap">
+                  <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-[#C9A84C] hover:bg-[#C9A84C]/10 transition-all font-bold text-sm uppercase whitespace-nowrap">
                     <BarChart3 size={18} />
                     {t("indicators")}
                     <ChevronDown size={14} className="group-hover:rotate-180 transition-transform" />
                   </button>
                   
                   <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 dropdown-shadow z-50">
-                    <div className="bg-[#082721] border border-[#C9A84C]/20 rounded-2xl p-5 w-[340px] grid grid-cols-2 gap-4 relative overflow-hidden">
+                    <div className="bg-[#082721] border border-[#C9A84C]/20 rounded-lg p-5 w-[340px] grid grid-cols-2 gap-4 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-[#C9A84C]/10 rounded-full blur-xl -translate-y-1/2 translate-x-1/2"></div>
                         
                         <div className="relative z-10">
@@ -244,7 +244,7 @@ const NewSplitMenu = () => {
               <div className="flex items-center gap-2 md:gap-3">
                 <Link 
                   to="/rapport"
-                  className="hidden md:flex items-center gap-2 px-4 lg:px-6 py-2 md:py-2.5 rounded-xl bg-gradient-to-r from-[#C9A84C] to-[#e0c268] text-white font-black text-xs md:text-sm hover:shadow-[0_4px_20px_rgba(201,168,76,0.4)] transition-all hover:-translate-y-0.5 whitespace-nowrap"
+                  className="hidden md:flex items-center gap-2 px-4 lg:px-6 py-2 md:py-2.5 rounded-lg bg-gradient-to-r from-[#C9A84C] to-[#e0c268] text-white font-black text-xs md:text-sm hover:shadow-[0_4px_20px_rgba(201,168,76,0.4)] transition-all hover:-translate-y-0.5 whitespace-nowrap"
                 >
                   <FileText size={16} />
                   <span>{t("smartReports")}</span>
@@ -299,7 +299,7 @@ const NewSplitMenu = () => {
                 key={idx} 
                 to={link.to} 
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-4 p-3 sm:p-4 rounded-xl transition-colors ${location.pathname === link.to ? 'bg-[#C9A84C] text-white' : 'text-[#C9A84C] hover:bg-white/5'}`}
+                className={`flex items-center gap-4 p-3 sm:p-4 rounded-lg transition-colors ${location.pathname === link.to ? 'bg-[#C9A84C] text-white' : 'text-[#C9A84C] hover:bg-white/5'}`}
               >
                 <link.icon size={20} className={location.pathname === link.to ? '' : 'text-[#C9A84C]/70'} />
                 <span className="text-base sm:text-lg font-bold">{link.label}</span>
@@ -309,7 +309,7 @@ const NewSplitMenu = () => {
             <div className="my-2 sm:my-4 h-[1px] bg-white/10"></div>
 
             {isAuthenticated() ? (
-              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 p-3 sm:p-4 text-white hover:bg-white/5 rounded-xl transition-colors">
+              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 p-3 sm:p-4 text-white hover:bg-white/5 rounded-lg transition-colors">
                 <User size={20} className="text-[#C9A84C]" />
                 <span className="text-base sm:text-lg font-bold">{t("dashboard")}</span>
               </Link>
@@ -325,7 +325,7 @@ const NewSplitMenu = () => {
             <Link 
                 to="/rapport" 
                 onClick={() => setMobileOpen(false)} 
-                className="flex items-center justify-center gap-2 w-full py-3 sm:py-4 bg-[#C9A84C] text-white rounded-xl font-black shadow-lg"
+                className="flex items-center justify-center gap-2 w-full py-3 sm:py-4 bg-[#C9A84C] text-white rounded-lg font-black shadow-lg"
             >
                 <FileText size={18} />
                 {t("smartReports")}
@@ -337,9 +337,9 @@ const NewSplitMenu = () => {
                 </button>
                 
                 <div className="flex items-center bg-white/5 rounded-lg p-1 border border-white/10">
-                  <button onClick={() => changeLanguage('ar')} className={`px-2 sm:px-3 py-1 rounded-md text-xs font-black transition-all ${language === 'ar' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>AR</button>
-                  <button onClick={() => changeLanguage('fr')} className={`px-2 sm:px-3 py-1 rounded-md text-xs font-black transition-all ${language === 'fr' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>FR</button>
-                  <button onClick={() => changeLanguage('en')} className={`px-2 sm:px-3 py-1 rounded-md text-xs font-black transition-all ${language === 'en' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>EN</button>
+                  <button onClick={() => changeLanguage('ar')} className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-black transition-all ${language === 'ar' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>AR</button>
+                  <button onClick={() => changeLanguage('fr')} className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-black transition-all ${language === 'fr' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>FR</button>
+                  <button onClick={() => changeLanguage('en')} className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-black transition-all ${language === 'en' ? 'bg-[#C9A84C] text-white' : 'text-white/50 hover:text-[#C9A84C]'}`}>EN</button>
                 </div>
 
             </div>
