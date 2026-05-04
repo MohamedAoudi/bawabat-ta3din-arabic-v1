@@ -1259,6 +1259,8 @@ border-radius:13px !important;
         /* Chatbot CTA */
         .chat-cta { background:linear-gradient(135deg,var(--forest) 0%,#0d3d34 60%,#102e28 100%); border:1px solid rgba(201,168,76,0.25); position:relative; overflow:hidden; }
         .chat-cta::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 70% 50%,rgba(201,168,76,0.07) 0%,transparent 60%); animation:floatSlow 8s ease-in-out infinite; }
+        html.theme-dark .chat-cta { background:linear-gradient(135deg,#0f4a3f 0%,#083c33 60%,#051f1a 100%); border:1px solid rgba(201,168,76,0.35); }
+        html.theme-dark .chat-cta::before { background:radial-gradient(ellipse at 70% 50%,rgba(201,168,76,0.12) 0%,transparent 60%); }
 
         /* Float button */
         .float-btn { background:var(--forest); border:1px solid rgba(201,168,76,0.3); animation:pulseGlow 3s ease-in-out infinite; transition:transform 0.3s,box-shadow 0.3s; }
@@ -1542,7 +1544,7 @@ border-radius:13px !important;
 
             <GoldDivider />
 
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:"24px 12px" }}>
+            <div className="countries-responsive-grid">
               {countries.map(c => (
                 <a key={c.code} href={`/countries?country=${c.code}`} className="country-btn"
                   onClick={() => setSelectedCountryCode(c.code)}
