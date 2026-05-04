@@ -7,82 +7,70 @@ const Footer = () => {
 
   const TRANSLATIONS = {
     ar: {
-      logoAlt: "Arab Mining Indicators Portal",
-      aboutTitle: "عن بوابة المؤشرات التعدينية العربية",
-      aboutText:
-        "بوابة تحليلية للبيانات التعدينية في الدول العربية، تجمع بين المؤشرات والتقارير ودعم صناع القرار والباحثين والمستثمرين في قطاع الثروات المعدنية",
-      sitemapTitle: "خريطة البوابة",
-      relatedTitle: "روابط ذات صلة",
+      logoAlt: "بوابة المؤشرات التعدينية العربية",
+      aboutTitle: "عن البوابة",
+      aboutText: "منصة تحليلية متقدمة تهدف إلى توفير بيانات دقيقة حول قطاع التعدين في الوطن العربي لدعم المستثمرين وصناع القرار.",
+      sitemapTitle: "وصول سريع",
+      relatedTitle: "روابط هامة",
       home: "الرئيسية",
-      indicators: "المؤشرات التعدينية",
-      countries: "الدول العربية",
+      indicators: "المؤشرات",
+      countries: "الدول",
       sources: "المصادر",
       reports: "التقارير",
-      about: "عن البوابة",
-      apfm: "APFM (لاحقا)",
-      library: "المكتبة (لاحقا)",
-      contact: "تواصل معنا (لاحقا)",
-      protoTitle: "نسخة اولية تجريبية",
-      protoVersion: "V1 - Prototype",
+      about: "من نحن",
+      apfm: "منصة APFM",
+      library: "المكتبة الرقمية",
+      contact: "اتصل بنا",
+      protoVersion: "V1.0 Prototype",
       rights: "جميع الحقوق محفوظة",
-      developed: "تم تطوير هذه النسخة لاغراض العرض والتجربة الاولية للبوابة.",
-      online: "Online",
     },
     fr: {
       logoAlt: "Portail des indicateurs miniers arabes",
-      aboutTitle: "A propos du portail des indicateurs miniers arabes",
-      aboutText:
-        "Portail analytique des donnees minieres dans les pays arabes, combinant indicateurs et rapports pour soutenir decideurs, chercheurs et investisseurs.",
-      sitemapTitle: "Plan du portail",
-      relatedTitle: "Liens associes",
+      aboutTitle: "À Propos",
+      aboutText: "Une plateforme analytique avancée dédiée aux données minières arabes, conçue pour les décideurs et investisseurs.",
+      sitemapTitle: "Navigation",
+      relatedTitle: "Liens Utiles",
       home: "Accueil",
-      indicators: "Indicateurs miniers",
-      countries: "Pays arabes",
+      indicators: "Indicateurs",
+      countries: "Pays",
       sources: "Sources",
       reports: "Rapports",
-      about: "A propos",
-      apfm: "APFM (bientot)",
-      library: "Bibliotheque (bientot)",
-      contact: "Contact (bientot)",
-      protoTitle: "Version prototype initiale",
-      protoVersion: "V1 - Prototype",
-      rights: "Tous droits reserves",
-      developed: "Cette version a ete developpee pour demonstration et test initial du portail.",
-      online: "En ligne",
+      about: "À propos",
+      apfm: "Plateforme APFM",
+      library: "Bibliothèque",
+      contact: "Contact",
+      protoVersion: "V1.0 Prototype",
+      rights: "Tous droits réservés",
     },
     en: {
       logoAlt: "Arab Mining Indicators Portal",
-      aboutTitle: "About the Arab Mining Indicators Portal",
-      aboutText:
-        "Analytical portal for mining data across Arab countries, combining indicators and reports to support decision-makers, researchers, and investors.",
-      sitemapTitle: "Portal map",
-      relatedTitle: "Related links",
+      aboutTitle: "About Portal",
+      aboutText: "An advanced analytical platform providing precise mining data across the Arab world for investors and decision-makers.",
+      sitemapTitle: "Quick Links",
+      relatedTitle: "Resources",
       home: "Home",
-      indicators: "Mining indicators",
-      countries: "Arab countries",
+      indicators: "Indicators",
+      countries: "Countries",
       sources: "Sources",
       reports: "Reports",
-      about: "About",
-      apfm: "APFM (soon)",
-      library: "Library (soon)",
-      contact: "Contact us (soon)",
-      protoTitle: "Early prototype version",
-      protoVersion: "V1 - Prototype",
+      about: "About Us",
+      apfm: "APFM Platform",
+      library: "Digital Library",
+      contact: "Contact Us",
+      protoVersion: "V1.0 Prototype",
       rights: "All rights reserved",
-      developed: "This version was developed for showcase and early portal testing.",
-      online: "Online",
     },
   };
 
   const t = TRANSLATIONS[language] || TRANSLATIONS.ar;
+  const isAr = language === "ar";
 
   const sitemapLinks = [
     { l: t.home, h: "/" },
     { l: t.indicators, h: "/m1" },
     { l: t.countries, h: "/countries" },
-    { l: t.sources, h: "sources.html" },
-    { l: t.reports, h: "reports.html" },
-    { l: t.about, h: "/about" },
+    { l: t.sources, h: "#" },
+    { l: t.reports, h: "#" },
   ];
 
   const relatedLinks = [
@@ -94,159 +82,101 @@ const Footer = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
-
-        .ft-link {
-          position: relative;
-          display: inline-flex;
+        .footer-link {
+          display: flex;
           align-items: center;
-          gap: 5px;
-          color: rgba(255,255,255,0.65);
-          font-size: 13.5px;
-          font-weight: 600;
-          transition: color .2s;
+          gap: 8px;
+          color: rgba(255, 255, 255, 0.5);
+          font-size: 14px;
+          transition: all 0.3s ease;
         }
-        .ft-link:hover { color: #C9A84C; }
-        .ft-link::after {
-          content: '';
-          position: absolute;
-          bottom: -1px; right: 0;
-          height: 1px; width: 0;
-          background: #C9A84C;
-          border-radius: 1px;
-          transition: width .25s ease;
+        .footer-link:hover {
+          color: #C9A84C;
+          transform: translateX(${isAr ? '-5px' : '5px'});
         }
-        .ft-link:hover::after { width: 100%; }
-
-        .ft-col-title {
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: .14em;
+        .footer-title {
+          color: #C9A84C;
+          font-size: 12px;
+          font-weight: 800;
           text-transform: uppercase;
-          color: rgba(201,168,76,0.7);
-          padding-bottom: 10px;
-          border-bottom: 1px solid rgba(201,168,76,0.18);
-          margin-bottom: 14px;
+          letter-spacing: 1px;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .footer-title::after {
+          content: "";
+          flex: 1;
+          height: 1px;
+          background: linear-gradient(to ${isAr ? 'left' : 'right'}, rgba(201,168,76,0.3), transparent);
         }
       `}</style>
 
-      <footer
-        dir={language === "ar" ? "rtl" : "ltr"}
-        lang={language}
-        style={{ fontFamily: "'Cairo','Tajawal',sans-serif" }}
+      <footer 
+        dir={isAr ? "rtl" : "ltr"} 
+        className="relative overflow-hidden border-t border-white/5"
+        style={{ fontFamily: "'Cairo', sans-serif", backgroundColor: "#061a16" }}
       >
-        {/* ── top gold bar — identical to Menu ───────────────────────────── */}
-        <div style={{ height: 3, background: "linear-gradient(90deg,#8B2500,#C9A84C 50%,#082721)" }} />
+        {/* Barre de dégradé supérieure */}
+        <div className="h-[2px] w-full bg-gradient-to-r from-[#8B2500] via-[#C9A84C] to-[#082721]" />
 
-        {/* ── main body ──────────────────────────────────────────────────── */}
-        <div style={{ background: "linear-gradient(180deg,#0d3b33 0%,#082721 100%)" }}>
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 py-10 sm:py-12">
-
-            {/* Logo */}
-            <div className="mb-8 flex items-center justify-center sm:justify-start">
-                          <div className="rounded-full bg-white px-4 ">
-
-              <img
-                src={logo}
-                alt={t.logoAlt}
-                className="h-[60px] w-auto object-contain"
-                style={{ filter: "drop-shadow(0 1px 8px rgba(201,168,76,0.3))" }}
-              />
+        <div className="mx-auto max-w-7xl px-6 py-16">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+            
+            {/* Section 1: Brand & About */}
+            <div className="lg:col-span-5">
+              <div className="mb-6 inline-block rounded-xl  p-3 shadow-lg shadow-black/20">
+                <img src={logo} alt="Logo" className="h-18 w-auto object-contain" />
               </div>
+              <h3 className="mb-4 text-lg font-bold text-white/90">{t.aboutTitle}</h3>
+              <p className="max-w-md text-sm leading-relaxed text-white/50">
+                {t.aboutText}
+              </p>
             </div>
 
-            {/* 3-col grid — same structure as original */}
-            <div className="grid gap-10 md:grid-cols-3"
-                 style={{ paddingTop: 20, borderTop: "1px solid rgba(201,168,76,0.18)" }}>
+            {/* Section 2: Sitemap */}
+            <div className="lg:col-span-3">
+              <h4 className="footer-title">{t.sitemapTitle}</h4>
+              <nav className="grid grid-cols-1 gap-3">
+                {sitemapLinks.map((link) => (
+                  <a key={link.l} href={link.h} className="footer-link">
+                    <div className="h-1 w-1 rounded-full bg-[#C9A84C]/50" />
+                    {link.l}
+                  </a>
+                ))}
+              </nav>
+            </div>
 
-              {/* About */}
-              <div>
-                <p className="ft-col-title">{t.aboutTitle}</p>
-                <p className="text-[13.5px] leading-7 text-white/55">
-                  {t.aboutText}
-                </p>
+            {/* Section 3: Resources & Version */}
+            <div className="lg:col-span-4">
+              <h4 className="footer-title">{t.relatedTitle}</h4>
+              <div className="mb-8 flex flex-col gap-3">
+                {relatedLinks.map((link) => (
+                  <a key={link.l} href={link.h} className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-[#C9A84C]">
+                    {link.l}
+                  </a>
+                ))}
               </div>
 
-              {/* Sitemap */}
-              <div>
-                <p className="ft-col-title">{t.sitemapTitle}</p>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                  {sitemapLinks.map(({ l, h }) => (
-                    <a key={l} href={h} className="ft-link" dir="ltr">
-                      <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
-                      </svg>
-                      <span dir={language === "ar" ? "rtl" : "ltr"}>{l}</span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-
-              {/* Related links */}
-              <div>
-                <p className="ft-col-title">{t.relatedTitle}</p>
-                <div className="space-y-3">
-                  {relatedLinks.map(({ l, h }) => (
-                    <a key={l} href={h} className="ft-link block" dir="ltr">
-                      <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
-                      </svg>
-                      <span dir={language === "ar" ? "rtl" : "ltr"}>{l}</span>
-                    </a>
-                  ))}
-
-                  {/* version badge — same card style as menu dropdown panels */}
-                  <div
-                    className="mt-5 flex items-center gap-3 rounded-2xl px-4 py-3"
-                    style={{
-                      background: "linear-gradient(145deg,#0d3b33,#082721)",
-                      border: "1px solid rgba(201,168,76,0.25)",
-                      boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-                    }}
-                  >
-                    {/* icon circle — same gold gradient as "التقارير الذكية" CTA */}
-                    <div
-                      className="flex items-center justify-center w-9 h-9 rounded-full flex-shrink-0"
-                      style={{
-                        background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
-                        boxShadow: "0 2px 10px rgba(201,168,76,0.35)",
-                      }}
-                    >
-                      <svg className="w-4 h-4 text-[#082721]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-[12px] font-bold text-white/80">{t.protoTitle}</p>
-                      <p className="text-[11px] font-mono" style={{ color: "rgba(201,168,76,0.65)" }}>{t.protoVersion}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Prototype Badge */}
+             
             </div>
           </div>
         </div>
 
-        {/* ── bottom bar — same darker tone as scrolled nav ───────────────── */}
-        <div style={{ background: "#051712", borderTop: "1px solid rgba(201,168,76,0.15)" }}>
-          <div
-            className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 py-4
-                        flex flex-col sm:flex-row items-center justify-between gap-2"
-            dir={language === "ar" ? "rtl" : "ltr"}
-          >
-            <p className="text-[12px] text-white/30">
-              © AIDSMO {new Date().getFullYear()} - {t.rights}
-            </p>
-            <p className="text-[11px] text-white/25 text-center">
-              {t.developed}
-            </p>
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[11px] text-white/25">{t.online}</span>
+        {/* Bottom Strip */}
+        <div className="border-t border-white/5 bg-black/20 py-6">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-4 px-6 md:flex-row">
+            <div className="text-[12px] text-white/30">
+              © {new Date().getFullYear()} <span className="font-bold text-white/50">AIDSMO</span>. {t.rights}
             </div>
+            
+            
+            
+
           </div>
         </div>
-
       </footer>
     </>
   );
