@@ -295,7 +295,7 @@ export default function M6Page() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Main Chart */}
           <div className="lg:col-span-8 bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
             <div className="flex justify-between items-center mb-6">
@@ -304,8 +304,8 @@ export default function M6Page() {
                 <Info size={14} /> {t.usdHint}
               </div>
             </div>
-            <div className="h-[400px]">
-              <canvas ref={canvasRef}></canvas>
+            <div className="h-[400px] flex items-center justify-center">
+              <canvas ref={canvasRef} className="w-full h-full" />
             </div>
           </div>
 
@@ -395,37 +395,6 @@ export default function M6Page() {
           </div>
         </div>
 
-        {/* Data Table Section */}
-        <div className="mt-8 bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h3 className="font-bold text-[#082721]">{t.detailedTable}</h3>
-            <button className="text-xs font-bold text-sky-600 hover:underline">{t.exportCsv}</button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className={`w-full ${language === "ar" ? "text-right" : "text-left"}`}>
-              <thead className="bg-slate-50 text-slate-500 text-xs uppercase">
-                <tr>
-                  <th className="px-6 py-4">{t.year}</th>
-                  <th className="px-6 py-4">{t.mineral}</th>
-                  <th className="px-6 py-4">{t.importValue}</th>
-                  <th className="px-6 py-4">{t.status}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {yearlyUsdData.slice(0, 5).map((row, i) => (
-                  <tr key={i} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 font-bold text-slate-700">{formatFullUsd(row.year, language)}</td>
-                    <td className="px-6 py-4 text-slate-600">{localizeMineral(selectedMineral, language, t.totalMaterials)}</td>
-                    <td className="px-6 py-4 font-mono font-bold text-[#082721]">{formatFullUsd(row.value, language)} {t.usd}</td>
-                    <td className="px-6 py-4">
-                      <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md text-[10px] font-bold">{t.completed}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
       </main>
 
       <Footer />
