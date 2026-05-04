@@ -76,6 +76,10 @@ const PAGE_TRANSLATIONS = {
     mostImportedMineral: "المعدن الأكثر استيرادا",
     highPriority: "أولوية عالية",
     dataCoverage: "تغطية البيانات",
+    filterTools: "أدوات التصفية",
+    chooseCountry: "اختر الدولة",
+    mineralType: "نوع المعدن",
+    referenceYear: "السنة المرجعية",
     importsTrend: "تطور قيمة الواردات عبر السنوات",
     usdHint: "بالدولار الأمريكي",
     countryDetails: "تفاصيل الدولة",
@@ -101,6 +105,10 @@ const PAGE_TRANSLATIONS = {
     mostImportedMineral: "Minerai le plus importe",
     highPriority: "Priorite elevee",
     dataCoverage: "Couverture des donnees",
+    filterTools: "Outils de filtre",
+    chooseCountry: "Choisir le pays",
+    mineralType: "Type de minerai",
+    referenceYear: "Annee de reference",
     importsTrend: "Evolution de la valeur des importations",
     usdHint: "en dollars americains",
     countryDetails: "Details du pays",
@@ -126,6 +134,10 @@ const PAGE_TRANSLATIONS = {
     mostImportedMineral: "Most imported mineral",
     highPriority: "High priority",
     dataCoverage: "Data coverage",
+    filterTools: "Filter tools",
+    chooseCountry: "Choose country",
+    mineralType: "Mineral type",
+    referenceYear: "Reference year",
     importsTrend: "Import value trend over years",
     usdHint: "in US dollars",
     countryDetails: "Country details",
@@ -186,6 +198,17 @@ export default function M6Page() {
 
   const yearlyUsdData = useMemo(() => Object.entries(productYearlyData).map(([year, value]) => ({ year: Number(year), value })).sort((a, b) => a.year - b.year), [productYearlyData]);
   const totalUsd = useMemo(() => yearlyUsdData.reduce((sum, item) => sum + item.value, 0), [yearlyUsdData]);
+  const countryYears = useMemo(() => yearlyUsdData.map((item) => item.year), [yearlyUsdData]);
+  const latestYear = useMemo(() => (countryYears.length ? countryYears[countryYears.length - 1] : null), [countryYears]);
+  const latestYearValue = useMemo(() => (latestYear ? yearlyUsdData.find((item) => item.year === latestYear)?.value || 0 : 0), [latestYear, yearlyUsdData]);
+  const avgYearlyValue = useMemo(() => (yearlyUsdData.length ? totalUsd / yearlyUsdData.length : 0), [totalUsd, yearlyUsdData]);
+  const yoyChange = useMemo(() => {
+    if (yearlyUsdData.length < 2) return null;
+    const current = yearlyUsdData[yearlyUsdData.length - 1]?.value || 0;
+    const previous = yearlyUsdData[yearlyUsdData.length - 2]?.value || 0;
+    if (!previous) return null;
+    return ((current - previous) / previous) * 100;
+  }, [yearlyUsdData]);
   
   useEffect(() => {
     if (!countryYear && yearlyUsdData.length > 0) setCountryYear(yearlyUsdData[yearlyUsdData.length - 1].year);
@@ -235,39 +258,24 @@ export default function M6Page() {
     >
       <Menu />
       
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl font-black text-[#082721] flex items-center gap-3">
-              <Pickaxe className="text-[#ddbc6b]" size={32} />
+      <div className="relative overflow-hidden bg-[#082721] pb-28 pt-16 text-white">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ddbc6b 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+        <div className="container mx-auto px-4 relative z-10">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/20 px-4 py-1.5 text-xs font-bold uppercase tracking-widest border border-[#ddbc6b]/30 text-[#ddbc6b]">
+            {t.totalImportsCumulative}
+          </span>
+          <div className="mt-6 max-w-3xl">
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight">
               {t.pageTitle}
             </h1>
-            <p className="text-slate-500 mt-1">{t.pageSubtitle}</p>
-          </div>
-          
-          <div className="flex bg-white p-2 rounded-2xl shadow-sm border border-slate-200 gap-2">
-            <select 
-              value={selectedCountry} 
-              onChange={(e) => setSelectedCountry(e.target.value)}
-              className="bg-slate-50 border-none rounded-xl px-4 py-2 text-sm font-bold focus:ring-2 ring-[#ddbc6b]"
-            >
-              {COUNTRIES.map((c) => (
-                <option key={c.code} value={c.code}>{localizeCountry(c.code, language)}</option>
-              ))}
-            </select>
-            <select 
-              value={selectedMineral} 
-              onChange={(e) => setSelectedMineral(e.target.value)}
-              className="bg-slate-50 border-none rounded-xl px-4 py-2 text-sm font-bold focus:ring-2 ring-[#ddbc6b]"
-            >
-              {mineralOptions.map((m) => (
-                <option key={m} value={m}>{localizeMineral(m, language, t.allMinerals)}</option>
-              ))}
-            </select>
+            <p className="mt-4 text-base md:text-lg text-slate-200 leading-relaxed">
+              {t.pageSubtitle}
+            </p>
           </div>
         </div>
+      </div>
 
+      <main className="max-w-7xl mx-auto px-4 py-8 -mt-20 relative z-20">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-[#082721] text-white p-6 rounded-3xl shadow-xl relative overflow-hidden">
@@ -301,8 +309,64 @@ export default function M6Page() {
             </div>
           </div>
 
-          {/* Side Details */}
+          {/* Sidebar Controls */}
           <div className="lg:col-span-4 space-y-6">
+            <div className="bg-[#082721] rounded-[2.5rem] p-8 text-white shadow-2xl shadow-emerald-900/20 relative overflow-hidden group">
+              <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#ddbc6b]/10 rounded-full blur-3xl group-hover:bg-[#ddbc6b]/20 transition-all"></div>
+              <h3 className="text-lg font-bold mb-6 flex items-center gap-3">
+                <Info size={20} className="text-[#ddbc6b]" />
+                {t.filterTools}
+              </h3>
+              <div className="space-y-6 relative z-10">
+                <div>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.chooseCountry}</label>
+                  <div className="relative">
+                    <select
+                      value={selectedCountry}
+                      onChange={(e) => setSelectedCountry(e.target.value)}
+                      className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:border-[#ddbc6b] appearance-none transition-all"
+                    >
+                      {COUNTRIES.map((c) => (
+                        <option key={c.code} value={c.code} className="text-slate-800">
+                          {localizeCountry(c.code, language)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.mineralType}</label>
+                  <select
+                    value={selectedMineral}
+                    onChange={(e) => setSelectedMineral(e.target.value)}
+                    className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:border-[#ddbc6b] appearance-none transition-all"
+                  >
+                    {mineralOptions.map((m) => (
+                      <option key={m} value={m} className="text-slate-800">
+                        {localizeMineral(m, language, t.allMinerals)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.referenceYear}</label>
+                  <div className="flex flex-wrap gap-2">
+                    {countryYears.slice(-5).map((y) => (
+                      <button
+                        key={y}
+                        onClick={() => setCountryYear(y)}
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center text-xs font-black transition-all ${y === countryYear ? 'bg-white text-[#082721] scale-110 shadow-lg' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}
+                      >
+                        {formatFullUsd(y, language)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-[#ddbc6b]/10 p-6 rounded-[2rem] border border-[#ddbc6b]/20">
               <h3 className="font-bold text-[#082721] mb-4 flex items-center gap-2">
                 <Globe2 size={20} /> {t.countryDetails}
@@ -314,17 +378,7 @@ export default function M6Page() {
                 </div>
                 <div className="bg-white p-4 rounded-2xl shadow-sm">
                   <p className="text-xs text-slate-500 mb-1">{t.selectedYear}</p>
-                  <div className="flex gap-2 overflow-x-auto py-1">
-                    {yearlyUsdData.slice(-5).map(d => (
-                      <button 
-                        key={d.year}
-                        onClick={() => setCountryYear(d.year)}
-                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${countryYear === d.year ? 'bg-[#082721] text-white' : 'bg-slate-100 text-slate-600'}`}
-                      >
-                        {formatFullUsd(d.year, language)}
-                      </button>
-                    ))}
-                  </div>
+                  <p className="font-black text-[#082721]">{countryYear || latestYear || '-'}</p>
                 </div>
               </div>
             </div>
