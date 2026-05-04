@@ -114,6 +114,13 @@ const NewSplitMenu = () => {
           box-shadow: none !important; 
         }
 
+        html.theme-dark .main-nav-glass {
+          background: ${scrolled ? 'rgba(12, 35, 29, 0.95)' : 'transparent'};
+          backdrop-filter: ${scrolled ? 'blur(15px)' : 'none'};
+          border: none !important; 
+          box-shadow: none !important; 
+        }
+
         .dropdown-shadow {
             filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.2));
         }
