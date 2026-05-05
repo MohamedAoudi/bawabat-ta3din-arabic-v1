@@ -1,13 +1,10 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { CalendarRange, Gem, Globe2, Scale, TrendingUp, Weight, Filter, ChevronDown, List } from "lucide-react";
+import { CalendarRange, Gem, Globe2, TrendingUp, Filter, ChevronDown, List } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { LanguageContext, ThemeContext } from "../App";
-import {
-  tradeCriticalMineralsData,
-  tradeCriticalMineralsByYear,
-} from "../tradeCriticalMineralsData";
+import { getCriticalMineralExportsAnalytics } from "../services/tradeTransactionService";
 
 const COUNTRIES = [
   { name: "المملكة الأردنية الهاشمية", code: "jo" },
@@ -37,7 +34,7 @@ const countryNameAr = Object.fromEntries(COUNTRIES.map((c) => [c.code, c.name]))
 
 const DEFAULT_COUNTRY = "ma";
 
-const availableCountries = COUNTRIES.map((c) => c.code);
+const AVAILABLE_COUNTRIES_FALLBACK = COUNTRIES.map((c) => c.code);
 
 const COUNTRY_LABELS = {
   jo: { ar: "المملكة الاردنية الهاشمية", fr: "Royaume hachemite de Jordanie", en: "Hashemite Kingdom of Jordan" },
@@ -201,7 +198,11 @@ function translateMineral(name, language, fallback) {
   return mineralNameAr[name] || name;
 }
 
-const localizeCountryCode = (code, language) => COUNTRY_LABELS[code]?.[language] || countryNameAr[code] || code;
+const localizeCountryCode = (code, language, dbCountryNames = {}) =>
+  dbCountryNames[code]?.[language] ||
+  COUNTRY_LABELS[code]?.[language] ||
+  countryNameAr[code] ||
+  code;
 
 function textWithCount(template, count) {
   return template.replace("{count}", count);
@@ -215,32 +216,109 @@ export default function M5Page() {
   const [selectedCountry, setSelectedCountry] = useState(DEFAULT_COUNTRY);
   const [selectedMineral, setSelectedMineral] = useState("all");
   const [countryYear, setCountryYear] = useState(null);
+  const [analyticsRows, setAnalyticsRows] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadAnalytics = async () => {
+      setIsLoading(true);
+      setLoadError("");
+      try {
+        const rows = await getCriticalMineralExportsAnalytics();
+        if (isMounted) {
+          setAnalyticsRows(Array.isArray(rows) ? rows : []);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setLoadError(error?.response?.data?.error || error?.message || "Failed to load analytics data.");
+          setAnalyticsRows([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadAnalytics();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const mineralOptions = useMemo(() => {
     const products = Array.from(
-      new Set(tradeCriticalMineralsData.map((row) => row.aggregate_product))
+      new Set(analyticsRows.map((row) => row.mineral_name).filter(Boolean))
     ).sort();
     return ["all", ...products];
-  }, []);
+  }, [analyticsRows]);
 
-  const productYearlyData = useMemo(() => {
-    if (selectedMineral === "all") return tradeCriticalMineralsByYear;
+  const availableCountries = useMemo(() => {
+    const countriesFromData = Array.from(
+      new Set(
+        analyticsRows
+          .map((row) => String(row.country_code || "").toLowerCase())
+          .filter(Boolean)
+      )
+    ).sort();
 
-    return tradeCriticalMineralsData
-      .filter((row) => row.aggregate_product === selectedMineral)
-      .reduce((acc, row) => {
-        const y = String(row.year);
-        acc[y] = (acc[y] || 0) + (row.value_usd || 0);
+    return countriesFromData.length ? countriesFromData : AVAILABLE_COUNTRIES_FALLBACK;
+  }, [analyticsRows]);
+
+  const dbCountryNames = useMemo(
+    () =>
+      analyticsRows.reduce((acc, row) => {
+        const code = String(row.country_code || "").toLowerCase();
+        if (!code) return acc;
+        acc[code] = {
+          ar: row.country_name_ar || "",
+          en: row.country_name_en || "",
+          fr: row.country_name_fr || "",
+        };
         return acc;
-      }, {});
-  }, [selectedMineral]);
+      }, {}),
+    [analyticsRows]
+  );
 
   useEffect(() => {
-    const years = Object.keys(productYearlyData)
-      .map(Number)
-      .sort((a, b) => b - a);
-    setCountryYear(years[0] || null);
-  }, [productYearlyData]);
+    if (!availableCountries.length) return;
+    if (!availableCountries.includes(selectedCountry)) {
+      setSelectedCountry(availableCountries.includes(DEFAULT_COUNTRY) ? DEFAULT_COUNTRY : availableCountries[0]);
+    }
+  }, [availableCountries, selectedCountry]);
+
+  const productYearlyData = useMemo(() => {
+    return analyticsRows
+      .filter((row) => String(row.country_code || "").toLowerCase() === selectedCountry)
+      .filter((row) => selectedMineral === "all" || row.mineral_name === selectedMineral)
+      .reduce((acc, row) => {
+        const y = String(row.year);
+        acc[y] = (acc[y] || 0) + Number(row.value_usd || 0);
+        return acc;
+      }, {});
+  }, [analyticsRows, selectedCountry, selectedMineral]);
+
+  const referenceYears = useMemo(() => {
+    return Array.from(
+      new Set(
+        analyticsRows
+          .filter((row) => selectedMineral === "all" || row.mineral_name === selectedMineral)
+          .map((row) => Number(row.year))
+          .filter((year) => Number.isFinite(year))
+      )
+    ).sort((a, b) => b - a);
+  }, [analyticsRows, selectedMineral]);
+
+  useEffect(() => {
+    if (!referenceYears.length) {
+      setCountryYear(null);
+      return;
+    }
+    setCountryYear(referenceYears[0]);
+  }, [referenceYears]);
 
   const yearlyUsdData = useMemo(
     () =>
@@ -256,12 +334,6 @@ export default function M5Page() {
     () => yearlyUsdData.reduce((sum, item) => sum + item.value, 0),
     [yearlyUsdData]
   );
-
-  const totalGoldTin = useMemo(() => {
-    return tradeCriticalMineralsData
-      .filter((row) => row.aggregate_product === "Gold" || row.aggregate_product === "Tin")
-      .reduce((sum, row) => sum + (row.value_usd || 0), 0);
-  }, []);
 
   const countryYears = useMemo(() => yearlyUsdData.map((item) => item.year), [yearlyUsdData]);
 
@@ -288,19 +360,60 @@ export default function M5Page() {
     return ((current - previous) / previous) * 100;
   }, [yearlyUsdData]);
 
+  const countryTableRows = useMemo(() => {
+    if (!countryYear) return [];
+
+    const valuesByCountry = analyticsRows
+      .filter((row) => Number(row.year) === Number(countryYear))
+      .filter((row) => selectedMineral === "all" || row.mineral_name === selectedMineral)
+      .reduce((acc, row) => {
+        const countryCode = String(row.country_code || "").toLowerCase();
+        if (!countryCode) return acc;
+        acc[countryCode] = (acc[countryCode] || 0) + Number(row.value_usd || 0);
+        return acc;
+      }, {});
+
+    const total = Object.values(valuesByCountry).reduce((sum, value) => sum + value, 0);
+
+    return Object.entries(valuesByCountry)
+      .map(([countryCode, value]) => ({
+        c: countryCode,
+        v: value,
+        share: total > 0 ? (value / total) * 100 : 0,
+      }))
+      .sort((a, b) => b.v - a.v)
+      .slice(0, 5);
+  }, [analyticsRows, countryYear, selectedMineral]);
+
+  const selectedCountryValue = useMemo(
+    () => countryTableRows.find((row) => row.c === selectedCountry)?.v || 0,
+    [countryTableRows, selectedCountry]
+  );
+
+  const selectedCountryShare = useMemo(
+    () => countryTableRows.find((row) => row.c === selectedCountry)?.share || 0,
+    [countryTableRows, selectedCountry]
+  );
+
+  const statusMessage = useMemo(() => {
+    if (isLoading) {
+      if (language === "fr") return "Chargement des donnees...";
+      if (language === "en") return "Loading data...";
+      return "جاري تحميل البيانات...";
+    }
+    if (loadError) {
+      if (language === "fr") return "Erreur lors du chargement des donnees.";
+      if (language === "en") return "Failed to load data.";
+      return "تعذر تحميل البيانات.";
+    }
+    return "";
+  }, [isLoading, loadError, language]);
+
   const countryPack = useMemo(
     () => ({
-      table: [
-        {
-          c: selectedCountry,
-          v:
-            selectedCountry === "ma"
-              ? yearlyUsdData.find((item) => item.year === countryYear)?.value || 0
-              : 0,
-        },
-      ],
+      table: [{ c: selectedCountry, v: selectedCountryValue }],
     }),
-    [yearlyUsdData, countryYear, selectedCountry]
+    [selectedCountry, selectedCountryValue]
   );
 
   const effectiveCountry =
@@ -372,7 +485,7 @@ export default function M5Page() {
     const rows = countryPack.table || [];
     if (!rows.length) return;
 
-    const labels = rows.map((r) => localizeCountryCode(r.c, language));
+    const labels = rows.map((r) => localizeCountryCode(r.c, language, dbCountryNames));
     const values = rows.map((r) => r.v);
 
     donutChartRef.current = new Chart(ctx, {
@@ -399,7 +512,7 @@ export default function M5Page() {
             callbacks: {
               label: (c) => {
                 const v = c.parsed;
-                return ` ${c.label}: ${formatUsd(v, language)} ${t.usd} (100%)`;
+                return ` ${c.label}: ${formatUsd(v, language)} ${t.usd} (${selectedCountryShare.toFixed(1)}%)`;
               },
             },
           },
@@ -413,7 +526,7 @@ export default function M5Page() {
         donutChartRef.current = null;
       }
     };
-  }, [countryPack, language, t.usd]);
+  }, [countryPack, dbCountryNames, language, selectedCountryShare, t.usd]);
 
   return (
     <div
@@ -439,6 +552,11 @@ export default function M5Page() {
       </div>
 
       <main className="container mx-auto px-4 -mt-24 pb-12 relative z-20">
+        {statusMessage ? (
+          <div className="mb-6 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-600">
+            {statusMessage}
+          </div>
+        ) : null}
         
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -502,16 +620,16 @@ export default function M5Page() {
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-50 text-sm font-bold">
-                     {countryPack?.table?.map((r) => (
+                     {countryTableRows.map((r) => (
                         <tr key={r.c} className="hover:bg-slate-50/80 transition-colors group">
                           <td className="px-6 py-4 flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] group-hover:bg-[#ddbc6b]/20 group-hover:text-[#082721] transition-colors">{r.c.toUpperCase()}</div>
-                            {localizeCountryCode(r.c, language)}
+                            {localizeCountryCode(r.c, language, dbCountryNames)}
                           </td>
                           <td className={`px-6 py-4 font-black text-[#082721] ${language === "ar" ? "text-left" : "text-right"}`}>{formatUsd(r.v, language)} {t.usd}</td>
                           <td className="px-6 py-4">
                              <div className="w-24 h-1.5 bg-slate-100 rounded-full mx-auto overflow-hidden">
-                                <div className="h-full bg-[#ddbc6b]" style={{width: '100%'}}></div>
+                                <div className="h-full bg-[#ddbc6b]" style={{ width: `${Math.min(r.share, 100)}%` }}></div>
                              </div>
                           </td>
                         </tr>
@@ -543,7 +661,7 @@ export default function M5Page() {
                     >
                       {availableCountries.map((c) => (
                         <option key={c} value={c} className="text-slate-800">
-                          {localizeCountryCode(c, language)}
+                          {localizeCountryCode(c, language, dbCountryNames)}
                         </option>
                       ))}
                     </select>
@@ -569,7 +687,7 @@ export default function M5Page() {
                 <div>
                   <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.referenceYear}</label>
                   <div className="flex flex-wrap gap-2">
-                    {countryYears.map(y => (
+                    {referenceYears.map(y => (
                       <button 
                         key={y}
                         onClick={() => setCountryYear(y)}
@@ -590,7 +708,7 @@ export default function M5Page() {
                 <canvas ref={donutCanvasRef} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                    <span className="text-xs text-slate-400 font-bold">{t.totalShare}</span>
-                   <span className="text-2xl font-black text-[#082721]">100%</span>
+                   <span className="text-2xl font-black text-[#082721]">{selectedCountryShare.toFixed(1)}%</span>
                 </div>
               </div>
             </div>
