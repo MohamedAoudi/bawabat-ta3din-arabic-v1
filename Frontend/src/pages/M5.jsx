@@ -622,7 +622,7 @@ export default function M5Page() {
                    <button className={`px-4 py-2 text-xs font-bold rounded-xl ${isDarkMode ? "text-slate-300 hover:text-white" : "text-slate-400 hover:text-slate-600"}`}>{t.quantitiesSoon}</button>
                 </div>
               </div>
-              <div className="h-[400px]">
+              <div className="relative h-[260px] sm:h-[320px] md:h-[380px] lg:h-[400px] w-full">
                 <canvas ref={canvasRef} />
               </div>
             </div>
@@ -709,7 +709,7 @@ export default function M5Page() {
                 <div>
                   <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.referenceYear}</label>
                   <div className="flex flex-wrap gap-2">
-                    {referenceYears.map(y => (
+                    {referenceYears.slice(0, 6).map(y => (
                       <button 
                         key={y}
                         onClick={() => setCountryYear(y)}
@@ -728,9 +728,9 @@ export default function M5Page() {
             </div>
 
             {/* Donut Chart Card */}
-            <div className={`rounded-[2.5rem] p-8 border ${isDarkMode ? "bg-[#0d2c24] border-white/10 shadow-none" : "bg-white border-slate-100 shadow-xl shadow-slate-200/60"}`}>
+            <div className={`rounded-[2.5rem] p-6 sm:p-8 border ${isDarkMode ? "bg-[#0d2c24] border-white/10 shadow-none" : "bg-white border-slate-100 shadow-xl shadow-slate-200/60"}`}>
               <h3 className="text-base font-black mb-6 text-center">{t.relativeDistribution}</h3>
-              <div className="h-[250px] relative">
+              <div className="relative h-[210px] sm:h-[240px] md:h-[250px] w-full">
                 <canvas ref={donutCanvasRef} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                    <span className={`text-xs font-bold ${isDarkMode ? "text-slate-300" : "text-slate-400"}`}>{t.totalShare}</span>
