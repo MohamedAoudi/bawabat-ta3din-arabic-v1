@@ -361,29 +361,44 @@ export default function M5Page() {
   }, [yearlyUsdData]);
 
   const countryTableRows = useMemo(() => {
-    if (!countryYear) return [];
+    const latestReferenceYear = referenceYears[0];
+    if (!latestReferenceYear) return [];
 
     const valuesByCountry = analyticsRows
-      .filter((row) => Number(row.year) === Number(countryYear))
+      .filter((row) => Number(row.year) === Number(latestReferenceYear))
       .filter((row) => selectedMineral === "all" || row.mineral_name === selectedMineral)
       .reduce((acc, row) => {
         const countryCode = String(row.country_code || "").toLowerCase();
         if (!countryCode) return acc;
-        acc[countryCode] = (acc[countryCode] || 0) + Number(row.value_usd || 0);
+        const rowValue = Number(row.value_usd || 0);
+        const mineralName = row.mineral_name || "";
+
+        if (!acc[countryCode]) {
+          acc[countryCode] = { total: 0, minerals: {} };
+        }
+
+        acc[countryCode].total += rowValue;
+        acc[countryCode].minerals[mineralName] = (acc[countryCode].minerals[mineralName] || 0) + rowValue;
         return acc;
       }, {});
 
-    const total = Object.values(valuesByCountry).reduce((sum, value) => sum + value, 0);
+    const total = Object.values(valuesByCountry).reduce((sum, item) => sum + item.total, 0);
 
     return Object.entries(valuesByCountry)
-      .map(([countryCode, value]) => ({
+      .map(([countryCode, item]) => {
+        const topMineralEntry = Object.entries(item.minerals).sort((a, b) => b[1] - a[1])[0];
+        const topMineral = selectedMineral === "all" ? (topMineralEntry?.[0] || "-") : selectedMineral;
+
+        return {
         c: countryCode,
-        v: value,
-        share: total > 0 ? (value / total) * 100 : 0,
-      }))
+          mineral: topMineral,
+        v: item.total,
+          share: total > 0 ? (item.total / total) * 100 : 0,
+        };
+      })
       .sort((a, b) => b.v - a.v)
-      .slice(0, 5);
-  }, [analyticsRows, countryYear, selectedMineral]);
+      .slice(0, 2);
+  }, [analyticsRows, referenceYears, selectedMineral]);
 
   const selectedCountryValue = useMemo(
     () => countryTableRows.find((row) => row.c === selectedCountry)?.v || 0,
@@ -615,8 +630,8 @@ export default function M5Page() {
                    <thead className="bg-slate-50/50 text-slate-400 text-[11px] uppercase font-black">
                      <tr>
                        <th className="px-6 py-4">{t.arabCountry}</th>
+                       <th className="px-6 py-4">{t.mineralType}</th>
                        <th className={`px-6 py-4 ${language === "ar" ? "text-left" : "text-right"}`}>{t.exportValue}</th>
-                       <th className="px-6 py-4 text-center">{t.share}</th>
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-50 text-sm font-bold">
@@ -626,12 +641,8 @@ export default function M5Page() {
                             <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] group-hover:bg-[#ddbc6b]/20 group-hover:text-[#082721] transition-colors">{r.c.toUpperCase()}</div>
                             {localizeCountryCode(r.c, language, dbCountryNames)}
                           </td>
+                          <td className="px-6 py-4">{translateMineral(r.mineral, language, t.allMinerals)}</td>
                           <td className={`px-6 py-4 font-black text-[#082721] ${language === "ar" ? "text-left" : "text-right"}`}>{formatUsd(r.v, language)} {t.usd}</td>
-                          <td className="px-6 py-4">
-                             <div className="w-24 h-1.5 bg-slate-100 rounded-full mx-auto overflow-hidden">
-                                <div className="h-full bg-[#ddbc6b]" style={{ width: `${Math.min(r.share, 100)}%` }}></div>
-                             </div>
-                          </td>
                         </tr>
                      ))}
                    </tbody>
