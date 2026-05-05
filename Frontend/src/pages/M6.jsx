@@ -391,8 +391,23 @@ export default function M6Page() {
           },
         },
         scales: {
-          x: { grid: { display: false }, ticks: { font: { family: "Cairo" } } },
-          y: { grid: { color: "rgba(0,0,0,0.05)" }, ticks: { font: { family: "Cairo" } } },
+          x: {
+            grid: { display: false },
+            ticks: {
+              font: { family: "Cairo" },
+              autoSkip: true,
+              maxTicksLimit: 6,
+              maxRotation: 0,
+              minRotation: 0,
+            },
+          },
+          y: {
+            grid: { color: "rgba(0,0,0,0.05)" },
+            ticks: {
+              font: { family: "Cairo" },
+              callback: (value) => formatUsd(value, language),
+            },
+          },
         },
       },
     });
@@ -447,7 +462,7 @@ export default function M6Page() {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 -mt-24 pb-12 relative z-20">
+      <main className="container mx-auto px-3 sm:px-4 -mt-24 pb-12 relative z-20">
         {statusMessage ? <div className={`mb-6 rounded-2xl px-4 py-3 text-sm font-bold ${isDarkMode ? "border border-white/10 bg-[#0d2c24] text-slate-200" : "border border-slate-200 bg-white text-slate-600"}`}>{statusMessage}</div> : null}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -470,18 +485,18 @@ export default function M6Page() {
 
         <div className="grid lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-8">
-            <div className={`rounded-[2.5rem] p-6 md:p-8 border ${isDarkMode ? "bg-[#0d2c24] border-white/10 shadow-none" : "bg-white border-slate-100 shadow-xl shadow-slate-200/60"}`}>
-              <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
+            <div className={`rounded-[2.5rem] p-4 sm:p-6 md:p-8 border ${isDarkMode ? "bg-[#0d2c24] border-white/10 shadow-none" : "bg-white border-slate-100 shadow-xl shadow-slate-200/60"}`}>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-3 sm:gap-4">
                 <div>
-                  <h3 className="text-xl font-bold flex items-center gap-2"><TrendingUp className="text-[#ddbc6b]" size={20} />{t.trendAnalysis}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold flex items-center gap-2"><TrendingUp className="text-[#ddbc6b]" size={20} />{t.trendAnalysis}</h3>
                   <p className={`text-xs ${isDarkMode ? "text-slate-300" : "text-slate-400"}`}>{t.trendSubtitle}</p>
                 </div>
-                <div className={`flex gap-2 p-1.5 rounded-2xl border ${isDarkMode ? "bg-white/5 border-white/10" : "bg-slate-50 border-slate-100"}`}>
-                  <button className={`px-4 py-2 text-xs font-bold rounded-xl bg-white text-[#082721] ${isDarkMode ? "shadow-none" : "shadow-sm"}`}>{t.importsValue}</button>
-                  <button className={`px-4 py-2 text-xs font-bold rounded-xl ${isDarkMode ? "text-slate-300 hover:text-white" : "text-slate-400 hover:text-slate-600"}`}>{t.quantitiesSoon}</button>
+                <div className={`flex w-full sm:w-auto gap-2 p-1.5 rounded-2xl border ${isDarkMode ? "bg-white/5 border-white/10" : "bg-slate-50 border-slate-100"}`}>
+                  <button className={`flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl bg-white text-[#082721] ${isDarkMode ? "shadow-none" : "shadow-sm"}`}>{t.importsValue}</button>
+                  <button className={`flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl ${isDarkMode ? "text-slate-300 hover:text-white" : "text-slate-400 hover:text-slate-600"}`}>{t.quantitiesSoon}</button>
                 </div>
               </div>
-              <div className="relative h-[260px] sm:h-[320px] md:h-[380px] lg:h-[400px] w-full">
+              <div className="relative h-[240px] sm:h-[300px] md:h-[360px] lg:h-[400px] w-full">
                 <canvas ref={canvasRef} />
               </div>
             </div>
