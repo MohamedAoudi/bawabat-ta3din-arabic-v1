@@ -4,6 +4,7 @@ import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { LanguageContext } from "../App";
+import { getMineralProductionAnalytics } from "../services/mineralProductionService";
 
 export const dataByMineral = {
   "الذهب": {
@@ -317,6 +318,8 @@ const PAGE_TRANSLATIONS = {
     noResults: "لا توجد نتائج مطابقة.",
     sources: "المصادر",
     arabEconomicReport: "التقرير الاقتصادي العربي الموحد",
+    allMinerals: "كل المعادن",
+    allCountries: "كل الدول",
   },
   fr: {
     pageTitle: "Volume de la production miniere",
@@ -331,6 +334,8 @@ const PAGE_TRANSLATIONS = {
     noResults: "Aucun resultat correspondant.",
     sources: "Sources",
     arabEconomicReport: "Rapport economique arabe unifie",
+    allMinerals: "Tous les mineraux",
+    allCountries: "Tous les pays",
   },
   en: {
     pageTitle: "Mining production volume",
@@ -345,6 +350,8 @@ const PAGE_TRANSLATIONS = {
     noResults: "No matching results.",
     sources: "Sources",
     arabEconomicReport: "Unified Arab Economic Report",
+    allMinerals: "All minerals",
+    allCountries: "All countries",
   },
 };
 
@@ -406,8 +413,10 @@ const NUMBER_LOCALES = {
   en: "en-US",
 };
 
-const mineralYears = (mineral) =>
-  Object.keys(dataByMineral[mineral] || {})
+const ALL_MINERALS_KEY = "__all__";
+
+const mineralYears = (source, mineral) =>
+  Object.keys(source[mineral] || {})
     .map(Number)
     .sort((a, b) => a - b);
 
@@ -417,6 +426,9 @@ function formatNumber(n, language = "ar") {
 }
 
 const getLocalizedMineral = (mineral, language) =>
+  mineral === ALL_MINERALS_KEY
+    ? PAGE_TRANSLATIONS[language]?.allMinerals || PAGE_TRANSLATIONS.ar.allMinerals
+    :
   MINERAL_LABELS[mineral]?.[language] || mineral;
 
 const getLocalizedUnit = (unit, language) =>
@@ -549,7 +561,7 @@ const linePointCountryLabelPlugin = {
 };
 
 // ── Line chart: evolution over all years for selected mineral ──────────────
-function LineChartPanel({ mineral, language, annualEvolutionLabel }) {
+function LineChartPanel({ mineral, language, annualEvolutionLabel, sourceData }) {
   const canvasRef = useRef(null);
   const instanceRef = useRef(null);
 
@@ -558,10 +570,10 @@ function LineChartPanel({ mineral, language, annualEvolutionLabel }) {
     if (!ctx) return;
     if (instanceRef.current) instanceRef.current.destroy();
 
-    const years = mineralYears(mineral);
+    const years = mineralYears(sourceData, mineral);
     const countriesSet = new Set();
     years.forEach((y) =>
-      (dataByMineral[mineral][y] || []).forEach((r) =>
+      (sourceData[mineral][y] || []).forEach((r) =>
         countriesSet.add(r.country)
       )
     );
@@ -575,7 +587,7 @@ function LineChartPanel({ mineral, language, annualEvolutionLabel }) {
     const datasets = countries.map((country, i) => ({
       label: getLocalizedCountry(country, language),
       data: years.map((y) => {
-        const row = (dataByMineral[mineral][y] || []).find(
+        const row = (sourceData[mineral][y] || []).find(
           (r) => r.country === country
         );
         return row ? row.value : null;
@@ -643,7 +655,7 @@ function LineChartPanel({ mineral, language, annualEvolutionLabel }) {
       instanceRef.current?.destroy();
       instanceRef.current = null;
     };
-  }, [mineral, language]);
+  }, [mineral, language, sourceData]);
 
   return (
     <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
@@ -661,31 +673,125 @@ export default function M1Page() {
   const { language } = useContext(LanguageContext);
   const t = PAGE_TRANSLATIONS[language] || PAGE_TRANSLATIONS.ar;
 
-  const minerals = Object.keys(dataByMineral);
+  const [dbRows, setDbRows] = useState([]);
+  const [isLoadingDb, setIsLoadingDb] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const rows = await getMineralProductionAnalytics();
+        if (mounted) setDbRows(Array.isArray(rows) ? rows : []);
+      } catch (_) {
+        if (mounted) setDbRows([]);
+      } finally {
+        if (mounted) setIsLoadingDb(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const dbDataByMineral = useMemo(() => {
+    return dbRows.reduce((acc, row) => {
+      const mineral = row.mineral_name_ar || row.mineral_name_en;
+      const country = row.country_name_ar || row.country_name_en || row.country_code;
+      const year = Number(row.year);
+      const value = Number(row.production_quantity || 0);
+      if (!mineral || !country || !Number.isFinite(year)) return acc;
+      if (!acc[mineral]) acc[mineral] = {};
+      if (!acc[mineral][year]) acc[mineral][year] = [];
+      acc[mineral][year].push({ country, value });
+      return acc;
+    }, {});
+  }, [dbRows]);
+
+  const activeDataSource = useMemo(
+    () => (Object.keys(dbDataByMineral).length ? dbDataByMineral : dataByMineral),
+    [dbDataByMineral]
+  );
+
+  const allCountries = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          Object.values(activeDataSource).flatMap((yearMap) =>
+            Object.values(yearMap).flatMap((rowsForYear) => rowsForYear.map((r) => r.country))
+          )
+        )
+      ),
+    [activeDataSource]
+  );
+
+  const [activeCountry, setActiveCountry] = useState("all");
+
+  const countryFilteredSource = useMemo(() => {
+    if (activeCountry === "all") return activeDataSource;
+    return Object.entries(activeDataSource).reduce((mineralsAcc, [mineral, yearsMap]) => {
+      const filteredYears = Object.entries(yearsMap).reduce((yearsAcc, [year, rowsForYear]) => {
+        const rows = rowsForYear.filter((r) => r.country === activeCountry);
+        if (rows.length) yearsAcc[year] = rows;
+        return yearsAcc;
+      }, {});
+      if (Object.keys(filteredYears).length) mineralsAcc[mineral] = filteredYears;
+      return mineralsAcc;
+    }, {});
+  }, [activeCountry, activeDataSource]);
+
+  const sourceWithAllMinerals = useMemo(() => {
+    const allByYear = Object.values(countryFilteredSource).reduce((acc, yearsMap) => {
+      Object.entries(yearsMap).forEach(([year, rowsForYear]) => {
+        if (!acc[year]) acc[year] = {};
+        rowsForYear.forEach((row) => {
+          acc[year][row.country] = (acc[year][row.country] || 0) + row.value;
+        });
+      });
+      return acc;
+    }, {});
+
+    const allMineralsData = Object.entries(allByYear).reduce((acc, [year, byCountry]) => {
+      acc[year] = Object.entries(byCountry).map(([country, value]) => ({ country, value }));
+      return acc;
+    }, {});
+
+    return { ...countryFilteredSource, [ALL_MINERALS_KEY]: allMineralsData };
+  }, [countryFilteredSource]);
+
+  const minerals = useMemo(() => [ALL_MINERALS_KEY, ...Object.keys(countryFilteredSource)], [countryFilteredSource]);
   const [activeMineral, setActiveMineral] = useState(minerals[0]);
   const [activeYear, setActiveYear] = useState(() => {
-    const ys = mineralYears(minerals[0]);
+    const ys = mineralYears(sourceWithAllMinerals, minerals[0]);
     return ys[ys.length - 1];
   });
   const [search, setSearch] = useState("");
 
-  // When mineral changes, reset year to latest available
+  useEffect(() => {
+    if (!minerals.length) return;
+    if (!activeMineral || !sourceWithAllMinerals[activeMineral]) {
+      const nextMineral = minerals[0];
+      setActiveMineral(nextMineral);
+      const ys = mineralYears(sourceWithAllMinerals, nextMineral);
+      setActiveYear(ys[ys.length - 1]);
+    }
+  }, [sourceWithAllMinerals, activeMineral, minerals]);
+
   const availableYears = useMemo(
-    () => mineralYears(activeMineral),
-    [activeMineral]
+    () => mineralYears(sourceWithAllMinerals, activeMineral),
+    [sourceWithAllMinerals, activeMineral]
   );
 
   const handleMineralChange = (m) => {
     setActiveMineral(m);
-    const ys = mineralYears(m);
+    const ys = mineralYears(sourceWithAllMinerals, m);
     setActiveYear(ys[ys.length - 1]);
     setSearch("");
   };
 
   const baseRows = useMemo(() => {
-    const rows = dataByMineral[activeMineral]?.[activeYear] || [];
+    const rows = sourceWithAllMinerals[activeMineral]?.[activeYear] || [];
     return [...rows].sort((a, b) => b.value - a.value);
-  }, [activeMineral, activeYear]);
+  }, [sourceWithAllMinerals, activeMineral, activeYear]);
 
   const filteredRows = useMemo(() => {
     if (!search.trim()) return baseRows;
@@ -697,7 +803,6 @@ export default function M1Page() {
     });
   }, [baseRows, search, language]);
 
-  // ── Bar chart (per year) ─────────────────────────────────────────────────
   const barCanvasRef = useRef(null);
   const barInstanceRef = useRef(null);
 
@@ -713,14 +818,7 @@ export default function M1Page() {
       type: "bar",
       data: {
         labels,
-        datasets: [
-          {
-            label: t.production,
-            data: values,
-            backgroundColor: "rgba(8, 39, 33, 0.82)",
-            borderRadius: 10,
-          },
-        ],
+        datasets: [{ label: t.production, data: values, backgroundColor: "rgba(8, 39, 33, 0.82)", borderRadius: 10 }],
       },
       options: {
         responsive: true,
@@ -730,7 +828,9 @@ export default function M1Page() {
           tooltip: {
             callbacks: {
               label: (c) =>
-                ` ${formatNumber(c.parsed.y, language)} ${getLocalizedMineralUnit(activeMineral, language)}`,
+                ` ${formatNumber(c.parsed.y, language)} ${
+                  activeMineral === ALL_MINERALS_KEY ? "" : getLocalizedMineralUnit(activeMineral, language)
+                }`,
             },
           },
         },
@@ -753,11 +853,7 @@ export default function M1Page() {
             grid: { color: "rgba(0,0,0,.08)" },
             ticks: {
               font: { family: "Cairo" },
-              callback: (v) => {
-                if (v >= 1_000_000) return `${v / 1_000_000}M`;
-                if (v >= 1_000) return `${v / 1_000}K`;
-                return v;
-              },
+              callback: (v) => (v >= 1_000_000 ? `${v / 1_000_000}M` : v >= 1_000 ? `${v / 1_000}K` : v),
             },
           },
         },
@@ -775,70 +871,51 @@ export default function M1Page() {
       <Menu />
       <main className="min-h-screen py-6 sm:py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-
-          {/* Header */}
           <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
-            <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
-              {t.pageTitle}
-            </h1>
-            <p className="text-sm text-slate-100/80">
-              {t.pageSubtitle}
-            </p>
+            <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">{t.pageTitle}</h1>
+            <p className="text-sm text-slate-100/80">{t.pageSubtitle}</p>
+            <p className="mt-2 text-[11px] text-slate-200/70">{isLoadingDb ? "Loading DB..." : "DB connected"}</p>
           </header>
 
-          {/* Filters */}
           <section className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/60">
-
-            {/* Mineral selector */}
+            <div className="mb-3">
+              <select
+                value={activeCountry}
+                onChange={(e) => setActiveCountry(e.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-[#082721]"
+              >
+                <option value="all">{t.allCountries}</option>
+                {allCountries.map((c) => (
+                  <option key={c} value={c}>
+                    {getLocalizedCountry(c, language)}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="mb-3 flex gap-2 flex-wrap">
               {minerals.map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => handleMineralChange(m)}
-                  className={`inline-flex items-center rounded-2xl border px-4 py-1.5 text-sm font-extrabold transition ${
-                    m === activeMineral
-                      ? "border-[#082721] bg-[#082721] text-white shadow-sm"
-                      : "border-slate-200 bg-white text-[#082721] hover:bg-slate-50"
-                  }`}
-                >
+                <button key={m} type="button" onClick={() => handleMineralChange(m)} className={`inline-flex items-center rounded-2xl border px-4 py-1.5 text-sm font-extrabold transition ${m === activeMineral ? "border-[#082721] bg-[#082721] text-white shadow-sm" : "border-slate-200 bg-white text-[#082721] hover:bg-slate-50"}`}>
                   {getLocalizedMineral(m, language)}
-                  <span className="mr-2 text-[10px] opacity-60">
-                    ({getLocalizedMineralUnit(m, language)})
-                  </span>
+                  {m !== ALL_MINERALS_KEY ? (
+                    <span className="mr-2 text-[10px] opacity-60">({getLocalizedMineralUnit(m, language)})</span>
+                  ) : null}
                 </button>
               ))}
             </div>
-
-            {/* Year bar */}
             <div className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-100 bg-slate-50 px-2 py-2 shadow-sm">
               {availableYears.map((y) => (
-                <button
-                  key={y}
-                  type="button"
-                  onClick={() => setActiveYear(y)}
-                  className={`inline-flex items-center rounded-2xl border px-3 py-1 text-xs font-extrabold transition ${
-                    y === activeYear
-                      ? "border-[#082721] bg-[#082721] text-white shadow-sm"
-                      : "border-transparent bg-white text-[#082721] hover:border-slate-200 hover:bg-slate-50"
-                  }`}
-                >
+                <button key={y} type="button" onClick={() => setActiveYear(y)} className={`inline-flex items-center rounded-2xl border px-3 py-1 text-xs font-extrabold transition ${y === activeYear ? "border-[#082721] bg-[#082721] text-white shadow-sm" : "border-transparent bg-white text-[#082721] hover:border-slate-200 hover:bg-slate-50"}`}>
                   {y}
                 </button>
               ))}
             </div>
           </section>
 
-          {/* Main layout */}
           <section className="mt-4 grid gap-4 lg:grid-cols-12">
-
-            {/* Bar chart */}
             <div className="lg:col-span-8">
               <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="text-base font-extrabold text-slate-800">
-                    {t.productionByCountry}
-                  </h3>
+                  <h3 className="text-base font-extrabold text-slate-800">{t.productionByCountry}</h3>
                   <div className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
                     <CalendarDays size={14} strokeWidth={2.2} />
                     <span>{t.yearLabel}: {activeYear}</span>
@@ -850,59 +927,41 @@ export default function M1Page() {
               </div>
             </div>
 
-            {/* Table */}
             <div className="space-y-4 lg:col-span-4">
               <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <h3 className="text-sm font-extrabold text-slate-800">
-                    {t.productionByCountry}
-                  </h3>
+                  <h3 className="text-sm font-extrabold text-slate-800">{t.productionByCountry}</h3>
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-[11px] font-extrabold text-amber-900">
                     <ArrowDownWideNarrow size={13} strokeWidth={2.2} />
                     {t.ranking}
                   </span>
                 </div>
-
                 <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
                   <div className="mb-2 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
                     <Search size={14} strokeWidth={2.2} className="text-slate-400" />
-                    <input
-                      type="text"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      placeholder={t.searchPlaceholder}
-                      className="w-full border-none bg-transparent text-xs font-bold text-slate-700 outline-none focus:ring-0"
-                    />
+                    <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t.searchPlaceholder} className="w-full border-none bg-transparent text-xs font-bold text-slate-700 outline-none focus:ring-0" />
                   </div>
-
                   <div className="max-h-72 overflow-y-auto rounded-xl bg-white">
                     <table className={`min-w-full text-xs ${language === "ar" ? "text-right" : "text-left"}`}>
                       <thead className="bg-slate-50 text-[11px] font-extrabold text-[#082721]">
                         <tr>
                           <th className="px-3 py-2">{t.country}</th>
                           <th className="px-3 py-2">
-                            {t.production} ({getLocalizedMineralUnit(activeMineral, language)})
+                            {t.production}
+                            {activeMineral !== ALL_MINERALS_KEY ? ` (${getLocalizedMineralUnit(activeMineral, language)})` : ""}
                           </th>
                         </tr>
                       </thead>
                       <tbody>
                         {filteredRows.map((r) => (
-                          <tr
-                            key={r.country}
-                            className="border-t border-slate-100 text-xs text-slate-700"
-                          >
+                          <tr key={r.country} className="border-t border-slate-100 text-xs text-slate-700">
                             <td className="px-3 py-1.5 font-bold">{getLocalizedCountry(r.country, language)}</td>
                             <td className="px-3 py-1.5">{formatNumber(r.value, language)}</td>
                           </tr>
                         ))}
                         {filteredRows.length === 0 && (
                           <tr>
-                            <td
-                              colSpan={2}
-                              className="px-3 py-3 text-center text-xs text-slate-400"
-                            >
-                              {t.noResults}
-                            </td>
+                            <td colSpan={2} className="px-3 py-3 text-center text-xs text-slate-400">{t.noResults}</td>
                           </tr>
                         )}
                       </tbody>
@@ -910,43 +969,17 @@ export default function M1Page() {
                   </div>
                 </div>
               </div>
-
-              {/* Sources */}
-              <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
-                <h3 className="mb-2 text-sm font-extrabold text-slate-800">{t.sources}</h3>
-                <div className="space-y-2 rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
-                  <div className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 text-xs">
-                    <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#082721]" />
-                    <div>
-                      <div className="font-bold">BGS & IOCFWMC</div>
-                      <div className="text-[11px] text-slate-500">
-                        {t.arabEconomicReport}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 text-xs">
-                    <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500" />
-                    <div>
-                      <div className="font-bold">USGS</div>
-                      <div className="text-[11px] text-slate-500">
-                        U.S. Geological Survey
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </section>
 
-          {/* Line chart — full width below */}
           <section className="mt-4">
             <LineChartPanel
               mineral={activeMineral}
               language={language}
               annualEvolutionLabel={t.annualEvolution}
+              sourceData={sourceWithAllMinerals}
             />
           </section>
-
         </div>
       </main>
       <Footer />

@@ -9,6 +9,15 @@ const getAllMineralProduction = async (req, res) => {
   }
 };
 
+const getMineralProductionAnalytics = async (req, res) => {
+  try {
+    const rows = await mineralProductionModel.getMineralProductionAnalytics();
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const getMineralProductionById = async (req, res) => {
   try {
     const row = await mineralProductionModel.getMineralProductionById(req.params.id);
@@ -61,6 +70,7 @@ const deleteMineralProduction = async (req, res) => {
 
 module.exports = {
   getAllMineralProduction,
+  getMineralProductionAnalytics,
   getMineralProductionById,
   createMineralProduction,
   updateMineralProduction,

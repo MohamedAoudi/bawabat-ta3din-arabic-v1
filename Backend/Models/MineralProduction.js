@@ -10,6 +10,33 @@ const getAllMineralProduction = async () => {
   return result.rows;
 };
 
+const getMineralProductionAnalytics = async () => {
+  const result = await pool.query(
+    `SELECT
+       c.iso_code AS country_code,
+       c.name_ar AS country_name_ar,
+       c.name_en AS country_name_en,
+       c.name_fr AS country_name_fr,
+       m.name_ar AS mineral_name_ar,
+       m.name_en AS mineral_name_en,
+       m.name_fr AS mineral_name_fr,
+       mp.year,
+       SUM(COALESCE(mp.normalized_quantity, mp.production_quantity, 0))::double precision AS production_quantity,
+       COALESCE(MAX(mp.unit_name_ar), '') AS unit_name_ar,
+       COALESCE(MAX(mp.unit_name_en), '') AS unit_name_en,
+       COALESCE(MAX(mp.unit_name_fr), '') AS unit_name_fr
+     FROM mineral_production mp
+     LEFT JOIN countries c ON c.id = mp.country_id
+     LEFT JOIN minerals m ON m.id = mp.mineral_id
+     WHERE mp.year IS NOT NULL
+     GROUP BY
+       c.iso_code, c.name_ar, c.name_en, c.name_fr,
+       m.name_ar, m.name_en, m.name_fr, mp.year
+     ORDER BY mp.year ASC, c.iso_code ASC, m.name_en ASC`
+  );
+  return result.rows;
+};
+
 const getMineralProductionById = async (id) => {
   const result = await pool.query(
     `SELECT id, country_id, mineral_id, year, production_quantity, normalized_quantity,
@@ -85,6 +112,7 @@ const deleteMineralProduction = async (id) => {
 
 module.exports = {
   getAllMineralProduction,
+  getMineralProductionAnalytics,
   getMineralProductionById,
   createMineralProduction,
   updateMineralProduction,
