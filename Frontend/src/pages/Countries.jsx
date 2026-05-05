@@ -1985,9 +1985,9 @@ const Countries = () => {
     <div
       dir={isArabic ? "rtl" : "ltr"}
       lang={language}
-      className="min-h-screen"
+      className="min-h-screen font-['Cairo'] text-slate-800"
       style={{
-        background: isDarkMode ? "#071611" : "white",
+        background: isDarkMode ? "#071611" : "#F4F7F5",
         fontFamily: "'Cairo',system-ui,sans-serif",
       }}
     >
@@ -2003,19 +2003,26 @@ const Countries = () => {
       `}</style>
       <Menu />
 
-      <header className="pt-14 pb-20 -mb-10 text-center relative overflow-hidden"
-        style={{ background:"#082721", clipPath:"polygon(0 0,100% 0,100% 82%,0% 100%)" }}>
-        <div className="relative z-10 max-w-3xl mx-auto px-4">
+      <div className="relative overflow-hidden bg-[#082721] pb-36 pt-16 text-white">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(#ddbc6b 1px, transparent 1px)", size: "20px 20px" }}></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4 text-xs font-bold uppercase tracking-widest"
                style={{ background:"rgba(201,168,76,0.12)", color:"#C9A84C", border:"1px solid rgba(201,168,76,0.25)" }}>
             {labels.miningOutputBadge}
           </div>
-          <h1 className="text-3xl font-black text-white">{labels.countriesFilesTitle}</h1>
-          <p className="text-sm text-slate-200 mt-2">{labels.countriesFilesSubtitle}</p>
+          <h1 className="mb-4 text-4xl font-black md:text-5xl">{labels.countriesFilesTitle}</h1>
+          <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-300 md:text-base">{labels.countriesFilesSubtitle}</p>
         </div>
-      </header>
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20" style={{ transform: "translateY(2px)" }}>
+          <svg className="relative block w-full h-[56px] md:h-[90px] lg:h-[120px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill={isDarkMode ? "#0b221b" : "#F4F7F5"} fillOpacity="0.4" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L0,320Z" />
+            <path fill={isDarkMode ? "#071611" : "#F4F7F5"} fillOpacity="1" d="M0,288L60,261.3C120,235,240,181,360,149.3C480,117,600,107,720,122.7C840,139,960,181,1080,186.7C1200,192,1320,160,1380,144L1440,128L1440,320L0,320Z" />
+          </svg>
+        </div>
+      </div>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-20 space-y-6">
+      <main className="container mx-auto px-3 sm:px-4 -mt-24 pb-12 relative z-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
         <section className="rounded-2xl p-5 sm:p-7"
           style={{ background:"#ffffff", border:"1px solid rgba(0,0,0,0.08)", boxShadow:"0 2px 16px rgba(0,0,0,0.06)" }}>
@@ -2134,6 +2141,7 @@ const Countries = () => {
             />
           </div>
         )}
+        </div>
       </main>
 
       <Footer />
