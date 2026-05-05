@@ -885,7 +885,12 @@ export default function M1Page() {
   }, [baseRows, activeMineral, language, t.production]);
 
   return (
-    <div className="" dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
+    <div
+      dir={language === "ar" ? "rtl" : "ltr"}
+      lang={language}
+      className="min-h-screen font-['Cairo'] text-slate-800"
+      style={{ background: "#F4F7F5" }}
+    >
       <Menu />
       <div className="relative overflow-hidden bg-[#082721] pb-36 pt-16 text-white">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(#ddbc6b 1px, transparent 1px)", size: "20px 20px" }}></div>
@@ -900,7 +905,7 @@ export default function M1Page() {
           </svg>
         </div>
       </div>
-      <main className="min-h-screen py-6 sm:py-8 -mt-24 relative z-20">
+      <main className="container mx-auto px-3 sm:px-4 -mt-24 pb-12 relative z-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
           <section className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/60">

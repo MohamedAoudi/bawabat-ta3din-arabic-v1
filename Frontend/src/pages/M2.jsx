@@ -4,24 +4,7 @@ import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { LanguageContext } from "../App";
-
-const series = [
-  { year: 2010, val: 851 },
-  { year: 2011, val: 881 },
-  { year: 2012, val: 890 },
-  { year: 2013, val: 913 },
-  { year: 2014, val: 931 },
-  { year: 2015, val: 961 },
-  { year: 2016, val: 971 },
-  { year: 2017, val: 981 },
-  { year: 2018, val: 1011 },
-  { year: 2019, val: 2183 },
-  { year: 2020, val: 1568 },
-  { year: 2021, val: 1167 },
-  { year: 2022, val: 1574 },
-  { year: 2023, val: 1561 },
-  { year: 2024, val: 1600 },
-];
+import { getCountries, getMinerals, getMineralProductionTrend } from "../services";
 
 const PAGE_TRANSLATIONS = {
   ar: {
@@ -77,46 +60,6 @@ const PAGE_TRANSLATIONS = {
   },
 };
 
-const COUNTRY_LABELS = {
-  "مملكة البحرين": {
-    ar: "مملكة البحرين",
-    fr: "Royaume de Bahrein",
-    en: "Kingdom of Bahrain",
-  },
-  "المملكة المغربية": {
-    ar: "المملكة المغربية",
-    fr: "Royaume du Maroc",
-    en: "Kingdom of Morocco",
-  },
-  "المملكة العربية السعودية": {
-    ar: "المملكة العربية السعودية",
-    fr: "Royaume d'Arabie saoudite",
-    en: "Kingdom of Saudi Arabia",
-  },
-  "الجمهورية التونسية": {
-    ar: "الجمهورية التونسية",
-    fr: "Republique tunisienne",
-    en: "Tunisian Republic",
-  },
-  "جمهورية مصر العربية": {
-    ar: "جمهورية مصر العربية",
-    fr: "Republique arabe d'Egypte",
-    en: "Arab Republic of Egypt",
-  },
-};
-
-const PRODUCT_LABELS = {
-  "الألمنيوم الأولي": {
-    ar: "الالمنيوم الاولي",
-    fr: "Aluminium primaire",
-    en: "Primary aluminum",
-  },
-  "الفوسفات": { ar: "الفوسفات", fr: "Phosphate", en: "Phosphate" },
-  "النحاس": { ar: "النحاس", fr: "Cuivre", en: "Copper" },
-  "الحديد": { ar: "الحديد", fr: "Fer", en: "Iron" },
-  "الذهب": { ar: "الذهب", fr: "Or", en: "Gold" },
-};
-
 const UNIT_LABELS = {
   "ألف طن": { ar: "الف طن", fr: "milliers de tonnes", en: "thousand tons" },
 };
@@ -127,45 +70,221 @@ const NUMBER_LOCALES = {
   en: "en-US",
 };
 
-const COUNTRY_OPTIONS = [
-  "مملكة البحرين",
-  "المملكة المغربية",
-  "المملكة العربية السعودية",
-  "الجمهورية التونسية",
-  "جمهورية مصر العربية",
-];
-
-const PRODUCT_OPTIONS = [
-  "الألمنيوم الأولي",
-  "الفوسفات",
-  "النحاس",
-  "الحديد",
-  "الذهب",
-];
-
 function formatNumber(n, language = "ar") {
   return new Intl.NumberFormat(NUMBER_LOCALES[language] || NUMBER_LOCALES.ar).format(n);
 }
 
-const localizeCountry = (value, language) => COUNTRY_LABELS[value]?.[language] || value;
-const localizeProduct = (value, language) => PRODUCT_LABELS[value]?.[language] || value;
 const localizeUnit = (value, language) => UNIT_LABELS[value]?.[language] || value;
+
+const localizeCountry = (country, language) => {
+  if (!country) return "";
+  if (language === "fr") return country.name_fr || country.name_en || country.name_ar || "";
+  if (language === "en") return country.name_en || country.name_fr || country.name_ar || "";
+  return country.name_ar || country.name_en || country.name_fr || "";
+};
+
+const localizeMineral = (mineral, language) => {
+  if (!mineral) return "";
+  if (language === "fr") return mineral.name_fr || mineral.name_en || mineral.name_ar || "";
+  if (language === "en") return mineral.name_en || mineral.name_fr || mineral.name_ar || "";
+  return mineral.name_ar || mineral.name_en || mineral.name_fr || "";
+};
+
+const localizeCountryRow = (row, language) => {
+  if (!row) return "";
+  if (language === "fr") return row.country_name_fr || row.country_name_en || row.country_name_ar || "";
+  if (language === "en") return row.country_name_en || row.country_name_fr || row.country_name_ar || "";
+  return row.country_name_ar || row.country_name_en || row.country_name_fr || "";
+};
+
+const localizeMineralRow = (row, language) => {
+  if (!row) return "";
+  if (language === "fr") return row.mineral_name_fr || row.mineral_name_en || row.mineral_name_ar || "";
+  if (language === "en") return row.mineral_name_en || row.mineral_name_fr || row.mineral_name_ar || "";
+  return row.mineral_name_ar || row.mineral_name_en || row.mineral_name_fr || "";
+};
+
+const pickUnitLabelFromTrend = (trendRows, language) => {
+  const row = trendRows?.find((r) => r) || null;
+  if (!row) return "";
+  if (language === "fr") return row.unit_name_fr || row.unit_name_en || row.unit_name_ar || "";
+  if (language === "en") return row.unit_name_en || row.unit_name_fr || row.unit_name_ar || "";
+  return row.unit_name_ar || row.unit_name_en || row.unit_name_fr || "";
+};
+
+const PALETTE = [
+  "rgba(8, 39, 33, 0.95)",
+  "rgba(16, 120, 97, 0.95)",
+  "rgba(221, 188, 107, 0.95)",
+  "rgba(59, 130, 246, 0.95)",
+  "rgba(168, 85, 247, 0.95)",
+  "rgba(239, 68, 68, 0.95)",
+  "rgba(245, 158, 11, 0.95)",
+  "rgba(20, 184, 166, 0.95)",
+];
 
 export default function M2Page() {
   const { language } = useContext(LanguageContext);
   const t = PAGE_TRANSLATIONS[language] || PAGE_TRANSLATIONS.ar;
 
-  const [country, setCountry] = useState("مملكة البحرين");
-  const [product, setProduct] = useState("الألمنيوم الأولي");
-  const unitLabel = "ألف طن";
+  const [countries, setCountries] = useState([]);
+  const [minerals, setMinerals] = useState([]);
+  const [countryId, setCountryId] = useState("all");
+  const [mineralId, setMineralId] = useState("all");
 
-  const yearsRows = useMemo(
-    () => series.filter((x) => x.year <= 2022),
-    []
+  const [trendRows, setTrendRows] = useState([]); // { year, production_quantity, unit_name_* }
+  const [isLoadingTrend, setIsLoadingTrend] = useState(false);
+  const [trendError, setTrendError] = useState("");
+  const unitLabel = useMemo(() => pickUnitLabelFromTrend(trendRows, language), [trendRows, language]);
+
+  const selectedCountry = useMemo(
+    () => (countryId === "all" ? null : countries.find((c) => String(c.id) === String(countryId)) || null),
+    [countries, countryId]
   );
+  const selectedMineral = useMemo(
+    () => (mineralId === "all" ? null : minerals.find((m) => String(m.id) === String(mineralId)) || null),
+    [minerals, mineralId]
+  );
+
+  const { labels, datasets, tableSeries } = useMemo(() => {
+    const rows = Array.isArray(trendRows) ? trendRows : [];
+
+    const years = Array.from(
+      new Set(rows.map((r) => Number(r.year)).filter((y) => Number.isFinite(y)))
+    ).sort((a, b) => a - b);
+
+    // Determine grouping: by country or by mineral or single
+    const hasCountryGrouping = rows.some((r) => r?.country_id !== null && r?.country_id !== undefined);
+    const hasMineralGrouping = rows.some((r) => r?.mineral_id !== null && r?.mineral_id !== undefined);
+
+    const keyFn = (r) => {
+      if (hasCountryGrouping) return `country:${r.country_id}`;
+      if (hasMineralGrouping) return `mineral:${r.mineral_id}`;
+      return "single";
+    };
+
+    const labelFn = (r) => {
+      if (hasCountryGrouping) return localizeCountryRow(r, language) || "-";
+      if (hasMineralGrouping) return localizeMineralRow(r, language) || "-";
+      return t.production;
+    };
+
+    const groups = new Map();
+    for (const r of rows) {
+      const k = keyFn(r);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(r);
+    }
+
+    const ds = Array.from(groups.entries()).map(([k, groupRows], idx) => {
+      const yearToVal = new Map();
+      for (const r of groupRows) {
+        const y = Number(r.year);
+        const v = Number(r.production_quantity ?? 0);
+        yearToVal.set(y, v);
+      }
+
+      const color = PALETTE[idx % PALETTE.length];
+      return {
+        key: k,
+        label: labelFn(groupRows[0]),
+        data: years.map((y) => yearToVal.get(y) ?? 0),
+        borderWidth: 3,
+        tension: 0.18,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        fill: false,
+        borderColor: color,
+        pointBackgroundColor: color,
+        pointBorderColor: "#fff",
+      };
+    });
+
+    // Table: show total across datasets per year
+    const totals = years.map((_, i) => ds.reduce((sum, d) => sum + Number(d.data[i] ?? 0), 0));
+    const tbl = years.map((y, i) => ({ year: y, val: totals[i] }));
+
+    return { labels: years, datasets: ds, tableSeries: tbl };
+  }, [trendRows, language, t.production]);
+
+  const yearsRows = useMemo(() => tableSeries, [tableSeries]);
+  const sourceRows = useMemo(() => {
+    const sourceSet = new Set();
+    for (const row of trendRows || []) {
+      const list = Array.isArray(row?.data_sources) ? row.data_sources : [];
+      for (const source of list) {
+        if (source && String(source).trim()) {
+          sourceSet.add(String(source).trim());
+        }
+      }
+    }
+    return Array.from(sourceSet);
+  }, [trendRows]);
 
   const canvasRef = useRef(null);
   const chartRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadLookups() {
+      try {
+        const [c, m] = await Promise.all([getCountries(), getMinerals()]);
+        if (cancelled) return;
+
+        setCountries(Array.isArray(c) ? c : []);
+        setMinerals(Array.isArray(m) ? m : []);
+
+        const firstCountryId = (Array.isArray(c) && c[0]?.id) ? String(c[0].id) : "";
+        const firstMineralId = (Array.isArray(m) && m[0]?.id) ? String(m[0].id) : "";
+        setCountryId((prev) => prev || "all" || firstCountryId);
+        setMineralId((prev) => prev || "all" || firstMineralId);
+      } catch {
+        if (cancelled) return;
+        setCountries([]);
+        setMinerals([]);
+      }
+    }
+
+    loadLookups();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadTrend() {
+      setIsLoadingTrend(true);
+      setTrendError("");
+      try {
+        const rows = await getMineralProductionTrend({
+          country_id: countryId === "all" ? "" : Number(countryId),
+          mineral_id: mineralId === "all" ? "" : Number(mineralId),
+        });
+        if (cancelled) return;
+        setTrendRows(Array.isArray(rows) ? rows : []);
+      } catch {
+        if (cancelled) return;
+        setTrendRows([]);
+        setTrendError(
+          language === "fr"
+            ? "Erreur de chargement des donnees (API / DB)."
+            : language === "en"
+              ? "Failed to load data (API / DB)."
+              : "فشل تحميل البيانات (API / DB)."
+        );
+      } finally {
+        if (!cancelled) setIsLoadingTrend(false);
+      }
+    }
+
+    loadTrend();
+    return () => {
+      cancelled = true;
+    };
+  }, [countryId, mineralId]);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -176,37 +295,34 @@ export default function M2Page() {
       chartRef.current = null;
     }
 
-    const labels = series.map((x) => x.year);
-    const values = series.map((x) => x.val);
-
     chartRef.current = new Chart(ctx, {
       type: "line",
       data: {
         labels,
-        datasets: [
-          {
-            label: t.production,
-            data: values,
-            borderWidth: 3,
-            tension: 0.18,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            fill: false,
-            borderColor: "rgba(8, 39, 33, 0.95)",
-            pointBackgroundColor: "rgba(8, 39, 33, 0.95)",
-            pointBorderColor: "#fff",
-          },
-        ],
+        datasets: datasets.map((d) => ({
+          label: d.label,
+          data: d.data,
+          borderWidth: d.borderWidth,
+          tension: d.tension,
+          pointRadius: d.pointRadius,
+          pointHoverRadius: d.pointHoverRadius,
+          fill: d.fill,
+          borderColor: d.borderColor,
+          pointBackgroundColor: d.pointBackgroundColor,
+          pointBorderColor: d.pointBorderColor,
+        })),
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: false },
+          legend: { display: datasets.length > 1 },
           tooltip: {
             callbacks: {
               label: (context) =>
-                ` ${formatNumber(context.parsed.y, language)} ${localizeUnit(unitLabel, language)}`,
+                ` ${formatNumber(context.parsed.y, language)} ${
+                  unitLabel ? localizeUnit(unitLabel, language) : ""
+                }`,
             },
           },
         },
@@ -229,22 +345,31 @@ export default function M2Page() {
         chartRef.current = null;
       }
     };
-  }, [language, t.production]);
+  }, [language, t.production, labels, datasets, unitLabel]);
 
   return (
-    <div className="" dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
+    <div
+      dir={language === "ar" ? "rtl" : "ltr"}
+      lang={language}
+      className="min-h-screen font-['Cairo'] text-slate-800"
+      style={{ background: "#F4F7F5" }}
+    >
       <Menu />
-      <main className="min-h-screen py-6 sm:py-8">
+      <div className="relative overflow-hidden bg-[#082721] pb-36 pt-16 text-white">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(#ddbc6b 1px, transparent 1px)", size: "20px 20px" }}></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h1 className="mb-4 text-4xl font-black md:text-5xl">{t.pageTitle}</h1>
+          <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-300 md:text-base">{t.pageSubtitle}</p>
+        </div>
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20" style={{ transform: "translateY(2px)" }}>
+          <svg className="relative block w-full h-[56px] md:h-[90px] lg:h-[120px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="#eef2f1" fillOpacity="0.45" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L0,320Z" />
+            <path fill="#f8faf9" fillOpacity="1" d="M0,288L60,261.3C120,235,240,181,360,149.3C480,117,600,107,720,122.7C840,139,960,181,1080,186.7C1200,192,1320,160,1380,144L1440,128L1440,320L0,320Z" />
+          </svg>
+        </div>
+      </div>
+      <main className="container mx-auto px-3 sm:px-4 -mt-24 pb-12 relative z-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
-          <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">
-            {t.pageTitle}
-          </h1>
-          <p className="text-sm text-slate-100/80">
-            {t.pageSubtitle}
-          </p>
-        </header>
 
         {/* Top filters */}
         <section className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/60">
@@ -256,13 +381,16 @@ export default function M2Page() {
               <div className="flex items-center gap-2">
                 <Flag size={16} strokeWidth={2.2} className="text-[#082721]" />
                 <select
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
+                  value={countryId}
+                  onChange={(e) => setCountryId(e.target.value)}
                   className="w-full border-none bg-transparent text-sm font-bold text-slate-700 outline-none focus:ring-0"
                 >
-                  {COUNTRY_OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {localizeCountry(option, language)}
+                  <option value="all">
+                    {language === "fr" ? "Tous les pays" : language === "en" ? "All countries" : "كل الدول"}
+                  </option>
+                  {countries.map((c) => (
+                    <option key={c.id} value={String(c.id)}>
+                      {localizeCountry(c, language)}
                     </option>
                   ))}
                 </select>
@@ -276,13 +404,16 @@ export default function M2Page() {
               <div className="flex items-center gap-2">
                 <Boxes size={16} strokeWidth={2.2} className="text-[#082721]" />
                 <select
-                  value={product}
-                  onChange={(e) => setProduct(e.target.value)}
+                  value={mineralId}
+                  onChange={(e) => setMineralId(e.target.value)}
                   className="w-full border-none bg-transparent text-sm font-bold text-slate-700 outline-none focus:ring-0"
                 >
-                  {PRODUCT_OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {localizeProduct(option, language)}
+                  <option value="all">
+                    {language === "fr" ? "Tous les minerais" : language === "en" ? "All minerals" : "كل المعادن"}
+                  </option>
+                  {minerals.map((m) => (
+                    <option key={m.id} value={String(m.id)}>
+                      {localizeMineral(m, language)}
                     </option>
                   ))}
                 </select>
@@ -291,7 +422,22 @@ export default function M2Page() {
           </div>
 
           <div className="mt-3 text-xs font-semibold text-slate-500">
-            {t.demoView}: {localizeCountry(country, language)} - {localizeProduct(product, language)}
+            {t.demoView}:{" "}
+            {countryId === "all"
+              ? language === "fr"
+                ? "Tous les pays"
+                : language === "en"
+                  ? "All countries"
+                  : "كل الدول"
+              : localizeCountry(selectedCountry, language)}{" "}
+            -{" "}
+            {mineralId === "all"
+              ? language === "fr"
+                ? "Tous les minerais"
+                : language === "en"
+                  ? "All minerals"
+                  : "كل المعادن"
+              : localizeMineral(selectedMineral, language)}
           </div>
         </section>
 
@@ -306,12 +452,31 @@ export default function M2Page() {
                 </div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-[#ddbc6b]/15 px-3 py-1 text-xs font-bold text-[#082721]">
                   <ChartLine size={14} strokeWidth={2.2} />
-                  <span>{t.productionUnit}: {localizeUnit(unitLabel, language)}</span>
+                  <span>
+                    {t.productionUnit}: {unitLabel ? localizeUnit(unitLabel, language) : "-"}
+                  </span>
                 </div>
               </div>
 
-              <div className="h-[320px] sm:h-[420px]">
+              <div className="relative h-[320px] sm:h-[420px]">
                 <canvas ref={canvasRef} />
+                {isLoadingTrend ? (
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-bold text-slate-500">
+                    {language === "fr" ? "Chargement..." : language === "en" ? "Loading..." : "جار التحميل..."}
+                  </div>
+                ) : trendError ? (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-white/70 px-4 text-center text-sm font-bold text-red-700">
+                    {trendError}
+                  </div>
+                ) : labels.length === 0 ? (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-white/70 px-4 text-center text-sm font-bold text-slate-600">
+                    {language === "fr"
+                      ? "Aucune donnee pour cette selection."
+                      : language === "en"
+                        ? "No data for this selection."
+                        : "لا توجد بيانات لهذا الاختيار."}
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
@@ -347,42 +512,29 @@ export default function M2Page() {
               </div>
             </div>
 
-            <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
-              <div className="mb-2 text-sm font-extrabold text-slate-800">
+            <div className="rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] p-4 text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
+              <div className="mb-2 text-sm font-extrabold text-white">
                 {t.sources}
               </div>
-              <div className="space-y-2 rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
-                <div className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 text-xs">
-                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-[#082721]" />
-                  <div>
-                    <div className="font-bold">{t.ministryIndustry}</div>
-                    <div className="text-[11px] text-slate-500">
-                      {t.officialReports}
-                    </div>
-                    <button
-                      type="button"
-                      className="mt-1 text-[11px] font-bold text-[#082721] underline"
-                    >
-                      {t.sourceLink}
-                    </button>
+              <div className="space-y-2 rounded-2xl border border-white/15 bg-white/5 p-3">
+                {sourceRows.length === 0 ? (
+                  <div className="rounded-2xl border border-white/15 bg-white/10 p-3 text-xs text-slate-200">
+                    {language === "fr"
+                      ? "Aucune source pour cette selection."
+                      : language === "en"
+                        ? "No sources for this selection."
+                        : "لا توجد مصادر لهذا الاختيار."}
                   </div>
-                </div>
-
-                <div className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 text-xs">
-                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  <div>
-                    <div className="font-bold">USGS</div>
-                    <div className="text-[11px] text-slate-500">
-                      {t.globalDatabase}
+                ) : (
+                  sourceRows.map((source, idx) => (
+                    <div key={`${source}-${idx}`} className="flex gap-3 rounded-2xl border border-white/15 bg-white/10 p-3 text-xs">
+                      <span className={`mt-1 h-2.5 w-2.5 rounded-full ${idx % 2 === 0 ? "bg-[#ddbc6b]" : "bg-emerald-300"}`} />
+                      <div>
+                        <div className="font-bold text-white">{source}</div>
+                      </div>
                     </div>
-                    <button
-                      type="button"
-                      className="mt-1 text-[11px] font-bold text-[#082721] underline"
-                    >
-                      {t.sourceLink}
-                    </button>
-                  </div>
-                </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

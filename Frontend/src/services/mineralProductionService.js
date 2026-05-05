@@ -13,4 +13,11 @@ export const getMineralProductionAnalytics = async () => {
   return response.data;
 };
 
+export const getMineralProductionTrend = async ({ country_id, mineral_id }) => {
+  const response = await apiClient.get("/mineral-production/trend", {
+    params: { country_id, mineral_id },
+  });
+  return response.data;
+};
+
 export default mineralProductionService;

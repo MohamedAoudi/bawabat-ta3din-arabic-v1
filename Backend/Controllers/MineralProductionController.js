@@ -1,5 +1,28 @@
 const mineralProductionModel = require("../Models/MineralProduction");
 
+const getMineralProductionTrend = async (req, res) => {
+  try {
+    const rawMineral = req.query.mineral_id;
+    const mineral_id =
+      rawMineral === undefined || rawMineral === null || rawMineral === "" ? null : Number(rawMineral);
+    const rawCountry = req.query.country_id;
+    const country_id =
+      rawCountry === undefined || rawCountry === null || rawCountry === "" ? null : Number(rawCountry);
+
+    if (mineral_id !== null && !Number.isFinite(mineral_id)) {
+      return res.status(400).json({ message: "mineral_id must be a number when provided" });
+    }
+    if (country_id !== null && !Number.isFinite(country_id)) {
+      return res.status(400).json({ message: "country_id must be a number when provided" });
+    }
+
+    const rows = await mineralProductionModel.getMineralProductionTrend({ country_id, mineral_id });
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const getAllMineralProduction = async (req, res) => {
   try {
     const rows = await mineralProductionModel.getAllMineralProduction();
@@ -69,6 +92,7 @@ const deleteMineralProduction = async (req, res) => {
 };
 
 module.exports = {
+  getMineralProductionTrend,
   getAllMineralProduction,
   getMineralProductionAnalytics,
   getMineralProductionById,
