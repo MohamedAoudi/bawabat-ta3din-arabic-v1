@@ -553,7 +553,7 @@ export default function M5Page() {
       <Menu />
       
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-[#082721] pb-32 pt-16 text-white">
+      <div className="relative overflow-hidden bg-[#082721] pb-36 pt-16 text-white">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ddbc6b 1px, transparent 1px)', size: '20px 20px' }}></div>
         <div className="container mx-auto px-4 text-center relative z-10">
           <span className="inline-block px-4 py-1.5 mb-4 text-xs font-bold tracking-widest uppercase bg-[#ddbc6b]/20 border border-[#ddbc6b]/30 rounded-full text-[#ddbc6b]">
@@ -563,6 +563,20 @@ export default function M5Page() {
           <p className="max-w-2xl mx-auto text-slate-300 text-sm md:text-base leading-relaxed">
             {t.heroSubtitle}
           </p>
+        </div>
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20" style={{ transform: "translateY(2px)" }}>
+          <svg className="relative block w-full h-[56px] md:h-[90px] lg:h-[120px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path
+              fill={isDarkMode ? "#0b221b" : "#F4F7F5"}
+              fillOpacity="0.4"
+              d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L0,320Z"
+            />
+            <path
+              fill={isDarkMode ? "#071611" : "#F4F7F5"}
+              fillOpacity="1"
+              d="M0,288L60,261.3C120,235,240,181,360,149.3C480,117,600,107,720,122.7C840,139,960,181,1080,186.7C1200,192,1320,160,1380,144L1440,128L1440,320L0,320Z"
+            />
+          </svg>
         </div>
       </div>
 
