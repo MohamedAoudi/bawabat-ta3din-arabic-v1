@@ -565,6 +565,16 @@ function LineChartPanel({ mineral, language, annualEvolutionLabel, sourceData })
   const canvasRef = useRef(null);
   const instanceRef = useRef(null);
   const hasMineralData = Boolean(sourceData?.[mineral]);
+  const [isCompact, setIsCompact] = useState(false);
+
+  useEffect(() => {
+    const updateCompact = () => {
+      setIsCompact(window.innerWidth < 1024);
+    };
+    updateCompact();
+    window.addEventListener("resize", updateCompact);
+    return () => window.removeEventListener("resize", updateCompact);
+  }, []);
 
   useEffect(() => {
     if (!hasMineralData) return;
@@ -604,21 +614,21 @@ function LineChartPanel({ mineral, language, annualEvolutionLabel, sourceData })
 
     instanceRef.current = new Chart(ctx, {
       type: "line",
-      plugins: [linePointCountryLabelPlugin],
+      plugins: isCompact ? [] : [linePointCountryLabelPlugin],
       data: { labels: years, datasets },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         layout: {
           padding: {
-            right: 120,
+            right: isCompact ? 8 : 120,
           },
         },
         plugins: {
           legend: {
             display: true,
             position: "bottom",
-            labels: { font: { family: "Cairo", size: 11 }, boxWidth: 14 },
+            labels: { font: { family: "Cairo", size: isCompact ? 10 : 11 }, boxWidth: isCompact ? 10 : 14 },
           },
           tooltip: {
             callbacks: {
@@ -631,9 +641,10 @@ function LineChartPanel({ mineral, language, annualEvolutionLabel, sourceData })
           x: {
             grid: { display: false },
             ticks: {
-              autoSkip: false,
-              maxRotation: 45,
-              minRotation: 45,
+              autoSkip: true,
+              maxTicksLimit: isCompact ? 6 : 12,
+              maxRotation: isCompact ? 0 : 45,
+              minRotation: isCompact ? 0 : 45,
               font: { family: "Cairo", weight: "700" },
             },
           },
@@ -657,14 +668,14 @@ function LineChartPanel({ mineral, language, annualEvolutionLabel, sourceData })
       instanceRef.current?.destroy();
       instanceRef.current = null;
     };
-  }, [hasMineralData, mineral, language, sourceData]);
+  }, [hasMineralData, mineral, language, sourceData, isCompact]);
 
   return (
     <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
       <h3 className="mb-2 text-base font-extrabold text-slate-800">
         {annualEvolutionLabel} - {getLocalizedMineral(mineral, language)}
       </h3>
-      <div className="h-[280px]">
+      <div className="h-[260px] sm:h-[300px] lg:h-[340px]">
         {hasMineralData ? (
           <canvas ref={canvasRef} />
         ) : (

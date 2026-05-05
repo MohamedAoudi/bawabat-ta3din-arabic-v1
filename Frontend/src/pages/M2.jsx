@@ -135,6 +135,7 @@ export default function M2Page() {
   const [trendRows, setTrendRows] = useState([]); // { year, production_quantity, unit_name_* }
   const [isLoadingTrend, setIsLoadingTrend] = useState(false);
   const [trendError, setTrendError] = useState("");
+  const [isCompact, setIsCompact] = useState(false);
   const unitLabel = useMemo(() => pickUnitLabelFromTrend(trendRows, language), [trendRows, language]);
 
   const selectedCountry = useMemo(
@@ -223,6 +224,15 @@ export default function M2Page() {
 
   const canvasRef = useRef(null);
   const chartRef = useRef(null);
+
+  useEffect(() => {
+    const updateCompact = () => {
+      setIsCompact(window.innerWidth < 768);
+    };
+    updateCompact();
+    window.addEventListener("resize", updateCompact);
+    return () => window.removeEventListener("resize", updateCompact);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -316,7 +326,14 @@ export default function M2Page() {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: datasets.length > 1 },
+          legend: {
+            display: datasets.length > 1,
+            position: "bottom",
+            labels: {
+              boxWidth: isCompact ? 10 : 14,
+              font: { family: "Cairo", size: isCompact ? 10 : 11 },
+            },
+          },
           tooltip: {
             callbacks: {
               label: (context) =>
@@ -329,7 +346,11 @@ export default function M2Page() {
         scales: {
           x: {
             grid: { color: "rgba(0,0,0,.08)" },
-            ticks: { font: { family: "Cairo", weight: "700" } },
+            ticks: {
+              font: { family: "Cairo", weight: "700" },
+              autoSkip: true,
+              maxTicksLimit: isCompact ? 6 : 12,
+            },
           },
           y: {
             grid: { color: "rgba(0,0,0,.10)" },
@@ -345,7 +366,7 @@ export default function M2Page() {
         chartRef.current = null;
       }
     };
-  }, [language, t.production, labels, datasets, unitLabel]);
+  }, [language, t.production, labels, datasets, unitLabel, isCompact]);
 
   return (
     <div
@@ -458,7 +479,7 @@ export default function M2Page() {
                 </div>
               </div>
 
-              <div className="relative h-[320px] sm:h-[420px]">
+              <div className="relative h-[260px] sm:h-[340px] lg:h-[420px]">
                 <canvas ref={canvasRef} />
                 {isLoadingTrend ? (
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-bold text-slate-500">
