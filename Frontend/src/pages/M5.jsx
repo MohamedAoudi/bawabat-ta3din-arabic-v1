@@ -547,7 +547,7 @@ export default function M5Page() {
     <div
       dir={language === "ar" ? "rtl" : "ltr"}
       lang={language}
-      className="min-h-screen font-['Cairo'] text-slate-800"
+      className={`min-h-screen font-['Cairo'] ${isDarkMode ? "text-slate-100" : "text-slate-800"}`}
       style={{ background: isDarkMode ? "#071611" : "#F4F7F5" }}
     >
       <Menu />
@@ -568,7 +568,11 @@ export default function M5Page() {
 
       <main className="container mx-auto px-4 -mt-24 pb-12 relative z-20">
         {statusMessage ? (
-          <div className="mb-6 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-600">
+          <div
+            className={`mb-6 rounded-2xl px-4 py-3 text-sm font-bold ${
+              isDarkMode ? "border border-white/10 bg-[#0d2c24] text-slate-200" : "border border-slate-200 bg-white text-slate-600"
+            }`}
+          >
             {statusMessage}
           </div>
         ) : null}
@@ -581,14 +585,21 @@ export default function M5Page() {
             { label: t.yearlyAverage, value: formatUsd(avgYearlyValue, language), sub: textWithCount(t.acrossYears, countryYears.length), icon: <Globe2 />, color: "bg-emerald-500" },
             { label: t.yearlyChange, value: yoyChange !== null ? `${yoyChange.toFixed(1)}%` : "-", icon: <TrendingUp />, color: yoyChange > 0 ? "bg-green-500" : "bg-red-500" },
           ].map((card, i) => (
-            <div key={i} className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-white flex items-center gap-5 transition-transform hover:-translate-y-1">
-              <div className={`${card.color} p-4 rounded-2xl text-white shadow-lg shadow-inherit`}>
+            <div
+              key={i}
+              className={`rounded-3xl p-6 border flex items-center gap-5 transition-transform hover:-translate-y-1 ${
+                isDarkMode
+                  ? "bg-[#0d2c24] border-white/10 shadow-none"
+                  : "bg-white border-white shadow-xl shadow-slate-200/50"
+              }`}
+            >
+              <div className={`${card.color} p-4 rounded-2xl text-white ${isDarkMode ? "shadow-none" : "shadow-lg shadow-inherit"}`}>
                 {card.icon}
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-400 mb-1">{card.label}</p>
-                <p className="text-xl font-black text-slate-800">{card.value}</p>
-                {card.sub && <p className="text-[10px] text-slate-500">{card.sub}</p>}
+                <p className={`text-xs font-bold mb-1 ${isDarkMode ? "text-slate-300" : "text-slate-400"}`}>{card.label}</p>
+                <p className={`text-xl font-black ${isDarkMode ? "text-white" : "text-slate-800"}`}>{card.value}</p>
+                {card.sub && <p className={`text-[10px] ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>{card.sub}</p>}
               </div>
             </div>
           ))}
@@ -597,18 +608,18 @@ export default function M5Page() {
         <div className="grid lg:grid-cols-12 gap-8">
           {/* Main Chart Section */}
           <div className="lg:col-span-8 space-y-8">
-            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-xl shadow-slate-200/60 border border-slate-100">
+            <div className={`rounded-[2.5rem] p-6 md:p-8 border ${isDarkMode ? "bg-[#0d2c24] border-white/10 shadow-none" : "bg-white border-slate-100 shadow-xl shadow-slate-200/60"}`}>
               <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
                 <div>
                   <h3 className="text-xl font-bold flex items-center gap-2">
                     <TrendingUp className="text-[#ddbc6b]" size={20} />
                     {t.trendAnalysis}
                   </h3>
-                  <p className="text-xs text-slate-400">{t.trendSubtitle}</p>
+                  <p className={`text-xs ${isDarkMode ? "text-slate-300" : "text-slate-400"}`}>{t.trendSubtitle}</p>
                 </div>
-                <div className="flex gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
-                   <button className="px-4 py-2 text-xs font-bold rounded-xl bg-white shadow-sm text-[#082721]">{t.exportsValue}</button>
-                   <button className="px-4 py-2 text-xs font-bold rounded-xl text-slate-400 hover:text-slate-600">{t.quantitiesSoon}</button>
+                <div className={`flex gap-2 p-1.5 rounded-2xl border ${isDarkMode ? "bg-white/5 border-white/10" : "bg-slate-50 border-slate-100"}`}>
+                   <button className={`px-4 py-2 text-xs font-bold rounded-xl bg-white text-[#082721] ${isDarkMode ? "shadow-none" : "shadow-sm"}`}>{t.exportsValue}</button>
+                   <button className={`px-4 py-2 text-xs font-bold rounded-xl ${isDarkMode ? "text-slate-300 hover:text-white" : "text-slate-400 hover:text-slate-600"}`}>{t.quantitiesSoon}</button>
                 </div>
               </div>
               <div className="h-[400px]">
@@ -617,32 +628,32 @@ export default function M5Page() {
             </div>
 
             {/* Comparison Table */}
-            <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/60 border border-slate-100">
-               <div className="p-6 border-b border-slate-50 flex justify-between items-center">
+            <div className={`rounded-[2.5rem] overflow-hidden border ${isDarkMode ? "bg-[#0d2c24] border-white/10 shadow-none" : "bg-white border-slate-100 shadow-xl shadow-slate-200/60"}`}>
+               <div className={`p-6 border-b flex justify-between items-center ${isDarkMode ? "border-white/10" : "border-slate-50"}`}>
                   <h3 className="font-bold flex items-center gap-2">
                     <List className="text-[#ddbc6b]" size={20} />
                     {t.countryExportDetails}
                   </h3>
-                  <span className="text-[10px] bg-slate-100 px-3 py-1 rounded-full font-bold uppercase tracking-wider text-slate-500">{t.yearTag} {countryYear ? formatUsd(countryYear, language) : "-"}</span>
+                  <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${isDarkMode ? "bg-white/10 text-slate-200" : "bg-slate-100 text-slate-500"}`}>{t.yearTag} {countryYear ? formatUsd(countryYear, language) : "-"}</span>
                </div>
                <div className="overflow-x-auto">
                  <table className={`w-full ${language === "ar" ? "text-right" : "text-left"}`}>
-                   <thead className="bg-slate-50/50 text-slate-400 text-[11px] uppercase font-black">
+                  <thead className={`${isDarkMode ? "bg-white/5 text-slate-300" : "bg-slate-50/50 text-slate-400"} text-[11px] uppercase font-black`}>
                      <tr>
                        <th className="px-6 py-4">{t.arabCountry}</th>
                        <th className="px-6 py-4">{t.mineralType}</th>
                        <th className={`px-6 py-4 ${language === "ar" ? "text-left" : "text-right"}`}>{t.exportValue}</th>
                      </tr>
                    </thead>
-                   <tbody className="divide-y divide-slate-50 text-sm font-bold">
+                   <tbody className={`text-sm font-bold ${isDarkMode ? "divide-y divide-white/10" : "divide-y divide-slate-50"}`}>
                      {countryTableRows.map((r) => (
-                        <tr key={r.c} className="hover:bg-slate-50/80 transition-colors group">
+                        <tr key={r.c} className={`transition-colors group ${isDarkMode ? "hover:bg-white/5" : "hover:bg-slate-50/80"}`}>
                           <td className="px-6 py-4 flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] group-hover:bg-[#ddbc6b]/20 group-hover:text-[#082721] transition-colors">{r.c.toUpperCase()}</div>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] transition-colors ${isDarkMode ? "bg-white/10 text-white group-hover:bg-[#ddbc6b]/20 group-hover:text-[#ddbc6b]" : "bg-slate-100 group-hover:bg-[#ddbc6b]/20 group-hover:text-[#082721]"}`}>{r.c.toUpperCase()}</div>
                             {localizeCountryCode(r.c, language, dbCountryNames)}
                           </td>
                           <td className="px-6 py-4">{translateMineral(r.mineral, language, t.allMinerals)}</td>
-                          <td className={`px-6 py-4 font-black text-[#082721] ${language === "ar" ? "text-left" : "text-right"}`}>{formatUsd(r.v, language)} {t.usd}</td>
+                          <td className={`px-6 py-4 font-black ${isDarkMode ? "text-[#ddbc6b]" : "text-[#082721]"} ${language === "ar" ? "text-left" : "text-right"}`}>{formatUsd(r.v, language)} {t.usd}</td>
                         </tr>
                      ))}
                    </tbody>
@@ -653,7 +664,7 @@ export default function M5Page() {
 
           {/* Sidebar Controls */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-[#082721] rounded-[2.5rem] p-8 text-white shadow-2xl shadow-emerald-900/20 relative overflow-hidden group">
+            <div className={`bg-[#082721] rounded-[2.5rem] p-8 text-white relative overflow-hidden group ${isDarkMode ? "shadow-none" : "shadow-2xl shadow-emerald-900/20"}`}>
               <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#ddbc6b]/10 rounded-full blur-3xl group-hover:bg-[#ddbc6b]/20 transition-all"></div>
               
               <h3 className="text-lg font-bold mb-6 flex items-center gap-3">
@@ -702,7 +713,11 @@ export default function M5Page() {
                       <button 
                         key={y}
                         onClick={() => setCountryYear(y)}
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center text-xs font-black transition-all ${y === countryYear ? 'bg-white text-[#082721] scale-110 shadow-lg' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center text-xs font-black transition-all ${
+                          y === countryYear
+                            ? `bg-white text-[#082721] scale-110 ${isDarkMode ? "shadow-none" : "shadow-lg"}`
+                            : "bg-white/5 text-slate-400 hover:bg-white/10"
+                        }`}
                       >
                         {formatUsd(y, language)}
                       </button>
@@ -713,13 +728,13 @@ export default function M5Page() {
             </div>
 
             {/* Donut Chart Card */}
-            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/60 border border-slate-100">
+            <div className={`rounded-[2.5rem] p-8 border ${isDarkMode ? "bg-[#0d2c24] border-white/10 shadow-none" : "bg-white border-slate-100 shadow-xl shadow-slate-200/60"}`}>
               <h3 className="text-base font-black mb-6 text-center">{t.relativeDistribution}</h3>
               <div className="h-[250px] relative">
                 <canvas ref={donutCanvasRef} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                   <span className="text-xs text-slate-400 font-bold">{t.totalShare}</span>
-                   <span className="text-2xl font-black text-[#082721]">{selectedCountryShare.toFixed(1)}%</span>
+                   <span className={`text-xs font-bold ${isDarkMode ? "text-slate-300" : "text-slate-400"}`}>{t.totalShare}</span>
+                   <span className={`text-2xl font-black ${isDarkMode ? "text-[#ddbc6b]" : "text-[#082721]"}`}>{selectedCountryShare.toFixed(1)}%</span>
                 </div>
               </div>
             </div>
