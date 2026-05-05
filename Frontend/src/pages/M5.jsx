@@ -76,7 +76,7 @@ const PAGE_TRANSLATIONS = {
     trendSubtitle: "تطور قيم الصادرات حسب الخام المختار",
     exportsValue: "قيمة الصادرات",
     quantitiesSoon: "الكميات (قريبا)",
-    countryExportDetails: "تفاصيل الصادرات حسب الدولة",
+    countryExportDetails: "آخر الدول المصدرة",
     yearTag: "سنة",
     arabCountry: "الدولة العربية",
     exportValue: "قيمة الصادرات",

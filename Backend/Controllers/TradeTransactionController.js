@@ -18,6 +18,15 @@ const getCriticalMineralExportsAnalytics = async (req, res) => {
   }
 };
 
+const getCriticalMineralImportsAnalytics = async (req, res) => {
+  try {
+    const rows = await tradeTransactionModel.getCriticalMineralImportsAnalytics();
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const getTradeTransactionById = async (req, res) => {
   try {
     const row = await tradeTransactionModel.getTradeTransactionById(req.params.id);
@@ -71,6 +80,7 @@ const deleteTradeTransaction = async (req, res) => {
 module.exports = {
   getAllTradeTransactions,
   getCriticalMineralExportsAnalytics,
+  getCriticalMineralImportsAnalytics,
   getTradeTransactionById,
   createTradeTransaction,
   updateTradeTransaction,

@@ -4,6 +4,7 @@ const tradeTransactionController = require("../Controllers/TradeTransactionContr
 
 router.get("/", tradeTransactionController.getAllTradeTransactions);
 router.get("/analytics/critical-exports", tradeTransactionController.getCriticalMineralExportsAnalytics);
+router.get("/analytics/critical-imports", tradeTransactionController.getCriticalMineralImportsAnalytics);
 router.get("/:id", tradeTransactionController.getTradeTransactionById);
 router.post("/", tradeTransactionController.createTradeTransaction);
 router.put("/:id", tradeTransactionController.updateTradeTransaction);

@@ -31,6 +31,27 @@ const getCriticalMineralExportsAnalytics = async () => {
   return result.rows;
 };
 
+const getCriticalMineralImportsAnalytics = async () => {
+  const result = await pool.query(
+    `SELECT
+       c.iso_code AS country_code,
+       c.name_ar AS country_name_ar,
+       c.name_en AS country_name_en,
+       c.name_fr AS country_name_fr,
+       m.name_en AS mineral_name,
+       tt.year,
+       SUM(tt.trade_value_usd)::double precision AS value_usd
+     FROM trade_transactions tt
+     JOIN countries c ON c.id = tt.country_id
+     JOIN minerals m ON m.id = tt.mineral_id
+     WHERE LOWER(tt.trade_type) = 'import'
+       AND tt.trade_value_usd IS NOT NULL
+     GROUP BY c.iso_code, c.name_ar, c.name_en, c.name_fr, m.name_en, tt.year
+     ORDER BY tt.year ASC, c.iso_code ASC, m.name_en ASC`
+  );
+  return result.rows;
+};
+
 const getTradeTransactionById = async (id) => {
   const result = await pool.query(
     `SELECT id, country_id, mineral_id, hs_product_code, year, trade_type,
@@ -88,6 +109,7 @@ const deleteTradeTransaction = async (id) => {
 module.exports = {
   getAllTradeTransactions,
   getCriticalMineralExportsAnalytics,
+  getCriticalMineralImportsAnalytics,
   getTradeTransactionById,
   createTradeTransaction,
   updateTradeTransaction,

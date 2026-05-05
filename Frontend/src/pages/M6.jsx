@@ -1,37 +1,103 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Scale, Globe2, TrendingUp, Info, ChevronDown, Download, Layers } from "lucide-react";
+import { CalendarRange, Globe2, TrendingUp, Filter, ChevronDown, List } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { LanguageContext, ThemeContext } from "../App";
-import {
-  tradeCriticalMineralsImportData,
-  tradeCriticalMineralsImportByYear,
-} from "../tradeCriticalMineralsImportDataProcessed";
+import { getCriticalMineralImportsAnalytics } from "../services/tradeTransactionService";
+import { getCountries } from "../services/countryService";
 
-const COUNTRIES = [
-  { name: "الأردن", code: "jo" },
-  { name: "الإمارات", code: "ae" },
-  { name: "البحرين", code: "bh" },
-  { name: "تونس", code: "tn" },
-  { name: "الجزائر", code: "dz" },
-  { name: "جيبوتي", code: "dj" },
-  { name: "السعودية", code: "sa" },
-  { name: "السودان", code: "sd" },
-  { name: "سوريا", code: "sy" },
-  { name: "الصومال", code: "so" },
-  { name: "العراق", code: "iq" },
-  { name: "عمان", code: "om" },
-  { name: "فلسطين", code: "ps" },
-  { name: "قطر", code: "qa" },
-  { name: "الكويت", code: "kw" },
-  { name: "لبنان", code: "lb" },
-  { name: "ليبيا", code: "ly" },
-  { name: "مصر", code: "eg" },
-  { name: "المغرب", code: "ma" },
-  { name: "موريتانيا", code: "mr" },
-  { name: "اليمن", code: "ye" },
-];
+const DEFAULT_COUNTRY = "ma";
+const ALL_COUNTRIES_VALUE = "all";
+
+const PAGE_TRANSLATIONS = {
+  ar: {
+    badge: "البيانات التعدينية العربية",
+    heroTitle: "الواردات التعدينية",
+    heroTitleAccent: "الاستراتيجية",
+    heroSubtitle: "منصة تحليلية ذكية لرصد وتتبع تدفقات المعادن الحرجة في المنطقة العربية، مع نظرة شاملة على القيم السنوية.",
+    latestYear: "احدث سنة",
+    lastYearValue: "قيمة اخر سنة",
+    yearlyAverage: "المتوسط السنوي",
+    yearlyChange: "التغير السنوي",
+    acrossYears: "عبر {count} سنوات",
+    usd: "دولار امريكي",
+    trendAnalysis: "تحليل الاتجاه الزمني",
+    trendSubtitle: "تطور قيم الواردات حسب الخام المختار",
+    importsValue: "قيمة الواردات",
+    quantitiesSoon: "الكميات (قريبا)",
+    countryImportDetails: "آخر الدول الموردة",
+    yearTag: "سنة",
+    arabCountry: "الدولة العربية",
+    mineralType: "نوع المعدن",
+    importValue: "قيمة الواردات",
+    filterTools: "ادوات التصفية",
+    chooseCountry: "اختر الدولة",
+    referenceYear: "السنة المرجعية",
+    relativeDistribution: "التوزيع النسبي للواردات",
+    totalShare: "اجمالي الحصة",
+    allMinerals: "كل المعادن",
+    allCountries: "كل الدول",
+  },
+  fr: {
+    badge: "Donnees minieres arabes",
+    heroTitle: "Importations minieres",
+    heroTitleAccent: "strategiques",
+    heroSubtitle: "Plateforme analytique pour suivre les flux de mineraux critiques dans la region arabe avec les tendances annuelles des valeurs.",
+    latestYear: "Derniere annee",
+    lastYearValue: "Valeur de la derniere annee",
+    yearlyAverage: "Moyenne annuelle",
+    yearlyChange: "Variation annuelle",
+    acrossYears: "sur {count} ans",
+    usd: "USD",
+    trendAnalysis: "Analyse de tendance temporelle",
+    trendSubtitle: "Evolution des valeurs d'import selon le minerai choisi",
+    importsValue: "Valeur des importations",
+    quantitiesSoon: "Quantites (bientot)",
+    countryImportDetails: "Details des importations par pays",
+    yearTag: "Annee",
+    arabCountry: "Pays arabe",
+    mineralType: "Type de minerai",
+    importValue: "Valeur des importations",
+    filterTools: "Outils de filtre",
+    chooseCountry: "Choisir le pays",
+    referenceYear: "Annee de reference",
+    relativeDistribution: "Distribution relative des importations",
+    totalShare: "Part totale",
+    allMinerals: "Tous les mineraux",
+    allCountries: "Tous les pays",
+  },
+  en: {
+    badge: "Arab mining data",
+    heroTitle: "Strategic mining",
+    heroTitleAccent: "imports",
+    heroSubtitle: "Smart analytics platform to monitor critical mineral flows in the Arab region with annual import value trends.",
+    latestYear: "Latest year",
+    lastYearValue: "Last year value",
+    yearlyAverage: "Yearly average",
+    yearlyChange: "Year-over-year change",
+    acrossYears: "across {count} years",
+    usd: "USD",
+    trendAnalysis: "Time trend analysis",
+    trendSubtitle: "Import values over time by selected mineral",
+    importsValue: "Import value",
+    quantitiesSoon: "Volumes (soon)",
+    countryImportDetails: "Country import details",
+    yearTag: "Year",
+    arabCountry: "Arab country",
+    mineralType: "Mineral type",
+    importValue: "Import value",
+    filterTools: "Filter tools",
+    chooseCountry: "Choose country",
+    referenceYear: "Reference year",
+    relativeDistribution: "Relative import distribution",
+    totalShare: "Total share",
+    allMinerals: "All minerals",
+    allCountries: "All countries",
+  },
+};
+
+const NUMBER_LOCALES = { ar: "ar-MA", fr: "fr-FR", en: "en-US" };
 
 const mineralNameAr = {
   Gold: "الذهب",
@@ -47,464 +113,458 @@ const mineralNameAr = {
   Cobalt: "الكوبالت",
 };
 
-const countryNameAr = Object.fromEntries(COUNTRIES.map((c) => [c.code, c.name]));
+function formatUsd(value, language = "ar") {
+  return Number(value || 0).toLocaleString(NUMBER_LOCALES[language] || NUMBER_LOCALES.ar);
+}
 
-const countryNameLocalized = {
-  jo: { ar: "الأردن", fr: "Jordanie", en: "Jordan" },
-  ae: { ar: "الإمارات", fr: "Emirats arabes unis", en: "United Arab Emirates" },
-  bh: { ar: "البحرين", fr: "Bahrein", en: "Bahrain" },
-  tn: { ar: "تونس", fr: "Tunisie", en: "Tunisia" },
-  dz: { ar: "الجزائر", fr: "Algerie", en: "Algeria" },
-  dj: { ar: "جيبوتي", fr: "Djibouti", en: "Djibouti" },
-  sa: { ar: "السعودية", fr: "Arabie saoudite", en: "Saudi Arabia" },
-  sd: { ar: "السودان", fr: "Soudan", en: "Sudan" },
-  sy: { ar: "سوريا", fr: "Syrie", en: "Syria" },
-  so: { ar: "الصومال", fr: "Somalie", en: "Somalia" },
-  iq: { ar: "العراق", fr: "Irak", en: "Iraq" },
-  om: { ar: "عمان", fr: "Oman", en: "Oman" },
-  ps: { ar: "فلسطين", fr: "Palestine", en: "Palestine" },
-  qa: { ar: "قطر", fr: "Qatar", en: "Qatar" },
-  kw: { ar: "الكويت", fr: "Koweit", en: "Kuwait" },
-  lb: { ar: "لبنان", fr: "Liban", en: "Lebanon" },
-  ly: { ar: "ليبيا", fr: "Libye", en: "Libya" },
-  eg: { ar: "مصر", fr: "Egypte", en: "Egypt" },
-  ma: { ar: "المغرب", fr: "Maroc", en: "Morocco" },
-  mr: { ar: "موريتانيا", fr: "Mauritanie", en: "Mauritania" },
-  ye: { ar: "اليمن", fr: "Yemen", en: "Yemen" },
-};
+function translateMineral(name, language, fallback) {
+  if (!name || name === "all") return fallback;
+  if (language === "fr") {
+    const mineralNameFr = {
+      Gold: "Or",
+      Tin: "Etain",
+      Silver: "Argent",
+      Uranium: "Uranium",
+      Copper: "Cuivre",
+      Iron: "Fer",
+      Lead: "Plomb",
+      Zinc: "Zinc",
+      Nickel: "Nickel",
+      Lithium: "Lithium",
+      Cobalt: "Cobalt",
+    };
+    return mineralNameFr[name] || name;
+  }
+  if (language === "en") return name;
+  return mineralNameAr[name] || name;
+}
 
-const mineralNameLocalized = {
-  Gold: { ar: "الذهب", fr: "Or", en: "Gold" },
-  Tin: { ar: "القصدير", fr: "Etain", en: "Tin" },
-  Silver: { ar: "الفضة", fr: "Argent", en: "Silver" },
-  Uranium: { ar: "اليورانيوم", fr: "Uranium", en: "Uranium" },
-  Copper: { ar: "النحاس", fr: "Cuivre", en: "Copper" },
-  Iron: { ar: "الحديد", fr: "Fer", en: "Iron" },
-  Lead: { ar: "الرصاص", fr: "Plomb", en: "Lead" },
-  Zinc: { ar: "الزنك", fr: "Zinc", en: "Zinc" },
-  Nickel: { ar: "النيكل", fr: "Nickel", en: "Nickel" },
-  Lithium: { ar: "الليثيوم", fr: "Lithium", en: "Lithium" },
-  Cobalt: { ar: "الكوبالت", fr: "Cobalt", en: "Cobalt" },
-};
+function textWithCount(template, count) {
+  return template.replace("{count}", count);
+}
 
-const PAGE_TRANSLATIONS = {
-  ar: {
-    pageTitle: "بوابة الواردات التعدينية",
-    pageSubtitle: "تحليل البيانات الجمركية للمواد الخام في العالم العربي",
-    totalImportsCumulative: "إجمالي الواردات (تراكمي)",
-    mostImportedMineral: "المعدن الأكثر استيرادا",
-    highPriority: "أولوية عالية",
-    dataCoverage: "تغطية البيانات",
-    importsTrend: "تطور قيمة الواردات عبر السنوات",
-    usdHint: "بالدولار الأمريكي",
-    importValue: "القيمة الاستيرادية",
-    share: "الحصة",
-    countryImportDetails: "تفاصيل الواردات حسب الدولة",
-    yearTag: "سنة",
-    filterTools: "أدوات التصفية",
-    chooseCountry: "اختر الدولة",
-    mineralType: "نوع المعدن",
-    referenceYear: "السنة المرجعية",
-    countryDetails: "تفاصيل الدولة",
-    selectedCountry: "الدولة المختارة",
-    selectedYear: "السنة المحددة",
-    relativeDistribution: "التوزيع النسبي",
-    allMinerals: "كل المعادن",
-    usd: "دولار",
-    importsValueLabel: "قيمة الواردات",
-  },
-  fr: {
-    pageTitle: "Portail des importations minieres",
-    pageSubtitle: "Analyse des donnees douanieres des matieres premieres dans le monde arabe",
-    totalImportsCumulative: "Importations totales (cumulees)",
-    mostImportedMineral: "Minerai le plus importe",
-    highPriority: "Priorite elevee",
-    dataCoverage: "Couverture des donnees",
-    importsTrend: "Evolution de la valeur des importations",
-    usdHint: "en dollars americains",
-    importValue: "Valeur importee",
-    share: "Part",
-    countryImportDetails: "Details des importations par pays",
-    yearTag: "Annee",
-    filterTools: "Outils de filtre",
-    chooseCountry: "Choisir le pays",
-    mineralType: "Type de minerai",
-    referenceYear: "Annee de reference",
-    countryDetails: "Details du pays",
-    selectedCountry: "Pays selectionne",
-    selectedYear: "Annee selectionnee",
-    relativeDistribution: "Distribution relative",
-    allMinerals: "Tous les mineraux",
-    usd: "USD",
-    importsValueLabel: "Valeur des importations",
-  },
-  en: {
-    pageTitle: "Mining imports portal",
-    pageSubtitle: "Customs-data analysis for raw materials across the Arab world",
-    totalImportsCumulative: "Total imports (cumulative)",
-    mostImportedMineral: "Most imported mineral",
-    highPriority: "High priority",
-    dataCoverage: "Data coverage",
-    importsTrend: "Import value trend over years",
-    usdHint: "in US dollars",
-    importValue: "Import value",
-    share: "Share",
-    countryImportDetails: "Import details by country",
-    yearTag: "Year",
-    filterTools: "Filter tools",
-    chooseCountry: "Choose country",
-    mineralType: "Mineral type",
-    referenceYear: "Reference year",
-    countryDetails: "Country details",
-    selectedCountry: "Selected country",
-    selectedYear: "Selected year",
-    relativeDistribution: "Relative distribution",
-    allMinerals: "All minerals",
-    usd: "USD",
-    importsValueLabel: "Import value",
-  },
-};
-
-const NUMBER_LOCALES = {
-  ar: "ar-MA",
-  fr: "fr-FR",
-  en: "en-US",
-};
-
-const formatUsdCompact = (val, language) =>
-  new Intl.NumberFormat(NUMBER_LOCALES[language] || NUMBER_LOCALES.ar, {
-    notation: "compact",
-    maximumFractionDigits: 2,
-  }).format(val || 0);
-
-const formatFullUsd = (val, language) =>
-  Number(val || 0).toLocaleString(NUMBER_LOCALES[language] || NUMBER_LOCALES.ar);
-
-const localizeCountry = (code, language) =>
-  countryNameLocalized[code]?.[language] || countryNameAr[code] || code;
-
-const localizeMineral = (name, language, allFallback) => {
-  if (!name || name === "all") return allFallback;
-  return mineralNameLocalized[name]?.[language] || mineralNameAr[name] || name;
-};
+const localizeCountryCode = (code, language, dbCountryNames = {}) =>
+  code === ALL_COUNTRIES_VALUE
+    ? language === "fr"
+      ? "Tous les pays"
+      : language === "en"
+        ? "All countries"
+        : "كل الدول"
+    : dbCountryNames[code]?.[language] || code;
 
 export default function M6Page() {
   const { language } = useContext(LanguageContext);
   const { isDarkMode } = useContext(ThemeContext);
   const t = PAGE_TRANSLATIONS[language] || PAGE_TRANSLATIONS.ar;
 
-  const [selectedCountry, setSelectedCountry] = useState("ma");
+  const [selectedCountry, setSelectedCountry] = useState(DEFAULT_COUNTRY);
   const [selectedMineral, setSelectedMineral] = useState("all");
   const [countryYear, setCountryYear] = useState(null);
+  const [analyticsRows, setAnalyticsRows] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
-  // -- Data Logic --
-  const mineralOptions = useMemo(() => ["all", ...new Set(tradeCriticalMineralsImportData.map(r => r.aggregate_product))].sort(), []);
-  
+  useEffect(() => {
+    let isMounted = true;
+    const loadAnalytics = async () => {
+      setIsLoading(true);
+      setLoadError("");
+      try {
+        const [rows, countriesRows] = await Promise.all([
+          getCriticalMineralImportsAnalytics(),
+          getCountries(),
+        ]);
+        if (isMounted) {
+          setAnalyticsRows(Array.isArray(rows) ? rows : []);
+          setCountries(Array.isArray(countriesRows) ? countriesRows : []);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setLoadError(error?.response?.data?.error || error?.message || "Failed to load analytics data.");
+          setAnalyticsRows([]);
+          setCountries([]);
+        }
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+    loadAnalytics();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const mineralOptions = useMemo(() => {
+    const products = Array.from(new Set(analyticsRows.map((row) => row.mineral_name).filter(Boolean))).sort();
+    return ["all", ...products];
+  }, [analyticsRows]);
+
+  const availableCountries = useMemo(() => {
+    const fromDb = countries.map((row) => String(row.iso_code || "").toLowerCase()).filter(Boolean);
+    if (fromDb.length) return fromDb;
+    return Array.from(new Set(analyticsRows.map((row) => String(row.country_code || "").toLowerCase()).filter(Boolean))).sort();
+  }, [analyticsRows, countries]);
+
+  const dbCountryNames = useMemo(() => {
+    const namesFromCountries = countries.reduce((acc, row) => {
+      const code = String(row.iso_code || "").toLowerCase();
+      if (!code) return acc;
+      acc[code] = { ar: row.name_ar || "", en: row.name_en || "", fr: row.name_fr || "" };
+      return acc;
+    }, {});
+    return analyticsRows.reduce((acc, row) => {
+      const code = String(row.country_code || "").toLowerCase();
+      if (!code) return acc;
+      acc[code] = {
+        ar: row.country_name_ar || acc[code]?.ar || "",
+        en: row.country_name_en || acc[code]?.en || "",
+        fr: row.country_name_fr || acc[code]?.fr || "",
+      };
+      return acc;
+    }, namesFromCountries);
+  }, [analyticsRows, countries]);
+
+  useEffect(() => {
+    if (!availableCountries.length) return;
+    if (selectedCountry !== ALL_COUNTRIES_VALUE && !availableCountries.includes(selectedCountry)) {
+      setSelectedCountry(availableCountries.includes(DEFAULT_COUNTRY) ? DEFAULT_COUNTRY : availableCountries[0]);
+    }
+  }, [availableCountries, selectedCountry]);
+
   const productYearlyData = useMemo(() => {
-    if (selectedMineral === "all") return tradeCriticalMineralsImportByYear;
-    return tradeCriticalMineralsImportData.filter(r => r.aggregate_product === selectedMineral)
-      .reduce((acc, r) => { acc[r.year] = (acc[r.year] || 0) + (r.value_usd || 0); return acc; }, {});
-  }, [selectedMineral]);
+    const filteredRows = analyticsRows
+      .filter((row) => selectedCountry === ALL_COUNTRIES_VALUE || String(row.country_code || "").toLowerCase() === selectedCountry)
+      .filter((row) => selectedMineral === "all" || row.mineral_name === selectedMineral)
+      .reduce((acc, row) => {
+        const y = String(row.year);
+        acc[y] = (acc[y] || 0) + Number(row.value_usd || 0);
+        return acc;
+      }, {});
 
-  const yearlyUsdData = useMemo(() => Object.entries(productYearlyData).map(([year, value]) => ({ year: Number(year), value })).sort((a, b) => a.year - b.year), [productYearlyData]);
+    if (Object.keys(filteredRows).length > 0) {
+      return filteredRows;
+    }
+
+    // Fallback: if selected country has no rows for the chosen mineral,
+    // show the trend aggregated across all countries instead of empty chart.
+    return analyticsRows
+      .filter((row) => selectedMineral === "all" || row.mineral_name === selectedMineral)
+      .reduce((acc, row) => {
+        const y = String(row.year);
+        acc[y] = (acc[y] || 0) + Number(row.value_usd || 0);
+        return acc;
+      }, {});
+  }, [analyticsRows, selectedCountry, selectedMineral]);
+
+  const referenceYears = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          analyticsRows
+            .filter((row) => selectedMineral === "all" || row.mineral_name === selectedMineral)
+            .map((row) => Number(row.year))
+            .filter((year) => Number.isFinite(year))
+        )
+      ).sort((a, b) => b - a),
+    [analyticsRows, selectedMineral]
+  );
+
+  useEffect(() => {
+    if (!referenceYears.length) return setCountryYear(null);
+    setCountryYear(referenceYears[0]);
+  }, [referenceYears]);
+
+  const yearlyUsdData = useMemo(
+    () => Object.entries(productYearlyData).map(([year, value]) => ({ year: Number(year), value })).sort((a, b) => a.year - b.year),
+    [productYearlyData]
+  );
+  const barYears = useMemo(() => yearlyUsdData.map((item) => item.year), [yearlyUsdData]);
+  const chartValues = useMemo(() => yearlyUsdData.map((item) => item.value), [yearlyUsdData]);
   const totalUsd = useMemo(() => yearlyUsdData.reduce((sum, item) => sum + item.value, 0), [yearlyUsdData]);
   const countryYears = useMemo(() => yearlyUsdData.map((item) => item.year), [yearlyUsdData]);
-  const currentYear = countryYear || (countryYears.length ? countryYears[countryYears.length - 1] : null);
+  const latestYear = useMemo(() => (countryYears.length ? countryYears[countryYears.length - 1] : null), [countryYears]);
+  const latestYearValue = useMemo(() => (latestYear ? yearlyUsdData.find((item) => item.year === latestYear)?.value || 0 : 0), [latestYear, yearlyUsdData]);
+  const avgYearlyValue = useMemo(() => (yearlyUsdData.length ? totalUsd / yearlyUsdData.length : 0), [totalUsd, yearlyUsdData]);
+  const yoyChange = useMemo(() => {
+    if (yearlyUsdData.length < 2) return null;
+    const current = yearlyUsdData[yearlyUsdData.length - 1]?.value || 0;
+    const previous = yearlyUsdData[yearlyUsdData.length - 2]?.value || 0;
+    if (!previous) return null;
+    return ((current - previous) / previous) * 100;
+  }, [yearlyUsdData]);
 
-  const countryImportRows = useMemo(() => {
-    if (!currentYear) return [];
-    const totalsByReporter = {};
-    tradeCriticalMineralsImportData
-      .filter((row) => row.year === currentYear && (selectedMineral === "all" || row.aggregate_product === selectedMineral))
-      .forEach((row) => {
-        totalsByReporter[row.reporter] = (totalsByReporter[row.reporter] || 0) + (row.value_usd || 0);
-      });
-    const totalForYear = Object.values(totalsByReporter).reduce((sum, value) => sum + value, 0);
-    return Object.entries(totalsByReporter)
-      .map(([reporter, value]) => ({ reporter, value, share: totalForYear ? value / totalForYear : 0 }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 6);
-  }, [currentYear, selectedMineral]);
+  const countryTableRows = useMemo(() => {
+    const latestReferenceYear = referenceYears[0];
+    if (!latestReferenceYear) return [];
+    const valuesByCountry = analyticsRows
+      .filter((row) => Number(row.year) === Number(latestReferenceYear))
+      .filter((row) => selectedMineral === "all" || row.mineral_name === selectedMineral)
+      .reduce((acc, row) => {
+        const countryCode = String(row.country_code || "").toLowerCase();
+        if (!countryCode) return acc;
+        const rowValue = Number(row.value_usd || 0);
+        const mineralName = row.mineral_name || "";
+        if (!acc[countryCode]) acc[countryCode] = { total: 0, minerals: {} };
+        acc[countryCode].total += rowValue;
+        acc[countryCode].minerals[mineralName] = (acc[countryCode].minerals[mineralName] || 0) + rowValue;
+        return acc;
+      }, {});
+    const total = Object.values(valuesByCountry).reduce((sum, item) => sum + item.total, 0);
+    return Object.entries(valuesByCountry)
+      .map(([countryCode, item]) => {
+        const topMineralEntry = Object.entries(item.minerals).sort((a, b) => b[1] - a[1])[0];
+        return {
+          c: countryCode,
+          mineral: selectedMineral === "all" ? topMineralEntry?.[0] || "-" : selectedMineral,
+          v: item.total,
+          share: total > 0 ? (item.total / total) * 100 : 0,
+        };
+      })
+      .sort((a, b) => b.v - a.v)
+      .slice(0, 2);
+  }, [analyticsRows, referenceYears, selectedMineral]);
 
-  // -- Charts Implementation --
-  const mainChartRef = useRef(null);
-  const donutChartRef = useRef(null);
+  const selectedCountryValue = useMemo(
+    () => (selectedCountry === ALL_COUNTRIES_VALUE ? countryTableRows.reduce((sum, row) => sum + row.v, 0) : countryTableRows.find((row) => row.c === selectedCountry)?.v || 0),
+    [countryTableRows, selectedCountry]
+  );
+  const selectedCountryShare = useMemo(
+    () => (selectedCountry === ALL_COUNTRIES_VALUE ? 100 : countryTableRows.find((row) => row.c === selectedCountry)?.share || 0),
+    [countryTableRows, selectedCountry]
+  );
+  const statusMessage = useMemo(() => {
+    if (isLoading) return language === "fr" ? "Chargement des donnees..." : language === "en" ? "Loading data..." : "جاري تحميل البيانات...";
+    if (loadError) return language === "fr" ? "Erreur lors du chargement des donnees." : language === "en" ? "Failed to load data." : "تعذر تحميل البيانات.";
+    return "";
+  }, [isLoading, loadError, language]);
+
+  const countryPack = useMemo(() => ({ table: [{ c: selectedCountry, v: selectedCountryValue }] }), [selectedCountry, selectedCountryValue]);
+  const effectiveCountry = selectedCountry === ALL_COUNTRIES_VALUE || (selectedCountry && availableCountries.includes(selectedCountry)) ? selectedCountry : DEFAULT_COUNTRY;
+
   const canvasRef = useRef(null);
+  const chartRef = useRef(null);
   const donutCanvasRef = useRef(null);
+  const donutChartRef = useRef(null);
 
-  // Main Trend Chart
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
-    if (mainChartRef.current) mainChartRef.current.destroy();
-
+    if (chartRef.current) chartRef.current.destroy();
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(221, 188, 107, 0.4)');
-    gradient.addColorStop(1, 'rgba(221, 188, 107, 0)');
-
-    mainChartRef.current = new Chart(ctx, {
-      type: 'line',
+    gradient.addColorStop(0, "rgba(221, 188, 107, 0.45)");
+    gradient.addColorStop(1, "rgba(221, 188, 107, 0.02)");
+    chartRef.current = new Chart(ctx, {
+      type: "line",
       data: {
-        labels: yearlyUsdData.map(d => d.year),
-        datasets: [{
-          data: yearlyUsdData.map(d => d.value),
-          borderColor: '#ddbc6b',
-          borderWidth: 4,
-          backgroundColor: gradient,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 0,
-          pointHoverRadius: 6,
-          pointHitRadius: 30,
-          pointBackgroundColor: '#082721',
-          pointBorderColor: '#ddbc6b',
-          pointBorderWidth: 2,
-        }]
+        labels: barYears,
+        datasets: [
+          {
+            label: selectedMineral === "all" ? t.importsValue : translateMineral(selectedMineral, language, t.allMinerals),
+            data: chartValues,
+            borderColor: "#ddbc6b",
+            borderWidth: 4,
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.35,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointHitRadius: 28,
+            pointBackgroundColor: "#082721",
+            pointBorderColor: "#ddbc6b",
+            pointBorderWidth: 2,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { padding: 12, cornerRadius: 12 } },
-        scales: { 
-            y: { grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { callback: v => formatUsdCompact(v, language) } },
-            x: { grid: { display: false } }
-        }
-      }
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "#082721",
+            titleFont: { family: "Cairo", size: 14 },
+            bodyFont: { family: "Cairo", size: 13 },
+            padding: 12,
+            cornerRadius: 10,
+            callbacks: { label: (context) => ` ${formatUsd(context.parsed.y, language)} ${t.usd}` },
+          },
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { family: "Cairo" } } },
+          y: { grid: { color: "rgba(0,0,0,0.05)" }, ticks: { font: { family: "Cairo" } } },
+        },
+      },
     });
-  }, [yearlyUsdData, language]);
+    return () => chartRef.current?.destroy();
+  }, [barYears, chartValues, selectedMineral, language, t.importsValue, t.allMinerals, t.usd]);
 
-  // Donut Chart
   useEffect(() => {
     const ctx = donutCanvasRef.current?.getContext("2d");
-    if (!ctx || countryImportRows.length === 0) return;
-    if (donutChartRef.current) donutChartRef.current.destroy();
-
+    if (!ctx || !countryPack) return;
+    if (donutChartRef.current) {
+      donutChartRef.current.destroy();
+      donutChartRef.current = null;
+    }
+    const rows = countryPack.table || [];
+    if (!rows.length) return;
     donutChartRef.current = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: countryImportRows.map(r => r.reporter),
-        datasets: [{
-          data: countryImportRows.map(r => r.value),
-          backgroundColor: ['#ddbc6b', '#082721', '#1e4b40', '#4a6d64', '#8da49d', '#cbd5d1'],
-          borderWidth: 0,
-          hoverOffset: 15
-        }]
-      },
+      type: "doughnut",
+      data: { labels: rows.map((r) => localizeCountryCode(r.c, language, dbCountryNames)), datasets: [{ data: rows.map((r) => r.v), borderWidth: 3, borderColor: "rgba(8,39,33,0.9)", cutout: "68%", backgroundColor: ["rgba(8, 39, 33, .92)"] }] },
       options: {
-        cutout: '75%',
-        plugins: { legend: { display: false } },
-        maintainAspectRatio: false
-      }
+        responsive: true,
+        maintainAspectRatio: false,
+        onClick: () => setSelectedCountry(DEFAULT_COUNTRY),
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: (c) => ` ${c.label}: ${formatUsd(c.parsed, language)} ${t.usd} (${selectedCountryShare.toFixed(1)}%)` } },
+        },
+      },
     });
-  }, [countryImportRows]);
+    return () => {
+      if (donutChartRef.current) {
+        donutChartRef.current.destroy();
+        donutChartRef.current = null;
+      }
+    };
+  }, [countryPack, dbCountryNames, language, selectedCountryShare, t.usd]);
 
   return (
-    <div dir={language === "ar" ? "rtl" : "ltr"} className={`min-h-screen font-['Cairo'] transition-colors duration-500 ${isDarkMode ? "bg-[#050f0c]" : "bg-[#fcfdfd]"}`}>
+    <div dir={language === "ar" ? "rtl" : "ltr"} lang={language} className={`min-h-screen font-['Cairo'] ${isDarkMode ? "text-slate-100" : "text-slate-800"}`} style={{ background: isDarkMode ? "#071611" : "#F4F7F5" }}>
       <Menu />
-      
-      {/* Hero Header */}
-      <div className="relative overflow-hidden bg-[#082721] pb-32 pt-20 text-white">
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'linear-gradient(30deg, #082721 12%, transparent 12.5%, transparent 87%, #082721 87.5%, #082721), linear-gradient(150deg, #082721 12%, transparent 12.5%, transparent 87%, #082721 87.5%, #082721), linear-gradient(30deg, #082721 12%, transparent 12.5%, transparent 87%, #082721 87.5%, #082721), linear-gradient(150deg, #082721 12%, transparent 12.5%, transparent 87%, #082721 87.5%, #082721), linear-gradient(60deg, #ddbc6b10 25%, transparent 25.5%, transparent 75%, #ddbc6b10 75%, #ddbc6b10), linear-gradient(60deg, #ddbc6b10 25%, transparent 25.5%, transparent 75%, #ddbc6b10 75%, #ddbc6b10)', backgroundSize: '40px 70px' }} />
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="h-px w-8 bg-[#ddbc6b]"></span>
-                <span className="text-[#ddbc6b] text-sm font-bold tracking-[0.2em] uppercase">{t.dataCoverage} 2014-2024</span>
-              </div>
-              <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight">{t.pageTitle}</h1>
-              <p className="text-xl text-emerald-100/70 font-medium leading-relaxed">{t.pageSubtitle}</p>
-            </div>
-            <button className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-3 rounded-2xl transition-all group backdrop-blur-sm">
-                <Download size={18} className="text-[#ddbc6b] group-hover:scale-110 transition-transform" />
-                <span className="text-sm font-bold">{t.exportCsv}</span>
-            </button>
-          </div>
+      <div className="relative overflow-hidden bg-[#082721] pb-36 pt-16 text-white">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(#ddbc6b 1px, transparent 1px)", size: "20px 20px" }}></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <span className="inline-block px-4 py-1.5 mb-4 text-xs font-bold tracking-widest uppercase bg-[#ddbc6b]/20 border border-[#ddbc6b]/30 rounded-full text-[#ddbc6b]">{t.badge}</span>
+          <h1 className="text-4xl md:text-5xl font-black mb-4">{t.heroTitle} <span className="text-[#ddbc6b]">{t.heroTitleAccent}</span></h1>
+          <p className="max-w-2xl mx-auto text-slate-300 text-sm md:text-base leading-relaxed">{t.heroSubtitle}</p>
+        </div>
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20" style={{ transform: "translateY(2px)" }}>
+          <svg className="relative block w-full h-[56px] md:h-[90px] lg:h-[120px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill={isDarkMode ? "#0b221b" : "#F4F7F5"} fillOpacity="0.4" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L0,320Z" />
+            <path fill={isDarkMode ? "#071611" : "#F4F7F5"} fillOpacity="1" d="M0,288L60,261.3C120,235,240,181,360,149.3C480,117,600,107,720,122.7C840,139,960,181,1080,186.7C1200,192,1320,160,1380,144L1440,128L1440,320L0,320Z" />
+          </svg>
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-6 -mt-16 pb-20 relative z-20">
-        {/* Top KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="group bg-[#082721] p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden transition-transform hover:-translate-y-1">
-            <TrendingUp className="absolute right-6 top-6 w-12 h-12 text-[#ddbc6b]/10 group-hover:scale-125 transition-transform duration-700" />
-            <p className="text-emerald-200/50 text-sm font-bold mb-2 uppercase tracking-wider">{t.totalImportsCumulative}</p>
-            <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-black text-white">{formatUsdCompact(totalUsd, language)}</span>
-                <span className="text-[#ddbc6b] font-bold text-lg">{t.usd}</span>
-            </div>
-          </div>
-          
+      <main className="container mx-auto px-4 -mt-24 pb-12 relative z-20">
+        {statusMessage ? <div className={`mb-6 rounded-2xl px-4 py-3 text-sm font-bold ${isDarkMode ? "border border-white/10 bg-[#0d2c24] text-slate-200" : "border border-slate-200 bg-white text-slate-600"}`}>{statusMessage}</div> : null}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
-            { label: t.mostImportedMineral, val: localizeMineral("Gold", language, t.allMinerals), sub: t.highPriority, icon: <Layers className="text-[#ddbc6b]" /> },
-            { label: t.status, val: t.completed, sub: "100% Verified", icon: <Globe2 className="text-[#ddbc6b]" /> }
+            { label: t.latestYear, value: latestYear ? formatUsd(latestYear, language) : "-", icon: <CalendarRange />, color: "bg-blue-500" },
+            { label: t.lastYearValue, value: formatUsd(latestYearValue, language), sub: t.usd, icon: <TrendingUp />, color: "bg-[#ddbc6b]" },
+            { label: t.yearlyAverage, value: formatUsd(avgYearlyValue, language), sub: textWithCount(t.acrossYears, countryYears.length), icon: <Globe2 />, color: "bg-emerald-500" },
+            { label: t.yearlyChange, value: yoyChange !== null ? `${yoyChange.toFixed(1)}%` : "-", icon: <TrendingUp />, color: yoyChange > 0 ? "bg-green-500" : "bg-red-500" },
           ].map((card, i) => (
-            <div key={i} className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <div key={i} className={`rounded-3xl p-6 border flex items-center gap-5 transition-transform hover:-translate-y-1 ${isDarkMode ? "bg-[#0d2c24] border-white/10 shadow-none" : "bg-white border-white shadow-xl shadow-slate-200/50"}`}>
+              <div className={`${card.color} p-4 rounded-2xl text-white ${isDarkMode ? "shadow-none" : "shadow-lg shadow-inherit"}`}>{card.icon}</div>
               <div>
-                <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-3">{card.label}</p>
-                <h3 className="text-3xl font-black text-[#082721]">{card.val}</h3>
-              </div>
-              <div className="flex items-center gap-2 mt-4 text-sm font-bold text-emerald-600 bg-emerald-50 self-start px-3 py-1 rounded-full">
-                {card.icon} {card.sub}
+                <p className={`text-xs font-bold mb-1 ${isDarkMode ? "text-slate-300" : "text-slate-400"}`}>{card.label}</p>
+                <p className={`text-xl font-black ${isDarkMode ? "text-white" : "text-slate-800"}`}>{card.value}</p>
+                {card.sub && <p className={`text-[10px] ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>{card.sub}</p>}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Trend Section */}
+        <div className="grid lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-8">
-            <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-100">
-              <div className="flex justify-between items-center mb-10">
+            <div className={`rounded-[2.5rem] p-6 md:p-8 border ${isDarkMode ? "bg-[#0d2c24] border-white/10 shadow-none" : "bg-white border-slate-100 shadow-xl shadow-slate-200/60"}`}>
+              <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
                 <div>
-                  <h3 className="text-xl font-black text-[#082721] mb-1">{t.importsTrend}</h3>
-                  <p className="text-slate-400 text-xs font-bold uppercase">{t.usdHint}</p>
+                  <h3 className="text-xl font-bold flex items-center gap-2"><TrendingUp className="text-[#ddbc6b]" size={20} />{t.trendAnalysis}</h3>
+                  <p className={`text-xs ${isDarkMode ? "text-slate-300" : "text-slate-400"}`}>{t.trendSubtitle}</p>
                 </div>
-                <div className="bg-slate-50 p-2 rounded-xl border border-slate-100">
-                  <div className="flex gap-1">
-                    {['1Y', '5Y', 'ALL'].map(range => (
-                        <button key={range} className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${range === 'ALL' ? 'bg-white shadow-sm text-[#082721]' : 'text-slate-400 hover:text-slate-600'}`}>{range}</button>
-                    ))}
-                  </div>
+                <div className={`flex gap-2 p-1.5 rounded-2xl border ${isDarkMode ? "bg-white/5 border-white/10" : "bg-slate-50 border-slate-100"}`}>
+                  <button className={`px-4 py-2 text-xs font-bold rounded-xl bg-white text-[#082721] ${isDarkMode ? "shadow-none" : "shadow-sm"}`}>{t.importsValue}</button>
+                  <button className={`px-4 py-2 text-xs font-bold rounded-xl ${isDarkMode ? "text-slate-300 hover:text-white" : "text-slate-400 hover:text-slate-600"}`}>{t.quantitiesSoon}</button>
                 </div>
               </div>
-              <div className="h-[400px]">
+              <div className="relative h-[260px] sm:h-[320px] md:h-[380px] lg:h-[400px] w-full">
                 <canvas ref={canvasRef} />
               </div>
             </div>
 
-            {/* Enhanced Table */}
-            <div className="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
-                <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-                    <h3 className="font-black text-[#082721] flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#ddbc6b]/10 flex items-center justify-center">
-                            <Scale size={20} className="text-[#ddbc6b]" />
-                        </div>
-                        {t.countryImportDetails}
-                    </h3>
-                    <div className="flex items-center gap-2 text-xs font-black text-slate-500 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        {currentYear}
-                    </div>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="text-[11px] font-black uppercase text-slate-400 tracking-wider">
-                                <th className="px-8 py-5 text-start">Market / Country</th>
-                                <th className="px-8 py-5 text-center">{t.importValue}</th>
-                                <th className="px-8 py-5 text-end">Market Share</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50">
-                            {countryImportRows.map((row, idx) => (
-                                <tr key={row.reporter} className="group hover:bg-slate-50/50 transition-colors">
-                                    <td className="px-8 py-5">
-                                        <div className="flex items-center gap-4">
-                                            <span className="text-xs font-black text-slate-300">0{idx + 1}</span>
-                                            <div className="w-10 h-10 rounded-full bg-[#082721] text-[#ddbc6b] flex items-center justify-center font-bold text-xs border-2 border-white shadow-sm">
-                                                {row.reporter.slice(0, 2).toUpperCase()}
-                                            </div>
-                                            <span className="font-black text-[#082721]">{row.reporter}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-5 text-center">
-                                        <span className="bg-slate-100 px-4 py-1.5 rounded-lg text-sm font-black text-[#082721]">
-                                            {formatFullUsd(row.value, language)}
-                                        </span>
-                                    </td>
-                                    <td className="px-8 py-5">
-                                        <div className="flex items-center justify-end gap-3">
-                                            <span className="text-xs font-bold text-slate-500">{Math.round(row.share * 100)}%</span>
-                                            <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
-                                                <div className="h-full bg-[#ddbc6b] rounded-full" style={{ width: `${row.share * 100}%` }} />
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+            <div className={`rounded-[2.5rem] overflow-hidden border ${isDarkMode ? "bg-[#0d2c24] border-white/10 shadow-none" : "bg-white border-slate-100 shadow-xl shadow-slate-200/60"}`}>
+              <div className={`p-6 border-b flex justify-between items-center ${isDarkMode ? "border-white/10" : "border-slate-50"}`}>
+                <h3 className="font-bold flex items-center gap-2"><List className="text-[#ddbc6b]" size={20} />{t.countryImportDetails}</h3>
+                <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${isDarkMode ? "bg-white/10 text-slate-200" : "bg-slate-100 text-slate-500"}`}>{t.yearTag} {countryYear ? formatUsd(countryYear, language) : "-"}</span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className={`w-full ${language === "ar" ? "text-right" : "text-left"}`}>
+                  <thead className={`${isDarkMode ? "bg-white/5 text-slate-300" : "bg-slate-50/50 text-slate-400"} text-[11px] uppercase font-black`}>
+                    <tr>
+                      <th className="px-6 py-4">{t.arabCountry}</th>
+                      <th className="px-6 py-4">{t.mineralType}</th>
+                      <th className={`px-6 py-4 ${language === "ar" ? "text-left" : "text-right"}`}>{t.importValue}</th>
+                    </tr>
+                  </thead>
+                  <tbody className={`text-sm font-bold ${isDarkMode ? "divide-y divide-white/10" : "divide-y divide-slate-50"}`}>
+                    {countryTableRows.map((r) => (
+                      <tr key={r.c} className={`transition-colors group ${isDarkMode ? "hover:bg-white/5" : "hover:bg-slate-50/80"}`}>
+                        <td className="px-6 py-4 flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] transition-colors ${isDarkMode ? "bg-white/10 text-white group-hover:bg-[#ddbc6b]/20 group-hover:text-[#ddbc6b]" : "bg-slate-100 group-hover:bg-[#ddbc6b]/20 group-hover:text-[#082721]"}`}>{r.c.toUpperCase()}</div>
+                          {localizeCountryCode(r.c, language, dbCountryNames)}
+                        </td>
+                        <td className="px-6 py-4">{translateMineral(r.mineral, language, t.allMinerals)}</td>
+                        <td className={`px-6 py-4 font-black ${isDarkMode ? "text-[#ddbc6b]" : "text-[#082721]"} ${language === "ar" ? "text-left" : "text-right"}`}>{formatUsd(r.v, language)} {t.usd}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
-          {/* Right Column: Controls & Donut */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-[#082721] rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden border border-white/5">
-              <h3 className="text-lg font-black mb-8 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#ddbc6b] flex items-center justify-center">
-                    <ChevronDown size={18} className="text-[#082721]" />
-                </div>
-                {t.filterTools}
-              </h3>
-              
-              <div className="space-y-8">
-                {[
-                  { label: t.chooseCountry, val: selectedCountry, set: setSelectedCountry, options: COUNTRIES.map(c => ({v: c.code, l: localizeCountry(c.code, language)})) },
-                  { label: t.mineralType, val: selectedMineral, set: setSelectedMineral, options: mineralOptions.map(m => ({v: m, l: localizeMineral(m, language, t.allMinerals)})) }
-                ].map((filter, i) => (
-                  <div key={i}>
-                    <label className="text-[10px] font-black text-emerald-200/40 uppercase tracking-[0.2em] block mb-3">{filter.label}</label>
-                    <div className="relative group">
-                      <select 
-                        value={filter.val} 
-                        onChange={(e) => filter.set(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:border-[#ddbc6b] appearance-none transition-all cursor-pointer"
-                      >
-                        {filter.options.map(opt => <option key={opt.v} value={opt.v} className="text-slate-900">{opt.l}</option>)}
-                      </select>
-                      <ChevronDown size={16} className="absolute right-5 top-1/2 -translate-y-1/2 text-[#ddbc6b] pointer-events-none group-hover:translate-y-[-40%] transition-transform" />
-                    </div>
-                  </div>
-                ))}
-
+            <div className={`bg-[#082721] rounded-[2.5rem] p-8 text-white relative overflow-hidden group ${isDarkMode ? "shadow-none" : "shadow-2xl shadow-emerald-900/20"}`}>
+              <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#ddbc6b]/10 rounded-full blur-3xl group-hover:bg-[#ddbc6b]/20 transition-all"></div>
+              <h3 className="text-lg font-bold mb-6 flex items-center gap-3"><Filter size={20} className="text-[#ddbc6b]" />{t.filterTools}</h3>
+              <div className="space-y-6 relative z-10">
                 <div>
-                  <label className="text-[10px] font-black text-emerald-200/40 uppercase tracking-[0.2em] block mb-4">{t.referenceYear}</label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {countryYears.slice(-8).map((y) => (
-                      <button
-                        key={y}
-                        onClick={() => setCountryYear(y)}
-                        className={`py-3 rounded-xl text-[10px] font-black transition-all ${y === currentYear ? 'bg-[#ddbc6b] text-[#082721] scale-105 shadow-lg' : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/5'}`}
-                      >
-                        {y}
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.chooseCountry}</label>
+                  <div className="relative">
+                    <select value={effectiveCountry} onChange={(e) => setSelectedCountry(e.target.value)} className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:border-[#ddbc6b] appearance-none transition-all">
+                      <option value={ALL_COUNTRIES_VALUE} className="text-slate-800">{t.allCountries}</option>
+                      {availableCountries.map((c) => <option key={c} value={c} className="text-slate-800">{localizeCountryCode(c, language, dbCountryNames)}</option>)}
+                    </select>
+                    <ChevronDown className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.mineralType}</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {mineralOptions.slice(0, 6).map((m) => (
+                      <button key={m} onClick={() => setSelectedMineral(m)} className={`px-3 py-3 rounded-xl text-[11px] font-bold border transition-all ${selectedMineral === m ? "bg-[#ddbc6b] border-[#ddbc6b] text-[#082721]" : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"}`}>
+                        {translateMineral(m, language, t.allMinerals)}
                       </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.referenceYear}</label>
+                  <div className="flex flex-wrap gap-2">
+                    {referenceYears.slice(0, 6).map((y) => (
+                      <button key={y} onClick={() => setCountryYear(y)} className={`w-12 h-12 rounded-xl flex items-center justify-center text-xs font-black transition-all ${y === countryYear ? `bg-white text-[#082721] scale-110 ${isDarkMode ? "shadow-none" : "shadow-lg"}` : "bg-white/5 text-slate-400 hover:bg-white/10"}`}>{formatUsd(y, language)}</button>
                     ))}
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* Relative Distribution Card */}
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                <div className="flex items-center gap-3 mb-8">
-                    <div className="w-2 h-6 bg-[#ddbc6b] rounded-full"></div>
-                    <h3 className="font-black text-[#082721]">{t.relativeDistribution}</h3>
+            <div className={`rounded-[2.5rem] p-6 sm:p-8 border ${isDarkMode ? "bg-[#0d2c24] border-white/10 shadow-none" : "bg-white border-slate-100 shadow-xl shadow-slate-200/60"}`}>
+              <h3 className="text-base font-black mb-6 text-center">{t.relativeDistribution}</h3>
+              <div className="relative h-[210px] sm:h-[240px] md:h-[250px] w-full">
+                <canvas ref={donutCanvasRef} />
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className={`text-xs font-bold ${isDarkMode ? "text-slate-300" : "text-slate-400"}`}>{t.totalShare}</span>
+                  <span className={`text-2xl font-black ${isDarkMode ? "text-[#ddbc6b]" : "text-[#082721]"}`}>{selectedCountryShare.toFixed(1)}%</span>
                 </div>
-                <div className="h-[240px] relative flex items-center justify-center">
-                    <canvas ref={donutCanvasRef} />
-                    <div className="absolute flex flex-col items-center">
-                        <span className="text-3xl font-black text-[#082721]">100%</span>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Market Total</span>
-                    </div>
-                </div>
-                <div className="mt-8 space-y-3">
-                    {countryImportRows.slice(0, 3).map((row, i) => (
-                        <div key={row.reporter} className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ['#ddbc6b', '#082721', '#1e4b40'][i] }} />
-                                <span className="text-xs font-bold text-slate-600">{row.reporter}</span>
-                            </div>
-                            <span className="text-xs font-black text-[#082721]">{Math.round(row.share * 100)}%</span>
-                        </div>
-                    ))}
-                </div>
+              </div>
             </div>
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );

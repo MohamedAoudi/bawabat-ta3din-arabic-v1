@@ -12,5 +12,9 @@ export const getCriticalMineralExportsAnalytics = async () => {
   const response = await apiClient.get("/trade-transactions/analytics/critical-exports");
   return response.data;
 };
+export const getCriticalMineralImportsAnalytics = async () => {
+  const response = await apiClient.get("/trade-transactions/analytics/critical-imports");
+  return response.data;
+};
 
 export default tradeTransactionService;
