@@ -564,8 +564,10 @@ const linePointCountryLabelPlugin = {
 function LineChartPanel({ mineral, language, annualEvolutionLabel, sourceData }) {
   const canvasRef = useRef(null);
   const instanceRef = useRef(null);
+  const hasMineralData = Boolean(sourceData?.[mineral]);
 
   useEffect(() => {
+    if (!hasMineralData) return;
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
     if (instanceRef.current) instanceRef.current.destroy();
@@ -655,7 +657,7 @@ function LineChartPanel({ mineral, language, annualEvolutionLabel, sourceData })
       instanceRef.current?.destroy();
       instanceRef.current = null;
     };
-  }, [mineral, language, sourceData]);
+  }, [hasMineralData, mineral, language, sourceData]);
 
   return (
     <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
@@ -663,7 +665,13 @@ function LineChartPanel({ mineral, language, annualEvolutionLabel, sourceData })
         {annualEvolutionLabel} - {getLocalizedMineral(mineral, language)}
       </h3>
       <div className="h-[280px]">
-        <canvas ref={canvasRef} />
+        {hasMineralData ? (
+          <canvas ref={canvasRef} />
+        ) : (
+          <div className="flex h-full items-center justify-center text-sm text-slate-500">
+            No data
+          </div>
+        )}
       </div>
     </div>
   );
@@ -759,7 +767,7 @@ export default function M1Page() {
   }, [countryFilteredSource]);
 
   const minerals = useMemo(() => [ALL_MINERALS_KEY, ...Object.keys(countryFilteredSource)], [countryFilteredSource]);
-  const [activeMineral, setActiveMineral] = useState(minerals[0]);
+  const [activeMineral, setActiveMineral] = useState(ALL_MINERALS_KEY);
   const [activeYear, setActiveYear] = useState(() => {
     const ys = mineralYears(sourceWithAllMinerals, minerals[0]);
     return ys[ys.length - 1];
@@ -780,6 +788,16 @@ export default function M1Page() {
     () => mineralYears(sourceWithAllMinerals, activeMineral),
     [sourceWithAllMinerals, activeMineral]
   );
+
+  useEffect(() => {
+    if (!availableYears.length) {
+      setActiveYear(undefined);
+      return;
+    }
+    if (!activeYear || !availableYears.includes(activeYear)) {
+      setActiveYear(availableYears[availableYears.length - 1]);
+    }
+  }, [activeYear, availableYears]);
 
   const handleMineralChange = (m) => {
     setActiveMineral(m);
@@ -869,13 +887,21 @@ export default function M1Page() {
   return (
     <div className="" dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
       <Menu />
-      <main className="min-h-screen py-6 sm:py-8">
+      <div className="relative overflow-hidden bg-[#082721] pb-36 pt-16 text-white">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(#ddbc6b 1px, transparent 1px)", size: "20px 20px" }}></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h1 className="mb-4 text-4xl font-black md:text-5xl">{t.pageTitle}</h1>
+          <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-300 md:text-base">{t.pageSubtitle}</p>
+        </div>
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20" style={{ transform: "translateY(2px)" }}>
+          <svg className="relative block w-full h-[56px] md:h-[90px] lg:h-[120px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="#eef2f1" fillOpacity="0.45" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L0,320Z" />
+            <path fill="#f8faf9" fillOpacity="1" d="M0,288L60,261.3C120,235,240,181,360,149.3C480,117,600,107,720,122.7C840,139,960,181,1080,186.7C1200,192,1320,160,1380,144L1440,128L1440,320L0,320Z" />
+          </svg>
+        </div>
+      </div>
+      <main className="min-h-screen py-6 sm:py-8 -mt-24 relative z-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <header className="mb-6 rounded-3xl bg-gradient-to-l from-[#082721] to-[#051712] px-6 py-8 text-center text-white shadow-lg ring-1 ring-[#ddbc6b]/25">
-            <h1 className="mb-2 text-2xl font-extrabold sm:text-3xl">{t.pageTitle}</h1>
-            <p className="text-sm text-slate-100/80">{t.pageSubtitle}</p>
-            <p className="mt-2 text-[11px] text-slate-200/70">{isLoadingDb ? "Loading DB..." : "DB connected"}</p>
-          </header>
 
           <section className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/60">
             <div className="mb-3">
