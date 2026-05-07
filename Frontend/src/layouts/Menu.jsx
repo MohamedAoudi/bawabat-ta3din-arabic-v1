@@ -1,11 +1,11 @@
 import { useState, useEffect, useContext } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
-import { isAuthenticated } from "../services/authService";
+import { isAuthenticated, logout } from "../services/authService";
 import { 
   User, Search, Moon, Sun, FileText, 
   LogIn, ChevronDown, LayoutGrid, 
-  BarChart3, Map, Info, Menu as MenuIcon, X, Mail
+  BarChart3, Map, Info, Menu as MenuIcon, X, Mail, LogOut
 } from "lucide-react";
 
 import logoAmip from "../assets/logo_n_v-removebg-preview.png";
@@ -21,6 +21,7 @@ const TRANSLATIONS = {
     quickSearch: "بحث...",
     smartReports: "التقارير الذكية",
     login: "دخول",
+    logout: "تسجيل الخروج",
     dashboard: "لوحة التحكم",
     miningProduction: "الانتاج التعديني",
     miningTrade: "التجارة التعدينية",
@@ -36,6 +37,7 @@ const TRANSLATIONS = {
     about: "À Propos",    contact: "Contactez-nous",    quickSearch: "Recherche...",
     smartReports: "Rapports IA",
     login: "Connexion",
+    logout: "Déconnexion",
     dashboard: "Tableau de bord",
     miningProduction: "Production Minière",
     miningTrade: "Commerce Minier",
@@ -53,6 +55,7 @@ const TRANSLATIONS = {
     quickSearch: "Search...",
     smartReports: "Smart Reports",
     login: "Login",
+    logout: "Logout",
     dashboard: "Dashboard",
     miningProduction: "Mining Production",
     miningTrade: "Mining Trade",
@@ -70,6 +73,7 @@ const NewSplitMenu = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isRTL = language === "ar";
 
   const t = (key) => TRANSLATIONS[language]?.[key] || key;
@@ -80,6 +84,12 @@ const NewSplitMenu = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [location.pathname]);
+
+  const handleLogout = () => {
+    logout();
+    setMobileOpen(false);
+    navigate("/login");
+  };
 
   const NavItem = ({ to, icon: Icon, label }) => {
     const isActive = location.pathname === to;
@@ -173,10 +183,20 @@ const NewSplitMenu = () => {
               </div>
 
               {isAuthenticated() ? (
-                <Link to="/dashboard" className="hidden sm:flex items-center gap-1.5 text-white/90 hover:text-[#C9A84C] font-bold px-1 sm:px-2 whitespace-nowrap">
-                  <User size={14} />
-                  <span className="hidden md:block">{t("dashboard")}</span>
-                </Link>
+                <>
+                  <Link to="/dashboard" className="hidden sm:flex items-center gap-1.5 text-white/90 hover:text-[#C9A84C] font-bold px-1 sm:px-2 whitespace-nowrap">
+                    <User size={14} />
+                    <span className="hidden md:block">{t("dashboard")}</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="hidden sm:flex items-center gap-1.5 text-white/60 hover:text-[#C9A84C] font-bold px-1 sm:px-2 transition-colors whitespace-nowrap"
+                  >
+                    <LogOut size={14} />
+                    <span className="hidden md:block">{t("logout")}</span>
+                  </button>
+                </>
               ) : (
                 <Link to="/login" className="hidden sm:flex items-center gap-1.5 text-[#C9A84C] hover:text-white font-bold px-1 sm:px-2 transition-colors whitespace-nowrap">
                   <LogIn size={14} />
@@ -312,10 +332,20 @@ const NewSplitMenu = () => {
             <div className="my-2 sm:my-4 h-[1px] bg-white/10"></div>
 
             {isAuthenticated() ? (
-              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 p-3 sm:p-4 text-white hover:bg-white/5 rounded-lg transition-colors">
-                <User size={20} className="text-[#C9A84C]" />
-                <span className="text-base sm:text-lg font-bold">{t("dashboard")}</span>
-              </Link>
+              <>
+                <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 p-3 sm:p-4 text-white hover:bg-white/5 rounded-lg transition-colors">
+                  <User size={20} className="text-[#C9A84C]" />
+                  <span className="text-base sm:text-lg font-bold">{t("dashboard")}</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex items-center gap-4 p-3 sm:p-4 text-white hover:bg-white/5 rounded-lg transition-colors"
+                >
+                  <LogOut size={20} className="text-[#C9A84C]" />
+                  <span className="text-base sm:text-lg font-bold">{t("logout")}</span>
+                </button>
+              </>
             ) : (
               <Link to="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 p-3 sm:p-4 text-white hover:bg-white/5 rounded-xl transition-colors">
                 <LogIn size={20} className="text-[#C9A84C]" />

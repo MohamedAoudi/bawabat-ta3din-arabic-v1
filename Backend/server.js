@@ -14,6 +14,7 @@ const countryProductionSummaryRoutes = require("./Routes/countryProductionSummar
 const countryTradeSummaryRoutes = require("./Routes/countryTradeSummaryRoutes");
 const path = require("path");
 const { runMigrations } = require("./migrate");
+const { seedOnStartup } = require("./seed");
 
 const app = express();
 app.use(cors());
@@ -44,6 +45,7 @@ async function startServer() {
   try {
     await pool.query("SELECT 1");
     await runMigrations();
+    await seedOnStartup();
 
     app.listen(5000, () => {
       console.log("Server running on port 5000");

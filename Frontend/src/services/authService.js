@@ -42,6 +42,7 @@ export const login = async (email, password) => {
 export const logout = () => {
   localStorage.removeItem("user");
   localStorage.removeItem("token");
+  window.dispatchEvent(new Event("auth:user-updated"));
 };
 
 // Get current user
