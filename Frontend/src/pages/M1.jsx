@@ -432,7 +432,7 @@ const getLocalizedMineral = (mineral, language) =>
   MINERAL_LABELS[mineral]?.[language] || mineral;
 
 const getLocalizedUnit = (unit, language) =>
-  UNIT_LABELS[unit]?.[language] || unit;
+  unit ? UNIT_LABELS[unit]?.[language] || unit : "";
 
 const getLocalizedMineralUnit = (mineral, language) =>
   getLocalizedUnit(mineralUnits[mineral], language);
@@ -561,7 +561,13 @@ const linePointCountryLabelPlugin = {
 };
 
 // ── Line chart: evolution over all years for selected mineral ──────────────
-function LineChartPanel({ mineral, language, annualEvolutionLabel, sourceData }) {
+function LineChartPanel({
+  mineral,
+  language,
+  annualEvolutionLabel,
+  sourceData,
+  getMineralUnitLabel,
+}) {
   const canvasRef = useRef(null);
   const instanceRef = useRef(null);
   const hasMineralData = Boolean(sourceData?.[mineral]);
@@ -633,7 +639,7 @@ function LineChartPanel({ mineral, language, annualEvolutionLabel, sourceData })
           tooltip: {
             callbacks: {
               label: (c) =>
-                ` ${c.dataset.label}: ${formatNumber(c.parsed.y, language)} ${getLocalizedMineralUnit(mineral, language)}`,
+                ` ${c.dataset.label}: ${formatNumber(c.parsed.y, language)} ${getMineralUnitLabel(mineral, language)}`,
             },
           },
         },
@@ -726,10 +732,27 @@ export default function M1Page() {
     }, {});
   }, [dbRows]);
 
-  const activeDataSource = useMemo(
-    () => (Object.keys(dbDataByMineral).length ? dbDataByMineral : dataByMineral),
-    [dbDataByMineral]
-  );
+  // For this page, always rely on DB data (no demo fallback).
+  const activeDataSource = useMemo(() => dbDataByMineral, [dbDataByMineral]);
+
+  const dbMineralUnitsByName = useMemo(() => {
+    return dbRows.reduce((acc, row) => {
+      const mineralKey = row.mineral_name_ar || row.mineral_name_en;
+      if (!mineralKey) return acc;
+      if (!acc[mineralKey]) acc[mineralKey] = {};
+
+      if (row.unit_name_ar) acc[mineralKey].ar = row.unit_name_ar;
+      if (row.unit_name_en) acc[mineralKey].en = row.unit_name_en;
+      if (row.unit_name_fr) acc[mineralKey].fr = row.unit_name_fr;
+
+      return acc;
+    }, {});
+  }, [dbRows]);
+
+  const getMineralUnitLabel = (mineralKey, language) => {
+    if (!mineralKey || mineralKey === ALL_MINERALS_KEY) return "";
+    return dbMineralUnitsByName?.[mineralKey]?.[language] || getLocalizedMineralUnit(mineralKey, language) || "";
+  };
 
   const allCountries = useMemo(
     () =>
@@ -819,8 +842,21 @@ export default function M1Page() {
 
   const baseRows = useMemo(() => {
     const rows = sourceWithAllMinerals[activeMineral]?.[activeYear] || [];
+
+    // When "All countries" is selected, we want to show *every* country present in the dataset.
+    // For countries without data in the selected year, we display 0 instead of hiding them.
+    if (activeCountry === "all") {
+      const byCountry = new Map(rows.map((r) => [r.country, Number(r.value ?? 0)]));
+      return allCountries
+        .map((country) => ({
+          country,
+          value: byCountry.get(country) ?? 0,
+        }))
+        .sort((a, b) => b.value - a.value);
+    }
+
     return [...rows].sort((a, b) => b.value - a.value);
-  }, [sourceWithAllMinerals, activeMineral, activeYear]);
+  }, [sourceWithAllMinerals, activeMineral, activeYear, activeCountry, allCountries]);
 
   const filteredRows = useMemo(() => {
     if (!search.trim()) return baseRows;
@@ -858,7 +894,7 @@ export default function M1Page() {
             callbacks: {
               label: (c) =>
                 ` ${formatNumber(c.parsed.y, language)} ${
-                  activeMineral === ALL_MINERALS_KEY ? "" : getLocalizedMineralUnit(activeMineral, language)
+                  activeMineral === ALL_MINERALS_KEY ? "" : getMineralUnitLabel(activeMineral, language)
                 }`,
             },
           },
@@ -939,7 +975,7 @@ export default function M1Page() {
                 <button key={m} type="button" onClick={() => handleMineralChange(m)} className={`inline-flex items-center rounded-2xl border px-4 py-1.5 text-sm font-extrabold transition ${m === activeMineral ? "border-[#082721] bg-[#082721] text-white shadow-sm" : "border-slate-200 bg-white text-[#082721] hover:bg-slate-50"}`}>
                   {getLocalizedMineral(m, language)}
                   {m !== ALL_MINERALS_KEY ? (
-                    <span className="mr-2 text-[10px] opacity-60">({getLocalizedMineralUnit(m, language)})</span>
+                    <span className="mr-2 text-[10px] opacity-60">({getMineralUnitLabel(m, language)})</span>
                   ) : null}
                 </button>
               ))}
@@ -990,7 +1026,7 @@ export default function M1Page() {
                           <th className="px-3 py-2">{t.country}</th>
                           <th className="px-3 py-2">
                             {t.production}
-                            {activeMineral !== ALL_MINERALS_KEY ? ` (${getLocalizedMineralUnit(activeMineral, language)})` : ""}
+                            {activeMineral !== ALL_MINERALS_KEY ? ` (${getMineralUnitLabel(activeMineral, language)})` : ""}
                           </th>
                         </tr>
                       </thead>
@@ -1020,6 +1056,7 @@ export default function M1Page() {
               language={language}
               annualEvolutionLabel={t.annualEvolution}
               sourceData={sourceWithAllMinerals}
+              getMineralUnitLabel={getMineralUnitLabel}
             />
           </section>
         </div>
