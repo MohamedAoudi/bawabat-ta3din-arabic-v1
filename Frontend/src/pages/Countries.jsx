@@ -5,32 +5,87 @@ import { TreemapController, TreemapElement } from "chartjs-chart-treemap";
 import { LanguageContext, ThemeContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
+import { getCountries } from "../services/countryService";
 import { dataByMineral, mineralUnits } from "./M1";
+import flagJordan from "../assets/flags/jordan.webp";
+import flagUae from "../assets/flags/uae.webp";
+import flagBahrain from "../assets/flags/bahrain.webp";
+import flagTunisia from "../assets/flags/tunisia.webp";
+import flagAlgeria from "../assets/flags/algeria.webp";
+import flagDjibouti from "../assets/flags/djibouti.webp";
+import flagSaudi from "../assets/flags/saudiarabe.webp";
+import flagSudan from "../assets/flags/sudan.webp";
+import flagSyria from "../assets/flags/syria.webp";
+import flagSomalia from "../assets/flags/somalia.webp";
+import flagIraq from "../assets/flags/iraq.webp";
+import flagOman from "../assets/flags/oman.webp";
+import flagPalestine from "../assets/flags/palestine.webp";
+import flagQatar from "../assets/flags/qatar.webp";
+import flagKuwait from "../assets/flags/kuwait.webp";
+import flagLebanon from "../assets/flags/lebanon.webp";
+import flagLibya from "../assets/flags/libya.webp";
+import flagEgypt from "../assets/flags/egypt.webp";
+import flagMorocco from "../assets/flags/morocco.webp";
+import flagMauritania from "../assets/flags/mauritania.webp";
+import flagYemen from "../assets/flags/yemen.webp";
 
 Chart.register(TreemapController, TreemapElement);
 
-const flagModules = import.meta.glob("../assets/flags/*.webp", { eager: true });
-
-const getCountryFlags = () => {
-  const flags = {};
-  const countryCodeMap = {
-    "jordan.webp": "jo", "uae.webp": "ae", "bahrain.webp": "bh",
-    "tunisia.webp": "tn", "algeria.webp": "dz", "djibouti.webp": "dj",
-    "saudiarabe.webp": "sa", "sudan.webp": "sd", "syria.webp": "sy",
-    "somalia.webp": "so", "iraq.webp": "iq", "oman.webp": "om",
-    "palestine.webp": "ps", "qatar.webp": "qa", "kuwait.webp": "kw",
-    "lebanon.webp": "lb", "libya.webp": "ly", "egypt.webp": "eg",
-    "morocco.webp": "ma", "mauritania.webp": "mr", "yemen.webp": "ye",
-  };
-  Object.entries(flagModules).forEach(([path, module]) => {
-    const filename = path.split("/").pop();
-    const countryCode = countryCodeMap[filename];
-    if (countryCode) flags[countryCode] = module.default;
-  });
-  return flags;
+const countryFlags = {
+  jo: flagJordan,
+  ae: flagUae,
+  bh: flagBahrain,
+  tn: flagTunisia,
+  dz: flagAlgeria,
+  dj: flagDjibouti,
+  sa: flagSaudi,
+  sd: flagSudan,
+  sy: flagSyria,
+  so: flagSomalia,
+  iq: flagIraq,
+  om: flagOman,
+  ps: flagPalestine,
+  qa: flagQatar,
+  kw: flagKuwait,
+  lb: flagLebanon,
+  ly: flagLibya,
+  eg: flagEgypt,
+  ma: flagMorocco,
+  mr: flagMauritania,
+  ye: flagYemen,
 };
 
-const countryFlags = getCountryFlags();
+const ISO3_TO_ISO2 = {
+  jor: "jo",
+  are: "ae",
+  bhr: "bh",
+  tun: "tn",
+  dza: "dz",
+  dji: "dj",
+  sau: "sa",
+  sdn: "sd",
+  syr: "sy",
+  som: "so",
+  irq: "iq",
+  omn: "om",
+  pse: "ps",
+  qat: "qa",
+  kwt: "kw",
+  lbn: "lb",
+  lby: "ly",
+  egy: "eg",
+  mar: "ma",
+  mrt: "mr",
+  yem: "ye",
+};
+
+const normalizeCountryCode = (rawCode) => {
+  const code = String(rawCode || "").trim().toLowerCase();
+  if (!code) return "";
+  if (countryFlags[code]) return code;
+  if (ISO3_TO_ISO2[code]) return ISO3_TO_ISO2[code];
+  return code;
+};
 
 const FLAG_IMAGE_STYLE = {
   width: "100%",
@@ -328,6 +383,11 @@ const COUNTRY_AR_TO_CSV_NAME = {
   "الجمهورية الإسلامية الموريتانية": "Mauritania",
   "الجمهورية اليمنية": "Yemen",
 };
+
+const COUNTRY_CODE_TO_CSV_NAME = COUNTRIES.reduce((acc, country) => {
+  acc[country.code] = COUNTRY_AR_TO_CSV_NAME[country.name];
+  return acc;
+}, {});
 
 const ARAB_COUNTRY_NAMES = COUNTRIES.map((c) => c.name);
 
@@ -1906,10 +1966,11 @@ const Countries = () => {
   const { labels, language, isArabic, isDarkMode } = useCountriesI18n();
   const query = typeof window!=="undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
   const initialCountryCode = query.get("country");
-  const initialSelected    = initialCountryCode ? (COUNTRIES.find(c=>c.code===initialCountryCode)?.name??"—") : "—";
+  const initialSelected    = "—";
 
   const lastAvailableYear = ALL_YEARS[ALL_YEARS.length - 1];
 
+  const [countries, setCountries]               = useState(COUNTRIES);
   const [selected, setSelected]               = useState(initialSelected);
   const [donutYear, setDonutYear]             = useState(DEFAULT_SELECTED_YEAR);
   const [barYear, setBarYear]                 = useState(DEFAULT_SELECTED_YEAR);
@@ -1922,9 +1983,52 @@ const Countries = () => {
   const [tradeByCountry, setTradeByCountry]   = useState({ imports: null, exports: null });
   const [tradeBreakdownByCountry, setTradeBreakdownByCountry] = useState({ exports: null, imports: null });
 
-  const selectedCountryObj = COUNTRIES.find(c=>c.name===selected);
-  const selectedCountryCsvName = COUNTRY_AR_TO_CSV_NAME[selected] || null;
+  const selectedCountryObj = countries.find((c) => c.name === selected);
+  const selectedCountryCsvName = selectedCountryObj ? COUNTRY_CODE_TO_CSV_NAME[selectedCountryObj.code] || null : null;
   const selectedTheme = getCountryTheme(selectedCountryObj?.code);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadCountries = async () => {
+      try {
+        const rows = await getCountries();
+        if (!active || !Array.isArray(rows) || !rows.length) return;
+
+        const mapped = rows
+          .filter((row) => row?.iso_code && row?.name_ar)
+          .map((row) => ({
+            code: normalizeCountryCode(row.iso_code),
+            name: row.name_ar,
+            name_en: row.name_en || "",
+            name_fr: row.name_fr || "",
+            display_order: Number.isFinite(Number(row.display_order)) ? Number(row.display_order) : Number.MAX_SAFE_INTEGER,
+          }))
+          .sort((a, b) => a.display_order - b.display_order);
+
+        if (mapped.length) setCountries(mapped);
+      } catch {
+        // Keep static fallback when API is unavailable.
+      }
+    };
+
+    loadCountries();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!countries.length) return;
+
+    if (initialCountryCode) {
+      const byCode = countries.find((c) => c.code === String(initialCountryCode).toLowerCase());
+      if (byCode) {
+        setSelected(byCode.name);
+      }
+    }
+  }, [countries, initialCountryCode, selected]);
 
   useEffect(() => {
     if (selectedCountryObj?.code === "ma") {
@@ -2036,7 +2140,7 @@ const Countries = () => {
             </a>
           </div>
           <div className="grid gap-y-5 gap-x-3 grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
-            {COUNTRIES.map((c) => (
+            {countries.map((c) => (
               <button key={c.code} type="button" onClick={()=>setSelected(c.name)}
                       className="group flex flex-col items-center text-center transition-transform hover:-translate-y-1 focus:outline-none">
                 <div className="relative flex h-24 w-full items-center justify-center overflow-hidden rounded-lg bg-slate-50 transition-all"
