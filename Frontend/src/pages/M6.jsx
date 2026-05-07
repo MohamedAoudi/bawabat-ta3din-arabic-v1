@@ -294,7 +294,7 @@ export default function M6Page() {
     return ((current - previous) / previous) * 100;
   }, [yearlyUsdData]);
 
-  const countryTableRows = useMemo(() => {
+  const allCountryRows = useMemo(() => {
     const latestReferenceYear = referenceYears[0];
     if (!latestReferenceYear) return [];
     const valuesByCountry = analyticsRows
@@ -322,16 +322,26 @@ export default function M6Page() {
         };
       })
       .sort((a, b) => b.v - a.v)
-      .slice(0, 2);
+      ;
   }, [analyticsRows, referenceYears, selectedMineral]);
 
+  const countryTableRows = useMemo(() => {
+    if (!allCountryRows.length) return [];
+    if (selectedCountry === ALL_COUNTRIES_VALUE) return allCountryRows;
+    return allCountryRows.filter((r) => r.c === selectedCountry);
+  }, [allCountryRows, selectedCountry]);
+
   const selectedCountryValue = useMemo(
-    () => (selectedCountry === ALL_COUNTRIES_VALUE ? countryTableRows.reduce((sum, row) => sum + row.v, 0) : countryTableRows.find((row) => row.c === selectedCountry)?.v || 0),
-    [countryTableRows, selectedCountry]
+    () =>
+      selectedCountry === ALL_COUNTRIES_VALUE
+        ? allCountryRows.reduce((sum, row) => sum + row.v, 0)
+        : allCountryRows.find((row) => row.c === selectedCountry)?.v || 0,
+    [allCountryRows, selectedCountry]
   );
   const selectedCountryShare = useMemo(
-    () => (selectedCountry === ALL_COUNTRIES_VALUE ? 100 : countryTableRows.find((row) => row.c === selectedCountry)?.share || 0),
-    [countryTableRows, selectedCountry]
+    () =>
+      selectedCountry === ALL_COUNTRIES_VALUE ? 100 : allCountryRows.find((row) => row.c === selectedCountry)?.share || 0,
+    [allCountryRows, selectedCountry]
   );
   const statusMessage = useMemo(() => {
     if (isLoading) return language === "fr" ? "Chargement des donnees..." : language === "en" ? "Loading data..." : "جاري تحميل البيانات...";
@@ -339,7 +349,11 @@ export default function M6Page() {
     return "";
   }, [isLoading, loadError, language]);
 
-  const countryPack = useMemo(() => ({ table: [{ c: selectedCountry, v: selectedCountryValue }] }), [selectedCountry, selectedCountryValue]);
+  const countryPack = useMemo(() => {
+    if (!allCountryRows.length) return { table: [] };
+    if (selectedCountry === ALL_COUNTRIES_VALUE) return { table: allCountryRows };
+    return { table: allCountryRows.filter((r) => r.c === selectedCountry) };
+  }, [allCountryRows, selectedCountry]);
   const effectiveCountry = selectedCountry === ALL_COUNTRIES_VALUE || (selectedCountry && availableCountries.includes(selectedCountry)) ? selectedCountry : DEFAULT_COUNTRY;
 
   const canvasRef = useRef(null);
@@ -425,14 +439,38 @@ export default function M6Page() {
     if (!rows.length) return;
     donutChartRef.current = new Chart(ctx, {
       type: "doughnut",
-      data: { labels: rows.map((r) => localizeCountryCode(r.c, language, dbCountryNames)), datasets: [{ data: rows.map((r) => r.v), borderWidth: 3, borderColor: "rgba(8,39,33,0.9)", cutout: "68%", backgroundColor: ["rgba(8, 39, 33, .92)"] }] },
+      data: {
+        labels: rows.map((r) => localizeCountryCode(r.c, language, dbCountryNames)),
+        datasets: [
+          {
+            data: rows.map((r) => r.v),
+            borderWidth: 3,
+            borderColor: "rgba(8,39,33,0.9)",
+            cutout: "68%",
+            backgroundColor: ["rgba(8, 39, 33, .92)"],
+          },
+        ],
+      },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        onClick: () => setSelectedCountry(DEFAULT_COUNTRY),
+        onClick: (_evt, elements) => {
+          const idx = elements?.[0]?.index ?? null;
+          if (idx == null) return;
+          const next = rows[idx]?.c;
+          if (next) setSelectedCountry(next);
+        },
         plugins: {
           legend: { display: false },
-          tooltip: { callbacks: { label: (c) => ` ${c.label}: ${formatUsd(c.parsed, language)} ${t.usd} (${selectedCountryShare.toFixed(1)}%)` } },
+          tooltip: {
+            callbacks: {
+              label: (c) => {
+                const idx = c?.dataIndex ?? 0;
+                const share = rows[idx]?.share ?? 0;
+                return ` ${c.label}: ${formatUsd(c.parsed, language)} ${t.usd} (${Number(share).toFixed(1)}%)`;
+              },
+            },
+          },
         },
       },
     });
@@ -442,7 +480,7 @@ export default function M6Page() {
         donutChartRef.current = null;
       }
     };
-  }, [countryPack, dbCountryNames, language, selectedCountryShare, t.usd]);
+  }, [countryPack, dbCountryNames, language, t.usd]);
 
   return (
     <div dir={language === "ar" ? "rtl" : "ltr"} lang={language} className={`min-h-screen font-['Cairo'] ${isDarkMode ? "text-slate-100" : "text-slate-800"}`} style={{ background: isDarkMode ? "#071611" : "#F4F7F5" }}>

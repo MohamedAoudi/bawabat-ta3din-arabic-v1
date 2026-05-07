@@ -5,6 +5,7 @@ import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCriticalMineralExportsAnalytics } from "../services/tradeTransactionService";
+import { getCountries } from "../services/countryService";
 
 const COUNTRIES = [
   { name: "المملكة الأردنية الهاشمية", code: "jo" },
@@ -217,6 +218,7 @@ export default function M5Page() {
   const [selectedMineral, setSelectedMineral] = useState("all");
   const [countryYear, setCountryYear] = useState(null);
   const [analyticsRows, setAnalyticsRows] = useState([]);
+  const [countries, setCountries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
@@ -227,14 +229,16 @@ export default function M5Page() {
       setIsLoading(true);
       setLoadError("");
       try {
-        const rows = await getCriticalMineralExportsAnalytics();
+        const [rows, countriesRows] = await Promise.all([getCriticalMineralExportsAnalytics(), getCountries()]);
         if (isMounted) {
           setAnalyticsRows(Array.isArray(rows) ? rows : []);
+          setCountries(Array.isArray(countriesRows) ? countriesRows : []);
         }
       } catch (error) {
         if (isMounted) {
           setLoadError(error?.response?.data?.error || error?.message || "Failed to load analytics data.");
           setAnalyticsRows([]);
+          setCountries([]);
         }
       } finally {
         if (isMounted) {
@@ -257,30 +261,38 @@ export default function M5Page() {
   }, [analyticsRows]);
 
   const availableCountries = useMemo(() => {
+    const fromDb = countries.map((row) => String(row.iso_code || "").toLowerCase()).filter(Boolean);
+    const unique = Array.from(new Set(fromDb));
+    if (unique.length) return unique.sort();
+
+    // Fallback: if DB countries aren't available, derive from analytics data.
     const countriesFromData = Array.from(
-      new Set(
-        analyticsRows
-          .map((row) => String(row.country_code || "").toLowerCase())
-          .filter(Boolean)
-      )
+      new Set(analyticsRows.map((row) => String(row.country_code || "").toLowerCase()).filter(Boolean))
     ).sort();
 
     return countriesFromData.length ? countriesFromData : AVAILABLE_COUNTRIES_FALLBACK;
-  }, [analyticsRows]);
+  }, [countries, analyticsRows]);
 
   const dbCountryNames = useMemo(
     () =>
-      analyticsRows.reduce((acc, row) => {
-        const code = String(row.country_code || "").toLowerCase();
-        if (!code) return acc;
-        acc[code] = {
-          ar: row.country_name_ar || "",
-          en: row.country_name_en || "",
-          fr: row.country_name_fr || "",
-        };
-        return acc;
-      }, {}),
-    [analyticsRows]
+      (countries.length
+        ? countries.reduce((acc, row) => {
+            const code = String(row.iso_code || "").toLowerCase();
+            if (!code) return acc;
+            acc[code] = { ar: row.name_ar || "", en: row.name_en || "", fr: row.name_fr || "" };
+            return acc;
+          }, {})
+        : analyticsRows.reduce((acc, row) => {
+            const code = String(row.country_code || "").toLowerCase();
+            if (!code) return acc;
+            acc[code] = {
+              ar: row.country_name_ar || "",
+              en: row.country_name_en || "",
+              fr: row.country_name_fr || "",
+            };
+            return acc;
+          }, {})),
+    [countries, analyticsRows]
   );
 
   useEffect(() => {
@@ -397,7 +409,7 @@ export default function M5Page() {
         };
       })
       .sort((a, b) => b.v - a.v)
-      .slice(0, 2);
+      ;
   }, [analyticsRows, referenceYears, selectedMineral]);
 
   const selectedCountryValue = useMemo(
@@ -426,9 +438,10 @@ export default function M5Page() {
 
   const countryPack = useMemo(
     () => ({
-      table: [{ c: selectedCountry, v: selectedCountryValue }],
+      // Donut + tooltip doivent couvrir tous les pays (pas seulement top 2).
+      table: countryTableRows,
     }),
-    [selectedCountry, selectedCountryValue]
+    [countryTableRows]
   );
 
   const effectiveCountry =
@@ -520,14 +533,21 @@ export default function M5Page() {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        onClick: () => setSelectedCountry(DEFAULT_COUNTRY),
+        onClick: (_evt, elements) => {
+          const idx = elements?.[0]?.index ?? null;
+          if (idx == null) return;
+          const next = rows[idx]?.c;
+          if (next) setSelectedCountry(next);
+        },
         plugins: {
           legend: { display: false },
           tooltip: {
             callbacks: {
               label: (c) => {
+                const idx = c?.dataIndex ?? 0;
+                const share = rows[idx]?.share ?? 0;
                 const v = c.parsed;
-                return ` ${c.label}: ${formatUsd(v, language)} ${t.usd} (${selectedCountryShare.toFixed(1)}%)`;
+                return ` ${c.label}: ${formatUsd(v, language)} ${t.usd} (${Number(share).toFixed(1)}%)`;
               },
             },
           },
@@ -708,7 +728,7 @@ export default function M5Page() {
                 <div>
                   <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-3">{t.mineralType}</label>
                   <div className="grid grid-cols-2 gap-2">
-                    {mineralOptions.slice(0, 6).map(m => (
+                    {mineralOptions.map((m) => (
                       <button 
                         key={m}
                         onClick={() => setSelectedMineral(m)}
