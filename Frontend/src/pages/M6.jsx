@@ -233,22 +233,8 @@ export default function M6Page() {
   }, [availableCountries, selectedCountry]);
 
   const productYearlyData = useMemo(() => {
-    const filteredRows = analyticsRows
-      .filter((row) => selectedCountry === ALL_COUNTRIES_VALUE || String(row.country_code || "").toLowerCase() === selectedCountry)
-      .filter((row) => selectedMineral === "all" || row.mineral_name === selectedMineral)
-      .reduce((acc, row) => {
-        const y = String(row.year);
-        acc[y] = (acc[y] || 0) + Number(row.value_usd || 0);
-        return acc;
-      }, {});
-
-    if (Object.keys(filteredRows).length > 0) {
-      return filteredRows;
-    }
-
-    // Fallback: if selected country has no rows for the chosen mineral,
-    // show the trend aggregated across all countries instead of empty chart.
     return analyticsRows
+      .filter((row) => selectedCountry === ALL_COUNTRIES_VALUE || String(row.country_code || "").toLowerCase() === selectedCountry)
       .filter((row) => selectedMineral === "all" || row.mineral_name === selectedMineral)
       .reduce((acc, row) => {
         const y = String(row.year);
@@ -295,10 +281,10 @@ export default function M6Page() {
   }, [yearlyUsdData]);
 
   const allCountryRows = useMemo(() => {
-    const latestReferenceYear = referenceYears[0];
-    if (!latestReferenceYear) return [];
+    const targetYear = countryYear || referenceYears[0];
+    if (!targetYear) return [];
     const valuesByCountry = analyticsRows
-      .filter((row) => Number(row.year) === Number(latestReferenceYear))
+      .filter((row) => Number(row.year) === Number(targetYear))
       .filter((row) => selectedMineral === "all" || row.mineral_name === selectedMineral)
       .reduce((acc, row) => {
         const countryCode = String(row.country_code || "").toLowerCase();
@@ -321,9 +307,8 @@ export default function M6Page() {
           share: total > 0 ? (item.total / total) * 100 : 0,
         };
       })
-      .sort((a, b) => b.v - a.v)
-      ;
-  }, [analyticsRows, referenceYears, selectedMineral]);
+      .sort((a, b) => b.v - a.v);
+  }, [analyticsRows, referenceYears, selectedMineral, countryYear]);
 
   const countryTableRows = useMemo(() => {
     if (!allCountryRows.length) return [];
