@@ -6,7 +6,9 @@ import { LanguageContext, ThemeContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { getCountries } from "../services/countryService";
-import { dataByMineral, mineralUnits } from "./M1";
+import { getYears } from "../services/yearService";
+import { getMineralProductionAnalytics } from "../services/mineralProductionService";
+import { dataByMineral as staticDataByMineral, mineralUnits as staticMineralUnits } from "./M1";
 import flagJordan from "../assets/flags/jordan.webp";
 import flagUae from "../assets/flags/uae.webp";
 import flagBahrain from "../assets/flags/bahrain.webp";
@@ -146,8 +148,7 @@ const PAGE_TRANSLATIONS = {
   ar: {
     none: "—",
     allMinerals: "كل الخامات",
-    thousandTon: "ألف طن",
-    kilograms: "كجم",
+
     countryProfile: "ملف الدولة",
     productionComparison: "مقارنة الإنتاج",
     productionComparisonSubtitle: (year) => `انتاج الخامات بالحجم حسب السنة ${year}`,
@@ -210,13 +211,11 @@ const PAGE_TRANSLATIONS = {
     mineralsCount: (count) => `${count} معدن`,
     millionDollar: "مليون دولار",
     dollar: "دولار",
-    millionTonValue: "مليون طن",
+    
   },
   fr: {
     none: "—",
-    allMinerals: "Tous les minerais",
-    thousandTon: "Kt",
-    kilograms: "kg",
+
     countryProfile: "Fiche pays",
     productionComparison: "Comparaison de la production",
     productionComparisonSubtitle: (year) => `Production minière par volume en ${year}`,
@@ -283,9 +282,7 @@ const PAGE_TRANSLATIONS = {
   },
   en: {
     none: "—",
-    allMinerals: "All minerals",
-    thousandTon: "k tons",
-    kilograms: "kg",
+   
     countryProfile: "Country profile",
     productionComparison: "Production comparison",
     productionComparisonSubtitle: (year) => `Mining output by volume in ${year}`,
@@ -358,8 +355,6 @@ const NUMBER_LOCALES = {
   en: "en-US",
 };
 
-const UNIT_LABELS = { ton: "ألف طن", kg: "كجم" };
-
 const COUNTRY_AR_TO_CSV_NAME = {
   "المملكة الأردنية الهاشمية": "Jordan",
   "دولة الامارات العربية المتحدة": "United Arab Emirates",
@@ -391,31 +386,76 @@ const COUNTRY_CODE_TO_CSV_NAME = COUNTRIES.reduce((acc, country) => {
 
 const ARAB_COUNTRY_NAMES = COUNTRIES.map((c) => c.name);
 
-const ALL_YEARS = Array.from(
+const STATIC_YEARS = Array.from(
   new Set(
-    Object.values(dataByMineral)
+    Object.values(staticDataByMineral)
       .flatMap((byYear) => Object.keys(byYear))
       .map(Number)
   )
 ).sort((a, b) => a - b);
 
-const DEFAULT_SELECTED_YEAR = ALL_YEARS.includes(2019)
+const DEFAULT_SELECTED_YEAR = STATIC_YEARS.includes(2019)
   ? 2019
-  : ALL_YEARS[ALL_YEARS.length - 1];
+  : STATIC_YEARS[STATIC_YEARS.length - 1];
+
+let runtimeDataByMineral = staticDataByMineral;
+let runtimeMineralUnits = staticMineralUnits;
+let runtimeYears = STATIC_YEARS;
 
 const getLabelsForLanguage = (language) => PAGE_TRANSLATIONS[language] || PAGE_TRANSLATIONS.ar;
 
+const getDbDefaultUnit = () =>
+  Object.values(runtimeMineralUnits || {}).find((u) => String(u || "").trim()) || "";
+
 const getUnitLabel = (unit, language) => {
   const labels = getLabelsForLanguage(language);
-  return unit === "kg" ? labels.kilograms : labels.thousandTon;
+  const dbUnit = getDbDefaultUnit();
+  if (dbUnit) return dbUnit;
+  return unit === "kg" ? labels.kilograms : "";
+};
+
+const detectUnitType = (rawUnit) => {
+  const u = String(rawUnit || "").trim().toLowerCase();
+  if (!u) return null;
+  if (u.includes("كجم") || u.includes("kg") || u.includes("kilogram")) return "kg";
+  if (u.includes("طن") || u.includes("ton") || u.includes("tonne") || u.includes("kt")) return "ton";
+  return null;
 };
 
 const buildMineralFilterOptions = (language) => {
   const labels = getLabelsForLanguage(language);
   return [
     { value: "all", label: labels.allMinerals },
-    ...Object.keys(dataByMineral).map((mineral) => ({ value: mineral, label: mineral })),
+    ...Object.keys(runtimeDataByMineral).map((mineral) => ({ value: mineral, label: mineral })),
   ];
+};
+
+const buildDatasetFromDbRows = (rows) => {
+  const byMineral = {};
+  const units = {};
+  const yearsSet = new Set();
+
+  (Array.isArray(rows) ? rows : []).forEach((row) => {
+    const mineral = String(row?.mineral_name_ar || row?.mineral_name_en || row?.mineral_name_fr || "").trim();
+    const country = String(row?.country_name_ar || row?.country_name_en || row?.country_name_fr || "").trim();
+    const year = Number(row?.year);
+    const value = Number(row?.production_quantity);
+    const unit = String(row?.unit_name_ar || row?.unit_name_en || row?.unit_name_fr || "").trim();
+    if (!mineral || !country || !Number.isFinite(year) || !Number.isFinite(value)) return;
+
+    if (!byMineral[mineral]) byMineral[mineral] = {};
+    if (!byMineral[mineral][year]) byMineral[mineral][year] = [];
+    byMineral[mineral][year].push({ country, value });
+    if (unit) units[mineral] = unit;
+    yearsSet.add(year);
+  });
+
+  const years = [...yearsSet].sort((a, b) => a - b);
+  return {
+    dataByMineral: Object.keys(byMineral).length ? byMineral : staticDataByMineral,
+    mineralUnits: Object.keys(units).length ? units : staticMineralUnits,
+    allYears: years.length ? years : STATIC_YEARS,
+  };
 };
 
 const getCountryDisplayName = (countryName, language) => {
@@ -724,43 +764,43 @@ const toTradeSeries = (totalsByCountry, countryEn) => {
 
 const convertVolume = (value, fromUnit, toUnit) => {
   if (value == null) return value;
-  const isThousandTon = fromUnit.includes("طن");
-  const isKg = fromUnit.includes("كجم");
+  const unitType = detectUnitType(fromUnit);
+  const isThousandTon = unitType === "ton";
+  const isKg = unitType === "kg";
   if (isThousandTon) { if (toUnit === "ton") return value; if (toUnit === "kg") return value * 1_000_000; }
   if (isKg) { if (toUnit === "kg") return value; if (toUnit === "ton") return value / 1_000_000; }
   return value;
 };
 
 const getCountryMineralData = (country, mineralFilter = null, toUnit = "ton") => {
-  return { years: ALL_YEARS, chartData: [] };
-  const minerals = Object.keys(dataByMineral).filter((m) =>
+  const minerals = Object.keys(runtimeDataByMineral).filter((m) =>
     !mineralFilter || mineralFilter === "all" ? true : m === mineralFilter
   );
   const chartData = minerals.map((mineral) => {
-    const fromUnit = mineralUnits[mineral] || "";
+    const fromUnit = runtimeMineralUnits[mineral] || "";
     return {
       mineral,
-      values: ALL_YEARS.map((year) => {
-        const row = (dataByMineral[mineral][year] || []).find((r) => r.country === country);
+      values: runtimeYears.map((year) => {
+        const row = (runtimeDataByMineral[mineral][year] || []).find((r) => r.country === country);
         const value = row ? row.value : null;
         return value != null ? convertVolume(value, fromUnit, toUnit) : null;
       }),
     };
   });
-  return { years: ALL_YEARS, chartData };
+  return { years: runtimeYears, chartData };
 };
 
 const getMineralShareForYear = (country, year, mineralFilter = null, toUnit = "ton") => {
-  return [];
-  const minerals = Object.keys(dataByMineral).filter((m) =>
+  const minerals = Object.keys(runtimeDataByMineral).filter((m) =>
     !mineralFilter || mineralFilter === "all" ? true : m === mineralFilter
   );
   const results = [];
   minerals.forEach((mineral) => {
-    const row = (dataByMineral[mineral][year] || []).find((r) => r.country === country);
+    const row = (runtimeDataByMineral[mineral][year] || []).find((r) => r.country === country);
     if (row && row.value > 0) {
-      const fromUnit = mineralUnits[mineral] || "";
-      results.push({ mineral, value: convertVolume(row.value, fromUnit, toUnit), unit: UNIT_LABELS[toUnit] || "" });
+      const fromUnit = runtimeMineralUnits[mineral] || "";
+      const unitLabel = fromUnit || "";
+      results.push({ mineral, value: convertVolume(row.value, fromUnit, toUnit), unit: unitLabel });
     }
   });
   return results;
@@ -774,14 +814,13 @@ const getMineralTreemapData = (country, year, unit = "ton") => {
 };
 
 const getComparisonData = (selectedCountry, year, mineralFilter, unit, scope) => {
-  return null;
-  const minerals = Object.keys(dataByMineral).filter((m) =>
+  const minerals = Object.keys(runtimeDataByMineral).filter((m) =>
     !mineralFilter || mineralFilter === "all" ? true : m === mineralFilter
   );
   const countryTotals = {};
   minerals.forEach((mineral) => {
-    const fromUnit = mineralUnits[mineral] || "";
-    (dataByMineral[mineral][year] || []).forEach((r) => {
+    const fromUnit = runtimeMineralUnits[mineral] || "";
+    (runtimeDataByMineral[mineral][year] || []).forEach((r) => {
       if (!r.country || !r.value) return;
       if (scope === "arab" && !ARAB_COUNTRY_NAMES.includes(r.country)) return;
       const converted = convertVolume(r.value, fromUnit, unit) || 0;
@@ -833,8 +872,8 @@ const fmtVal = (v) => {
 
 const formatLargeTonValue = (value, labels, locale) => {
   if (value == null) return labels.none;
-  if (value >= 1000) return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(value / 1000)} ${labels.millionTonValue}`;
-  return `${fmtVal(value)} ${labels.thousandTon}`;
+  const dbUnit = getDbDefaultUnit();
+  return dbUnit ? `${fmtVal(value)} ${dbUnit}` : `${fmtVal(value)}`;
 };
 
 const formatDollarValue = (value, labels, locale) => {
@@ -953,13 +992,17 @@ const buildCountrySnapshot = ({
   labels,
   locale,
 }) => {
+  const productionRows = getMineralShareForYear(country, year, null, "ton");
+  const productionTotal = productionRows.reduce((sum, row) => sum + (row.value || 0), 0);
+  const topProduction = [...productionRows].sort((a, b) => b.value - a.value)[0] || null;
+
   return {
     year,
     production: {
-      totalText: labels.none,
-      countText: labels.none,
-      topMineral: labels.none,
-      topValueText: labels.none,
+      totalText: formatLargeTonValue(productionTotal, labels, locale),
+      countText: productionRows.length ? labels.productsCount(productionRows.length) : labels.none,
+      topMineral: topProduction?.mineral || labels.none,
+      topValueText: topProduction ? formatLargeTonValue(topProduction.value, labels, locale) : labels.none,
     },
     tradeBalance: {
       valueText: labels.none,
@@ -1061,72 +1104,12 @@ const CountrySnapshotPanel = ({
     labels,
     locale,
   });
-  const isMorocco = countryCode === "ma";
   const balanceColor =
     summary.tradeBalance.tone === "positive"
       ? "#16a34a"
       : summary.tradeBalance.tone === "negative"
         ? "#16a34a"
         : "#94a3b8";
-
-  if (isMorocco) {
-    return (
-      <section className="rounded-[10px] bg-white p-1.5 sm:p-2" style={{ border: "1px solid #b8b8b8" }}>
-        <div className="mb-2 flex items-center justify-end gap-3 px-1">
-          <h3 className="text-[18px] font-black leading-none text-[#b8860b]">{getCountryDisplayName(country, language)}</h3>
-          <label className="flex items-center gap-2 text-[16px] font-bold text-slate-700">
-            <span>{labels.selectYear}</span>
-            <select
-              value={2023}
-              onChange={() => {}}
-              disabled
-              className="rounded-md border border-slate-300 bg-white px-2 py-1 text-[16px] font-bold text-slate-800 outline-none disabled:cursor-not-allowed"
-            >
-              <option value={2023}>2023</option>
-            </select>
-          </label>
-        </div>
-
-        <SnapshotSectionHeader title={labels.miningProduction} featured />
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <SnapshotStatCard title={labels.totalMiningProduction} value={summary.production.totalText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
-          <SnapshotStatCard title={labels.numberOfProducts} value={summary.production.countText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
-          <SnapshotStatCard title={labels.topMiningProduct} value={summary.production.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
-          <SnapshotStatCard title={labels.topMiningProductValue} value={summary.production.topValueText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[88px] px-3 py-3" valueClassName="text-[20px]" />
-        </div>
-
-        <div className="mt-2">
-          <div>
-            <div className="space-y-2">
-              <div>
-                <SnapshotSectionHeader title={labels.miningExports} featured />
-                <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
-                  <SnapshotStatCard title={labels.totalExports} value={summary.exports.totalText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title={labels.numberOfExportedMinerals} value={summary.exports.countText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title={labels.topExportedMineral} value={summary.exports.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title={labels.exportGrowth} value={summary.exports.growthText} note={`(${summary.exports.growthSubtext})`} borderColor="#b9b9b9" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title={labels.exportMarkets} value={summary.exports.marketsText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title={labels.exportConcentration} value={summary.exports.concentrationText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                </div>
-              </div>
-
-              <div>
-                <SnapshotSectionHeader title={labels.miningImports} featured />
-                <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
-                  <SnapshotStatCard title={labels.totalImports} value={summary.imports.totalText} borderColor="#b9b9b9" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title={labels.numberOfImportedMinerals} value={summary.imports.countText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title={labels.topImportedMineral} value={summary.imports.topMineral} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title={labels.importGrowth} value={summary.imports.growthText} note={`(${summary.imports.growthSubtext})`} borderColor="#b9b9b9" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title={labels.importMarkets} value={summary.imports.marketsText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                  <SnapshotStatCard title={labels.importConcentration} value={summary.imports.concentrationText} borderColor="#d0a018" bgColor="#0e4238" dark noBorder className="min-h-[86px] px-3 py-3" valueClassName="text-[20px]" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section className="rounded-[24px] bg-[#f7f7f7] p-4 sm:p-5" style={{ border: "1px solid #d4d4d4" }}>
@@ -1136,10 +1119,9 @@ const CountrySnapshotPanel = ({
           <select
             value={year}
             onChange={(e) => onYearChange?.(Number(e.target.value))}
-            disabled={isMorocco}
-            className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-[16px] font-bold text-slate-800 outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
+            className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-[16px] font-bold text-slate-800 outline-none"
           >
-            {(isMorocco ? [2023] : ALL_YEARS).map((yr) => (
+            {runtimeYears.map((yr) => (
               <option key={yr} value={yr}>{yr}</option>
             ))}
           </select>
@@ -1264,7 +1246,7 @@ const CardHeader = ({ title, subtitle, children }) => (
 
 const YearPills = ({ selectedYear, onYearChange }) => (
   <div className="flex flex-wrap gap-1.5">
-    {ALL_YEARS.map((yr) => (
+    {runtimeYears.map((yr) => (
       <button key={yr} type="button" onClick={() => onYearChange?.(yr)}
         className="rounded-full px-3 py-1 text-[11px] font-bold transition-all duration-200"
         style={selectedYear === yr
@@ -1520,7 +1502,7 @@ const CountryLineChart = ({
                   }
             }
           >
-            {labels.thousandTon}
+            {getUnitLabel("ton", language)}
           </button>
           <button
             type="button"
@@ -1621,7 +1603,7 @@ const CountryBarChart = ({
                   }
             }
           >
-            {labels.thousandTon}
+            {getUnitLabel("ton", language)}
           </button>
           <button
             type="button"
@@ -1907,9 +1889,11 @@ const Countries = () => {
   const initialCountryCode = query.get("country");
   const initialSelected    = "—";
 
-  const lastAvailableYear = ALL_YEARS[ALL_YEARS.length - 1];
-
   const [countries, setCountries]               = useState(COUNTRIES);
+  const [yearsFromDb, setYearsFromDb] = useState([]);
+  const [productionDataset, setProductionDataset] = useState(() =>
+    buildDatasetFromDbRows([])
+  );
   const [selected, setSelected]               = useState(initialSelected);
   const [donutYear, setDonutYear]             = useState(DEFAULT_SELECTED_YEAR);
   const [barYear, setBarYear]                 = useState(DEFAULT_SELECTED_YEAR);
@@ -1922,6 +1906,9 @@ const Countries = () => {
 
   const selectedCountryObj = countries.find((c) => c.name === selected);
   const selectedTheme = getCountryTheme(selectedCountryObj?.code);
+  runtimeDataByMineral = productionDataset.dataByMineral;
+  runtimeMineralUnits = productionDataset.mineralUnits;
+  runtimeYears = yearsFromDb.length ? yearsFromDb : productionDataset.allYears;
 
   useEffect(() => {
     let active = true;
@@ -1956,6 +1943,48 @@ const Countries = () => {
   }, []);
 
   useEffect(() => {
+    let active = true;
+
+    const loadYearsFromDb = async () => {
+      try {
+        const rows = await getYears();
+        if (!active) return;
+        const years = (Array.isArray(rows) ? rows : [])
+          .map((row) => Number(row?.year))
+          .filter(Number.isFinite)
+          .sort((a, b) => a - b);
+        if (years.length) {
+          setYearsFromDb(years);
+        }
+      } catch {
+        // Fallback to production-derived/static years.
+      }
+    };
+
+    const loadProductionFromDb = async () => {
+      try {
+        const rows = await getMineralProductionAnalytics();
+        if (!active) return;
+        setProductionDataset(buildDatasetFromDbRows(rows));
+      } catch {
+        if (!active) return;
+        setProductionDataset({
+          dataByMineral: staticDataByMineral,
+          mineralUnits: staticMineralUnits,
+          allYears: STATIC_YEARS,
+        });
+      }
+    };
+
+    loadYearsFromDb();
+    loadProductionFromDb();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
     if (!countries.length) return;
 
     if (initialCountryCode) {
@@ -1967,12 +1996,15 @@ const Countries = () => {
   }, [countries, initialCountryCode, selected]);
 
   useEffect(() => {
-    if (selectedCountryObj?.code === "ma") {
-      setSummaryYear(2023);
-      return;
-    }
-    setSummaryYear(DEFAULT_SELECTED_YEAR);
-  }, [selectedCountryObj?.code]);
+    if (!runtimeYears.length) return;
+    const defaultYear = runtimeYears.includes(2019)
+      ? 2019
+      : runtimeYears[runtimeYears.length - 1];
+    setSummaryYear(defaultYear);
+    setDonutYear(defaultYear);
+    setBarYear(defaultYear);
+    setTreemapYear(defaultYear);
+  }, [productionDataset]);
 
   const importSeries = [];
   const exportSeries = [];
