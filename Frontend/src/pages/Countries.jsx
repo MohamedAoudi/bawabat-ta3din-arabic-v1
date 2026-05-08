@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import Chart from "chart.js/auto";
 import { TreemapController, TreemapElement } from "chartjs-chart-treemap";
@@ -8,6 +8,9 @@ import Footer from "../layouts/Footer";
 import { getCountries } from "../services/countryService";
 import { getYears } from "../services/yearService";
 import { getMineralProductionAnalytics } from "../services/mineralProductionService";
+import { getTradeTransactions } from "../services/tradeTransactionService";
+import { getMinerals } from "../services/mineralService";
+import { getBilateralTrade } from "../services/bilateralTradeService";
 import { dataByMineral as staticDataByMineral, mineralUnits as staticMineralUnits } from "./M1";
 import flagJordan from "../assets/flags/jordan.webp";
 import flagUae from "../assets/flags/uae.webp";
@@ -997,6 +1000,8 @@ const buildCountrySnapshot = ({
   importSeries,
   exportBreakdownByYear,
   importBreakdownByYear,
+  exportMarketsByYear,
+  importMarketsByYear,
   labels,
   locale,
 }) => {
@@ -1005,6 +1010,57 @@ const buildCountrySnapshot = ({
   const topProduction = [...productionRows].sort((a, b) => b.value - a.value)[0] || null;
   const totalUnit = getMostFrequentUnit(productionRows);
   const topUnit = String(topProduction?.unit || "").trim();
+  const exportsMap = new Map((exportSeries || []).map((row) => [Number(row?.year), Number(row?.value) || 0]));
+  const importsMap = new Map((importSeries || []).map((row) => [Number(row?.year), Number(row?.value) || 0]));
+  const selectedYearNumber = Number(year);
+  const effectiveTradeYear = selectedYearNumber;
+
+  const exportValue = exportsMap.get(effectiveTradeYear);
+  const importValue = importsMap.get(effectiveTradeYear);
+  const hasTradeData = Number.isFinite(exportValue) || Number.isFinite(importValue);
+  const safeExportValue = Number.isFinite(exportValue) ? exportValue : 0;
+  const safeImportValue = Number.isFinite(importValue) ? importValue : 0;
+  const tradeBalanceValue = hasTradeData ? safeExportValue - safeImportValue : null;
+  const exportsByMineral = exportBreakdownByYear?.[effectiveTradeYear] || {};
+  const importsByMineral = importBreakdownByYear?.[effectiveTradeYear] || {};
+  const exportMineralRows = Object.entries(exportsByMineral).sort(([, a], [, b]) => b - a);
+  const importMineralRows = Object.entries(importsByMineral).sort(([, a], [, b]) => b - a);
+  const topExportMineral = getTopMineralEntry(exportsByMineral);
+  const topImportMineral = getTopMineralEntry(importsByMineral);
+  const exportConcentration =
+    topExportMineral && safeExportValue > 0 ? (Number(topExportMineral[1]) / safeExportValue) * 100 : null;
+  const importConcentration =
+    topImportMineral && safeImportValue > 0 ? (Number(topImportMineral[1]) / safeImportValue) * 100 : null;
+  const exportMarkets = Number(exportMarketsByYear?.[effectiveTradeYear]);
+  const importMarkets = Number(importMarketsByYear?.[effectiveTradeYear]);
+
+  const sortedExportSeries = [...(exportSeries || [])].sort((a, b) => Number(a.year) - Number(b.year));
+  const sortedImportSeries = [...(importSeries || [])].sort((a, b) => Number(a.year) - Number(b.year));
+  const exportYearIndex = sortedExportSeries.findIndex((row) => Number(row.year) === effectiveTradeYear);
+  const importYearIndex = sortedImportSeries.findIndex((row) => Number(row.year) === effectiveTradeYear);
+  const prevExportEntry = exportYearIndex > 0 ? sortedExportSeries[exportYearIndex - 1] : null;
+  const prevImportEntry = importYearIndex > 0 ? sortedImportSeries[importYearIndex - 1] : null;
+  const exportGrowth =
+    prevExportEntry && Number(prevExportEntry.value) > 0
+      ? ((safeExportValue - Number(prevExportEntry.value)) / Number(prevExportEntry.value)) * 100
+      : null;
+  const importGrowth =
+    prevImportEntry && Number(prevImportEntry.value) > 0
+      ? ((safeImportValue - Number(prevImportEntry.value)) / Number(prevImportEntry.value)) * 100
+      : null;
+  let tradeStatusText = labels.noTradeData;
+  let tradeTone = "neutral";
+  if (hasTradeData) {
+    if (tradeBalanceValue > 0) {
+      tradeStatusText = labels.tradeSurplus;
+      tradeTone = "positive";
+    } else if (tradeBalanceValue < 0) {
+      tradeStatusText = labels.tradeDeficit;
+      tradeTone = "negative";
+    } else {
+      tradeStatusText = labels.tradeBalanced;
+    }
+  }
 
   return {
     year,
@@ -1015,27 +1071,27 @@ const buildCountrySnapshot = ({
       topValueText: topProduction ? formatLargeTonValue(topProduction.value, labels, locale, topUnit) : labels.none,
     },
     tradeBalance: {
-      valueText: labels.none,
-      statusText: labels.noTradeData,
-      tone: "neutral",
+      valueText: hasTradeData ? formatDollarValue(Math.abs(tradeBalanceValue), labels, locale) : labels.none,
+      statusText: tradeStatusText,
+      tone: tradeTone,
     },
     exports: {
-      totalText: labels.none,
-      countText: labels.none,
-      topMineral: labels.none,
-      growthText: labels.none,
-      growthSubtext: labels.noComparisonYear,
-      marketsText: labels.none,
-      concentrationText: labels.none,
+      totalText: hasTradeData ? formatDollarValue(safeExportValue, labels, locale) : labels.none,
+      countText: exportMineralRows.length ? labels.mineralsCount(exportMineralRows.length) : labels.none,
+      topMineral: topExportMineral?.[0] || labels.none,
+      growthText: formatGrowthPercent(exportGrowth),
+      growthSubtext: prevExportEntry ? labels.comparedTo(prevExportEntry.year) : labels.noComparisonYear,
+      marketsText: Number.isFinite(exportMarkets) ? `${fmtVal(exportMarkets)}` : labels.none,
+      concentrationText: exportConcentration == null ? labels.none : formatGrowthPercent(exportConcentration),
     },
     imports: {
-      totalText: labels.none,
-      countText: labels.none,
-      topMineral: labels.none,
-      growthText: labels.none,
-      growthSubtext: labels.noComparisonYear,
-      marketsText: labels.none,
-      concentrationText: labels.none,
+      totalText: hasTradeData ? formatDollarValue(safeImportValue, labels, locale) : labels.none,
+      countText: importMineralRows.length ? labels.mineralsCount(importMineralRows.length) : labels.none,
+      topMineral: topImportMineral?.[0] || labels.none,
+      growthText: formatGrowthPercent(importGrowth),
+      growthSubtext: prevImportEntry ? labels.comparedTo(prevImportEntry.year) : labels.noComparisonYear,
+      marketsText: Number.isFinite(importMarkets) ? `${fmtVal(importMarkets)}` : labels.none,
+      concentrationText: importConcentration == null ? labels.none : formatGrowthPercent(importConcentration),
     },
   };
 };
@@ -1101,6 +1157,8 @@ const CountrySnapshotPanel = ({
   importSeries,
   exportBreakdownByYear,
   importBreakdownByYear,
+  exportMarketsByYear,
+  importMarketsByYear,
 }) => {
   const { labels, language, locale } = useCountriesI18n();
   const summary = buildCountrySnapshot({
@@ -1111,6 +1169,8 @@ const CountrySnapshotPanel = ({
     importSeries,
     exportBreakdownByYear,
     importBreakdownByYear,
+    exportMarketsByYear,
+    importMarketsByYear,
     labels,
     locale,
   });
@@ -1118,7 +1178,7 @@ const CountrySnapshotPanel = ({
     summary.tradeBalance.tone === "positive"
       ? "#16a34a"
       : summary.tradeBalance.tone === "negative"
-        ? "#16a34a"
+        ? "#dc2626"
         : "#94a3b8";
 
   return (
@@ -1817,6 +1877,9 @@ const Countries = () => {
 
   const [countries, setCountries]               = useState(COUNTRIES);
   const [yearsFromDb, setYearsFromDb] = useState([]);
+  const [mineralsFromDb, setMineralsFromDb] = useState([]);
+  const [tradeTransactions, setTradeTransactions] = useState([]);
+  const [bilateralTradeRows, setBilateralTradeRows] = useState([]);
   const [productionDataset, setProductionDataset] = useState(() =>
     buildDatasetFromDbRows([])
   );
@@ -1845,6 +1908,7 @@ const Countries = () => {
         const mapped = rows
           .filter((row) => row?.iso_code && row?.name_ar)
           .map((row) => ({
+            id: row.id,
             code: normalizeCountryCode(row.iso_code),
             name: row.name_ar,
             name_en: row.name_en || "",
@@ -1900,8 +1964,44 @@ const Countries = () => {
       }
     };
 
+    const loadMineralsFromDb = async () => {
+      try {
+        const rows = await getMinerals();
+        if (!active) return;
+        setMineralsFromDb(Array.isArray(rows) ? rows : []);
+      } catch {
+        if (!active) return;
+        setMineralsFromDb([]);
+      }
+    };
+
+    const loadTradeTransactionsFromDb = async () => {
+      try {
+        const rows = await getTradeTransactions();
+        if (!active) return;
+        setTradeTransactions(Array.isArray(rows) ? rows : []);
+      } catch {
+        if (!active) return;
+        setTradeTransactions([]);
+      }
+    };
+
+    const loadBilateralTradeFromDb = async () => {
+      try {
+        const rows = await getBilateralTrade();
+        if (!active) return;
+        setBilateralTradeRows(Array.isArray(rows) ? rows : []);
+      } catch {
+        if (!active) return;
+        setBilateralTradeRows([]);
+      }
+    };
+
     loadYearsFromDb();
     loadProductionFromDb();
+    loadMineralsFromDb();
+    loadTradeTransactionsFromDb();
+    loadBilateralTradeFromDb();
 
     return () => {
       active = false;
@@ -1930,10 +2030,99 @@ const Countries = () => {
     setTreemapYear(defaultYear);
   }, [productionDataset]);
 
-  const importSeries = [];
-  const exportSeries = [];
-  const exportBreakdownByYear = {};
-  const importBreakdownByYear = {};
+  const mineralNameById = useMemo(
+    () =>
+      (mineralsFromDb || []).reduce((acc, mineral) => {
+        const key = String(mineral?.id ?? "");
+        if (!key) return acc;
+        acc[key] =
+          language === "ar"
+            ? mineral?.name_ar || mineral?.name_en || mineral?.name_fr || labels.none
+            : language === "fr"
+              ? mineral?.name_fr || mineral?.name_en || mineral?.name_ar || labels.none
+              : mineral?.name_en || mineral?.name_fr || mineral?.name_ar || labels.none;
+        return acc;
+      }, {}),
+    [mineralsFromDb, language, labels.none]
+  );
+
+  const selectedCountryTradeRows = useMemo(() => {
+    if (!selectedCountryObj) return [];
+    const selectedCountryId = selectedCountryObj?.id != null ? String(selectedCountryObj.id) : null;
+    const selectedCode = String(selectedCountryObj?.code || "").toLowerCase();
+    return (tradeTransactions || []).filter((row) => {
+      const rowType = String(row?.trade_type || "").toLowerCase();
+      if (rowType !== "export" && rowType !== "import") return false;
+      if (selectedCountryId && String(row?.country_id) === selectedCountryId) return true;
+      const rowCode = normalizeCountryCode(row?.country_code || row?.iso_code || row?.country_iso_code || "");
+      return rowCode && rowCode === selectedCode;
+    });
+  }, [tradeTransactions, selectedCountryObj]);
+
+  const { exportSeries, importSeries, exportBreakdownByYear, importBreakdownByYear } = useMemo(() => {
+    const exportTotals = {};
+    const importTotals = {};
+    const exportBreakdown = {};
+    const importBreakdown = {};
+
+    selectedCountryTradeRows.forEach((row) => {
+      const year = Number(row?.year);
+      if (!Number.isFinite(year)) return;
+      const value = Number(row?.trade_value_usd || 0);
+      const tradeType = String(row?.trade_type || "").toLowerCase();
+      const mineralKey = String(row?.mineral_id ?? "");
+      const mineralLabel = mineralNameById[mineralKey] || labels.none;
+
+      if (tradeType === "export") {
+        exportTotals[year] = (exportTotals[year] || 0) + value;
+        if (!exportBreakdown[year]) exportBreakdown[year] = {};
+        exportBreakdown[year][mineralLabel] = (exportBreakdown[year][mineralLabel] || 0) + value;
+      } else if (tradeType === "import") {
+        importTotals[year] = (importTotals[year] || 0) + value;
+        if (!importBreakdown[year]) importBreakdown[year] = {};
+        importBreakdown[year][mineralLabel] = (importBreakdown[year][mineralLabel] || 0) + value;
+      }
+    });
+
+    return {
+      exportSeries: Object.entries(exportTotals)
+        .map(([year, value]) => ({ year: Number(year), value: Number(value) }))
+        .sort((a, b) => a.year - b.year),
+      importSeries: Object.entries(importTotals)
+        .map(([year, value]) => ({ year: Number(year), value: Number(value) }))
+        .sort((a, b) => a.year - b.year),
+      exportBreakdownByYear: exportBreakdown,
+      importBreakdownByYear: importBreakdown,
+    };
+  }, [selectedCountryTradeRows, mineralNameById, labels.none]);
+
+  const { exportMarketsByYear, importMarketsByYear } = useMemo(() => {
+    if (!selectedCountryObj?.id) return { exportMarketsByYear: {}, importMarketsByYear: {} };
+    const selectedCountryId = String(selectedCountryObj.id);
+    const exportSets = {};
+    const importSets = {};
+
+    (bilateralTradeRows || []).forEach((row) => {
+      if (String(row?.country_id) !== selectedCountryId) return;
+      const year = Number(row?.year);
+      if (!Number.isFinite(year)) return;
+      const partnerKey = String(row?.partner_id ?? row?.partner_code ?? "");
+      if (!partnerKey) return;
+      const tradeType = String(row?.trade_type || "").toLowerCase();
+      if (tradeType === "export") {
+        if (!exportSets[year]) exportSets[year] = new Set();
+        exportSets[year].add(partnerKey);
+      } else if (tradeType === "import") {
+        if (!importSets[year]) importSets[year] = new Set();
+        importSets[year].add(partnerKey);
+      }
+    });
+
+    return {
+      exportMarketsByYear: Object.fromEntries(Object.entries(exportSets).map(([year, set]) => [year, set.size])),
+      importMarketsByYear: Object.fromEntries(Object.entries(importSets).map(([year, set]) => [year, set.size])),
+    };
+  }, [bilateralTradeRows, selectedCountryObj]);
 
   return (
     <div
@@ -2042,6 +2231,8 @@ const Countries = () => {
                 importSeries={importSeries}
                 exportBreakdownByYear={exportBreakdownByYear}
                 importBreakdownByYear={importBreakdownByYear}
+                exportMarketsByYear={exportMarketsByYear}
+                importMarketsByYear={importMarketsByYear}
               />
             )}
 
