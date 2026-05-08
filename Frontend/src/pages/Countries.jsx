@@ -407,6 +407,17 @@ const getLabelsForLanguage = (language) => PAGE_TRANSLATIONS[language] || PAGE_T
 const getDbDefaultUnit = () =>
   Object.values(runtimeMineralUnits || {}).find((u) => String(u || "").trim()) || "";
 
+const getMostFrequentUnit = (rows = []) => {
+  const counts = {};
+  (Array.isArray(rows) ? rows : []).forEach((row) => {
+    const unit = String(row?.unit || "").trim();
+    if (!unit) return;
+    counts[unit] = (counts[unit] || 0) + 1;
+  });
+  const entries = Object.entries(counts).sort(([, a], [, b]) => b - a);
+  return entries[0]?.[0] || "";
+};
+
 const detectUnitType = (rawUnit) => {
   const u = String(rawUnit || "").trim().toLowerCase();
   if (!u) return null;
@@ -867,9 +878,10 @@ const fmtVal = (v) => {
   }).format(Number(v));
 };
 
-const formatLargeTonValue = (value, labels, locale) => {
+const formatLargeTonValue = (value, labels, locale, unit = "") => {
   if (value == null) return labels.none;
-  return `${fmtVal(value)}`;
+  const safeUnit = String(unit || "").trim();
+  return safeUnit ? `${fmtVal(value)} ${safeUnit}` : `${fmtVal(value)}`;
 };
 
 const formatDollarValue = (value, labels, locale) => {
@@ -991,14 +1003,16 @@ const buildCountrySnapshot = ({
   const productionRows = getMineralShareForYear(country, year, null, "ton");
   const productionTotal = productionRows.reduce((sum, row) => sum + (row.value || 0), 0);
   const topProduction = [...productionRows].sort((a, b) => b.value - a.value)[0] || null;
+  const totalUnit = getMostFrequentUnit(productionRows);
+  const topUnit = String(topProduction?.unit || "").trim();
 
   return {
     year,
     production: {
-      totalText: formatLargeTonValue(productionTotal, labels, locale),
+      totalText: formatLargeTonValue(productionTotal, labels, locale, totalUnit),
       countText: productionRows.length ? labels.productsCount(productionRows.length) : labels.none,
       topMineral: topProduction?.mineral || labels.none,
-      topValueText: topProduction ? formatLargeTonValue(topProduction.value, labels, locale) : labels.none,
+      topValueText: topProduction ? formatLargeTonValue(topProduction.value, labels, locale, topUnit) : labels.none,
     },
     tradeBalance: {
       valueText: labels.none,
