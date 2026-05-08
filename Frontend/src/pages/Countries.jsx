@@ -732,6 +732,7 @@ const convertVolume = (value, fromUnit, toUnit) => {
 };
 
 const getCountryMineralData = (country, mineralFilter = null, toUnit = "ton") => {
+  return { years: ALL_YEARS, chartData: [] };
   const minerals = Object.keys(dataByMineral).filter((m) =>
     !mineralFilter || mineralFilter === "all" ? true : m === mineralFilter
   );
@@ -750,6 +751,7 @@ const getCountryMineralData = (country, mineralFilter = null, toUnit = "ton") =>
 };
 
 const getMineralShareForYear = (country, year, mineralFilter = null, toUnit = "ton") => {
+  return [];
   const minerals = Object.keys(dataByMineral).filter((m) =>
     !mineralFilter || mineralFilter === "all" ? true : m === mineralFilter
   );
@@ -772,6 +774,7 @@ const getMineralTreemapData = (country, year, unit = "ton") => {
 };
 
 const getComparisonData = (selectedCountry, year, mineralFilter, unit, scope) => {
+  return null;
   const minerals = Object.keys(dataByMineral).filter((m) =>
     !mineralFilter || mineralFilter === "all" ? true : m === mineralFilter
   );
@@ -929,38 +932,7 @@ const getCountryTheme = (countryCode) => {
   return COUNTRY_THEME_PRESETS[presetKey];
 };
 
-const MOROCCO_SNAPSHOT_2023 = {
-  year: 2023,
-  production: {
-    totalText: "83.8 مليون طن",
-    countText: "14 منتج / خام",
-    topMineral: "الفوسفات",
-    topValueText: "35.62 مليون طن",
-  },
-  tradeBalance: {
-    valueText: "—",
-    statusText: "—",
-    tone: "neutral",
-  },
-  exports: {
-    totalText: "473.9 مليون دولار",
-    countText: "21 معدن",
-    topMineral: "الفضة",
-    growthText: "3.52 %",
-    growthSubtext: "مقارنة بـ 2022",
-    marketsText: "108 سوق",
-    concentrationText: "46.8 %",
-  },
-  imports: {
-    totalText: "952.9 مليون دولار",
-    countText: "22 معدن",
-    topMineral: "الألمنيوم",
-    growthText: "-5.1 %",
-    growthSubtext: "مقارنة بـ 2022",
-    marketsText: "100 سوق",
-    concentrationText: "34.7 %",
-  },
-};
+
 
 const formatGrowthPercent = (value) => {
   if (value == null) return "—";
@@ -981,69 +953,36 @@ const buildCountrySnapshot = ({
   labels,
   locale,
 }) => {
-  if (countryCode === "ma" && year === 2023) {
-    return MOROCCO_SNAPSHOT_2023;
-  }
-
-  const productionRows = getMineralShareForYear(country, year, null, "ton");
-  const productionTotal = productionRows.reduce((sum, row) => sum + (row.value || 0), 0);
-  const topProduction = [...productionRows].sort((a, b) => b.value - a.value)[0] || null;
-
-  const exportsMap = new Map((exportSeries || []).map((entry) => [entry.year, entry.value]));
-  const importsMap = new Map((importSeries || []).map((entry) => [entry.year, entry.value]));
-  const exportValue = exportsMap.get(year) ?? null;
-  const importValue = importsMap.get(year) ?? null;
-  const previousExportValue = exportsMap.get(year - 1) ?? null;
-  const previousImportValue = importsMap.get(year - 1) ?? null;
-  const exportGrowth =
-    exportValue != null && previousExportValue && previousExportValue > 0
-      ? ((exportValue - previousExportValue) / previousExportValue) * 100
-      : null;
-  const importGrowth =
-    importValue != null && previousImportValue && previousImportValue > 0
-      ? ((importValue - previousImportValue) / previousImportValue) * 100
-      : null;
-
-  const exportsByMineral = exportBreakdownByYear?.[year] || {};
-  const importsByMineral = importBreakdownByYear?.[year] || {};
-  const topExport = getTopMineralEntry(exportsByMineral);
-  const topImport = getTopMineralEntry(importsByMineral);
-  const exportConcentration = topExport && exportValue ? (topExport[1] / exportValue) * 100 : null;
-  const importConcentration = topImport && importValue ? (topImport[1] / importValue) * 100 : null;
-  const tradeBalance =
-    exportValue != null && importValue != null ? exportValue - importValue : null;
-
   return {
     year,
     production: {
-      totalText: formatLargeTonValue(productionTotal, labels, locale),
-      countText: productionRows.length ? labels.productsCount(productionRows.length) : labels.none,
-      topMineral: topProduction?.mineral || labels.none,
-      topValueText: topProduction ? formatLargeTonValue(topProduction.value, labels, locale) : labels.none,
+      totalText: labels.none,
+      countText: labels.none,
+      topMineral: labels.none,
+      topValueText: labels.none,
     },
     tradeBalance: {
-      valueText: tradeBalance == null ? labels.none : `${tradeBalance >= 0 ? "+" : "-"} ${formatDollarValue(Math.abs(tradeBalance), labels, locale)}`,
-      statusText:
-        tradeBalance == null ? labels.noTradeData : tradeBalance > 0 ? labels.tradeSurplus : tradeBalance < 0 ? labels.tradeDeficit : labels.tradeBalanced,
-      tone: tradeBalance == null ? "neutral" : tradeBalance >= 0 ? "positive" : "negative",
+      valueText: labels.none,
+      statusText: labels.noTradeData,
+      tone: "neutral",
     },
     exports: {
-      totalText: formatDollarValue(exportValue, labels, locale),
-      countText: Object.keys(exportsByMineral).length ? labels.mineralsCount(Object.keys(exportsByMineral).length) : labels.none,
-      topMineral: topExport?.[0] || labels.none,
-      growthText: formatGrowthPercent(exportGrowth),
-      growthSubtext: previousExportValue != null ? labels.comparedTo(year - 1) : labels.noComparisonYear,
+      totalText: labels.none,
+      countText: labels.none,
+      topMineral: labels.none,
+      growthText: labels.none,
+      growthSubtext: labels.noComparisonYear,
       marketsText: labels.none,
-      concentrationText: exportConcentration != null ? `${exportConcentration.toFixed(1)} %` : labels.none,
+      concentrationText: labels.none,
     },
     imports: {
-      totalText: formatDollarValue(importValue, labels, locale),
-      countText: Object.keys(importsByMineral).length ? labels.mineralsCount(Object.keys(importsByMineral).length) : labels.none,
-      topMineral: topImport?.[0] || labels.none,
-      growthText: formatGrowthPercent(importGrowth),
-      growthSubtext: previousImportValue != null ? labels.comparedTo(year - 1) : labels.noComparisonYear,
+      totalText: labels.none,
+      countText: labels.none,
+      topMineral: labels.none,
+      growthText: labels.none,
+      growthSubtext: labels.noComparisonYear,
       marketsText: labels.none,
-      concentrationText: importConcentration != null ? `${importConcentration.toFixed(1)} %` : labels.none,
+      concentrationText: labels.none,
     },
   };
 };
@@ -1980,11 +1919,8 @@ const Countries = () => {
   const [lineMineralFilter, setLineMineralFilter] = useState("all");
   const [lineUnit, setLineUnit]               = useState("ton");
   const [summaryYear, setSummaryYear]         = useState(DEFAULT_SELECTED_YEAR);
-  const [tradeByCountry, setTradeByCountry]   = useState({ imports: null, exports: null });
-  const [tradeBreakdownByCountry, setTradeBreakdownByCountry] = useState({ exports: null, imports: null });
 
   const selectedCountryObj = countries.find((c) => c.name === selected);
-  const selectedCountryCsvName = selectedCountryObj ? COUNTRY_CODE_TO_CSV_NAME[selectedCountryObj.code] || null : null;
   const selectedTheme = getCountryTheme(selectedCountryObj?.code);
 
   useEffect(() => {
@@ -2038,52 +1974,10 @@ const Countries = () => {
     setSummaryYear(DEFAULT_SELECTED_YEAR);
   }, [selectedCountryObj?.code]);
 
-  useEffect(() => {
-    let active = true;
-
-    const combinedTradeUrl = new URL("../assets/Trade_Critical_Minerals_Morocco.txt", import.meta.url);
-
-    fetch(combinedTradeUrl)
-      .then((r) => {
-        if (!r.ok) throw new Error("Missing user trade data");
-        return r.text();
-      })
-      .then((combinedText) => {
-        if (!active) return;
-        setTradeByCountry({
-          imports: buildTradeTotalsFromRawText(combinedText, "Import"),
-          exports: buildTradeTotalsFromRawText(combinedText, "Export"),
-        });
-        setTradeBreakdownByCountry({
-          exports: buildTradeByCountryYearMineralFromRawText(combinedText, "Export"),
-          imports: buildTradeByCountryYearMineralFromRawText(combinedText, "Import"),
-        });
-      })
-      .catch(() => {
-        if (!active) return;
-        setTradeByCountry({ imports: {}, exports: {} });
-        setTradeBreakdownByCountry({ exports: {}, imports: {} });
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const importSeries = selectedCountryCsvName
-    ? toTradeSeries(tradeByCountry.imports, selectedCountryCsvName)
-    : [];
-  const exportSeries = selectedCountryCsvName
-    ? toTradeSeries(tradeByCountry.exports, selectedCountryCsvName)
-    : [];
-  const exportBreakdownByYear =
-    selectedCountryCsvName && tradeBreakdownByCountry.exports
-      ? tradeBreakdownByCountry.exports[selectedCountryCsvName] || {}
-      : {};
-  const importBreakdownByYear =
-    selectedCountryCsvName && tradeBreakdownByCountry.imports
-      ? tradeBreakdownByCountry.imports[selectedCountryCsvName] || {}
-      : {};
+  const importSeries = [];
+  const exportSeries = [];
+  const exportBreakdownByYear = {};
+  const importBreakdownByYear = {};
 
   return (
     <div
