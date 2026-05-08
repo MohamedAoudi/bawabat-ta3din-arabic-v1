@@ -135,6 +135,7 @@ const getMineralProductionAnalytics = async () => {
        m.name_fr AS mineral_name_fr,
        mp.year,
        SUM(COALESCE(mp.normalized_quantity, mp.production_quantity, 0))::double precision AS production_quantity,
+       COALESCE(MAX(mp.unit_name_ar), MAX(mp.unit_name_en), MAX(mp.unit_name_fr), '') AS unit,
        COALESCE(MAX(mp.unit_name_ar), '') AS unit_name_ar,
        COALESCE(MAX(mp.unit_name_en), '') AS unit_name_en,
        COALESCE(MAX(mp.unit_name_fr), '') AS unit_name_fr

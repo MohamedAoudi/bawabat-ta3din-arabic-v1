@@ -163,7 +163,7 @@ const PAGE_TRANSLATIONS = {
     productionTrend: "تطوّر الإنتاج التعديني",
     productionTrendSubtitle: (country, mineralFilter) => `${country} — جميع السنوات${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
     yearlyProduction: "انتاج الخامات بالحجم حسب السنة",
-    yearlyProductionSubtitle: (country, year, mineralFilter, unitLabel) => `${country} — سنة ${year}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""} (${unitLabel})`,
+    yearlyProductionSubtitle: (country, year, mineralFilter) => `${country} — سنة ${year}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
     mineralDistribution: "توزيع المعادن حسب النسبة",
     mineralDistributionSubtitle: (country, year) => `${country} — ${year}`,
     tradeValueUsd: (country) => `${country} — القيمة بالدولار الأمريكي`,
@@ -230,7 +230,7 @@ const PAGE_TRANSLATIONS = {
     productionTrend: "Évolution de la production minière",
     productionTrendSubtitle: (country, mineralFilter) => `${country} — toutes les années${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
     yearlyProduction: "Production minière annuelle",
-    yearlyProductionSubtitle: (country, year, mineralFilter, unitLabel) => `${country} — ${year}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""} (${unitLabel})`,
+    yearlyProductionSubtitle: (country, year, mineralFilter) => `${country} — ${year}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
     mineralDistribution: "Répartition des minerais",
     mineralDistributionSubtitle: (country, year) => `${country} — ${year}`,
     tradeValueUsd: (country) => `${country} — valeur en dollars US`,
@@ -297,7 +297,7 @@ const PAGE_TRANSLATIONS = {
     productionTrend: "Mining production trend",
     productionTrendSubtitle: (country, mineralFilter) => `${country} — all years${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
     yearlyProduction: "Yearly mining output",
-    yearlyProductionSubtitle: (country, year, mineralFilter, unitLabel) => `${country} — ${year}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""} (${unitLabel})`,
+    yearlyProductionSubtitle: (country, year, mineralFilter) => `${country} — ${year}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
     mineralDistribution: "Mineral distribution share",
     mineralDistributionSubtitle: (country, year) => `${country} — ${year}`,
     tradeValueUsd: (country) => `${country} — value in USD`,
@@ -407,13 +407,6 @@ const getLabelsForLanguage = (language) => PAGE_TRANSLATIONS[language] || PAGE_T
 const getDbDefaultUnit = () =>
   Object.values(runtimeMineralUnits || {}).find((u) => String(u || "").trim()) || "";
 
-const getUnitLabel = (unit, language) => {
-  const labels = getLabelsForLanguage(language);
-  const dbUnit = getDbDefaultUnit();
-  if (dbUnit) return dbUnit;
-  return unit === "kg" ? labels.kilograms : "";
-};
-
 const detectUnitType = (rawUnit) => {
   const u = String(rawUnit || "").trim().toLowerCase();
   if (!u) return null;
@@ -440,7 +433,11 @@ const buildDatasetFromDbRows = (rows) => {
     const country = String(row?.country_name_ar || row?.country_name_en || row?.country_name_fr || "").trim();
     const year = Number(row?.year);
     const value = Number(row?.production_quantity);
-    const unit = String(row?.unit_name_ar || row?.unit_name_en || row?.unit_name_fr || "").trim();
+    const unit = String(
+      row?.unit_name_ar ||
+      row?.unit_name_en ||
+      row?.unit_name_fr 
+    ).trim();
     if (!mineral || !country || !Number.isFinite(year) || !Number.isFinite(value)) return;
 
     if (!byMineral[mineral]) byMineral[mineral] = {};
@@ -547,8 +544,7 @@ const quantityToKton = (quantityRaw, unitsRaw) => {
   const quantity = Number.parseFloat(quantityRaw);
   if (Number.isNaN(quantity)) return null;
   const units = (unitsRaw || "").toLowerCase();
-  if (units.includes("kilogram")) return quantity / 1_000_000;
-  if (units.includes("ton")) return quantity / 1_000;
+
   return quantity;
 };
 
@@ -864,16 +860,16 @@ const getComparisonData = (selectedCountry, year, mineralFilter, unit, scope) =>
 const destroyChart = (ref) => { if (ref.current) { ref.current.destroy(); ref.current = null; } };
 
 const fmtVal = (v) => {
-  if (v >= 1_000_000_000) return `${(v / 1_000_000_000).toFixed(2)}B`;
-  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(2)}M`;
-  if (v >= 1_000) return `${(v / 1_000).toFixed(1)}K`;
-  return v.toFixed(2);
+  if (!Number.isFinite(Number(v))) return "0";
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(Number(v));
 };
 
 const formatLargeTonValue = (value, labels, locale) => {
   if (value == null) return labels.none;
-  const dbUnit = getDbDefaultUnit();
-  return dbUnit ? `${fmtVal(value)} ${dbUnit}` : `${fmtVal(value)}`;
+  return `${fmtVal(value)}`;
 };
 
 const formatDollarValue = (value, labels, locale) => {
@@ -1340,7 +1336,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
       data: { labels: result.slices.map(s=>s.name), datasets: [{ data: result.slices.map(s=>s.value), backgroundColor: colors, borderColor: borders, borderWidth: borderWidths, hoverOffset: 10 }] },
       options: { responsive:true, maintainAspectRatio:false, cutout:"64%",
         plugins: { legend:{display:false}, tooltip:{ rtl:true, bodyFont:{family:"Cairo",size:12}, titleFont:{family:"Cairo",size:13,weight:"700"},
-          callbacks:{ label(c){ const val=c.parsed; const pct=result.total>0?((val/result.total)*100).toFixed(1):0; return ` ${fmtVal(val)} ${getUnitLabel(unit, language)}  (${pct}%)`; } } } } },
+          callbacks:{ label(c){ const val=c.parsed; const pct=result.total>0?((val/result.total)*100).toFixed(1):0; return ` ${fmtVal(val)} (${pct}%)`; } } } } },
     });
     return () => { destroyChart(chartRef); };
   }, [selectedCountry, year, mineralFilter, unit, scope]);
@@ -1396,7 +1392,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
                     </span>
                     <span className="text-[15px] font-black" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
                   </div>
-                  <p className="text-[10px] mt-1 font-mono" style={{ color:"rgba(201,168,76,0.45)" }}>{fmtVal(selectedSlice.value)} {getUnitLabel(unit, language)}</p>
+                  <p className="text-[10px] mt-1 font-mono" style={{ color:"rgba(201,168,76,0.45)" }}>{fmtVal(selectedSlice.value)}</p>
                 </div>
               )}
 
@@ -1430,7 +1426,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
                         </span>
                         <span className="text-[11px] font-bold flex-shrink-0 ml-2" style={{ color:"rgba(255,255,255,0.45)" }}>{pct.toFixed(1)}%</span>
                       </div>
-                      <p className="text-[9px] mt-0.5 font-mono" style={{ color:"rgba(255,255,255,0.22)" }}>{fmtVal(s.value)} {getUnitLabel(unit, language)}</p>
+                      <p className="text-[9px] mt-0.5 font-mono" style={{ color:"rgba(255,255,255,0.22)" }}>{fmtVal(s.value)}</p>
                     </div>
                   );
                 })}
@@ -1438,7 +1434,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
 
               <div className="rounded-xl px-4 py-2 flex items-center justify-between" style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)" }}>
                 <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.total}</span>
-                <span className="text-[13px] font-black" style={{ color:"rgba(255,255,255,0.6)" }}>{fmtVal(result.total)} {getUnitLabel(unit, language)}</span>
+                <span className="text-[13px] font-black" style={{ color:"rgba(255,255,255,0.6)" }}>{fmtVal(result.total)}</span>
               </div>
             </div>
           </div>
@@ -1452,13 +1448,12 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
 const CountryLineChart = ({
   country,
   mineralFilter = "all",
-  unit = "ton",
   onMineralFilterChange,
-  onUnitChange,
 }) => {
   const { labels, language } = useCountriesI18n();
   const mineralOptions = buildMineralFilterOptions(language);
   const wrapperRef = useRef(null);
+  const unit = "ton";
 
   const canvasRef = useChartInit((canvas) => {
     const { years, chartData } = getCountryMineralData(country, mineralFilter, unit);
@@ -1472,7 +1467,7 @@ const CountryLineChart = ({
     return new Chart(canvas, {
       type:"line", data:{ labels:years, datasets },
       options:{ responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{position:"bottom",labels:{font:{family:"Cairo",size:11},boxWidth:10,color:"rgba(255,255,255,0.6)",padding:16}}, tooltip:{callbacks:{label:(c)=>` ${c.dataset.label}: ${c.parsed.y??0} ${getUnitLabel(unit, language)}`}} },
+        plugins:{ legend:{position:"bottom",labels:{font:{family:"Cairo",size:11},boxWidth:10,color:"rgba(255,255,255,0.6)",padding:16}}, tooltip:{callbacks:{label:(c)=>` ${c.dataset.label}: ${c.parsed.y??0}`}} },
         scales:{ x:{grid:{display:false},border:{display:false},ticks:{font:{family:"Cairo",weight:"700"},color:"rgba(255,255,255,0.5)"}}, y:{beginAtZero:true,grid:{color:"rgba(255,255,255,0.05)"},border:{display:false},ticks:{font:{family:"Cairo"},color:"rgba(255,255,255,0.5)",callback:(v)=>v>=1e6?`${v/1e6}M`:v>=1000?`${v/1000}K`:v}} },
       },
     });
@@ -1484,47 +1479,6 @@ const CountryLineChart = ({
         title={labels.productionTrend}
         subtitle={labels.productionTrendSubtitle(getCountryDisplayName(country, language), mineralFilter)}
       >
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => onUnitChange?.("ton")}
-            className="rounded-full px-3 py-1 text-[11px] font-bold transition-all"
-            style={
-              unit === "ton"
-                ? {
-                    background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
-                    color: "#082721",
-                  }
-                : {
-                    background: "rgba(255,255,255,0.04)",
-                    color: "rgba(255,255,255,0.5)",
-                    border: "1px solid rgba(201,168,76,0.18)",
-                  }
-            }
-          >
-            {getUnitLabel("ton", language)}
-          </button>
-          <button
-            type="button"
-            onClick={() => onUnitChange?.("kg")}
-            className="rounded-full px-3 py-1 text-[11px] font-bold transition-all"
-            style={
-              unit === "kg"
-                ? {
-                    background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
-                    color: "#082721",
-                  }
-                : {
-                    background: "rgba(255,255,255,0.04)",
-                    color: "rgba(255,255,255,0.5)",
-                    border: "1px solid rgba(201,168,76,0.18)",
-                  }
-            }
-          >
-            {labels.kilograms}
-          </button>
-        </div>
-
         <select
           value={mineralFilter || "all"}
           onChange={(e) => onMineralFilterChange?.(e.target.value)}
@@ -1554,15 +1508,14 @@ const CountryLineChart = ({
 const CountryBarChart = ({
   country,
   mineralFilter = "all",
-  unit = "ton",
   selectedYear,
   onYearChange,
   onMineralFilterChange,
-  onUnitChange,
 }) => {
   const { labels, language } = useCountriesI18n();
   const mineralOptions = buildMineralFilterOptions(language);
   const [noData, setNoData] = useState(false);
+  const unit = "ton";
   const slices = getMineralShareForYear(country, selectedYear, mineralFilter, unit).sort((a,b)=>b.value-a.value);
   const total  = slices.reduce((s,d)=>s+d.value, 0);
 
@@ -1584,48 +1537,7 @@ const CountryBarChart = ({
 
   return (
     <Card>
-      <CardHeader title={labels.yearlyProduction} subtitle={labels.yearlyProductionSubtitle(getCountryDisplayName(country, language), selectedYear, mineralFilter, getUnitLabel(unit, language))}>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => onUnitChange?.("ton")}
-            className="rounded-full px-3 py-1 text-[11px] font-bold transition-all"
-            style={
-              unit === "ton"
-                ? {
-                    background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
-                    color: "#082721",
-                  }
-                : {
-                    background: "rgba(255,255,255,0.04)",
-                    color: "rgba(255,255,255,0.5)",
-                    border: "1px solid rgba(201,168,76,0.18)",
-                  }
-            }
-          >
-            {getUnitLabel("ton", language)}
-          </button>
-          <button
-            type="button"
-            onClick={() => onUnitChange?.("kg")}
-            className="rounded-full px-3 py-1 text-[11px] font-bold transition-all"
-            style={
-              unit === "kg"
-                ? {
-                    background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
-                    color: "#082721",
-                  }
-                : {
-                    background: "rgba(255,255,255,0.04)",
-                    color: "rgba(255,255,255,0.5)",
-                    border: "1px solid rgba(201,168,76,0.18)",
-                  }
-            }
-          >
-            {labels.kilograms}
-          </button>
-        </div>
-
+      <CardHeader title={labels.yearlyProduction} subtitle={labels.yearlyProductionSubtitle(getCountryDisplayName(country, language), selectedYear, mineralFilter)}>
         <select
           value={mineralFilter || "all"}
           onChange={(e) => onMineralFilterChange?.(e.target.value)}
@@ -1657,7 +1569,7 @@ const CountryBarChart = ({
           <div className="xl:w-60 flex-shrink-0">
             <div className="rounded-xl px-4 py-2.5 mb-3 flex items-center justify-between" style={{ background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.18)" }}>
               <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(201,168,76,0.6)" }}>{labels.total}</span>
-              <span className="text-[15px] font-black" style={{ color:"#C9A84C" }}>{fmtVal(total)} {getUnitLabel(unit, language)}</span>
+              <span className="text-[15px] font-black" style={{ color:"#C9A84C" }}>{fmtVal(total)}</span>
             </div>
             <div className="space-y-1.5">
               {slices.map((d,i)=>{
@@ -1673,7 +1585,7 @@ const CountryBarChart = ({
                     <div className="h-0.5 rounded-full overflow-hidden" style={{ background:"rgba(255,255,255,0.07)" }}>
                       <div className="h-full rounded-full" style={{ width:`${pct}%`, background:color }} />
                     </div>
-                    <p className="text-[9px] mt-1 font-mono" style={{ color:"rgba(255,255,255,0.28)" }}>{fmtVal(d.value)} {d.unit}</p>
+                    <p className="text-[9px] mt-1 font-mono" style={{ color:"rgba(255,255,255,0.28)" }}>{fmtVal(d.value)}</p>
                   </div>
                 );
               })}
@@ -1686,10 +1598,10 @@ const CountryBarChart = ({
 };
 
 // ── Treemap ────────────────────────────────────────────────────────────────────
-const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
+const MineralTreemap = ({ country, year, onYearChange }) => {
   const { labels, language } = useCountriesI18n();
   const [noData, setNoData] = useState(false);
-  const treeData = getMineralTreemapData(country, year, unit).sort((a, b) => b.value - a.value);
+  const treeData = getMineralTreemapData(country, year, "ton").sort((a, b) => b.value - a.value);
 
   const canvasRef = useChartInit((canvas) => {
     if (treeData.length===0) { setNoData(true); return null; }
@@ -1721,11 +1633,11 @@ const MineralTreemap = ({ country, year, unit="ton", onYearChange }) => {
       options:{ responsive:true, maintainAspectRatio:false,
         plugins:{ legend:{display:false}, tooltip:{callbacks:{
           title(items){ const raw=items[0]?.raw; const d=getTreemapDatum(raw); return d?.mineral||""; },
-          label(item){ const raw=item.raw; const d=getTreemapDatum(raw); const pct=d?.pct!=null?d.pct.toFixed(1):labels.none; const val=d?.rawValue!=null?fmtVal(d.rawValue):labels.none; return[`${pct}%`,`${val} ${d?.unit||""}`]; },
+          label(item){ const raw=item.raw; const d=getTreemapDatum(raw); const pct=d?.pct!=null?d.pct.toFixed(1):labels.none; const val=d?.rawValue!=null?fmtVal(d.rawValue):labels.none; return[`${pct}%`,`${val}`]; },
         }}},
       },
     });
-  }, [country, year, unit]);
+  }, [country, year]);
 
   return (
     <Card>
@@ -1898,10 +1810,8 @@ const Countries = () => {
   const [donutYear, setDonutYear]             = useState(DEFAULT_SELECTED_YEAR);
   const [barYear, setBarYear]                 = useState(DEFAULT_SELECTED_YEAR);
   const [barMineralFilter, setBarMineralFilter] = useState("all");
-  const [barUnit, setBarUnit]                 = useState("ton");
   const [treemapYear, setTreemapYear]         = useState(DEFAULT_SELECTED_YEAR);
   const [lineMineralFilter, setLineMineralFilter] = useState("all");
-  const [lineUnit, setLineUnit]               = useState("ton");
   const [summaryYear, setSummaryYear]         = useState(DEFAULT_SELECTED_YEAR);
 
   const selectedCountryObj = countries.find((c) => c.name === selected);
@@ -1997,8 +1907,8 @@ const Countries = () => {
 
   useEffect(() => {
     if (!runtimeYears.length) return;
-    const defaultYear = runtimeYears.includes(2019)
-      ? 2019
+    const defaultYear = runtimeYears.includes( new Date().getFullYear() )
+      ? new Date().getFullYear()
       : runtimeYears[runtimeYears.length - 1];
     setSummaryYear(defaultYear);
     setDonutYear(defaultYear);
@@ -2128,9 +2038,7 @@ const Countries = () => {
               key={`line-${selected}`}
               country={selected}
               mineralFilter={lineMineralFilter}
-              unit={lineUnit}
               onMineralFilterChange={setLineMineralFilter}
-              onUnitChange={setLineUnit}
             />
 
             <CountryBarChart
@@ -2139,9 +2047,7 @@ const Countries = () => {
               selectedYear={barYear}
               onYearChange={setBarYear}
               mineralFilter={barMineralFilter}
-              unit={barUnit}
               onMineralFilterChange={setBarMineralFilter}
-              onUnitChange={setBarUnit}
             />
 
             <MineralTreemap key={`tree-${selected}`} country={selected} year={treemapYear} onYearChange={setTreemapYear} />
