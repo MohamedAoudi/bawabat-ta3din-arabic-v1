@@ -1635,7 +1635,7 @@ border-radius:13px !important;
           position:"fixed",
           bottom:24,
           [isArabic ? "right" : "left"]:24,
-          zIndex:50,
+          zIndex:990,
           display:"flex",
           alignItems:"center",
           gap:12,
