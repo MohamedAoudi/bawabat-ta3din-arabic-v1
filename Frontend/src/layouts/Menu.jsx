@@ -85,7 +85,7 @@ const NewSplitMenu = () => {
               <img src={logoAidsmo} alt="AIDSMO" className="h-7 w-7 sm:h-9 sm:w-9 object-contain" />
             </a>
 
-            <div className="hidden md:flex flex-1 justify-center px-4 max-w-md">
+            <div className="hidden md:flex flex-1 justify-center px-6 max-w-md">
               <div className={`relative flex items-center w-full transition-all duration-300 ${searchFocused ? 'scale-105' : ''}`}>
                 <Search size={14} className={`absolute text-[#C9A84C] ${isRTL ? 'right-3' : 'left-3'}`} />
                 <input 
@@ -131,7 +131,7 @@ const NewSplitMenu = () => {
         </div>
 
         {/* MAIN NAVIGATION */}
-        <div className={`w-full transition-all duration-300 ${scrolled ? 'py-1' : 'py-3'}`}>
+        <div className={`w-full transition-all duration-300 ${scrolled ? 'py-1' : 'py-1'}`}>
           <div className="max-w-7xl mx-auto px-4">
             <div className="main-nav-glass rounded-xl px-4 py-2 flex items-center justify-between transition-all duration-300">
               
