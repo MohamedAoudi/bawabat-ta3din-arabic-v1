@@ -245,10 +245,8 @@ export default function M2Page() {
         setCountries(Array.isArray(c) ? c : []);
         setMinerals(Array.isArray(m) ? m : []);
 
-        const firstCountryId = (Array.isArray(c) && c[0]?.id) ? String(c[0].id) : "";
-        const firstMineralId = (Array.isArray(m) && m[0]?.id) ? String(m[0].id) : "";
-        setCountryId((prev) => prev || "all" || firstCountryId);
-        setMineralId((prev) => prev || "all" || firstMineralId);
+        setCountryId((prev) => prev || "all");
+        setMineralId((prev) => prev || "all");
       } catch {
         if (cancelled) return;
         setCountries([]);
