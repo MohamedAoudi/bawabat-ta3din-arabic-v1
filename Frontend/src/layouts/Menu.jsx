@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
-import { isAuthenticated, logout } from "../services/authService";
+import { isAuthenticated, logout, getCurrentUser } from "../services/authService";
 import { 
   User, Search, Moon, Sun, FileText, 
   LogIn, ChevronDown, LayoutGrid, 
@@ -75,6 +75,8 @@ const NewSplitMenu = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isRTL = language === "ar";
+  const currentUser = getCurrentUser();
+  const canShowDashboard = isAuthenticated() && currentUser?.role !== "user";
 
   const t = (key) => TRANSLATIONS[language]?.[key] || key;
 
@@ -184,10 +186,12 @@ const NewSplitMenu = () => {
 
               {isAuthenticated() ? (
                 <>
-                  <Link to="/dashboard" className="hidden sm:flex items-center gap-1.5 text-white/90 hover:text-[#C9A84C] font-bold px-1 sm:px-2 whitespace-nowrap">
-                    <User size={14} />
-                    <span className="hidden md:block">{t("dashboard")}</span>
-                  </Link>
+                  {canShowDashboard && (
+                    <Link to="/dashboard" className="hidden sm:flex items-center gap-1.5 text-white/90 hover:text-[#C9A84C] font-bold px-1 sm:px-2 whitespace-nowrap">
+                      <User size={14} />
+                      <span className="hidden md:block">{t("dashboard")}</span>
+                    </Link>
+                  )}
                   <button
                     type="button"
                     onClick={handleLogout}
@@ -333,10 +337,12 @@ const NewSplitMenu = () => {
 
             {isAuthenticated() ? (
               <>
-                <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 p-3 sm:p-4 text-white hover:bg-white/5 rounded-lg transition-colors">
-                  <User size={20} className="text-[#C9A84C]" />
-                  <span className="text-base sm:text-lg font-bold">{t("dashboard")}</span>
-                </Link>
+                {canShowDashboard && (
+                  <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 p-3 sm:p-4 text-white hover:bg-white/5 rounded-lg transition-colors">
+                    <User size={20} className="text-[#C9A84C]" />
+                    <span className="text-base sm:text-lg font-bold">{t("dashboard")}</span>
+                  </Link>
+                )}
                 <button
                   type="button"
                   onClick={handleLogout}
