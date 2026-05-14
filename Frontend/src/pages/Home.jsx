@@ -1,4 +1,5 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowLeftRight,
@@ -20,10 +21,13 @@ import {
   Search,
   Ship,
   Truck,
+  Map,
+  X,
 } from "lucide-react";
 import { LanguageContext, ThemeContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
+import { getCountries } from "../services/countryService";
 import i7 from "../assets/i-7.png";
 import im1 from "../assets/وزارة-الصناعة-والمعادن-دولة-ليبيا-removebg-preview.png";
 import im2 from "../assets/وزارة-الصناعة-والتجارة-الجمهورية-اليمنية-removebg-preview.png";
@@ -154,8 +158,13 @@ const HOME_TRANSLATIONS = {
     heroTitleStart: "بوابة المؤشرات",
     heroTitleAccent: "التعدينية العربية",
     heroSubtitle: "نافذتك لبيانات ومؤشرات قطاع التعدين العربي",
-    smartSearch: "بحث ذكي",
-    searchPlaceholder: "ابحث عن معدن، دولة، أو إحصائية...",
+    smartSearch: " بحث",
+        searchPlaceholder: "ابحث عن معدن، دولة، أو إحصائية...",
+    noSearchResults: "لا نتائج مطابقة",
+    searchTapToOpen: "اضغط للبحث عن دولة…",
+    searchModalTitle: "بحث عن دولة",
+    searchModalHint: "اكتب اسماً بالعربية أو الفرنسية أو الإنجليزية، أو رمز الدولة (مثال: ma، Maroc).",
+    closeModal: "إغلاق",
     portalInNumbers: "البوابة في أرقام",
     miningIndicatorsSection: "المؤشرات التعدينية",
     tradeIndicatorsSection: "التجارة التعدينية",
@@ -213,8 +222,13 @@ const HOME_TRANSLATIONS = {
     heroTitleStart: "Portail des indicateurs",
     heroTitleAccent: "miniers arabes",
     heroSubtitle: "Votre portail vers les données et indicateurs du secteur minier arabe.",
-    smartSearch: "Recherche intelligente",
+    smartSearch: "cherche ",
     searchPlaceholder: "Rechercher un minerai, un pays ou une statistique...",
+    noSearchResults: "Aucun résultat",
+    searchTapToOpen: "Cliquez pour rechercher un pays…",
+    searchModalTitle: "Rechercher un pays",
+    searchModalHint: "Saisissez un nom (arabe, français ou anglais) ou un code pays (ex. ma, Maroc).",
+    closeModal: "Fermer",
     portalInNumbers: "Le portail en chiffres",
     miningIndicatorsSection: "Indicateurs miniers",
     tradeIndicatorsSection: "Commerce minier",
@@ -272,8 +286,13 @@ const HOME_TRANSLATIONS = {
     heroTitleStart: "Mining Indicators",
     heroTitleAccent: "Arab Portal",
     heroSubtitle: "Your gateway to Arab mining sector data and indicators.",
-    smartSearch: "Smart Search",
+    smartSearch: " Search",
     searchPlaceholder: "Search for a mineral, country, or statistic...",
+    noSearchResults: "No matching results",
+    searchTapToOpen: "Click to search for a country…",
+    searchModalTitle: "Search for a country",
+    searchModalHint: "Type a name in Arabic, French, or English, or an ISO code (e.g. ma, Morocco).",
+    closeModal: "Close",
     portalInNumbers: "Portal in Numbers",
     miningIndicatorsSection: "Mining Indicators",
     tradeIndicatorsSection: "Mining Trade",
@@ -1004,16 +1023,100 @@ const useReveal = () => {
 const Home = () => {
   const { language } = useContext(LanguageContext);
   const { isDarkMode } = useContext(ThemeContext);
+  const navigate = useNavigate();
   const labels = HOME_TRANSLATIONS[language] || HOME_TRANSLATIONS.ar;
   const numberLocale = NUMBER_LOCALES[language] || NUMBER_LOCALES.ar;
   const isArabic = language === "ar";
   const [selectedCountryCode, setSelectedCountryCode] = useState(null);
   const [sponsorSlide, setSponsorSlide]       = useState(0);
-  const [searchFocused, setSearchFocused]     = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [heroSearchQuery, setHeroSearchQuery] = useState("");
+  const [navCountriesForSearch, setNavCountriesForSearch] = useState([]);
+  const modalSearchInputRef = useRef(null);
   const portalStats = useMemo(() => buildPortalStats(), []);
   const kpiData = useMemo(() => buildKpiData(labels), [labels]);
 
   useReveal();
+
+  useEffect(() => {
+    let active = true;
+    getCountries()
+      .then((rows) => {
+        if (!active || !Array.isArray(rows)) return;
+        const mapped = rows
+          .filter((row) => row?.iso_code && (row?.name_ar || row?.name_en || row?.name_fr))
+          .map((row) => ({
+            code: String(row.iso_code).trim().toLowerCase(),
+            name_ar: row.name_ar || "",
+            name_en: row.name_en || "",
+            name_fr: row.name_fr || "",
+          }));
+        setNavCountriesForSearch(mapped);
+      })
+      .catch(() => {
+        if (active) setNavCountriesForSearch([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const countrySearchLabel = (c) => {
+    if (language === "ar") return c.name_ar || c.name_en || c.name_fr || c.code;
+    if (language === "fr") return c.name_fr || c.name_en || c.name_ar || c.code;
+    return c.name_en || c.name_fr || c.name_ar || c.code;
+  };
+
+  const displayModalCountries = useMemo(() => {
+    if (!navCountriesForSearch.length) return [];
+    const q = heroSearchQuery.trim().toLowerCase();
+    if (!q) return navCountriesForSearch.slice(0, 16);
+    return navCountriesForSearch
+      .filter((c) => {
+        const hay = [c.name_ar, c.name_en, c.name_fr, c.code].join(" ").toLowerCase();
+        return hay.includes(q);
+      })
+      .slice(0, 24);
+  }, [heroSearchQuery, navCountriesForSearch]);
+
+  const closeSearchModal = () => {
+    setSearchModalOpen(false);
+    setHeroSearchQuery("");
+  };
+
+  const goToCountryFromHero = (code) => {
+    navigate(`/countries?country=${encodeURIComponent(code)}`);
+    closeSearchModal();
+  };
+
+  useEffect(() => {
+    if (!searchModalOpen) return;
+    const id = window.requestAnimationFrame(() => {
+      modalSearchInputRef.current?.focus();
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [searchModalOpen]);
+
+  useEffect(() => {
+    if (!searchModalOpen) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        setSearchModalOpen(false);
+        setHeroSearchQuery("");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [searchModalOpen]);
+
+  useEffect(() => {
+    if (!searchModalOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [searchModalOpen]);
 
   /* Sponsor carousel */
   const referenceCards = useMemo(
@@ -1250,7 +1353,7 @@ border-radius:13px !important;
       <Menu />
 
       {/* ═══════════════════════ HERO ═══════════════════════ */}
-<header className="relative overflow-hidden" style={{ height:"100vh", minHeight:600, maxHeight:800 }}>
+<header className="relative z-[9] overflow-hidden" style={{ height:"100vh", minHeight:600, maxHeight:800 }}>
 
         {/* --- VIDÉO & OVERLAYS --- */}
         <video
@@ -1267,7 +1370,7 @@ border-radius:13px !important;
         }} />
 
         {/* --- CONTENU PRINCIPAL --- */}
-        <div className="relative z-20 h-full flex flex-col items-center justify-center text-center px-6">
+        <div className="relative z-[20] h-full flex flex-col items-center justify-center text-center px-6">
 
           {/* Badge */}
           <div className="hero-title" style={{ marginBottom:24 }}>
@@ -1291,29 +1394,58 @@ border-radius:13px !important;
             {labels.heroSubtitle}
           </p>
 
-          {/* Search */}
-          <div className="hero-search w-full" style={{ maxWidth:580 }}>
-            <div className={`search-box flex items-center gap-3 rounded-full px-5 py-3 ${searchFocused?"focused":""}`}
-              style={{ borderRadius:999, background:"rgba(255,255,255,0.92)", boxShadow: searchFocused ? "0 20px 60px rgba(8,39,33,0.18)" : "0 16px 48px rgba(0,0,0,0.12)", transition:"all 0.3s ease" }}>
-              <button type="button" style={{ background:"linear-gradient(135deg,#c9a84c,#f0d98a)", color:"#082721", padding:"10px 24px", borderRadius:999, fontSize:"0.9rem", fontWeight:800, letterSpacing:"0.04em", whiteSpace:"nowrap", border:"none", cursor:"pointer" }}>
+          {/* Recherche pays : clic ouvre une popup (au-dessus du menu z-900) */}
+          <div className="hero-search relative z-[1020] isolate w-full" style={{ maxWidth:580 }}>
+            <button
+              type="button"
+              className={`search-box flex w-full cursor-pointer items-center gap-3 rounded-[28px] px-5 py-3 text-left ${searchModalOpen ? "focused" : ""}`}
+              style={{
+                borderRadius: 28,
+                background: "rgba(255,255,255,0.92)",
+                boxShadow: searchModalOpen ? "0 20px 60px rgba(8,39,33,0.18)" : "0 16px 48px rgba(0,0,0,0.12)",
+                transition: "all 0.3s ease",
+                border: "none",
+                font: "inherit",
+              }}
+              onClick={() => setSearchModalOpen(true)}
+              dir={isArabic ? "rtl" : "ltr"}
+            >
+              <span
+                style={{
+                  background: "linear-gradient(135deg,#c9a84c,#f0d98a)",
+                  color: "#082721",
+                  padding: "10px 24px",
+                  borderRadius: 999,
+                  fontSize: "0.9rem",
+                  fontWeight: 800,
+                  letterSpacing: "0.04em",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
                 {labels.smartSearch}
-              </button>
-              <input
-                type="text"
-                placeholder={labels.searchPlaceholder}
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
-                style={{ flex:1, minWidth:0, border:"none", background:"transparent", outline:"none", color:"#082721", fontSize:"0.95rem", textAlign:isArabic ? "right" : "left", caretColor:"#c9a84c" }}
-              />
-              <AppIcon name="fa-search" size={18} style={{ color:"rgba(8,39,33,0.65)" }} />
-            </div>
+              </span>
+              <span
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  color: "rgba(8,39,33,0.55)",
+                  fontSize: "0.95rem",
+                  fontWeight: 600,
+                  textAlign: isArabic ? "right" : "left",
+                }}
+              >
+                {labels.searchTapToOpen}
+              </span>
+              <AppIcon name="fa-search" size={18} style={{ color: "rgba(8,39,33,0.65)", flexShrink: 0 }} />
+            </button>
           </div>
           
         </div>
 
         {/* --- SHAPE DIVIDER (VAGUE DYNAMIQUE CLAIR/SOMBRE) --- */}
         {/* Le translateY(2px) empêche de voir une fine ligne de coupure avec la section suivante */}
-        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20" style={{ transform: "translateY(2px)" }}>
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-[15]" style={{ transform: "translateY(2px)" }}>
           {/* L'attribut preserveAspectRatio="none" permet à la vague de s'étirer sur toute la largeur */}
           <svg className="relative block w-full h-[60px] md:h-[100px] lg:h-[140px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
             
@@ -1343,7 +1475,7 @@ border-radius:13px !important;
 
         {/* ── KPIs ── */}
    
-      <section className="reveal d2" style={{ marginTop: "-210px", position: "relative", zIndex: 100, padding: "0 16px" }}>
+      <section className="reveal d2" style={{ marginTop: "-210px", position: "relative", zIndex: 10, padding: "0 16px" }}>
   <div className="divf9" style={{ 
     display: "grid", 
     gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", 
@@ -1628,6 +1760,117 @@ border-radius:13px !important;
 
       {/* ── FOOTER ── */}
       <div className="reveal d5"><Footer /></div>
+
+      {/* ── POPUP RECHERCHE PAYS (au-dessus du menu fixe) ── */}
+      {searchModalOpen && (
+        <div
+          className="fixed inset-0 z-[1200] flex items-center justify-center p-4 font-['Cairo',sans-serif]"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="home-search-modal-title"
+          dir={isArabic ? "rtl" : "ltr"}
+        >
+          <button
+            type="button"
+            className="absolute inset-0 h-full w-full cursor-default border-0 bg-black/55 backdrop-blur-sm"
+            aria-label={labels.closeModal}
+            onClick={closeSearchModal}
+          />
+          <div
+            className="relative z-[1] flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl shadow-2xl"
+            style={{
+              background: isDarkMode ? "linear-gradient(180deg,#0f3129 0%,#071611 100%)" : "#ffffff",
+              border: isDarkMode ? "1px solid rgba(201,168,76,0.35)" : "1px solid rgba(8,39,33,0.12)",
+              boxShadow: "0 24px 80px rgba(0,0,0,0.35)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            <div
+              className="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3 sm:px-5"
+              style={{ borderColor: isDarkMode ? "rgba(201,168,76,0.2)" : "rgba(8,39,33,0.08)" }}
+            >
+              <h2
+                id="home-search-modal-title"
+                className="m-0 text-base font-black sm:text-lg"
+                style={{ color: isDarkMode ? "#efe8d4" : "#082721" }}
+              >
+                {labels.searchModalTitle}
+              </h2>
+              <button
+                type="button"
+                onClick={closeSearchModal}
+                className="flex items-center justify-center rounded-xl p-2 transition-colors hover:bg-black/10"
+                style={{ color: isDarkMode ? "#c9a84c" : "#082721" }}
+                aria-label={labels.closeModal}
+              >
+                <X size={22} strokeWidth={2.2} />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
+              <input
+                ref={modalSearchInputRef}
+                type="text"
+                value={heroSearchQuery}
+                onChange={(e) => setHeroSearchQuery(e.target.value)}
+                placeholder={labels.searchPlaceholder}
+                autoComplete="off"
+                className="w-full rounded-xl border px-4 py-3 text-sm font-semibold outline-none transition-shadow focus:ring-2 focus:ring-[#C9A84C]/50"
+                style={{
+                  background: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(8,39,33,0.04)",
+                  borderColor: isDarkMode ? "rgba(201,168,76,0.25)" : "rgba(8,39,33,0.12)",
+                  color: isDarkMode ? "#efe8d4" : "#082721",
+                  textAlign: isArabic ? "right" : "left",
+                }}
+              />
+              <p className="mt-2 text-xs leading-relaxed" style={{ color: isDarkMode ? "rgba(239,232,212,0.55)" : "rgba(8,39,33,0.55)" }}>
+                {labels.searchModalHint}
+              </p>
+              <p
+                className="mb-2 mt-4 text-[10px] font-black uppercase tracking-wider"
+                style={{ color: "#c9a84c" }}
+              >
+                {labels.arabCountriesTitle}
+              </p>
+              <div
+                className="max-h-[min(42vh,320px)] overflow-y-auto rounded-xl border"
+                style={{
+                  borderColor: isDarkMode ? "rgba(201,168,76,0.2)" : "rgba(8,39,33,0.1)",
+                  background: isDarkMode ? "rgba(0,0,0,0.2)" : "rgba(8,39,33,0.03)",
+                }}
+              >
+                {!navCountriesForSearch.length ? (
+                  <p className="px-4 py-6 text-center text-sm" style={{ color: isDarkMode ? "rgba(239,232,212,0.5)" : "rgba(8,39,33,0.5)" }}>
+                    {labels.noSearchResults}
+                  </p>
+                ) : heroSearchQuery.trim() && displayModalCountries.length === 0 ? (
+                  <p className="px-4 py-6 text-center text-sm" style={{ color: isDarkMode ? "rgba(239,232,212,0.5)" : "rgba(8,39,33,0.5)" }}>
+                    {labels.noSearchResults}
+                  </p>
+                ) : (
+                  displayModalCountries.map((c) => (
+                    <button
+                      key={c.code}
+                      type="button"
+                      onClick={() => goToCountryFromHero(c.code)}
+                      className="flex w-full items-center gap-3 border-b px-4 py-3 text-left text-sm font-bold transition-colors last:border-b-0 hover:bg-[#C9A84C]/12"
+                      style={{
+                        color: isDarkMode ? "#efe8d4" : "#082721",
+                        borderColor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(8,39,33,0.06)",
+                        flexDirection: isArabic ? "row-reverse" : "row",
+                        textAlign: isArabic ? "right" : "left",
+                      }}
+                    >
+                      <Map size={18} className="flex-shrink-0 text-[#C9A84C]" />
+                      <span className="min-w-0 flex-1 truncate">{countrySearchLabel(c)}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── FLOATING BOT BUTTON ── */}
       <button type="button" onClick={handleChatbotClick} title={labels.floatingBotSubtitle} className="float-btn"
