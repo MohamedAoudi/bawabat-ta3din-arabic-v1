@@ -61,10 +61,14 @@ export const isAuthenticated = () => {
   return !!localStorage.getItem("token");
 };
 
-// Check if user is admin
+// Check if user is admin (case-insensitive; backend may vary casing)
 export const isAdmin = () => {
   const user = getCurrentUser();
-  return user && user.role === "admin";
+  if (!user) return false;
+  const role = String(user.role ?? "")
+    .trim()
+    .toLowerCase();
+  return role === "admin";
 };
 
 // Refresh current user data from server (to get updated photo)

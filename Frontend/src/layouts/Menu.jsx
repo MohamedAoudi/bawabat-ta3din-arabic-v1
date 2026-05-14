@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useMemo, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
-import { isAuthenticated, logout, getCurrentUser } from "../services/authService";
+import { isAuthenticated, logout, isAdmin } from "../services/authService";
 import { getCountries } from "../services/countryService";
 import { 
   User, Search, Moon, Sun, FileText, 
@@ -32,8 +32,19 @@ const NewSplitMenu = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isRTL = language === "ar";
-  const currentUser = getCurrentUser();
-  const canShowDashboard = isAuthenticated() && currentUser?.role !== "user";
+  const [authTick, setAuthTick] = useState(0);
+
+  useEffect(() => {
+    const bump = () => setAuthTick((n) => n + 1);
+    window.addEventListener("auth:user-updated", bump);
+    window.addEventListener("storage", bump);
+    return () => {
+      window.removeEventListener("auth:user-updated", bump);
+      window.removeEventListener("storage", bump);
+    };
+  }, []);
+
+  const canShowDashboard = useMemo(() => isAdmin(), [authTick, location.pathname]);
 
   const t = (key) => TRANSLATIONS[language]?.[key] || key;
 
@@ -203,8 +214,16 @@ const NewSplitMenu = () => {
               </div>
 
               <div className="hidden sm:flex items-center border-l border-white/10 pl-4 gap-3">
+                {canShowDashboard && (
+                  <Link
+                    to="/dashboard"
+                    className="text-white/70 hover:text-[#C9A84C] flex items-center gap-1 text-xs font-bold whitespace-nowrap transition-colors"
+                  >
+                    <User size={14} /> {t("dashboard")}
+                  </Link>
+                )}
                 {isAuthenticated() ? (
-                  <button onClick={handleLogout} className="text-white/70 hover:text-[#C9A84C] flex items-center gap-1 text-xs font-bold">
+                  <button onClick={handleLogout} className="text-white/70 hover:text-[#C9A84C] flex items-center gap-1 text-xs font-bold transition-colors">
                     <LogOut size={14} /> {t("logout")}
                   </button>
                 ) : (
@@ -231,7 +250,7 @@ const NewSplitMenu = () => {
               </Link>
 
               {/* Menu Desktop */}
-              <nav className="hidden xl:flex items-center gap-1">
+              <nav className="hidden lg:flex items-center gap-1 flex-wrap justify-end max-w-[min(100%,52rem)]">
                 <NavItem to="/" icon={LayoutGrid} label={t("home")} />
                 
                 <div className="relative group">
@@ -265,6 +284,7 @@ const NewSplitMenu = () => {
                 <NavItem to="/countries" icon={Map} label={t("arabCountries")} />
                 <NavItem to="/about" icon={Info} label={t("about")} />
                 <NavItem to="/contact" icon={Mail} label={t("contact")} />
+                {canShowDashboard && <NavItem to="/dashboard" icon={User} label={t("dashboard")} />}
               </nav>
 
               <div className="flex items-center gap-2">
@@ -273,7 +293,7 @@ const NewSplitMenu = () => {
                   <span>{t("smartReports")}</span>
                 </Link>
 
-                <button onClick={() => setMobileOpen(true)} className="xl:hidden p-2.5 bg-[#C9A84C]/10 rounded-lg text-[#C9A84C] active:scale-95 transition-all">
+                <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2.5 bg-[#C9A84C]/10 rounded-lg text-[#C9A84C] active:scale-95 transition-all">
                   <MenuIcon size={24} />
                 </button>
               </div>
@@ -283,7 +303,7 @@ const NewSplitMenu = () => {
       </header>
 
       {/* MOBILE DRAWER */}
-      <div className={`fixed inset-0 z-[1000] xl:hidden transition-all duration-300 ${mobileOpen ? 'visible' : 'invisible'}`}>
+      <div className={`fixed inset-0 z-[1000] lg:hidden transition-all duration-300 ${mobileOpen ? 'visible' : 'invisible'}`}>
         <div className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0'}`} onClick={() => setMobileOpen(false)} />
         
         <div className={`absolute top-0 bottom-0 ${isRTL ? 'right-0' : 'left-0'} w-[280px] bg-[#082721] shadow-2xl transition-transform duration-500 ease-in-out flex flex-col ${mobileOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}`}>
