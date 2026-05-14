@@ -93,34 +93,48 @@ const countries = [
 ];
 
 const sponsors = [
-  { href: "https://csc.gov.ly/portfolio/%D9%88%D8%B2%D8%A7%D8%B1%D8%A9-%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D8%A9-%D9%88%D8%A7%D9%84%D9%85%D8%B9%D8%A7%D8%AF%D9%86/", img: im1, title: "دولــة لـيـبـيـا",        subtitle: "وزارة الصناعة والمعادن" },
-  { href: "https://mom-ye.com/site-ar/",     img: im2, title: "الجمهورية اليمنية", subtitle: "وزارة النفط والمعادن"        },
-  { href: "https://www.mim.gov.sa/ar", img: i7, title: "المملكة العربية السعودية",        subtitle: "وزارة المعادن والصناعة" },
-
+  {
+    href: "https://csc.gov.ly/portfolio/%D9%88%D8%B2%D8%A7%D8%B1%D8%A9-%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D8%A9-%D9%88%D8%A7%D9%84%D9%85%D8%B9%D8%A7%D8%AF%D9%86/",
+    img: im1,
+    title: { ar: "دولــة لـيـبـيـا", fr: "État de Libye", en: "State of Libya" },
+    subtitle: { ar: "وزارة الصناعة والمعادن", fr: "Ministère de l'Industrie et des Mines", en: "Ministry of Industry and Mines" },
+  },
+  {
+    href: "https://mom-ye.com/site-ar/",
+    img: im2,
+    title: { ar: "الجمهورية اليمنية", fr: "République du Yémen", en: "Republic of Yemen" },
+    subtitle: { ar: "وزارة النفط والمعادن", fr: "Ministère du Pétrole et des Minerais", en: "Ministry of Oil and Minerals" },
+  },
+  {
+    href: "https://www.mim.gov.sa/ar",
+    img: i7,
+    title: { ar: "المملكة العربية السعودية", fr: "Royaume d'Arabie saoudite", en: "Kingdom of Saudi Arabia" },
+    subtitle: { ar: "وزارة المعادن والصناعة", fr: "Ministère de l'Industrie et des Ressources minérales", en: "Ministry of Industry and Mineral Resources" },
+  },
 ];
 
 const officialContacts = [
-  { country: "عمان - المملكة الأردنية الهاشمية", ministry: "وزارة الطاقة والثروة المعدنية", emails: ["memr@memr.gov.jo"] },
-  { country: "أبوظبي - دولة الإمارات العربية المتحدة", ministry: "وزارة الطاقة والبنية التحتية", emails: ["Archive.section@moei.gov.ae", "info@moei.gov.ae"] },
-  { country: "المنامة - مملكة البحرين", ministry: "وزارة الصناعة والتجارة", emails: ["minoffice@moic.gov.bh"] },
-  { country: "تونس - الجمهورية التونسية", ministry: "وزارة الصناعة والمناجم والطاقة", emails: ["contact@energiemines.gov.tn"] },
-  { country: "الجزائر - الجمهورية الجزائرية الديمقراطية الشعبية", ministry: "وزارة المحروقات والمناجم", emails: ["contact@energy.gov.dz", "sofiane.ouffa@energy.gov.dz"] },
-  { country: "جيبوتي - جمهورية جيبوتي", ministry: "وزارة الطاقة المكلف بالموارد الطبيعية", emails: ["contact@mern-gouv.com", "cabinet@energie.gouv.dj"] },
-  { country: "الرياض - المملكة العربية السعودية", ministry: "وزارة الصناعة والثروة المعدنية", emails: ["info@mim.gov.sa"] },
-  { country: "الخرطوم - جمهورية السودان", ministry: "وزارة المعادن", emails: ["info@minerals.gov.sd"] },
-  { country: "الجمهورية العربية السورية", ministry: "وزارة الطاقة", emails: ["info@mopmr.gov.sy"] },
-  { country: "مقاديشو - جمهورية الصومال الفيدرالية", ministry: "وزارة البترول والثروة المعدنية", emails: ["dg@mopmr.gov.so"] },
-  { country: "بغداد - جمهورية العراق", ministry: "وزارة الصناعة والمعادن", emails: ["invest@industry.gov.iq", "minister@industry.gov.iq"] },
-  { country: "مسقط - سلطنة عمان", ministry: "وزارة الطاقة والمعادن", emails: ["info@mog.gov.om"] },
-  { country: "رام الله - دولة فلسطين", ministry: "وزارة الصناعة", emails: ["manalf@met.gov.ps", "m.farhan@mind.gov.ps", "minister.office@met.gov.ps"] },
-  { country: "الدوحة - دولة قطر", ministry: "وزارة التجارة والصناعة", emails: ["salbraidi@moci.gov.qa"] },
-  { country: "الكويت - دولة الكويت", ministry: "وزارة التجارة والصناعة", emails: ["indust@pai.gov.kw"] },
-  { country: "بيروت - الجمهورية اللبنانية", ministry: "وزارة الطاقة والمياه", emails: ["minister@energyandwater.gov.lb", "mew@terra.net.lb"] },
-  { country: "دولة ليبيا", ministry: "وزارة الصناعة والمعادن", emails: ["masnaili@yahoo.com", "info2@industry.gov.ly"] },
-  { country: "القاهرة - جمهورية مصر العربية", ministry: "وزارة البترول والثروة المعدنية", emails: ["contact@petroleum.gov.eg"] },
-  { country: "الرباط - المملكة المغربية", ministry: "وزارة الانتقال الطاقي والتنمية المستدامة", emails: ["ministre@mem.gov.ma"] },
-  { country: "نواكشوط - الجمهورية الإسلامية الموريتانية", ministry: "وزارة المعادن والصناعة", emails: ["contact.mpemi@gmail.com"] },
-  { country: "الجمهورية اليمنية", ministry: "وزارة النفط والمعادن", emails: ["info@mom-ye.com"] },
+  { code: "jo", city: { ar: "عمان", fr: "Amman", en: "Amman" }, ministry: { ar: "وزارة الطاقة والثروة المعدنية", fr: "Ministère de l'Énergie et des Ressources minières", en: "Ministry of Energy and Mineral Resources" }, emails: ["memr@memr.gov.jo"] },
+  { code: "ae", city: { ar: "أبوظبي", fr: "Abou Dabi", en: "Abu Dhabi" }, ministry: { ar: "وزارة الطاقة والبنية التحتية", fr: "Ministère de l'Énergie et de l'Infrastructure", en: "Ministry of Energy and Infrastructure" }, emails: ["Archive.section@moei.gov.ae", "info@moei.gov.ae"] },
+  { code: "bh", city: { ar: "المنامة", fr: "Manama", en: "Manama" }, ministry: { ar: "وزارة الصناعة والتجارة", fr: "Ministère de l'Industrie et du Commerce", en: "Ministry of Industry and Commerce" }, emails: ["minoffice@moic.gov.bh"] },
+  { code: "tn", city: { ar: "تونس", fr: "Tunis", en: "Tunis" }, ministry: { ar: "وزارة الصناعة والمناجم والطاقة", fr: "Ministère de l'Industrie, des Mines et de l'Énergie", en: "Ministry of Industry, Mines and Energy" }, emails: ["contact@energiemines.gov.tn"] },
+  { code: "dz", city: { ar: "الجزائر", fr: "Alger", en: "Algiers" }, ministry: { ar: "وزارة المحروقات والمناجم", fr: "Ministère de l'Énergie et des Mines", en: "Ministry of Energy and Mines" }, emails: ["contact@energy.gov.dz", "sofiane.ouffa@energy.gov.dz"] },
+  { code: "dj", city: { ar: "جيبوتي", fr: "Djibouti", en: "Djibouti" }, ministry: { ar: "وزارة الطاقة المكلف بالموارد الطبيعية", fr: "Ministère de l'Énergie chargé des ressources naturelles", en: "Ministry of Energy in charge of Natural Resources" }, emails: ["contact@mern-gouv.com", "cabinet@energie.gouv.dj"] },
+  { code: "sa", city: { ar: "الرياض", fr: "Riyad", en: "Riyadh" }, ministry: { ar: "وزارة الصناعة والثروة المعدنية", fr: "Ministère de l'Industrie et des Ressources minérales", en: "Ministry of Industry and Mineral Resources" }, emails: ["info@mim.gov.sa"] },
+  { code: "sd", city: { ar: "الخرطوم", fr: "Khartoum", en: "Khartoum" }, ministry: { ar: "وزارة المعادن", fr: "Ministère des Minerais", en: "Ministry of Minerals" }, emails: ["info@minerals.gov.sd"] },
+  { code: "sy", city: null, ministry: { ar: "وزارة الطاقة", fr: "Ministère de l'Énergie", en: "Ministry of Energy" }, emails: ["info@mopmr.gov.sy"] },
+  { code: "so", city: { ar: "مقديشو", fr: "Mogadiscio", en: "Mogadishu" }, ministry: { ar: "وزارة البترول والثروة المعدنية", fr: "Ministère du Pétrole et des Ressources minières", en: "Ministry of Petroleum and Mineral Resources" }, emails: ["dg@mopmr.gov.so"] },
+  { code: "iq", city: { ar: "بغداد", fr: "Bagdad", en: "Baghdad" }, ministry: { ar: "وزارة الصناعة والمعادن", fr: "Ministère de l'Industrie et des Minerais", en: "Ministry of Industry and Minerals" }, emails: ["invest@industry.gov.iq", "minister@industry.gov.iq"] },
+  { code: "om", city: { ar: "مسقط", fr: "Mascate", en: "Muscat" }, ministry: { ar: "وزارة الطاقة والمعادن", fr: "Ministère de l'Énergie et des Minerais", en: "Ministry of Energy and Minerals" }, emails: ["info@mog.gov.om"] },
+  { code: "ps", city: { ar: "رام الله", fr: "Ramallah", en: "Ramallah" }, ministry: { ar: "وزارة الصناعة", fr: "Ministère de l'Industrie", en: "Ministry of Industry" }, emails: ["manalf@met.gov.ps", "m.farhan@mind.gov.ps", "minister.office@met.gov.ps"] },
+  { code: "qa", city: { ar: "الدوحة", fr: "Doha", en: "Doha" }, ministry: { ar: "وزارة التجارة والصناعة", fr: "Ministère du Commerce et de l'Industrie", en: "Ministry of Commerce and Industry" }, emails: ["salbraidi@moci.gov.qa"] },
+  { code: "kw", city: { ar: "الكويت", fr: "Koweït", en: "Kuwait City" }, ministry: { ar: "وزارة التجارة والصناعة", fr: "Ministère du Commerce et de l'Industrie", en: "Ministry of Commerce and Industry" }, emails: ["indust@pai.gov.kw"] },
+  { code: "lb", city: { ar: "بيروت", fr: "Beyrouth", en: "Beirut" }, ministry: { ar: "وزارة الطاقة والمياه", fr: "Ministère de l'Énergie et de l'Eau", en: "Ministry of Energy and Water" }, emails: ["minister@energyandwater.gov.lb", "mew@terra.net.lb"] },
+  { code: "ly", city: null, ministry: { ar: "وزارة الصناعة والمعادن", fr: "Ministère de l'Industrie et des Mines", en: "Ministry of Industry and Mines" }, emails: ["masnaili@yahoo.com", "info2@industry.gov.ly"] },
+  { code: "eg", city: { ar: "القاهرة", fr: "Le Caire", en: "Cairo" }, ministry: { ar: "وزارة البترول والثروة المعدنية", fr: "Ministère du Pétrole et des Ressources minières", en: "Ministry of Petroleum and Mineral Resources" }, emails: ["contact@petroleum.gov.eg"] },
+  { code: "ma", city: { ar: "الرباط", fr: "Rabat", en: "Rabat" }, ministry: { ar: "وزارة الانتقال الطاقي والتنمية المستدامة", fr: "Ministère de la Transition énergétique et du Développement durable", en: "Ministry of Energy Transition and Sustainable Development" }, emails: ["ministre@mem.gov.ma"] },
+  { code: "mr", city: { ar: "نواكشوط", fr: "Nouakchott", en: "Nouakchott" }, ministry: { ar: "وزارة المعادن والصناعة", fr: "Ministère des Mines et de l'Industrie", en: "Ministry of Mines and Industry" }, emails: ["contact.mpemi@gmail.com"] },
+  { code: "ye", city: null, ministry: { ar: "وزارة النفط والمعادن", fr: "Ministère du Pétrole et des Minerais", en: "Ministry of Oil and Minerals" }, emails: ["info@mom-ye.com"] },
 ];
 
 const COUNTRY_LABELS = {
@@ -348,7 +362,19 @@ const NUMBER_LOCALES = {
   en: "en-US",
 };
 
-const getCountryLabel = (code, language) => COUNTRY_LABELS[code]?.[language] || COUNTRY_LABELS[code]?.ar || code;
+const getCountryLabel = (code, language) =>
+  COUNTRY_LABELS[code]?.[language] || COUNTRY_LABELS[code]?.en || COUNTRY_LABELS[code]?.ar || code;
+
+const getOfficialContactTitle = (row, language) => {
+  const country = getCountryLabel(row.code, language);
+  if (row.city) {
+    const city = row.city[language] || row.city.ar;
+    return `${city} - ${country}`;
+  }
+  return country;
+};
+
+const getOfficialContactSubtitle = (row, language) => row.ministry[language] || row.ministry.ar;
 
 const shortText = (text, max = 95) => (text && text.length > max ? `${text.slice(0, max)}...` : text);
 
@@ -394,7 +420,7 @@ const buildPortalStats = () => {
   let exportTotal = 0;
   let importTotal = 0;
 
-  const uniqueSponsors = new Set(sponsors.map((s) => `${s.title}|${s.subtitle}`));
+  const uniqueSponsors = new Set(sponsors.map((s) => s.href));
 
   return {
     countryCount: countries.length,
@@ -1121,15 +1147,20 @@ const Home = () => {
   /* Sponsor carousel */
   const referenceCards = useMemo(
     () => [
-      ...sponsors,
+      ...sponsors.map((s) => ({
+        href: s.href,
+        img: s.img,
+        title: s.title[language] || s.title.ar,
+        subtitle: s.subtitle[language] || s.subtitle.ar,
+      })),
       ...officialContacts.map((c) => ({
         href: `mailto:${c.emails[0]}`,
-        title: c.country,
-        subtitle: c.ministry,
+        title: getOfficialContactTitle(c, language),
+        subtitle: getOfficialContactSubtitle(c, language),
         emails: c.emails,
       })),
     ],
-    []
+    [language]
   );
 
   const sponsorSlides = useMemo(() => {

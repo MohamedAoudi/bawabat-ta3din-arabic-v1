@@ -102,7 +102,7 @@ const FLAG_IMAGE_STYLE = {
 
 const COUNTRIES = [
   { name: "المملكة الأردنية الهاشمية", code: "jo" },
-  { name: "دولة الامارات العربية المتحدة", code: "ae" },
+  { name: "دولة الإمارات العربية المتحدة", code: "ae" },
   { name: "مملكة البحرين", code: "bh" },
   { name: "الجمهورية التونسية", code: "tn" },
   { name: "الجمهورية الجزائرية الديمقراطية الشعبية", code: "dz" },
@@ -110,9 +110,9 @@ const COUNTRIES = [
   { name: "المملكة العربية السعودية", code: "sa" },
   { name: "جمهورية السودان", code: "sd" },
   { name: "الجمهورية العربية السورية", code: "sy" },
-  { name: "جمهورية الصومال", code: "so" },
+  { name: "جمهورية الصومال الفيدرالية", code: "so" },
   { name: "جمهورية العراق", code: "iq" },
-  { name: "سلطنة عمان", code: "om" },
+  { name: "سلطنة عُمان", code: "om" },
   { name: "دولة فلسطين", code: "ps" },
   { name: "دولة قطر", code: "qa" },
   { name: "دولة الكويت", code: "kw" },
@@ -126,7 +126,7 @@ const COUNTRIES = [
 
 const COUNTRY_LABELS = {
   jo: { ar: "المملكة الأردنية الهاشمية", fr: "Royaume hachémite de Jordanie", en: "Hashemite Kingdom of Jordan" },
-  ae: { ar: "دولة الامارات العربية المتحدة", fr: "Émirats arabes unis", en: "United Arab Emirates" },
+  ae: { ar: "دولة الإمارات العربية المتحدة", fr: "Émirats arabes unis", en: "United Arab Emirates" },
   bh: { ar: "مملكة البحرين", fr: "Royaume de Bahreïn", en: "Kingdom of Bahrain" },
   tn: { ar: "الجمهورية التونسية", fr: "République tunisienne", en: "Tunisian Republic" },
   dz: { ar: "الجمهورية الجزائرية الديمقراطية الشعبية", fr: "République algérienne démocratique et populaire", en: "People's Democratic Republic of Algeria" },
@@ -134,9 +134,9 @@ const COUNTRY_LABELS = {
   sa: { ar: "المملكة العربية السعودية", fr: "Royaume d'Arabie saoudite", en: "Kingdom of Saudi Arabia" },
   sd: { ar: "جمهورية السودان", fr: "République du Soudan", en: "Republic of the Sudan" },
   sy: { ar: "الجمهورية العربية السورية", fr: "République arabe syrienne", en: "Syrian Arab Republic" },
-  so: { ar: "جمهورية الصومال", fr: "République fédérale de Somalie", en: "Federal Republic of Somalia" },
+  so: { ar: "جمهورية الصومال الفيدرالية", fr: "République fédérale de Somalie", en: "Federal Republic of Somalia" },
   iq: { ar: "جمهورية العراق", fr: "République d'Irak", en: "Republic of Iraq" },
-  om: { ar: "سلطنة عمان", fr: "Sultanat d'Oman", en: "Sultanate of Oman" },
+  om: { ar: "سلطنة عُمان", fr: "Sultanat d'Oman", en: "Sultanate of Oman" },
   ps: { ar: "دولة فلسطين", fr: "État de Palestine", en: "State of Palestine" },
   qa: { ar: "دولة قطر", fr: "État du Qatar", en: "State of Qatar" },
   kw: { ar: "دولة الكويت", fr: "État du Koweït", en: "State of Kuwait" },
@@ -155,7 +155,7 @@ const PAGE_TRANSLATIONS = {
 
     countryProfile: "ملف الدولة",
     productionComparison: "مقارنة الإنتاج",
-    productionComparisonSubtitle: (year) => `انتاج الخامات بالحجم حسب السنة ${year}`,
+    productionComparisonSubtitle: (year) => `إنتاج الخامات بالحجم حسب السنة ${year}`,
     arabCountries: "الدول العربية",
     world: "العالم",
     noDataForYear: (year) => `لا توجد بيانات لسنة ${year}`,
@@ -166,7 +166,7 @@ const PAGE_TRANSLATIONS = {
     total: "الإجمالي",
     productionTrend: "تطوّر الإنتاج التعديني",
     productionTrendSubtitle: (country, mineralFilter) => `${country} — جميع السنوات${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
-    yearlyProduction: "انتاج الخامات بالحجم حسب السنة",
+    yearlyProduction: "إنتاج الخامات بالحجم حسب السنة",
     yearlyProductionSubtitle: (country, year, mineralFilter) => `${country} — سنة ${year}${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
     mineralDistribution: "توزيع المعادن حسب النسبة",
     mineralDistributionSubtitle: (country, year) => `${country} — ${year}`,
@@ -180,8 +180,8 @@ const PAGE_TRANSLATIONS = {
     selectedCountry: "الدولة المختارة:",
     miningIndicators: "المؤشرات التعدينية",
     tradeIndicators: "الصادرات والواردات",
-    totalExportsTitle: "اجمالي الصادرات للمعادن",
-    totalImportsTitle: "اجمالي الواردات للمعادن",
+    totalExportsTitle: "إجمالي الصادرات للمعادن",
+    totalImportsTitle: "إجمالي الواردات للمعادن",
     selectYear: "اختر السنة :",
     miningProduction: "الإنتاج التعديني",
     totalMiningProduction: "إجمالي الإنتاج التعديني",
@@ -215,10 +215,12 @@ const PAGE_TRANSLATIONS = {
     mineralsCount: (count) => `${count} معدن`,
     millionDollar: "مليون دولار",
     dollar: "دولار",
-    
+    millionTonValue: "مليون طن",
+
   },
   fr: {
     none: "—",
+    allMinerals: "Tous les minerais",
 
     countryProfile: "Fiche pays",
     productionComparison: "Comparaison de la production",
@@ -286,7 +288,8 @@ const PAGE_TRANSLATIONS = {
   },
   en: {
     none: "—",
-   
+    allMinerals: "All minerals",
+
     countryProfile: "Country profile",
     productionComparison: "Production comparison",
     productionComparisonSubtitle: (year) => `Mining output by volume in ${year}`,
@@ -361,6 +364,7 @@ const NUMBER_LOCALES = {
 
 const COUNTRY_AR_TO_CSV_NAME = {
   "المملكة الأردنية الهاشمية": "Jordan",
+  "دولة الإمارات العربية المتحدة": "United Arab Emirates",
   "دولة الامارات العربية المتحدة": "United Arab Emirates",
   "مملكة البحرين": "Bahrain",
   "الجمهورية التونسية": "Tunisia",
@@ -369,8 +373,10 @@ const COUNTRY_AR_TO_CSV_NAME = {
   "المملكة العربية السعودية": "Saudi Arabia",
   "جمهورية السودان": "Sudan",
   "الجمهورية العربية السورية": "Syria",
+  "جمهورية الصومال الفيدرالية": "Somalia",
   "جمهورية الصومال": "Somalia",
   "جمهورية العراق": "Iraq",
+  "سلطنة عُمان": "Oman",
   "سلطنة عمان": "Oman",
   "دولة فلسطين": "Palestine",
   "دولة قطر": "Qatar",
@@ -388,7 +394,79 @@ const COUNTRY_CODE_TO_CSV_NAME = COUNTRIES.reduce((acc, country) => {
   return acc;
 }, {});
 
-const ARAB_COUNTRY_NAMES = COUNTRIES.map((c) => c.name);
+const ARAB_COUNTRY_CODES = new Set(COUNTRIES.map((c) => c.code));
+
+/** Tashkeel and tatwīl — treat عُمان and عمان as the same for lookups */
+const stripArabicTashkeel = (s) =>
+  String(s || "")
+    .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g, "")
+    .replace(/\u0640/g, "")
+    .trim();
+
+const normalizeArabicCountryKey = (s) =>
+  stripArabicTashkeel(String(s || "").trim())
+    .replace(/[إأآٱ]/g, "ا")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+
+const LOCALE_NAME_TO_CODE = COUNTRIES.reduce((acc, c) => {
+  ["fr", "en"].forEach((lang) => {
+    const t = COUNTRY_LABELS[c.code]?.[lang];
+    if (t) acc[String(t).trim().toLowerCase()] = c.code;
+  });
+  const csv = COUNTRY_CODE_TO_CSV_NAME[c.code];
+  if (csv) acc[String(csv).trim().toLowerCase()] = c.code;
+  return acc;
+}, {});
+
+const ARABIC_NORMALIZED_TO_CODE = (() => {
+  const m = {};
+  const add = (label, code) => {
+    if (!label || !code) return;
+    m[normalizeArabicCountryKey(label)] = code;
+  };
+  COUNTRIES.forEach((c) => {
+    add(c.name, c.code);
+    add(COUNTRY_LABELS[c.code]?.ar, c.code);
+  });
+  // Legacy / API spellings still seen in DB or static files
+  add("دولة الامارات العربية المتحدة", "ae");
+  add("دولة الإمارات العربية المتحدة", "ae");
+  add("جمهورية الصومال", "so");
+  add("جمهورية الصومال الفيدرالية", "so");
+  add("سلطنة عمان", "om");
+  add("سلطنة عُمان", "om");
+  return m;
+})();
+
+const resolveCountryIso2 = (input) => {
+  const raw = String(input ?? "").trim();
+  if (!raw) return "";
+  const lower = raw.toLowerCase();
+  if (countryFlags[lower]) return lower;
+  if (ISO3_TO_ISO2[lower]) return ISO3_TO_ISO2[lower];
+  const fromLocale = LOCALE_NAME_TO_CODE[lower];
+  if (fromLocale) return fromLocale;
+  const fromAr = ARABIC_NORMALIZED_TO_CODE[normalizeArabicCountryKey(raw)];
+  if (fromAr) return fromAr;
+  return "";
+};
+
+const canonicalCountryNameForData = (input) => {
+  const code = resolveCountryIso2(input);
+  if (code) {
+    const row = COUNTRIES.find((c) => c.code === code);
+    if (row?.name) return row.name;
+  }
+  return String(input ?? "").trim();
+};
+
+const countryNamesMatch = (a, b) => {
+  const ca = resolveCountryIso2(a);
+  const cb = resolveCountryIso2(b);
+  if (ca && cb) return ca === cb;
+  return String(a ?? "").trim() === String(b ?? "").trim();
+};
 
 const STATIC_YEARS = Array.from(
   new Set(
@@ -455,9 +533,11 @@ const buildDatasetFromDbRows = (rows) => {
     ).trim();
     if (!mineral || !country || !Number.isFinite(year) || !Number.isFinite(value)) return;
 
+    const countryKey = canonicalCountryNameForData(country);
+
     if (!byMineral[mineral]) byMineral[mineral] = {};
     if (!byMineral[mineral][year]) byMineral[mineral][year] = [];
-    byMineral[mineral][year].push({ country, value });
+    byMineral[mineral][year].push({ country: countryKey, value });
     if (unit) units[mineral] = unit;
     yearsSet.add(year);
   });
@@ -471,9 +551,18 @@ const buildDatasetFromDbRows = (rows) => {
 };
 
 const getCountryDisplayName = (countryName, language) => {
+  const code = resolveCountryIso2(countryName);
+  if (code) {
+    return (
+      COUNTRY_LABELS[code]?.[language] ||
+      COUNTRY_LABELS[code]?.en ||
+      COUNTRY_LABELS[code]?.ar ||
+      String(countryName ?? "")
+    );
+  }
   const country = COUNTRIES.find((item) => item.name === countryName || item.code === countryName);
-  if (!country) return countryName;
-  return COUNTRY_LABELS[country.code]?.[language] || country.name;
+  if (!country) return String(countryName ?? "");
+  return COUNTRY_LABELS[country.code]?.[language] || COUNTRY_LABELS[country.code]?.en || country.name;
 };
 
 const useCountriesI18n = () => {
@@ -787,12 +876,15 @@ const getCountryMineralData = (country, mineralFilter = null, toUnit = "ton") =>
   const minerals = Object.keys(runtimeDataByMineral).filter((m) =>
     !mineralFilter || mineralFilter === "all" ? true : m === mineralFilter
   );
+  const want = canonicalCountryNameForData(country);
   const chartData = minerals.map((mineral) => {
     const fromUnit = runtimeMineralUnits[mineral] || "";
     return {
       mineral,
       values: runtimeYears.map((year) => {
-        const row = (runtimeDataByMineral[mineral][year] || []).find((r) => r.country === country);
+        const row = (runtimeDataByMineral[mineral][year] || []).find(
+          (r) => canonicalCountryNameForData(r.country) === want
+        );
         const value = row ? row.value : null;
         return value != null ? convertVolume(value, fromUnit, toUnit) : null;
       }),
@@ -806,8 +898,11 @@ const getMineralShareForYear = (country, year, mineralFilter = null, toUnit = "t
     !mineralFilter || mineralFilter === "all" ? true : m === mineralFilter
   );
   const results = [];
+  const want = canonicalCountryNameForData(country);
   minerals.forEach((mineral) => {
-    const row = (runtimeDataByMineral[mineral][year] || []).find((r) => r.country === country);
+    const row = (runtimeDataByMineral[mineral][year] || []).find(
+      (r) => canonicalCountryNameForData(r.country) === want
+    );
     if (row && row.value > 0) {
       const fromUnit = runtimeMineralUnits[mineral] || "";
       const unitLabel = fromUnit || "";
@@ -833,24 +928,27 @@ const getComparisonData = (selectedCountry, year, mineralFilter, unit, scope) =>
     const fromUnit = runtimeMineralUnits[mineral] || "";
     (runtimeDataByMineral[mineral][year] || []).forEach((r) => {
       if (!r.country || !r.value) return;
-      if (scope === "arab" && !ARAB_COUNTRY_NAMES.includes(r.country)) return;
+      const rowCode = resolveCountryIso2(r.country);
+      if (scope === "arab" && (!rowCode || !ARAB_COUNTRY_CODES.has(rowCode))) return;
       const converted = convertVolume(r.value, fromUnit, unit) || 0;
-      countryTotals[r.country] = (countryTotals[r.country] || 0) + converted;
+      const key = canonicalCountryNameForData(r.country);
+      countryTotals[key] = (countryTotals[key] || 0) + converted;
     });
   });
   const sorted = Object.entries(countryTotals).filter(([, v]) => v > 0).sort(([, a], [, b]) => b - a);
   if (sorted.length === 0) return null;
-  const selectedValue = countryTotals[selectedCountry] || 0;
-  const selectedRank = sorted.findIndex(([name]) => name === selectedCountry) + 1;
+  const selectedKey = canonicalCountryNameForData(selectedCountry);
+  const selectedValue = countryTotals[selectedKey] || 0;
+  const selectedRank = sorted.findIndex(([name]) => name === selectedKey) + 1;
   const leaderName = sorted[0]?.[0] || null;
   const leaderValue = sorted[0]?.[1] || 0;
   const leaderGap = Math.max(leaderValue - selectedValue, 0);
 
-  const others = sorted.filter(([name]) => name !== selectedCountry);
+  const others = sorted.filter(([name]) => name !== selectedKey);
   const topOthers = others.slice(0, 8);
   const restValue = others.slice(8).reduce((s, [, v]) => s + v, 0);
   const slices = [];
-  if (selectedValue > 0) slices.push({ name: selectedCountry, value: selectedValue, isSelected: true });
+  if (selectedValue > 0) slices.push({ name: selectedKey, value: selectedValue, isSelected: true });
   topOthers.forEach(([name, value]) => slices.push({ name, value, isSelected: false }));
   if (restValue > 0) slices.push({ name: "أخرى", value: restValue, isSelected: false });
   const total = slices.reduce((s, d) => s + d.value, 0);
@@ -1896,7 +1994,9 @@ const Countries = () => {
   const [lineMineralFilter, setLineMineralFilter] = useState("all");
   const [summaryYear, setSummaryYear]         = useState(DEFAULT_SELECTED_YEAR);
 
-  const selectedCountryObj = countries.find((c) => c.name === selected);
+  const selectedCountryObj = countries.find(
+    (c) => countryNamesMatch(c.name, selected) || String(c.code).toLowerCase() === String(selected).trim().toLowerCase()
+  );
   const selectedTheme = getCountryTheme(selectedCountryObj?.code);
   runtimeDataByMineral = productionDataset.dataByMineral;
   runtimeMineralUnits = productionDataset.mineralUnits;
@@ -1912,14 +2012,19 @@ const Countries = () => {
 
         const mapped = rows
           .filter((row) => row?.iso_code && row?.name_ar)
-          .map((row) => ({
-            id: row.id,
-            code: normalizeCountryCode(row.iso_code),
-            name: row.name_ar,
-            name_en: row.name_en || "",
-            name_fr: row.name_fr || "",
-            display_order: Number.isFinite(Number(row.display_order)) ? Number(row.display_order) : Number.MAX_SAFE_INTEGER,
-          }))
+          .map((row) => {
+            const code = normalizeCountryCode(row.iso_code);
+            const nameAr =
+              COUNTRY_LABELS[code]?.ar || COUNTRIES.find((x) => x.code === code)?.name || row.name_ar;
+            return {
+              id: row.id,
+              code,
+              name: nameAr,
+              name_en: row.name_en || "",
+              name_fr: row.name_fr || "",
+              display_order: Number.isFinite(Number(row.display_order)) ? Number(row.display_order) : Number.MAX_SAFE_INTEGER,
+            };
+          })
           .sort((a, b) => a.display_order - b.display_order);
 
         if (mapped.length) setCountries(mapped);
@@ -2188,19 +2293,21 @@ const Countries = () => {
             </a>
           </div>
           <div className="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-3 sm:gap-x-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
-            {countries.map((c) => (
+            {countries.map((c) => {
+              const rowSelected = countryNamesMatch(selected, c.name) || String(selected).trim().toLowerCase() === c.code;
+              return (
               <button key={c.code} type="button" onClick={()=>setSelected(c.name)}
                       className="group flex min-w-0 flex-col items-center text-center transition-transform hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] rounded-lg">
                 <div className={`relative flex h-20 w-full items-center justify-center overflow-hidden rounded-lg transition-all sm:h-24 ${isDarkMode ? "bg-black/30" : "bg-slate-50"}`}
-                  style={{ boxShadow:selected===c.name?"0 0 0 2px #C9A84C,0 4px 12px rgba(201,168,76,0.25)":"0 1px 4px rgba(0,0,0,0.08)" }}>
+                  style={{ boxShadow:rowSelected?"0 0 0 2px #C9A84C,0 4px 12px rgba(201,168,76,0.25)":"0 1px 4px rgba(0,0,0,0.08)" }}>
                   <img src={countryFlags[c.code]} alt={getCountryDisplayName(c.name, language)} loading="lazy" decoding="async" style={{ ...FLAG_IMAGE_STYLE, padding:"2px", background: isDarkMode ? "#0b1f1a" : "#f8fafc" }} />
-                  {selected===c.name && <div className="absolute inset-0 rounded-lg" style={{ background:"rgba(201,168,76,0.08)" }} />}
+                  {rowSelected && <div className="absolute inset-0 rounded-lg" style={{ background:"rgba(201,168,76,0.08)" }} />}
                 </div>
-                <p className={`mt-1.5 line-clamp-2 min-h-[2.5rem] text-[10px] font-bold leading-tight transition-colors sm:min-h-0 sm:text-[11px] ${selected===c.name?"text-[#C9A84C]":isDarkMode?"text-slate-300 group-hover:text-[#C9A84C]":"text-slate-600 group-hover:text-[#082721]"}`}>
+                <p className={`mt-1.5 line-clamp-2 min-h-[2.5rem] text-[10px] font-bold leading-tight transition-colors sm:min-h-0 sm:text-[11px] ${rowSelected?"text-[#C9A84C]":isDarkMode?"text-slate-300 group-hover:text-[#C9A84C]":"text-slate-600 group-hover:text-[#082721]"}`}>
                   {getCountryDisplayName(c.name, language)}
                 </p>
               </button>
-            ))}
+            );})}
           </div>
           {selected&&selected!=="—"&&(
             <div className={`mt-5 flex flex-col items-stretch gap-2 border-t pt-4 sm:flex-row sm:items-center sm:gap-3 ${isDarkMode ? "border-white/10" : "border-slate-100"}`}>

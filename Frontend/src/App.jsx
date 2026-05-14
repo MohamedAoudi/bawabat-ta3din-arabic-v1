@@ -29,10 +29,13 @@ import ProductionManagementPage from "./pages/ProductionManagement";
 export const LanguageContext = createContext();
 export const ThemeContext = createContext();
 
+const ALLOWED_LANGUAGES = ["ar", "fr", "en"];
+
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("appLanguage") || "ar";
+      const stored = localStorage.getItem("appLanguage");
+      return ALLOWED_LANGUAGES.includes(stored) ? stored : "ar";
     }
     return "ar";
   });
@@ -44,7 +47,7 @@ export function LanguageProvider({ children }) {
   }, [language]);
 
   const changeLanguage = (lang) => {
-    if (["ar", "fr", "en"].includes(lang)) {
+    if (ALLOWED_LANGUAGES.includes(lang)) {
       setLanguage(lang);
     }
   };
