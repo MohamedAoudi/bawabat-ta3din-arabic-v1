@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Chart from "chart.js/auto";
 import { TreemapController, TreemapElement } from "chartjs-chart-treemap";
@@ -1871,9 +1872,8 @@ const TradeIndicatorsPanel = ({ country, exportSeries, importSeries, exportBreak
 // ── Main page ──────────────────────────────────────────────────────────────────
 const Countries = () => {
   const { labels, language, isArabic, isDarkMode } = useCountriesI18n();
-  const query = typeof window!=="undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
-  const initialCountryCode = query.get("country");
-  const initialSelected    = "—";
+  const [searchParams] = useSearchParams();
+  const countryFromUrl = searchParams.get("country");
 
   const [countries, setCountries]               = useState(COUNTRIES);
   const [yearsFromDb, setYearsFromDb] = useState([]);
@@ -1883,7 +1883,7 @@ const Countries = () => {
   const [productionDataset, setProductionDataset] = useState(() =>
     buildDatasetFromDbRows([])
   );
-  const [selected, setSelected]               = useState(initialSelected);
+  const [selected, setSelected]               = useState("—");
   const [donutYear, setDonutYear]             = useState(DEFAULT_SELECTED_YEAR);
   const [barYear, setBarYear]                 = useState(DEFAULT_SELECTED_YEAR);
   const [barMineralFilter, setBarMineralFilter] = useState("all");
@@ -2009,15 +2009,11 @@ const Countries = () => {
   }, []);
 
   useEffect(() => {
-    if (!countries.length) return;
-
-    if (initialCountryCode) {
-      const byCode = countries.find((c) => c.code === String(initialCountryCode).toLowerCase());
-      if (byCode) {
-        setSelected(byCode.name);
-      }
-    }
-  }, [countries, initialCountryCode, selected]);
+    if (!countries.length || !countryFromUrl) return;
+    const normalized = normalizeCountryCode(countryFromUrl);
+    const byCode = countries.find((c) => c.code === normalized);
+    if (byCode) setSelected(byCode.name);
+  }, [countries, countryFromUrl]);
 
   useEffect(() => {
     if (!runtimeYears.length) return;

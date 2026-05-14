@@ -1,7 +1,8 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useMemo, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
 import { isAuthenticated, logout, getCurrentUser } from "../services/authService";
+import { getCountries } from "../services/countryService";
 import { 
   User, Search, Moon, Sun, FileText, 
   LogIn, ChevronDown, LayoutGrid, 
@@ -12,9 +13,9 @@ import logoAmip from "../assets/logo_n_v-removebg-preview.png";
 import logoAidsmo from "../assets/aidsmo logo sans bg 800x 800.png";
 
 const TRANSLATIONS = {
-  ar: { home: "الرئيسية", indicators: "المؤشرات", arabCountries: "الدول العربية", about: "عن البوابة", contact: "اتصل بنا", quickSearch: "بحث...", smartReports: "التقارير الذكية", login: "دخول", logout: "تسجيل الخروج", dashboard: "لوحة التحكم", miningProduction: "الانتاج التعديني", miningTrade: "التجارة التعدينية", productionVolume: "حجم الإنتاج", productionEvolution: "تطور الإنتاج", exports: "الصادرات", imports: "الواردات" },
-  fr: { home: "Accueil", indicators: "Indicateurs", arabCountries: "Pays Arabes", about: "À Propos", contact: "Contactez-nous", quickSearch: "Recherche...", smartReports: "Rapports IA", login: "Connexion", logout: "Déconnexion", dashboard: "Tableau de bord", miningProduction: "Production Minière", miningTrade: "Commerce Minier", productionVolume: "Volume de Production", productionEvolution: "Évolution Production", exports: "Exportations", imports: "Importations" },
-  en: { home: "Home", indicators: "Indicators", arabCountries: "Arab Countries", about: "About Us", contact: "Contact Us", quickSearch: "Search...", smartReports: "Smart Reports", login: "Login", logout: "Logout", dashboard: "Dashboard", miningProduction: "Mining Production", miningTrade: "Mining Trade", productionVolume: "Production Volume", productionEvolution: "Production Evolution", exports: "Exports", imports: "Imports" }
+  ar: { home: "الرئيسية", indicators: "المؤشرات", arabCountries: "الدول العربية", about: "عن البوابة", contact: "اتصل بنا", quickSearch: "بحث...", smartReports: "التقارير الذكية", login: "دخول", logout: "تسجيل الخروج", dashboard: "لوحة التحكم", miningProduction: "الانتاج التعديني", miningTrade: "التجارة التعدينية", productionVolume: "حجم الإنتاج", productionEvolution: "تطور الإنتاج", exports: "الصادرات", imports: "الواردات", noSearchResults: "لا نتائج مطابقة" },
+  fr: { home: "Accueil", indicators: "Indicateurs", arabCountries: "Pays Arabes", about: "À Propos", contact: "Contactez-nous", quickSearch: "Recherche...", smartReports: "Rapports IA", login: "Connexion", logout: "Déconnexion", dashboard: "Tableau de bord", miningProduction: "Production Minière", miningTrade: "Commerce Minier", productionVolume: "Volume de Production", productionEvolution: "Évolution Production", exports: "Exportations", imports: "Importations", noSearchResults: "Aucun résultat" },
+  en: { home: "Home", indicators: "Indicators", arabCountries: "Arab Countries", about: "About Us", contact: "Contact Us", quickSearch: "Search...", smartReports: "Smart Reports", login: "Login", logout: "Logout", dashboard: "Dashboard", miningProduction: "Mining Production", miningTrade: "Mining Trade", productionVolume: "Production Volume", productionEvolution: "Production Evolution", exports: "Exports", imports: "Imports", noSearchResults: "No matching results" }
 };
 
 const NewSplitMenu = () => {
@@ -24,7 +25,10 @@ const NewSplitMenu = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [indicatorsOpen, setIndicatorsOpen] = useState(false); // حالة القائمة المنسدلة للموبايل
   const [searchFocused, setSearchFocused] = useState(false);
-  
+  const [navSearchQuery, setNavSearchQuery] = useState("");
+  const [navCountries, setNavCountries] = useState([]);
+  const searchBlurTimer = useRef(null);
+
   const location = useLocation();
   const navigate = useNavigate();
   const isRTL = language === "ar";
@@ -36,13 +40,66 @@ const NewSplitMenu = () => {
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (searchBlurTimer.current) clearTimeout(searchBlurTimer.current);
+    };
   }, []);
 
   useEffect(() => {
     setMobileOpen(false);
     setIndicatorsOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    let active = true;
+    getCountries()
+      .then((rows) => {
+        if (!active || !Array.isArray(rows)) return;
+        const mapped = rows
+          .filter((row) => row?.iso_code && (row?.name_ar || row?.name_en || row?.name_fr))
+          .map((row) => ({
+            code: String(row.iso_code).trim().toLowerCase(),
+            name_ar: row.name_ar || "",
+            name_en: row.name_en || "",
+            name_fr: row.name_fr || "",
+          }));
+        setNavCountries(mapped);
+      })
+      .catch(() => {
+        if (active) setNavCountries([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const countrySearchLabel = (c) => {
+    if (language === "ar") return c.name_ar || c.name_en || c.name_fr || c.code;
+    if (language === "fr") return c.name_fr || c.name_en || c.name_ar || c.code;
+    return c.name_en || c.name_fr || c.name_ar || c.code;
+  };
+
+  const filteredNavCountries = useMemo(() => {
+    const q = navSearchQuery.trim().toLowerCase();
+    if (q.length < 1 || !navCountries.length) return [];
+    return navCountries
+      .filter((c) => {
+        const hay = [c.name_ar, c.name_en, c.name_fr, c.code].join(" ").toLowerCase();
+        return hay.includes(q);
+      })
+      .slice(0, 10);
+  }, [navSearchQuery, navCountries]);
+
+  const openSearchDropdown = searchFocused && navSearchQuery.trim().length > 0;
+
+  const goToCountry = (code) => {
+    if (searchBlurTimer.current) clearTimeout(searchBlurTimer.current);
+    navigate(`/countries?country=${encodeURIComponent(code)}`);
+    setNavSearchQuery("");
+    setSearchFocused(false);
+    setMobileOpen(false);
+  };
 
   const handleLogout = () => {
     logout();
@@ -78,23 +135,57 @@ const NewSplitMenu = () => {
 
       <header className="fixed top-0 left-0 right-0 z-[900] font-cairo" dir={isRTL ? "rtl" : "ltr"}>
         
-        {/* TOP BAR */}
-        <div className="bg-[#082721] h-8 sm:h-12 flex items-center border-b border-white/5">
+        {/* TOP BAR: higher z-index than main nav so country search list paints above "Indicators" */}
+        <div className="relative z-[1020] bg-[#082721] h-8 sm:h-12 flex items-center border-b border-white/5">
           <div className="max-w-7xl mx-auto w-full px-4 flex justify-between items-center">
             <a href="https://aidsmo.org" target="_blank" rel="noreferrer" className="flex-shrink-0">
               <img src={logoAidsmo} alt="AIDSMO" className="h-7 w-7 sm:h-9 sm:w-9 object-contain" />
             </a>
 
-            <div className="hidden md:flex flex-1 justify-center px-6 max-w-md">
-              <div className={`relative flex items-center w-full transition-all duration-300 ${searchFocused ? 'scale-105' : ''}`}>
-                <Search size={14} className={`absolute text-[#C9A84C] ${isRTL ? 'right-3' : 'left-3'}`} />
+            <div className="flex flex-1 justify-center px-2 sm:px-6 min-w-0 max-w-full md:max-w-md">
+              <div className={`relative isolate flex items-center w-full transition-all duration-300 ${searchFocused ? 'scale-[1.02] md:scale-105' : ''}`}>
+                <Search size={14} className={`absolute text-[#C9A84C] pointer-events-none ${isRTL ? 'right-3' : 'left-3'}`} />
                 <input 
                   type="text" 
+                  value={navSearchQuery}
+                  onChange={(e) => setNavSearchQuery(e.target.value)}
                   placeholder={t("quickSearch")}
-                  onFocus={() => setSearchFocused(true)}
-                  onBlur={() => setSearchFocused(false)}
+                  onFocus={() => {
+                    if (searchBlurTimer.current) clearTimeout(searchBlurTimer.current);
+                    setSearchFocused(true);
+                  }}
+                  onBlur={() => {
+                    searchBlurTimer.current = setTimeout(() => setSearchFocused(false), 180);
+                  }}
+                  autoComplete="off"
                   className={`w-full rounded-full py-1.5 text-xs bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-[#C9A84C] transition-all ${isRTL ? 'pr-9 pl-4' : 'pl-9 pr-4'}`}
                 />
+                {openSearchDropdown && (
+                  <div
+                    className={`absolute top-full z-[1000] mt-1 w-full min-w-[220px] rounded-xl border border-white/10 bg-[#082721] py-1 shadow-2xl ${isRTL ? 'right-0' : 'left-0'}`}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    {filteredNavCountries.length === 0 ? (
+                      <p className="px-3 py-2 text-[11px] text-white/50">{t("noSearchResults")}</p>
+                    ) : (
+                      <>
+                        <p className="px-3 py-1.5 text-[9px] font-black uppercase tracking-wider text-[#C9A84C]/80 border-b border-white/5">{t("arabCountries")}</p>
+                        {filteredNavCountries.map((c) => (
+                          <button
+                            key={c.code}
+                            type="button"
+                            onClick={() => goToCountry(c.code)}
+                            className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-bold text-white/90 hover:bg-[#C9A84C]/15 hover:text-[#C9A84C] transition-colors"
+                            style={{ textAlign: isRTL ? "right" : "left" }}
+                          >
+                            <Map size={14} className="flex-shrink-0 text-[#C9A84C]" />
+                            <span className="min-w-0 flex-1 truncate">{countrySearchLabel(c)}</span>
+                          </button>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -130,8 +221,8 @@ const NewSplitMenu = () => {
           </div>
         </div>
 
-        {/* MAIN NAVIGATION */}
-        <div className={`w-full transition-all duration-300 ${scrolled ? 'py-1' : 'py-1'}`}>
+        {/* MAIN NAV: below top bar stacking so search dropdown is not covered */}
+        <div className={`relative z-[1010] w-full transition-all duration-300 ${scrolled ? 'py-1' : 'py-1'}`}>
           <div className="max-w-7xl mx-auto px-4">
             <div className="main-nav-glass rounded-xl px-4 py-2 flex items-center justify-between transition-all duration-300">
               
@@ -149,7 +240,7 @@ const NewSplitMenu = () => {
                     {t("indicators")}
                     <ChevronDown size={14} className="group-hover:rotate-180 transition-transform" />
                   </button>
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all z-50">
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all z-[1015]">
                     <div className="bg-[#082721] border border-[#C9A84C]/20 rounded-xl p-4 w-72 shadow-2xl">
                        <div className="grid grid-cols-1 gap-4 text-right">
                           <div>
@@ -205,6 +296,41 @@ const NewSplitMenu = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-1">
+            <div className="relative mb-2">
+              <Search size={16} className={`absolute text-[#C9A84C] top-1/2 -translate-y-1/2 ${isRTL ? 'right-3' : 'left-3'}`} />
+              <input
+                type="text"
+                value={navSearchQuery}
+                onChange={(e) => setNavSearchQuery(e.target.value)}
+                placeholder={t("quickSearch")}
+                autoComplete="off"
+                className={`w-full rounded-xl py-2.5 text-sm bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-[#C9A84C] ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
+              />
+              {navSearchQuery.trim().length > 0 && (
+                <div
+                  className="absolute left-0 right-0 top-full z-[1000] mt-1 rounded-xl border border-white/10 bg-[#0a3028] py-1 shadow-xl"
+                  onMouseDown={(e) => e.preventDefault()}
+                >
+                  {filteredNavCountries.length === 0 ? (
+                    <p className="px-3 py-2 text-xs text-white/50">{t("noSearchResults")}</p>
+                  ) : (
+                    filteredNavCountries.map((c) => (
+                      <button
+                        key={`m-${c.code}`}
+                        type="button"
+                        onClick={() => goToCountry(c.code)}
+                        className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-bold text-white/90 hover:bg-[#C9A84C]/15"
+                        style={{ textAlign: isRTL ? "right" : "left" }}
+                      >
+                        <Map size={18} className="text-[#C9A84C] flex-shrink-0" />
+                        <span className="truncate">{countrySearchLabel(c)}</span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Home */}
             <Link to="/" className={`flex items-center gap-4 p-3.5 rounded-xl transition-all ${location.pathname === '/' ? 'bg-[#C9A84C] text-white' : 'text-white/80 hover:bg-white/5'}`}>
               <LayoutGrid size={22} />
