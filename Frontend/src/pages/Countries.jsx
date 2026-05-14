@@ -1109,18 +1109,18 @@ const SnapshotStatCard = ({
   valueClassName = "",
 }) => (
   <div
-    className={`rounded-[18px] px-4 py-4 text-center ${className}`}
+    className={`rounded-[18px] px-3 py-3 text-center sm:px-4 sm:py-4 ${className}`}
     style={{ backgroundColor: bgColor, border: noBorder ? "none" : `2px solid ${borderColor}`, boxShadow: "0 4px 12px rgba(15,23,42,0.06)" }}
   >
-    <p className="text-[16px] font-bold" style={{ color: "#d4a017" }}>{title}</p>
-    <p className={`mt-2 text-[25px] font-black leading-tight ${dark ? "text-white" : "text-slate-900"} ${valueClassName}`}>{value}</p>
-    {note ? <p className="mt-1 text-[13px] font-semibold" style={{ color: "#d4a017" }}>{note}</p> : null}
+    <p className="text-sm font-bold sm:text-[16px] leading-snug" style={{ color: "#d4a017" }}>{title}</p>
+    <p className={`mt-2 break-words text-lg font-black leading-tight sm:text-xl md:text-2xl ${dark ? "text-white" : "text-slate-900"} ${valueClassName}`}>{value}</p>
+    {note ? <p className="mt-1 text-xs font-semibold sm:text-[13px]" style={{ color: "#d4a017" }}>{note}</p> : null}
   </div>
 );
 
 const SnapshotSectionHeader = ({ title, featured = false }) => (
   <div
-    className={featured ? "mb-3 rounded-[13px] px-4 py-3 text-center" : "mb-3 rounded-sm border bg-[#f2f2f2] px-4 py-1 text-center text-[18px] font-black text-slate-800"}
+    className={featured ? "mb-3 rounded-[13px] px-3 py-2.5 text-center sm:px-4 sm:py-3" : "mb-3 rounded-sm border bg-[#f2f2f2] px-3 py-1.5 text-center text-base font-black text-slate-800 sm:px-4 sm:text-[18px]"}
     style={featured
       ? {
           background: "var(--country-title-bg, linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%))",
@@ -1130,7 +1130,7 @@ const SnapshotSectionHeader = ({ title, featured = false }) => (
   >
     {featured ? (
       <span
-        className="text-[20px] font-black"
+        className="text-base font-black sm:text-lg md:text-[20px]"
         style={{
           display: "inline-block",
           background: "linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)",
@@ -1183,14 +1183,14 @@ const CountrySnapshotPanel = ({
         : "#94a3b8";
 
   return (
-    <section className="rounded-[24px] bg-[#f7f7f7] p-4 sm:p-5" style={{ border: "1px solid #d4d4d4" }}>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <label className="flex items-center gap-2 text-[16px] font-bold text-slate-700">
-          <span>{labels.selectYear}</span>
+    <section className="rounded-[24px] bg-[#f7f7f7] p-3 sm:p-5" style={{ border: "1px solid #d4d4d4" }}>
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
+        <label className="flex w-full flex-col gap-2 text-sm font-bold text-slate-700 sm:w-auto sm:flex-row sm:items-center sm:text-[16px]">
+          <span className="shrink-0">{labels.selectYear}</span>
           <select
             value={year}
             onChange={(e) => onYearChange?.(Number(e.target.value))}
-            className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-[16px] font-bold text-slate-800 outline-none"
+            className="w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-800 outline-none sm:w-auto sm:py-1.5 sm:text-[16px]"
           >
             {runtimeYears.map((yr) => (
               <option key={yr} value={yr}>{yr}</option>
@@ -1209,13 +1209,13 @@ const CountrySnapshotPanel = ({
 
       <div className="mt-5">
         <SnapshotSectionHeader title={labels.miningTrade} featured />
-        <div className="grid gap-3 xl:grid-cols-[180px_minmax(0,1fr)]">
-          <div className="rounded-[22px] bg-white px-4 py-6 text-center" style={{ border: `2px solid ${balanceColor}` }}>
-            <p className="text-[15px] font-bold" style={{ color: "#d4a017" }}>{labels.tradeBalance}</p>
-            <p className="text-[16px] font-bold" style={{ color: "#d4a017" }}>{labels.surplusDeficit}</p>
-            <div className="mt-16 space-y-2">
-              <p className="text-[28px] font-black text-slate-900">{summary.tradeBalance.statusText}</p>
-              <p className="text-[32px] font-black leading-tight text-slate-900">{summary.tradeBalance.valueText}</p>
+        <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,180px)_minmax(0,1fr)]">
+          <div className="rounded-[22px] bg-white px-3 py-5 text-center sm:px-4 sm:py-6" style={{ border: `2px solid ${balanceColor}` }}>
+            <p className="text-sm font-bold sm:text-[15px]" style={{ color: "#d4a017" }}>{labels.tradeBalance}</p>
+            <p className="text-sm font-bold sm:text-[16px]" style={{ color: "#d4a017" }}>{labels.surplusDeficit}</p>
+            <div className="mt-6 space-y-2 sm:mt-10 md:mt-16">
+              <p className="text-xl font-black text-slate-900 sm:text-2xl md:text-[28px]">{summary.tradeBalance.statusText}</p>
+              <p className="text-lg font-black leading-tight text-slate-900 break-words sm:text-2xl md:text-[32px]">{summary.tradeBalance.valueText}</p>
             </div>
           </div>
 
@@ -1296,22 +1296,26 @@ function useChartInit(buildChart, deps) {
 
 // ── Shared UI ─────────────────────────────────────────────────────────────────
 const Card = ({ children, className = "" }) => (
-  <div className={`rounded-2xl p-5 sm:p-6 ${className}`}
+  <div className={`min-w-0 overflow-hidden rounded-2xl p-4 sm:p-6 ${className}`}
     style={{ background:"var(--country-card-bg, linear-gradient(160deg,#0e4238 0%,#082c23 60%,#051a15 100%))", border:"1px solid var(--country-card-border, rgba(201,168,76,0.20))", boxShadow:"var(--country-card-shadow, 0 4px 24px rgba(0,0,0,0.30), inset 0 1px 0 rgba(201,168,76,0.08))", fontFamily:"'Cairo','Tajawal',sans-serif" }}>
     {children}
   </div>
 );
 
 const CardHeader = ({ title, subtitle, children }) => (
-  <div className="flex flex-wrap items-start justify-between gap-4 mb-5 pb-4" style={{ borderBottom:"1px solid rgba(201,168,76,0.14)" }}>
-    <div className="flex items-center gap-3">
-      <div className="w-0.5 h-6 rounded-full flex-shrink-0" style={{ background:"linear-gradient(180deg,#C9A84C,#7a4a00)" }} />
-      <div>
-        <h3 className="text-[18px] font-extrabold leading-tight" style={{ color: "#d4a017" }}>{title}</h3>
-        {subtitle && <p className="text-[16px] mt-0.5" style={{ color: "#d4a017" }}>{subtitle}</p>}
+  <div className="mb-5 flex flex-col gap-4 pb-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between" style={{ borderBottom:"1px solid rgba(201,168,76,0.14)" }}>
+    <div className="flex min-w-0 flex-1 items-start gap-3">
+      <div className="mt-1 h-6 w-0.5 shrink-0 rounded-full" style={{ background:"linear-gradient(180deg,#C9A84C,#7a4a00)" }} />
+      <div className="min-w-0">
+        <h3 className="text-base font-extrabold leading-snug sm:text-[18px]" style={{ color: "#d4a017" }}>{title}</h3>
+        {subtitle && <p className="mt-1 break-words text-sm leading-snug sm:mt-0.5 sm:text-[15px] md:text-[16px]" style={{ color: "#d4a017" }}>{subtitle}</p>}
       </div>
     </div>
-    {children && <div className="flex items-center gap-2 flex-wrap">{children}</div>}
+    {children && (
+      <div className="flex w-full min-w-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-2">
+        {children}
+      </div>
+    )}
   </div>
 );
 
@@ -1331,16 +1335,15 @@ const YearPills = ({ selectedYear, onYearChange }) => (
 
 const ChartSectionTitle = ({ title }) => (
   <section
+    className="mx-auto mt-6 max-w-full px-3 py-5 sm:mt-8 sm:px-6 sm:py-7"
     style={{
       textAlign: "center",
-      marginTop: 32,
       background: "var(--country-title-bg, linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%))",
       borderRadius: 13,
-      padding: "28px 24px",
       boxShadow: "0 40px 80px rgba(8,39,33,0.35),inset 0 0 0 1px rgba(201,168,76,0.08)",
     }}
   >
-    <h3 style={{ fontSize: "1.35rem", fontWeight: 900, color: "white", margin: 0 }}>
+    <h3 className="m-0 text-lg font-black leading-tight sm:text-xl md:text-[1.35rem]" style={{ color: "white" }}>
       <span
         style={{
           background: "linear-gradient(120deg,#c9a84c 0%,#f0d98a 40%,#c9a84c 60%,#8a6a1e 100%)",
@@ -1363,23 +1366,23 @@ const CountryHeroBanner = ({ country, countryCode, theme }) => {
   const flagSrc = countryFlags[countryCode];
   const countryLabel = getCountryDisplayName(country, language);
   return (
-    <div className="relative overflow-hidden rounded-2xl flex items-center gap-6 px-6 py-5"
+    <div className="relative flex flex-col items-center gap-4 overflow-hidden rounded-2xl px-4 py-4 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-5"
       style={{ background:theme?.heroBg || "linear-gradient(135deg,#082c23 0%,#0d3b2e 40%,#0a3028 100%)", border:"1px solid rgba(201,168,76,0.25)", boxShadow:"0 4px 24px rgba(0,0,0,0.35),inset 0 1px 0 rgba(201,168,76,0.10)", fontFamily:"'Cairo','Tajawal',sans-serif" }}>
-      <div className="absolute right-0 top-0 bottom-0 w-64 pointer-events-none"
+      <div className="pointer-events-none absolute bottom-0 right-0 top-0 w-48 sm:w-64"
         style={{ background:theme?.heroGlow || "radial-gradient(ellipse at 80% 50%,rgba(201,168,76,0.08) 0%,transparent 70%)" }} />
       {flagSrc && (
-        <div className="relative flex-shrink-0 overflow-hidden"
-          style={{ width:160, height:110, borderRadius:14, boxShadow:"0 6px 20px rgba(0,0,0,0.5),0 0 0 1px rgba(201,168,76,0.3)" }}>
+        <div className="relative mx-auto w-full max-w-[200px] shrink-0 overflow-hidden sm:mx-0 sm:max-w-[160px]"
+          style={{ aspectRatio:"160/110", borderRadius:14, boxShadow:"0 6px 20px rgba(0,0,0,0.5),0 0 0 1px rgba(201,168,76,0.3)" }}>
           <img src={flagSrc} alt={country} decoding="async" style={{ ...FLAG_IMAGE_STYLE, display:"block", background:"#0b1f1a" }} />
           <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,rgba(255,255,255,0.07) 0%,transparent 60%)", borderRadius:14 }} />
         </div>
       )}
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1 text-center sm:text-start">
         <div className="flex items-center gap-3 mb-1">
           <div className="h-px flex-1" style={{ background:"linear-gradient(90deg,rgba(201,168,76,0.4),transparent)" }} />
           <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color:"rgba(201,168,76,0.5)" }}>{labels.countryProfile}</span>
         </div>
-        <h2 className="font-black leading-snug" style={{ color:"#ffffff", fontSize:"clamp(16px,2.5vw,22px)", textShadow:"0 2px 12px rgba(0,0,0,0.5)" }}>{countryLabel}</h2>
+        <h2 className="break-words font-black leading-snug" style={{ color:"#ffffff", fontSize:"clamp(15px,4vw,22px)", textShadow:"0 2px 12px rgba(0,0,0,0.5)" }}>{countryLabel}</h2>
         <div className="flex items-center gap-2 mt-2">
           
         </div>
@@ -1424,10 +1427,10 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
   return (
     <Card>
       <CardHeader title={labels.productionComparison} subtitle={labels.productionComparisonSubtitle(year)}>
-        <div className="flex rounded-full overflow-hidden" style={{ border:"1px solid rgba(201,168,76,0.25)" }}>
+        <div className="flex w-full justify-stretch overflow-hidden rounded-full sm:w-auto sm:justify-start" style={{ border:"1px solid rgba(201,168,76,0.25)" }}>
           {[{key:"arab",label:labels.arabCountries},{key:"world",label:labels.world}].map(({key,label})=>(
             <button key={key} type="button" onClick={()=>setScope(key)}
-              className="px-4 py-1.5 text-[11px] font-bold transition-all duration-200"
+              className="min-w-0 flex-1 px-3 py-1.5 text-[10px] font-bold transition-all duration-200 sm:flex-none sm:px-4 sm:text-[11px]"
               style={scope===key?{background:"linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",color:"#082721"}:{background:"transparent",color:"rgba(255,255,255,0.4)"}}>
               {label}
             </button>
@@ -1437,7 +1440,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
       </CardHeader>
 
       {noData||!result ? (
-        <div className="h-[300px] flex flex-col items-center justify-center gap-3">
+        <div className="flex min-h-[220px] flex-col items-center justify-center gap-3 sm:min-h-[300px]">
           <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.noDataForYear(year)}</p>
         </div>
       ) : (
@@ -1446,13 +1449,15 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
   
             
           </div>
-          <div className="flex flex-col lg:flex-row gap-8 items-center">
-            <div style={{ position:"relative", width:"260px", height:"260px", flexShrink:0 }}>
-              <canvas ref={canvasRef} width={260} height={260} style={{ display:"block" }} />
+          <div className="flex flex-col items-center gap-8 lg:flex-row lg:items-start">
+            <div className="relative mx-auto w-full max-w-[260px] shrink-0">
+              <div className="relative aspect-square w-full">
+                <canvas ref={canvasRef} width={260} height={260} className="absolute left-0 top-0 h-full w-full" style={{ display:"block" }} />
+              </div>
               {selectedPct!==null && (
-                <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", pointerEvents:"none" }}>
-                  <span className="text-[30px] font-black leading-none" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
-                  <span className="text-[10px] font-bold mt-1 text-center px-4 leading-snug" style={{ color:"rgba(255,255,255,0.35)" }}>
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-2xl font-black leading-none sm:text-[30px]" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
+                  <span className="mt-1 max-w-[12rem] px-3 text-center text-[9px] font-bold leading-snug sm:text-[10px]" style={{ color:"rgba(255,255,255,0.35)" }}>
                     {scope==="arab" ? labels.shareOfArab : labels.shareOfWorld}
                   </span>
                 </div>
@@ -1461,11 +1466,11 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
             <div className="flex-1 w-full min-w-0 space-y-3">
               {selectedSlice && (
                 <div className="rounded-xl px-4 py-3" style={{ background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.25)" }}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-black flex items-center gap-2" style={{ color:"#C9A84C" }}>
-                      <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background:"#C9A84C" }} />{selectedSlice.name}
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="min-w-0 break-words text-[11px] font-black sm:text-[12px] flex items-center gap-2" style={{ color:"#C9A84C" }}>
+                      <span className="h-2.5 w-2.5 shrink-0 rounded-full inline-block" style={{ background:"#C9A84C" }} />{selectedSlice.name}
                     </span>
-                    <span className="text-[15px] font-black" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
+                    <span className="shrink-0 text-[15px] font-black" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
                   </div>
                   <p className="text-[10px] mt-1 font-mono" style={{ color:"rgba(201,168,76,0.45)" }}>{fmtVal(selectedSlice.value)}</p>
                 </div>
@@ -1557,7 +1562,7 @@ const CountryLineChart = ({
         <select
           value={mineralFilter || "all"}
           onChange={(e) => onMineralFilterChange?.(e.target.value)}
-          className="rounded-full px-3 py-1.5 text-[11px] font-bold"
+          className="w-full max-w-full rounded-full px-3 py-2 text-[11px] font-bold sm:w-auto sm:py-1.5"
           style={{
             background: "rgba(255,255,255,0.04)",
             color: "rgba(255,255,255,0.85)",
@@ -1572,7 +1577,7 @@ const CountryLineChart = ({
           ))}
         </select>
       </CardHeader>
-      <div ref={wrapperRef} style={{ position:"relative", height:"320px", width:"100%" }}>
+      <div ref={wrapperRef} className="relative h-[min(52vh,320px)] min-h-[220px] w-full sm:min-h-[260px]">
         <canvas ref={canvasRef} style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%" }} />
       </div>
     </Card>
@@ -1616,7 +1621,7 @@ const CountryBarChart = ({
         <select
           value={mineralFilter || "all"}
           onChange={(e) => onMineralFilterChange?.(e.target.value)}
-          className="rounded-full px-3 py-1.5 text-[11px] font-bold"
+          className="w-full max-w-full rounded-full px-3 py-2 text-[11px] font-bold sm:w-auto sm:py-1.5"
           style={{
             background: "rgba(255,255,255,0.04)",
             color: "rgba(255,255,255,0.85)",
@@ -1633,7 +1638,7 @@ const CountryBarChart = ({
         <YearPills selectedYear={selectedYear} onYearChange={onYearChange} />
       </CardHeader>
       {noData ? (
-        <div className="h-[280px] flex items-center justify-center">
+        <div className="flex min-h-[220px] items-center justify-center py-10 sm:min-h-[260px]">
           <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.noDataForYear(selectedYear)}</p>
         </div>
       ) : (
@@ -1720,15 +1725,15 @@ const MineralTreemap = ({ country, year, onYearChange }) => {
         <YearPills selectedYear={year} onYearChange={onYearChange} />
       </CardHeader>
       {noData ? (
-        <div className="h-[320px] flex items-center justify-center">
+        <div className="flex h-[min(48vh,320px)] min-h-[200px] items-center justify-center">
           <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.noData}</p>
         </div>
       ) : (
-        <div className="flex flex-col xl:flex-row gap-6">
-          <div className="flex-1" style={{ position:"relative", height:"320px", minWidth:0 }}>
+        <div className="flex flex-col gap-6 xl:flex-row">
+          <div className="relative h-[min(48vh,320px)] min-h-[220px] w-full min-w-0 flex-1 sm:min-h-[260px]">
             <canvas ref={canvasRef} style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%" }} />
           </div>
-          <div className="xl:w-64 flex-shrink-0 space-y-2">
+          <div className="max-h-[min(40vh,280px)] w-full shrink-0 space-y-2 overflow-y-auto pr-1 xl:max-h-none xl:w-64 xl:overflow-visible">
             {treeData.map((item, index) => {
               const hue = 160 - (index / Math.max(treeData.length - 1, 1)) * 100;
               const color = `hsl(${hue},60%,38%)`;
@@ -1827,14 +1832,14 @@ const CountryTradeChart = ({ title, country, series, color }) => {
     <Card>
       <CardHeader title={title} subtitle={labels.tradeValueUsd(getCountryDisplayName(country, language))} />
       {series && series.length > 0 ? (
-        <div style={{ position: "relative", height: "280px", width: "100%" }}>
+        <div className="relative h-[min(42vh,280px)] min-h-[200px] w-full sm:min-h-[240px]">
           <canvas
             ref={canvasRef}
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
           />
         </div>
       ) : (
-        <div className="h-[280px] flex items-center justify-center">
+        <div className="flex min-h-[200px] items-center justify-center py-12 sm:min-h-[240px]">
           <p className="text-[13px] font-semibold" style={{ color: "rgba(255,255,255,0.25)" }}>
             {labels.noData}
           </p>
@@ -2142,15 +2147,15 @@ const Countries = () => {
       `}</style>
       <Menu />
 
-      <div className="relative overflow-hidden bg-[#082721] pb-36 pt-16 text-white">
+      <div className="relative overflow-hidden bg-[#082721] pb-28 pt-20 text-white sm:pb-36 sm:pt-16">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(#ddbc6b 1px, transparent 1px)", size: "20px 20px" }}></div>
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4 text-xs font-bold uppercase tracking-widest"
+        <div className="container relative z-10 mx-auto max-w-full px-3 text-center sm:px-4">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest sm:px-4 sm:text-xs"
                style={{ background:"rgba(201,168,76,0.12)", color:"#C9A84C", border:"1px solid rgba(201,168,76,0.25)" }}>
             {labels.miningOutputBadge}
           </div>
-          <h1 className="mb-4 text-4xl font-black md:text-5xl">{labels.countriesFilesTitle}</h1>
-          <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-300 md:text-base">{labels.countriesFilesSubtitle}</p>
+          <h1 className="mb-3 px-1 text-2xl font-black leading-tight sm:mb-4 sm:text-4xl md:text-5xl">{labels.countriesFilesTitle}</h1>
+          <p className="mx-auto max-w-2xl text-xs leading-relaxed text-slate-300 sm:text-sm md:text-base">{labels.countriesFilesSubtitle}</p>
         </div>
         <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20" style={{ transform: "translateY(2px)" }}>
           <svg className="relative block w-full h-[56px] md:h-[90px] lg:h-[120px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
@@ -2160,39 +2165,47 @@ const Countries = () => {
         </div>
       </div>
 
-      <main className="container mx-auto px-3 sm:px-4 -mt-24 pb-12 relative z-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <main className="relative z-20 container mx-auto -mt-16 px-2 pb-10 sm:-mt-24 sm:px-4 sm:pb-12">
+        <div className="mx-auto max-w-6xl space-y-5 px-2 sm:space-y-6 sm:px-4 md:px-6 lg:px-8">
 
-        <section className="rounded-2xl p-5 sm:p-7"
-          style={{ background:"#ffffff", border:"1px solid rgba(0,0,0,0.08)", boxShadow:"0 2px 16px rgba(0,0,0,0.06)" }}>
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-            <div>
-              <h5 className="m-0 text-base font-bold text-slate-800">{labels.arabCountriesTitle}</h5>
-              <p className="mt-0.5 text-sm text-slate-400">{labels.chooseCountry}</p>
+        <section
+          className={`rounded-2xl border p-4 sm:p-6 md:p-7 ${isDarkMode ? "border-[#C9A84C]/20 bg-[#0f2a23] shadow-[0_4px_28px_rgba(0,0,0,0.35)]" : "border-black/[0.08] bg-white shadow-[0_2px_16px_rgba(0,0,0,0.06)]"}`}
+        >
+          <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+            <div className="min-w-0 text-start sm:text-start">
+              <h5 className={`m-0 text-base font-bold ${isDarkMode ? "text-[#efe8d4]" : "text-slate-800"}`}>{labels.arabCountriesTitle}</h5>
+              <p className={`mt-0.5 text-sm ${isDarkMode ? "text-slate-400" : "text-slate-400"}`}>{labels.chooseCountry}</p>
             </div>
-            <a href="countries.html" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#082721] shadow-sm ring-1 ring-[#082721]/20 hover:bg-slate-50 transition-colors">
+            <a
+              href="countries.html"
+              className={`inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-sm ring-1 transition-colors sm:w-auto ${
+                isDarkMode
+                  ? "bg-[#082721] text-[#C9A84C] ring-[#C9A84C]/35 hover:bg-[#0a3028]"
+                  : "bg-white text-[#082721] ring-[#082721]/20 hover:bg-slate-50"
+              }`}
+            >
               <ArrowLeft size={14} strokeWidth={2.4} /><span>{labels.more}</span>
             </a>
           </div>
-          <div className="grid gap-y-5 gap-x-3 grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
+          <div className="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-3 sm:gap-x-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
             {countries.map((c) => (
               <button key={c.code} type="button" onClick={()=>setSelected(c.name)}
-                      className="group flex flex-col items-center text-center transition-transform hover:-translate-y-1 focus:outline-none">
-                <div className="relative flex h-24 w-full items-center justify-center overflow-hidden rounded-lg bg-slate-50 transition-all"
+                      className="group flex min-w-0 flex-col items-center text-center transition-transform hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] rounded-lg">
+                <div className={`relative flex h-20 w-full items-center justify-center overflow-hidden rounded-lg transition-all sm:h-24 ${isDarkMode ? "bg-black/30" : "bg-slate-50"}`}
                   style={{ boxShadow:selected===c.name?"0 0 0 2px #C9A84C,0 4px 12px rgba(201,168,76,0.25)":"0 1px 4px rgba(0,0,0,0.08)" }}>
-                  <img src={countryFlags[c.code]} alt={getCountryDisplayName(c.name, language)} loading="lazy" decoding="async" style={{ ...FLAG_IMAGE_STYLE, padding:"2px", background:"#f8fafc" }} />
+                  <img src={countryFlags[c.code]} alt={getCountryDisplayName(c.name, language)} loading="lazy" decoding="async" style={{ ...FLAG_IMAGE_STYLE, padding:"2px", background: isDarkMode ? "#0b1f1a" : "#f8fafc" }} />
                   {selected===c.name && <div className="absolute inset-0 rounded-lg" style={{ background:"rgba(201,168,76,0.08)" }} />}
                 </div>
-                <p className={`mt-1.5 text-[11px] font-bold leading-tight transition-colors ${selected===c.name?"text-[#C9A84C]":"text-slate-600 group-hover:text-[#082721]"}`}>
+                <p className={`mt-1.5 line-clamp-2 min-h-[2.5rem] text-[10px] font-bold leading-tight transition-colors sm:min-h-0 sm:text-[11px] ${selected===c.name?"text-[#C9A84C]":isDarkMode?"text-slate-300 group-hover:text-[#C9A84C]":"text-slate-600 group-hover:text-[#082721]"}`}>
                   {getCountryDisplayName(c.name, language)}
                 </p>
               </button>
             ))}
           </div>
           {selected&&selected!=="—"&&(
-            <div className="mt-5 pt-4 border-t border-slate-100 flex items-center gap-2">
-              <span className="text-sm text-slate-400">{labels.selectedCountry}</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-900 border border-emerald-100">
+            <div className={`mt-5 flex flex-col items-stretch gap-2 border-t pt-4 sm:flex-row sm:items-center sm:gap-3 ${isDarkMode ? "border-white/10" : "border-slate-100"}`}>
+              <span className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-400"}`}>{labels.selectedCountry}</span>
+              <span className={`inline-flex flex-wrap items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-bold ${isDarkMode ? "border-[#C9A84C]/30 bg-[#082721]/80 text-[#efe8d4]" : "border-emerald-100 bg-emerald-50 text-emerald-900"}`}>
                 {selectedCountryObj&&countryFlags[selectedCountryObj.code]&&(
                   <img src={countryFlags[selectedCountryObj.code]} alt="" decoding="async" className="h-5 w-7 object-contain rounded-sm" />
                 )}
@@ -2204,7 +2217,7 @@ const Countries = () => {
 
         {selected!=="—"&&(
           <div
-            className="space-y-5 rounded-[28px] p-4 sm:p-5 lg:p-6"
+            className="min-w-0 space-y-5 overflow-x-hidden rounded-[28px] p-3 sm:p-5 lg:p-6"
             style={{
               background: selectedTheme.shellBg,
               border: `1px solid ${selectedTheme.shellBorder}`,
