@@ -4,6 +4,7 @@ import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, refreshCurrentUser } from "../services/authService";
 import { createCountry, deleteCountry, getCountries, updateCountry } from "../services/countryService";
+import { getArabCountryFlagUrl } from "../utils/arabCountryFlags";
 import { Check, ChevronLeft, ChevronRight, Edit, Flag, Plus, Search, Trash2, X } from "lucide-react";
 
 const PAGE_SIZE = 15;
@@ -119,14 +120,25 @@ function safeDate(v) {
 function CountriesMobileRow({ r, language, colors, t, isRTL, onEdit, onDelete }) {
   const title = language === "ar" ? r.name_ar || "-" : language === "fr" ? r.name_fr || "-" : r.name_en || "-";
   const updated = safeDate(r.updated_at);
+  const flagUrl = getArabCountryFlagUrl(r.iso_code);
 
   return (
     <div
       className={`flex items-start gap-3 px-3 sm:px-4 py-3 ${isRTL ? "flex-row-reverse" : ""}`}
       style={{ borderBottom: `1px solid ${colors.border}` }}
     >
-      <div className="w-9 h-9 shrink-0 rounded-lg flex items-center justify-center" style={{ background: colors.goldPale }}>
-        <Flag size={16} style={{ color: colors.gold }} />
+      <div
+        className="w-9 h-9 shrink-0 rounded-lg flex items-center justify-center overflow-hidden"
+        style={{
+          background: flagUrl ? "transparent" : colors.goldPale,
+          border: `1px solid ${colors.border}`,
+        }}
+      >
+        {flagUrl ? (
+          <img src={flagUrl} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+        ) : (
+          <Flag size={16} style={{ color: colors.gold }} />
+        )}
       </div>
       <div className={`min-w-0 flex-1 ${isRTL ? "text-right" : "text-left"}`}>
         <div className="text-sm font-semibold break-words" style={{ color: colors.ink }}>
@@ -427,14 +439,32 @@ export default function CountriesManagementPage() {
                     {paginatedRows.map((r) => {
                       const title = language === "ar" ? r.name_ar || "-" : language === "fr" ? r.name_fr || "-" : r.name_en || "-";
                       const updated = safeDate(r.updated_at);
+                      const flagUrl = getArabCountryFlagUrl(r.iso_code);
                       return (
                         <tr key={r.id} className="transition-all duration-200 hover:opacity-90" style={{ borderBottom: `1px solid ${colors.border}` }}>
                           <td className={`px-4 sm:px-6 py-3 sm:py-4 ${isRTL ? "text-right" : "text-left"}`}>
-                            <div className="text-sm font-semibold break-words" style={{ color: colors.ink }}>
-                              {title}
-                            </div>
-                            <div className="text-xs break-words mt-0.5" style={{ color: colors.muted }}>
-                              {r.name_en || r.name_fr || r.name_ar || "-"}
+                            <div className={`flex items-start gap-2 min-w-0 ${isRTL ? "flex-row-reverse" : ""}`}>
+                              <div
+                                className="mt-0.5 flex h-6 w-8 shrink-0 items-center justify-center overflow-hidden rounded-sm"
+                                style={{
+                                  background: flagUrl ? "transparent" : colors.goldPale,
+                                  border: `1px solid ${colors.border}`,
+                                }}
+                              >
+                                {flagUrl ? (
+                                  <img src={flagUrl} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+                                ) : (
+                                  <Flag size={14} style={{ color: colors.gold }} />
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="text-sm font-semibold break-words" style={{ color: colors.ink }}>
+                                  {title}
+                                </div>
+                                <div className="text-xs break-words mt-0.5" style={{ color: colors.muted }}>
+                                  {r.name_en || r.name_fr || r.name_ar || "-"}
+                                </div>
+                              </div>
                             </div>
                           </td>
                           <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm font-mono break-all max-w-[120px] ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
