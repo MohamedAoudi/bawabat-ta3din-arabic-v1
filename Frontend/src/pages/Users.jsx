@@ -1,12 +1,14 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, isAdmin, refreshCurrentUser } from "../services/authService";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
-import { User, Shield, Users, Edit, Trash2, X, Check, Search, CheckCircle, XCircle, ToggleLeft, ToggleRight } from "lucide-react";
+import { User, Shield, Users, Edit, Trash2, X, Check, Search, CheckCircle, XCircle, ToggleLeft, ToggleRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 // Importer l'URL du backend depuis .env
 const API_URL = import.meta.env.VITE_API_URL;
+
+const PAGE_SIZE = 15;
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const TRANSLATIONS = {
@@ -54,6 +56,12 @@ const TRANSLATIONS = {
     deactivate: "إلغاء التفعيل",
     userActivated: "تم تفعيل المستخدم بنجاح",
     userDeactivated: "تم إلغاء تفعيل المستخدم بنجاح",
+    pagination: {
+      previous: "السابق",
+      next: "التالي",
+      pageOf: (page, total) => `صفحة ${page} من ${total}`,
+      showing: (from, to, total) => `عرض ${from}–${to} من ${total}`,
+    },
   },
   fr: {
     dashboard: "Tableau de bord",
@@ -99,6 +107,12 @@ const TRANSLATIONS = {
     deactivate: "Désactiver",
     userActivated: "Utilisateur activé avec succès",
     userDeactivated: "Utilisateur désactivé avec succès",
+    pagination: {
+      previous: "Précédent",
+      next: "Suivant",
+      pageOf: (page, total) => `Page ${page} sur ${total}`,
+      showing: (from, to, total) => `Affichage ${from}–${to} sur ${total}`,
+    },
   },
   en: {
     dashboard: "Dashboard",
@@ -144,6 +158,12 @@ const TRANSLATIONS = {
     deactivate: "Deactivate",
     userActivated: "User activated successfully",
     userDeactivated: "User deactivated successfully",
+    pagination: {
+      previous: "Previous",
+      next: "Next",
+      pageOf: (page, total) => `Page ${page} of ${total}`,
+      showing: (from, to, total) => `Showing ${from}–${to} of ${total}`,
+    },
   },
 };
 
@@ -192,6 +212,7 @@ export default function UsersPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [editingUser, setEditingUser] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showAcceptConfirm, setShowAcceptConfirm] = useState(null);
@@ -365,7 +386,7 @@ export default function UsersPage() {
     }
   };
 
-  const getUserName = (user) => {
+  const getUserName = useCallback((user) => {
     if (language === "ar") {
       return `${user.prenom_ar || ""} ${user.nom_ar || ""}`.trim();
     } else if (language === "fr") {
@@ -373,14 +394,36 @@ export default function UsersPage() {
     } else {
       return `${user.prenom_en || ""} ${user.nom_en || ""}`.trim();
     }
-  };
+  }, [language]);
 
-  const filteredUsers = users.filter((user) => {
-    const name = getUserName(user).toLowerCase();
-    const email = user.email.toLowerCase();
-    const search = searchTerm.toLowerCase();
-    return name.includes(search) || email.includes(search);
-  });
+  const filteredUsers = useMemo(() => {
+    const search = searchTerm.trim().toLowerCase();
+    return users.filter((user) => {
+      const name = getUserName(user).toLowerCase();
+      const email = (user.email || "").toLowerCase();
+      if (!search) return true;
+      return name.includes(search) || email.includes(search);
+    });
+  }, [users, searchTerm, getUserName]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
+
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredUsers.slice(start, start + PAGE_SIZE);
+  }, [filteredUsers, currentPage]);
+
+  const rangeFrom = filteredUsers.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const rangeTo = Math.min(currentPage * PAGE_SIZE, filteredUsers.length);
+  const isRTL = language === "ar";
 
   if (loading) {
     return (
@@ -425,7 +468,10 @@ export default function UsersPage() {
               type="text"
               placeholder={`${t.search}...`}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
               className={`w-full ${language === "ar" ? "pr-10" : "pl-10"} py-3 rounded-lg border text-sm sm:text-base`}
               style={{ 
                 background: colors.bg, 
@@ -470,7 +516,7 @@ export default function UsersPage() {
                       </td>
                     </tr>
                   ) : (
-                    filteredUsers.map((user) => (
+                    paginatedUsers.map((user) => (
                       <tr key={user.id} className="transition-all duration-200 hover:opacity-80" style={{ borderBottom: `1px solid ${colors.border}` }}>
                         <td className="px-2 sm:px-6 py-2 sm:py-4">
                           <div className="flex items-center gap-2">
@@ -592,6 +638,43 @@ export default function UsersPage() {
               </tbody>
             </table>
           </div>
+          {filteredUsers.length > 0 && (
+            <div
+              className={`flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 ${isRTL ? "sm:flex-row-reverse" : ""}`}
+              style={{ borderTop: `1px solid ${colors.border}` }}
+            >
+              <p className="text-xs sm:text-sm text-center sm:text-start" style={{ color: colors.muted }}>
+                {t.pagination.showing(rangeFrom, rangeTo, filteredUsers.length)}
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
+                  style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }}
+                  aria-label={t.pagination.previous}
+                >
+                  {isRTL ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                  <span className="hidden sm:inline">{t.pagination.previous}</span>
+                </button>
+                <span className="text-xs sm:text-sm font-medium px-2 min-w-[7rem] text-center" style={{ color: colors.ink }}>
+                  {t.pagination.pageOf(currentPage, totalPages)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
+                  style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }}
+                  aria-label={t.pagination.next}
+                >
+                  <span className="hidden sm:inline">{t.pagination.next}</span>
+                  {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
