@@ -56,6 +56,81 @@ import flagMauritania from "../assets/flags/mauritania.webp";
 import flagYemen from "../assets/flags/yemen.webp";
 import { dataByMineral } from "./M1";
 
+const REFERENCES_AUTO_SLIDE_MS = 4500;
+
+function ReferenceCarouselCard({ item }) {
+  return (
+    <a
+      href={item.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="sponsor-card"
+      style={{
+        height: 170,
+        borderRadius: 13,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+        position: "relative",
+        padding: 10,
+      }}
+    >
+      {item.img ? (
+        <>
+          <img src={item.img} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "contain", padding: 12 }} />
+          <div
+            className="sponsor-hover"
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "rgba(255,255,255,0.97)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: 0,
+              transition: "opacity 0.3s",
+              padding: 12,
+              textAlign: "center",
+            }}
+          >
+            <p style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--forest)", margin: "0 0 4px" }}>{item.title}</p>
+            <p style={{ fontSize: "0.72rem", color: "var(--muted)", margin: 0 }}>{item.subtitle}</p>
+          </div>
+        </>
+      ) : (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            border: "1px solid rgba(8,39,33,0.08)",
+            borderRadius: 12,
+            background: "#fff",
+            padding: 10,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            gap: 8,
+          }}
+        >
+          <div>
+            <p style={{ margin: 0, fontSize: "0.72rem", color: "var(--muted)", fontWeight: 700 }}>{item.title}</p>
+            <p style={{ margin: "6px 0 0", fontSize: "0.78rem", color: "var(--forest)", fontWeight: 800, lineHeight: 1.45 }}>{item.subtitle}</p>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {(item.emails || []).slice(0, 2).map((email) => (
+              <span key={email} style={{ fontSize: "0.7rem", color: "var(--forest-mid)", textDecoration: "underline", wordBreak: "break-all" }}>
+                {email}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </a>
+  );
+}
+
 /* ─────────────────────────────────────────────
    DATA
 ───────────────────────────────────────────── */
@@ -1055,6 +1130,7 @@ const Home = () => {
   const isArabic = language === "ar";
   const [selectedCountryCode, setSelectedCountryCode] = useState(null);
   const [sponsorSlide, setSponsorSlide]       = useState(0);
+  const [sponsorPaused, setSponsorPaused]     = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [heroSearchQuery, setHeroSearchQuery] = useState("");
   const [navCountriesForSearch, setNavCountriesForSearch] = useState([]);
@@ -1181,6 +1257,16 @@ const Home = () => {
       return Math.min(current, sponsorSlides.length - 1);
     });
   }, [sponsorSlides.length]);
+
+  useEffect(() => {
+    if (sponsorSlides.length <= 1 || sponsorPaused) return;
+
+    const timer = window.setInterval(() => {
+      setSponsorSlide((current) => (current + 1) % sponsorSlides.length);
+    }, REFERENCES_AUTO_SLIDE_MS);
+
+    return () => window.clearInterval(timer);
+  }, [sponsorSlides.length, sponsorPaused]);
 
   const handleChatbotClick = () => alert(labels.chatbotAlert);
 
@@ -1325,6 +1411,18 @@ border-radius:13px !important;
         .sponsor-card { border:1px solid rgba(8,39,33,0.08); background:white; transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s; }
         .sponsor-card:hover { transform:translateY(-4px); border-color:var(--gold); box-shadow:0 16px 36px rgba(8,39,33,0.12); }
         .sponsor-card:hover .sponsor-hover { opacity:1 !important; }
+
+        .references-carousel-viewport { overflow:hidden; height:190px; position:relative; }
+        .references-carousel-track {
+          display:flex; height:100%;
+          transition:transform 0.75s cubic-bezier(0.16,1,0.3,1);
+          will-change:transform;
+        }
+        .references-carousel-slide {
+          min-width:100%; flex-shrink:0;
+          display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+          box-sizing:border-box;
+        }
 
         /* Dark mode overrides for light surfaces in this page */
         html.theme-dark .home-page .home-surface {
@@ -1720,40 +1818,30 @@ border-radius:13px !important;
               </div>
             </div>
 
-            {/* Carousel */}
-            <div style={{ position:"relative", height:190 }}>
+            {/* Carousel — glissement horizontal automatique (pause au survol) */}
+            <div
+              className="references-carousel-viewport"
+              onMouseEnter={() => setSponsorPaused(true)}
+              onMouseLeave={() => setSponsorPaused(false)}
+              onFocusCapture={() => setSponsorPaused(true)}
+              onBlurCapture={() => setSponsorPaused(false)}
+            >
+              <div
+                className="references-carousel-track"
+                style={{
+                  transform: isArabic
+                    ? `translateX(${sponsorSlide * 100}%)`
+                    : `translateX(-${sponsorSlide * 100}%)`,
+                }}
+              >
               {sponsorSlides.map((slide, idx) => (
-                <div key={idx} style={{ position:"absolute", inset:0, opacity:idx===sponsorSlide?1:0, pointerEvents:idx===sponsorSlide?"auto":"none", transition:"opacity 0.7s ease", display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12 }}>
+                <div key={idx} className="references-carousel-slide">
                   {slide.map((s, si) => (
-                    <a key={si} href={s.href} target="_blank" rel="noopener noreferrer" className="sponsor-card"
-                      style={{ height:170, borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden", position:"relative", padding:10 }}>
-                      {s.img ? (
-                        <>
-                          <img src={s.img} alt={s.title} style={{ width:"100%", height:"100%", objectFit:"contain", padding:12 }} />
-                          <div className="sponsor-hover" style={{ position:"absolute", inset:0, background:"rgba(255,255,255,0.97)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", opacity:0, transition:"opacity 0.3s", padding:12, textAlign:"center" }}>
-                            <p style={{ fontSize:"0.82rem", fontWeight:800, color:"var(--forest)", margin:"0 0 4px" }}>{s.title}</p>
-                            <p style={{ fontSize:"0.72rem", color:"var(--muted)", margin:0 }}>{s.subtitle}</p>
-                          </div>
-                        </>
-                      ) : (
-                        <div style={{ width:"100%", height:"100%", border:"1px solid rgba(8,39,33,0.08)", borderRadius:12, background:"#fff", padding:10, display:"flex", flexDirection:"column", justifyContent:"space-between", gap:8 }}>
-                          <div>
-                            <p style={{ margin:0, fontSize:"0.72rem", color:"var(--muted)", fontWeight:700 }}>{s.title}</p>
-                            <p style={{ margin:"6px 0 0", fontSize:"0.78rem", color:"var(--forest)", fontWeight:800, lineHeight:1.45 }}>{s.subtitle}</p>
-                          </div>
-                          <div style={{ display:"flex", flexDirection:"column", gap:2 }}>
-                            {(s.emails || []).slice(0, 2).map((email) => (
-                              <span key={email} style={{ fontSize:"0.7rem", color:"var(--forest-mid)", textDecoration:"underline", wordBreak:"break-all" }}>
-                                {email}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </a>
+                    <ReferenceCarouselCard key={`${idx}-${si}`} item={s} />
                   ))}
                 </div>
               ))}
+              </div>
             </div>
 
             {/* Dots */}
