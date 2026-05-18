@@ -375,7 +375,10 @@ export default function MineralsPage() {
     <>
       <MobileHeader onMenuClick={() => setSidebarOpen(true)} title={t.pageTitle} />
 
-      <div className="p-4 sm:p-6 lg:p-8" style={{ background: colors.bg, minHeight: "100vh" }}>
+      <div
+        className="p-4 sm:p-6 lg:p-8 xl:px-10 2xl:px-12 max-w-[1600px] mx-auto w-full box-border"
+        style={{ background: colors.bg, minHeight: "100vh" }}
+      >
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-4 sm:mb-6">
           <div className="flex items-center gap-2">
             <Gem size={20} style={{ color: colors.gold }} />
@@ -435,20 +438,32 @@ export default function MineralsPage() {
                   />
                 ))}
               </div>
-              <div className="hidden md:block overflow-x-auto scrollbar-thin overscroll-x-contain">
-                <table className="w-full min-w-[640px]">
+              <div className="hidden md:block w-full overflow-x-auto scrollbar-thin overscroll-x-contain lg:overflow-x-visible">
+                <table className="w-full min-w-[640px] lg:min-w-0 lg:table-fixed xl:text-[15px]">
                   <thead style={{ background: colors.goldPale }}>
                     <tr>
-                      <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                      <th
+                        className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-xs font-semibold lg:w-[40%] xl:w-[38%] ${isRTL ? "text-right" : "text-left"}`}
+                        style={{ color: colors.forest }}
+                      >
                         {t.columns.mineral}
                       </th>
-                      <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                      <th
+                        className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-xs font-semibold lg:w-[32%] xl:w-[34%] ${isRTL ? "text-right" : "text-left"}`}
+                        style={{ color: colors.forest }}
+                      >
                         {t.columns.category}
                       </th>
-                      <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold hidden lg:table-cell ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                      <th
+                        className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-xs font-semibold lg:w-[20%] xl:w-[20%] ${isRTL ? "text-right" : "text-left"}`}
+                        style={{ color: colors.forest }}
+                      >
                         {t.columns.updatedAt}
                       </th>
-                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-center text-xs font-semibold" style={{ color: colors.forest }}>
+                      <th
+                        className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-center text-xs font-semibold lg:w-[8%] xl:w-[8%]"
+                        style={{ color: colors.forest }}
+                      >
                         {t.columns.actions}
                       </th>
                     </tr>
@@ -467,28 +482,31 @@ export default function MineralsPage() {
                       const updated = safeDate(m.updated_at);
                       return (
                         <tr key={m.id} className="transition-all duration-200 hover:opacity-90" style={{ borderBottom: `1px solid ${colors.border}` }}>
-                          <td className={`px-4 sm:px-6 py-3 sm:py-4 ${isRTL ? "text-right" : "text-left"}`}>
+                          <td className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-center ${isRTL ? "text-right" : "text-left"}`}>
                             <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
-                              <div className="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center" style={{ background: colors.goldPale }}>
-                                <Gem size={16} style={{ color: colors.gold }} />
+                              <div className="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center lg:w-9 lg:h-9" style={{ background: colors.goldPale }}>
+                                <Gem size={18} style={{ color: colors.gold }} />
                               </div>
                               <div className="min-w-0">
-                                <div className="text-sm font-semibold break-words" style={{ color: colors.ink }}>
+                                <div className="text-sm font-semibold break-words lg:text-base" style={{ color: colors.ink }}>
                                   {mineralLabel}
                                 </div>
-                                <div className="text-xs break-words" style={{ color: colors.muted }}>
+                                <div className="text-xs break-words lg:text-sm" style={{ color: colors.muted }}>
                                   {m.name_en || m.name_fr || m.name_ar || "-"}
                                 </div>
                               </div>
                             </div>
                           </td>
-                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm break-words max-w-[200px] ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
+                          <td
+                            className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm break-words max-w-[220px] md:max-w-xs lg:max-w-none ${isRTL ? "text-right" : "text-left"}`}
+                            style={{ color: colors.muted }}
+                          >
                             {categoryLabel}
                           </td>
-                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm hidden lg:table-cell ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
+                          <td className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm whitespace-nowrap lg:whitespace-normal ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
                             {updated ? updated.toLocaleDateString() : "-"}
                           </td>
-                          <td className="px-4 sm:px-6 py-3 sm:py-4">
+                          <td className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
                             <div className="flex items-center justify-center gap-1">
                               <button
                                 onClick={() => openEdit(m)}
