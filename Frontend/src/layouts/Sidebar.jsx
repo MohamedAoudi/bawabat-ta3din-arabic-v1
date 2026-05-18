@@ -350,7 +350,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
 
         {/* Logo/Brand Section - Clickable to Dashboard */}
         <Link to="/dashboard" className="block p-4 sm:p-6 text-center" style={{ borderBottom: `1px solid ${colors.border}` }}>
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl mb-2 sm:mb-3 overflow-hidden">
+          <div className="inline-flex items-center justify-center w-40 h-40 sm:w-40 sm:h-40 rounded-xl sm:rounded-2xl mb-2 sm:mb-3 overflow-hidden">
             <img 
               src="/src/assets/LOGO_ARAB MINING grand.svg" 
               alt="Logo" 
