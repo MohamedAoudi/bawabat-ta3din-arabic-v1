@@ -4,7 +4,9 @@ import { LanguageContext, ThemeContext } from "../App";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { getCurrentUser, refreshCurrentUser } from "../services/authService";
 import { createMineral, deleteMineral, getMinerals, updateMineral } from "../services/mineralService";
-import { Check, Edit, Gem, Plus, Search, Trash2, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Edit, Gem, Plus, Search, Trash2, X } from "lucide-react";
+
+const PAGE_SIZE = 15;
 
 const TRANSLATIONS = {
   ar: {
@@ -33,6 +35,12 @@ const TRANSLATIONS = {
       updatedAt: "آخر تحديث",
       actions: "الإجراءات",
     },
+    pagination: {
+      previous: "السابق",
+      next: "التالي",
+      pageOf: (page, total) => `صفحة ${page} من ${total}`,
+      showing: (from, to, total) => `عرض ${from}–${to} من ${total}`,
+    },
   },
   fr: {
     pageTitle: "Gestion des minéraux",
@@ -60,6 +68,12 @@ const TRANSLATIONS = {
       updatedAt: "Mis à jour",
       actions: "Actions",
     },
+    pagination: {
+      previous: "Précédent",
+      next: "Suivant",
+      pageOf: (page, total) => `Page ${page} sur ${total}`,
+      showing: (from, to, total) => `Affichage ${from}–${to} sur ${total}`,
+    },
   },
   en: {
     pageTitle: "Minerals management",
@@ -86,6 +100,12 @@ const TRANSLATIONS = {
       category: "Category",
       updatedAt: "Updated",
       actions: "Actions",
+    },
+    pagination: {
+      previous: "Previous",
+      next: "Next",
+      pageOf: (page, total) => `Page ${page} of ${total}`,
+      showing: (from, to, total) => `Showing ${from}–${to} of ${total}`,
     },
   },
 };
@@ -151,6 +171,7 @@ export default function MineralsPage() {
 
   const [minerals, setMinerals] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [editing, setEditing] = useState(null); // mineral row
   const [creating, setCreating] = useState(false);
@@ -203,6 +224,24 @@ export default function MineralsPage() {
       return hay.includes(q);
     });
   }, [minerals, searchTerm]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
+
+  const paginatedRows = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filtered.slice(start, start + PAGE_SIZE);
+  }, [filtered, currentPage]);
+
+  const rangeFrom = filtered.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const rangeTo = Math.min(currentPage * PAGE_SIZE, filtered.length);
 
   const openCreate = () => {
     setCreating(true);
@@ -312,7 +351,10 @@ export default function MineralsPage() {
               type="text"
               placeholder={`${t.search}...`}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
               className={`w-full ${isRTL ? "pr-10" : "pl-10"} py-3 rounded-lg border text-sm sm:text-base`}
               style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }}
             />
@@ -347,7 +389,7 @@ export default function MineralsPage() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((m) => {
+                  paginatedRows.map((m) => {
                     const mineralLabel =
                       language === "ar" ? m.name_ar || "-" : language === "fr" ? m.name_fr || "-" : m.name_en || "-";
                     const categoryLabel =
@@ -407,6 +449,43 @@ export default function MineralsPage() {
               </tbody>
             </table>
           </div>
+          {filtered.length > 0 && (
+            <div
+              className={`flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 ${isRTL ? "sm:flex-row-reverse" : ""}`}
+              style={{ borderTop: `1px solid ${colors.border}` }}
+            >
+              <p className="text-xs sm:text-sm text-center sm:text-start" style={{ color: colors.muted }}>
+                {t.pagination.showing(rangeFrom, rangeTo, filtered.length)}
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
+                  style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }}
+                  aria-label={t.pagination.previous}
+                >
+                  {isRTL ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                  <span className="hidden sm:inline">{t.pagination.previous}</span>
+                </button>
+                <span className="text-xs sm:text-sm font-medium px-2 min-w-[7rem] text-center" style={{ color: colors.ink }}>
+                  {t.pagination.pageOf(currentPage, totalPages)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
+                  style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }}
+                  aria-label={t.pagination.next}
+                >
+                  <span className="hidden sm:inline">{t.pagination.next}</span>
+                  {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
