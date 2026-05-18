@@ -1110,8 +1110,12 @@ const Home = () => {
     setHeroSearchQuery("");
   };
 
+  const goToCountryProfile = (code) => {
+    navigate(`/countries?country=${encodeURIComponent(code)}#country-profile`);
+  };
+
   const goToCountryFromHero = (code) => {
-    navigate(`/countries?country=${encodeURIComponent(code)}`);
+    goToCountryProfile(code);
     closeSearchModal();
   };
 
@@ -1684,7 +1688,7 @@ border-radius:13px !important;
 
             <div className="countries-responsive-grid">
               {countries.map(c => (
-                <a key={c.code} href={`/countries?country=${c.code}`} className="country-btn"
+                <a key={c.code} href={`/countries?country=${c.code}#country-profile`} className="country-btn"
                   onClick={() => setSelectedCountryCode(c.code)}
                   style={{ background:"none", border:"none", cursor:"pointer", textAlign:"center", padding:0 }}>
                   <div className="flag-frame" style={{ width:"100%", aspectRatio:"3/2" }}>

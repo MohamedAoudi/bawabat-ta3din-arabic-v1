@@ -1901,6 +1901,7 @@ const Countries = () => {
   const { labels, language, isArabic, isDarkMode } = useCountriesI18n();
   const [searchParams] = useSearchParams();
   const countryFromUrl = searchParams.get("country");
+  const countryProfileRef = useRef(null);
 
   const [countries, setCountries]               = useState(COUNTRIES);
   const [yearsFromDb, setYearsFromDb] = useState([]);
@@ -2048,6 +2049,25 @@ const Countries = () => {
     const byCode = countries.find((c) => c.code === normalized);
     if (byCode) setSelected(byCode.name);
   }, [countries, countryFromUrl]);
+
+  useEffect(() => {
+    if (selected === "—" || !selectedCountryObj) return;
+    const shouldScroll =
+      Boolean(countryFromUrl) ||
+      window.location.hash === "#country-profile";
+    if (!shouldScroll) return;
+
+    const scrollToProfile = () => {
+      const el = countryProfileRef.current;
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    const id = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(scrollToProfile);
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [selected, selectedCountryObj, countryFromUrl]);
 
   useEffect(() => {
     if (!runtimeYears.length) return;
@@ -2248,7 +2268,9 @@ const Countries = () => {
 
         {selected!=="—"&&(
           <div
-            className="min-w-0 space-y-5 overflow-x-hidden rounded-[28px] p-3 sm:p-5 lg:p-6"
+            ref={countryProfileRef}
+            id="country-profile"
+            className="min-w-0 scroll-mt-24 space-y-5 overflow-x-hidden rounded-[28px] p-3 sm:p-5 lg:p-6"
             style={{
               background: selectedTheme.shellBg,
               border: `1px solid ${selectedTheme.shellBorder}`,
