@@ -139,6 +139,65 @@ const TRANSLATIONS = {
   },
 };
 
+function ProductionMobileRow({ r, countryName, mineralName, unitName, colors, t, isRTL, onEdit, onDelete }) {
+  return (
+    <div
+      className={`flex items-start gap-3 px-3 sm:px-4 py-3 ${isRTL ? "flex-row-reverse" : ""}`}
+      style={{ borderBottom: `1px solid ${colors.border}` }}
+    >
+      <div className="w-9 h-9 shrink-0 rounded-lg flex items-center justify-center" style={{ background: colors.goldPale }}>
+        <Factory size={16} style={{ color: colors.gold }} />
+      </div>
+      <div className={`min-w-0 flex-1 ${isRTL ? "text-right" : "text-left"}`}>
+        <div className="text-sm font-semibold break-words" style={{ color: colors.ink }}>
+          {countryName}
+        </div>
+        <div className="text-xs mt-1 break-words" style={{ color: colors.muted }}>
+          {mineralName}
+        </div>
+        <div className="text-xs mt-1.5">
+          <span style={{ color: colors.muted }}>{t.columns.year}: </span>
+          <span className="font-medium tabular-nums" style={{ color: colors.ink }}>
+            {r.year}
+          </span>
+        </div>
+        <div className="text-xs mt-1 font-mono break-all">
+          <span style={{ color: colors.muted }}>{t.columns.quantity}: </span>
+          <span style={{ color: colors.ink }}>{r.production_quantity ?? "-"}</span>
+        </div>
+        <div className="text-xs mt-1 break-words">
+          <span style={{ color: colors.muted }}>{t.columns.unit}: </span>
+          <span style={{ color: colors.ink }}>{unitName}</span>
+        </div>
+        <div className="text-xs mt-1 break-words">
+          <span style={{ color: colors.muted }}>{t.columns.source}: </span>
+          <span style={{ color: colors.ink }}>{r.data_source || "-"}</span>
+        </div>
+      </div>
+      <div className={`flex shrink-0 items-center gap-1 pt-0.5 ${isRTL ? "flex-row-reverse" : ""}`}>
+        <button
+          type="button"
+          onClick={() => onEdit(r)}
+          className="p-2 rounded-lg transition-all duration-200 hover:scale-110"
+          style={{ color: colors.gold }}
+          title={t.edit}
+        >
+          <Edit size={16} />
+        </button>
+        <button
+          type="button"
+          onClick={() => onDelete(r)}
+          className="p-2 rounded-lg transition-all duration-200 hover:scale-110"
+          style={{ color: "#dc2626" }}
+          title={t.delete}
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ProductionManagementPage() {
   const navigate = useNavigate();
   const { language } = useContext(LanguageContext);
@@ -314,38 +373,93 @@ export default function ProductionManagementPage() {
             <div className="relative"><Search className={`absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2`} size={20} style={{ color: colors.muted }} /><input type="text" placeholder={`${t.search}...`} value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} className={`w-full ${isRTL ? "pr-10" : "pl-10"} py-3 rounded-lg border text-sm sm:text-base`} style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }} /></div>
           </div>
           <div className="rounded-xl shadow-sm overflow-hidden" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
-            <div className="overflow-x-auto scrollbar-thin">
-              <table className="w-full min-w-[1100px]">
-                <thead style={{ background: colors.goldPale }}>
-                  <tr>
-                    <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>{t.columns.country}</th>
-                    <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>{t.columns.mineral}</th>
-                    <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>{t.columns.year}</th>
-                    <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>{t.columns.quantity}</th>
-                    <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>{t.columns.unit}</th>
-                    <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>{t.columns.source}</th>
-                    <th className="px-4 sm:px-6 py-3 sm:py-4 text-center text-xs font-semibold" style={{ color: colors.forest }}>{t.columns.actions}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRows.length === 0 ? (
-                    <tr><td colSpan={7} className="px-4 sm:px-6 py-8 text-center" style={{ color: colors.muted }}>{t.empty}</td></tr>
-                  ) : (
-                    paginatedRows.map((r) => (
-                      <tr key={r.id} className="transition-all duration-200 hover:opacity-90" style={{ borderBottom: `1px solid ${colors.border}` }}>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm font-semibold" style={{ color: colors.ink }}>{countryLabel(r.country_id)}</td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm" style={{ color: colors.muted }}>{mineralLabel(r.mineral_id)}</td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm" style={{ color: colors.muted }}>{r.year}</td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm font-mono" style={{ color: colors.ink }}>{r.production_quantity ?? "-"}</td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm" style={{ color: colors.muted }}>{unitLabel(r)}</td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm" style={{ color: colors.muted }}>{r.data_source || "-"}</td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4"><div className="flex items-center justify-center gap-1"><button onClick={() => openEdit(r)} className="p-2 rounded-lg transition-all duration-200 hover:scale-110" style={{ color: colors.gold }} title={t.edit}><Edit size={16} /></button><button onClick={() => setConfirmDelete(r)} className="p-2 rounded-lg transition-all duration-200 hover:scale-110" style={{ color: "#dc2626" }} title={t.delete}><Trash2 size={16} /></button></div></td>
+            {filteredRows.length === 0 ? (
+              <div className="px-4 sm:px-6 py-8 text-center text-sm" style={{ color: colors.muted }}>
+                {t.empty}
+              </div>
+            ) : (
+              <>
+                <div className="md:hidden">
+                  {paginatedRows.map((r) => (
+                    <ProductionMobileRow
+                      key={r.id}
+                      r={r}
+                      countryName={countryLabel(r.country_id)}
+                      mineralName={mineralLabel(r.mineral_id)}
+                      unitName={unitLabel(r)}
+                      colors={colors}
+                      t={t}
+                      isRTL={isRTL}
+                      onEdit={openEdit}
+                      onDelete={setConfirmDelete}
+                    />
+                  ))}
+                </div>
+                <div className="hidden md:block overflow-x-auto scrollbar-thin overscroll-x-contain">
+                  <table className="w-full min-w-[960px]">
+                    <thead style={{ background: colors.goldPale }}>
+                      <tr>
+                        <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                          {t.columns.country}
+                        </th>
+                        <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                          {t.columns.mineral}
+                        </th>
+                        <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                          {t.columns.year}
+                        </th>
+                        <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                          {t.columns.quantity}
+                        </th>
+                        <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                          {t.columns.unit}
+                        </th>
+                        <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                          {t.columns.source}
+                        </th>
+                        <th className="px-4 sm:px-6 py-3 sm:py-4 text-center text-xs font-semibold" style={{ color: colors.forest }}>
+                          {t.columns.actions}
+                        </th>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody>
+                      {paginatedRows.map((r) => (
+                        <tr key={r.id} className="transition-all duration-200 hover:opacity-90" style={{ borderBottom: `1px solid ${colors.border}` }}>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm font-semibold break-words max-w-[180px] ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.ink }}>
+                            {countryLabel(r.country_id)}
+                          </td>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm break-words max-w-[160px] ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
+                            {mineralLabel(r.mineral_id)}
+                          </td>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm tabular-nums ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
+                            {r.year}
+                          </td>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm font-mono break-all ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.ink }}>
+                            {r.production_quantity ?? "-"}
+                          </td>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm break-words max-w-[140px] ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
+                            {unitLabel(r)}
+                          </td>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm break-words max-w-[200px] ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
+                            {r.data_source || "-"}
+                          </td>
+                          <td className="px-4 sm:px-6 py-3 sm:py-4">
+                            <div className="flex items-center justify-center gap-1">
+                              <button onClick={() => openEdit(r)} className="p-2 rounded-lg transition-all duration-200 hover:scale-110" style={{ color: colors.gold }} title={t.edit}>
+                                <Edit size={16} />
+                              </button>
+                              <button onClick={() => setConfirmDelete(r)} className="p-2 rounded-lg transition-all duration-200 hover:scale-110" style={{ color: "#dc2626" }} title={t.delete}>
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
             {filteredRows.length > 0 && (
               <div
                 className={`flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 ${isRTL ? "sm:flex-row-reverse" : ""}`}

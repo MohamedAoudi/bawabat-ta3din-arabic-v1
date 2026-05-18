@@ -131,6 +131,65 @@ function safeDate(v) {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
+function TradeImportsMobileRow({ r, countryName, mineralName, colors, t, isRTL, onEdit, onDelete }) {
+  const updated = safeDate(r.updated_at);
+  const valueStr = Number(r.trade_value_usd || 0).toLocaleString();
+
+  return (
+    <div
+      className={`flex items-start gap-3 px-3 sm:px-4 py-3 ${isRTL ? "flex-row-reverse" : ""}`}
+      style={{ borderBottom: `1px solid ${colors.border}` }}
+    >
+      <div className="w-9 h-9 shrink-0 rounded-lg flex items-center justify-center" style={{ background: colors.goldPale }}>
+        <Download size={16} style={{ color: colors.gold }} />
+      </div>
+      <div className={`min-w-0 flex-1 ${isRTL ? "text-right" : "text-left"}`}>
+        <div className="text-sm font-semibold break-words" style={{ color: colors.ink }}>
+          {countryName}
+        </div>
+        <div className="text-xs mt-1 break-words" style={{ color: colors.muted }}>
+          {mineralName}
+        </div>
+        <div className="text-xs mt-1.5 tabular-nums">
+          <span style={{ color: colors.muted }}>{t.columns.year}: </span>
+          <span style={{ color: colors.ink }}>{r.year}</span>
+        </div>
+        <div className="text-xs mt-1 font-mono break-all">
+          <span style={{ color: colors.muted }}>{t.columns.hs}: </span>
+          <span style={{ color: colors.ink }}>{r.hs_product_code || "-"}</span>
+        </div>
+        <div className="text-xs mt-1 font-mono break-all">
+          <span style={{ color: colors.muted }}>{t.columns.value}: </span>
+          <span style={{ color: colors.ink }}>{valueStr}</span>
+        </div>
+        <div className="text-xs mt-1" style={{ color: colors.muted }}>
+          {t.columns.updatedAt}: {updated ? updated.toLocaleDateString() : "-"}
+        </div>
+      </div>
+      <div className={`flex shrink-0 items-center gap-1 pt-0.5 ${isRTL ? "flex-row-reverse" : ""}`}>
+        <button
+          type="button"
+          onClick={() => onEdit(r)}
+          className="p-2 rounded-lg transition-all duration-200 hover:scale-110"
+          style={{ color: colors.gold }}
+          title={t.edit}
+        >
+          <Edit size={16} />
+        </button>
+        <button
+          type="button"
+          onClick={() => onDelete(r)}
+          className="p-2 rounded-lg transition-all duration-200 hover:scale-110"
+          style={{ color: "#dc2626" }}
+          title={t.delete}
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function TradeImportsPage() {
   const navigate = useNavigate();
   const { language } = useContext(LanguageContext);
@@ -385,80 +444,95 @@ export default function TradeImportsPage() {
         </div>
 
         <div className="rounded-xl shadow-sm overflow-hidden" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
-          <div className="overflow-x-auto scrollbar-thin">
-            <table className="w-full min-w-[920px]">
-              <thead style={{ background: colors.goldPale }}>
-                <tr>
-                  <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>
-                    {t.columns.country}
-                  </th>
-                  <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>
-                    {t.columns.mineral}
-                  </th>
-                  <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>
-                    {t.columns.year}
-                  </th>
-                  <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>
-                    {t.columns.hs}
-                  </th>
-                  <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold`} style={{ color: colors.forest }}>
-                    {t.columns.value}
-                  </th>
-                  <th className={`px-4 sm:px-6 py-3 sm:py-4 text-${isRTL ? "right" : "left"} text-xs font-semibold hidden lg:table-cell`} style={{ color: colors.forest }}>
-                    {t.columns.updatedAt}
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-center text-xs font-semibold" style={{ color: colors.forest }}>
-                    {t.columns.actions}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredRows.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-4 sm:px-6 py-8 text-center" style={{ color: colors.muted }}>
-                      {t.empty}
-                    </td>
-                  </tr>
-                ) : (
-                  paginatedRows.map((r) => {
-                    const updated = safeDate(r.updated_at);
-                    return (
-                      <tr key={r.id} className="transition-all duration-200 hover:opacity-90" style={{ borderBottom: `1px solid ${colors.border}` }}>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm font-semibold" style={{ color: colors.ink }}>
-                          {countryLabel(r.country_id)}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm" style={{ color: colors.muted }}>
-                          {mineralLabel(r.mineral_id)}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm" style={{ color: colors.muted }}>
-                          {r.year}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm" style={{ color: colors.muted }}>
-                          {r.hs_product_code || "-"}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm font-mono" style={{ color: colors.ink }}>
-                          {Number(r.trade_value_usd || 0).toLocaleString()}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm hidden lg:table-cell" style={{ color: colors.muted }}>
-                          {updated ? updated.toLocaleDateString() : "-"}
-                        </td>
-                        <td className="px-4 sm:px-6 py-3 sm:py-4">
-                          <div className="flex items-center justify-center gap-1">
-                            <button onClick={() => openEdit(r)} className="p-2 rounded-lg transition-all duration-200 hover:scale-110" style={{ color: colors.gold }} title={t.edit}>
-                              <Edit size={16} />
-                            </button>
-                            <button onClick={() => setConfirmDelete(r)} className="p-2 rounded-lg transition-all duration-200 hover:scale-110" style={{ color: "#dc2626" }} title={t.delete}>
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+          {filteredRows.length === 0 ? (
+            <div className="px-4 sm:px-6 py-8 text-center text-sm" style={{ color: colors.muted }}>
+              {t.empty}
+            </div>
+          ) : (
+            <>
+              <div className="md:hidden">
+                {paginatedRows.map((r) => (
+                  <TradeImportsMobileRow
+                    key={r.id}
+                    r={r}
+                    countryName={countryLabel(r.country_id)}
+                    mineralName={mineralLabel(r.mineral_id)}
+                    colors={colors}
+                    t={t}
+                    isRTL={isRTL}
+                    onEdit={openEdit}
+                    onDelete={setConfirmDelete}
+                  />
+                ))}
+              </div>
+              <div className="hidden md:block overflow-x-auto scrollbar-thin overscroll-x-contain">
+                <table className="w-full min-w-[880px]">
+                  <thead style={{ background: colors.goldPale }}>
+                    <tr>
+                      <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                        {t.columns.country}
+                      </th>
+                      <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                        {t.columns.mineral}
+                      </th>
+                      <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                        {t.columns.year}
+                      </th>
+                      <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                        {t.columns.hs}
+                      </th>
+                      <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                        {t.columns.value}
+                      </th>
+                      <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold hidden lg:table-cell ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
+                        {t.columns.updatedAt}
+                      </th>
+                      <th className="px-4 sm:px-6 py-3 sm:py-4 text-center text-xs font-semibold" style={{ color: colors.forest }}>
+                        {t.columns.actions}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedRows.map((r) => {
+                      const updated = safeDate(r.updated_at);
+                      return (
+                        <tr key={r.id} className="transition-all duration-200 hover:opacity-90" style={{ borderBottom: `1px solid ${colors.border}` }}>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm font-semibold break-words max-w-[180px] ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.ink }}>
+                            {countryLabel(r.country_id)}
+                          </td>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm break-words max-w-[160px] ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
+                            {mineralLabel(r.mineral_id)}
+                          </td>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm tabular-nums ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
+                            {r.year}
+                          </td>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm font-mono break-all max-w-[120px] ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
+                            {r.hs_product_code || "-"}
+                          </td>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm font-mono break-all ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.ink }}>
+                            {Number(r.trade_value_usd || 0).toLocaleString()}
+                          </td>
+                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm hidden lg:table-cell ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
+                            {updated ? updated.toLocaleDateString() : "-"}
+                          </td>
+                          <td className="px-4 sm:px-6 py-3 sm:py-4">
+                            <div className="flex items-center justify-center gap-1">
+                              <button onClick={() => openEdit(r)} className="p-2 rounded-lg transition-all duration-200 hover:scale-110" style={{ color: colors.gold }} title={t.edit}>
+                                <Edit size={16} />
+                              </button>
+                              <button onClick={() => setConfirmDelete(r)} className="p-2 rounded-lg transition-all duration-200 hover:scale-110" style={{ color: "#dc2626" }} title={t.delete}>
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
           {filteredRows.length > 0 && (
             <div
               className={`flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 ${isRTL ? "sm:flex-row-reverse" : ""}`}
