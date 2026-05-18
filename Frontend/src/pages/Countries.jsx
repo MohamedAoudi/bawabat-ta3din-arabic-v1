@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Chart from "chart.js/auto";
 import { TreemapController, TreemapElement } from "chartjs-chart-treemap";
@@ -1899,9 +1899,16 @@ const TradeIndicatorsPanel = ({ country, exportSeries, importSeries, exportBreak
 // ── Main page ──────────────────────────────────────────────────────────────────
 const Countries = () => {
   const { labels, language, isArabic, isDarkMode } = useCountriesI18n();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const countryFromUrl = searchParams.get("country");
   const countryProfileRef = useRef(null);
+
+  const selectCountry = (country) => {
+    if (!country?.name || !country?.code) return;
+    setSelected(country.name);
+    navigate(`/countries?country=${encodeURIComponent(country.code)}#country-profile`, { replace: true });
+  };
 
   const [countries, setCountries]               = useState(COUNTRIES);
   const [yearsFromDb, setYearsFromDb] = useState([]);
@@ -2052,10 +2059,6 @@ const Countries = () => {
 
   useEffect(() => {
     if (selected === "—" || !selectedCountryObj) return;
-    const shouldScroll =
-      Boolean(countryFromUrl) ||
-      window.location.hash === "#country-profile";
-    if (!shouldScroll) return;
 
     const scrollToProfile = () => {
       const el = countryProfileRef.current;
@@ -2067,7 +2070,7 @@ const Countries = () => {
       window.requestAnimationFrame(scrollToProfile);
     });
     return () => window.cancelAnimationFrame(id);
-  }, [selected, selectedCountryObj, countryFromUrl]);
+  }, [selected, selectedCountryObj]);
 
   useEffect(() => {
     if (!runtimeYears.length) return;
@@ -2240,7 +2243,7 @@ const Countries = () => {
             {countries.map((c) => {
               const rowSelected = countryNamesMatch(selected, c.name) || String(selected).trim().toLowerCase() === c.code;
               return (
-              <button key={c.code} type="button" onClick={()=>setSelected(c.name)}
+              <button key={c.code} type="button" onClick={() => selectCountry(c)}
                       className="group flex min-w-0 flex-col items-center text-center transition-transform hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] rounded-lg">
                 <div className={`relative flex h-20 w-full items-center justify-center overflow-hidden rounded-lg transition-all sm:h-24 ${isDarkMode ? "bg-black/30" : "bg-slate-50"}`}
                   style={{ boxShadow:rowSelected?"0 0 0 2px #C9A84C,0 4px 12px rgba(201,168,76,0.25)":"0 1px 4px rgba(0,0,0,0.08)" }}>
