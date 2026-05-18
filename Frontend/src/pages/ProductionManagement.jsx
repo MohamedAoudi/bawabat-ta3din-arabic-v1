@@ -12,7 +12,9 @@ import {
 import { getCountries } from "../services/countryService";
 import { getMinerals } from "../services/mineralService";
 import { getYears } from "../services/yearService";
-import { Check, Edit, Factory, Plus, Search, Trash2, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Edit, Factory, Plus, Search, Trash2, X } from "lucide-react";
+
+const PAGE_SIZE = 15;
 
 const TRANSLATIONS = {
   ar: {
@@ -48,6 +50,12 @@ const TRANSLATIONS = {
       conversion_factor: "معامل التحويل",
       data_source: "مصدر البيانات",
     },
+    pagination: {
+      previous: "السابق",
+      next: "التالي",
+      pageOf: (page, total) => `صفحة ${page} من ${total}`,
+      showing: (from, to, total) => `عرض ${from}–${to} من ${total}`,
+    },
   },
   fr: {
     pageTitle: "Gestion de la production",
@@ -81,6 +89,12 @@ const TRANSLATIONS = {
       unit_name_fr: "Unité (Français)",
       conversion_factor: "Facteur de conversion",
       data_source: "Source des données",
+    },
+    pagination: {
+      previous: "Précédent",
+      next: "Suivant",
+      pageOf: (page, total) => `Page ${page} sur ${total}`,
+      showing: (from, to, total) => `Affichage ${from}–${to} sur ${total}`,
     },
   },
   en: {
@@ -116,6 +130,12 @@ const TRANSLATIONS = {
       conversion_factor: "Conversion factor",
       data_source: "Data source",
     },
+    pagination: {
+      previous: "Previous",
+      next: "Next",
+      pageOf: (page, total) => `Page ${page} of ${total}`,
+      showing: (from, to, total) => `Showing ${from}–${to} of ${total}`,
+    },
   },
 };
 
@@ -135,6 +155,7 @@ export default function ProductionManagementPage() {
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [countries, setCountries] = useState([]);
   const [minerals, setMinerals] = useState([]);
   const [years, setYears] = useState([]);
@@ -206,6 +227,24 @@ export default function ProductionManagementPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rows, searchTerm, language, countries, minerals]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
+
+  const paginatedRows = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredRows.slice(start, start + PAGE_SIZE);
+  }, [filteredRows, currentPage]);
+
+  const rangeFrom = filteredRows.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const rangeTo = Math.min(currentPage * PAGE_SIZE, filteredRows.length);
+
   const openCreate = () => {
     setCreating(true);
     setEditing(null);
@@ -272,7 +311,7 @@ export default function ProductionManagementPage() {
             <button onClick={openCreate} className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]" style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`, color: colors.forest }}><Plus size={18} /><span className="text-sm font-semibold">{t.add}</span></button>
           </div>
           <div className="mb-4 sm:mb-6 rounded-xl p-3 sm:p-4 shadow-sm" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
-            <div className="relative"><Search className={`absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2`} size={20} style={{ color: colors.muted }} /><input type="text" placeholder={`${t.search}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`w-full ${isRTL ? "pr-10" : "pl-10"} py-3 rounded-lg border text-sm sm:text-base`} style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }} /></div>
+            <div className="relative"><Search className={`absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2`} size={20} style={{ color: colors.muted }} /><input type="text" placeholder={`${t.search}...`} value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} className={`w-full ${isRTL ? "pr-10" : "pl-10"} py-3 rounded-lg border text-sm sm:text-base`} style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }} /></div>
           </div>
           <div className="rounded-xl shadow-sm overflow-hidden" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <div className="overflow-x-auto scrollbar-thin">
@@ -292,7 +331,7 @@ export default function ProductionManagementPage() {
                   {filteredRows.length === 0 ? (
                     <tr><td colSpan={7} className="px-4 sm:px-6 py-8 text-center" style={{ color: colors.muted }}>{t.empty}</td></tr>
                   ) : (
-                    filteredRows.map((r) => (
+                    paginatedRows.map((r) => (
                       <tr key={r.id} className="transition-all duration-200 hover:opacity-90" style={{ borderBottom: `1px solid ${colors.border}` }}>
                         <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm font-semibold" style={{ color: colors.ink }}>{countryLabel(r.country_id)}</td>
                         <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm" style={{ color: colors.muted }}>{mineralLabel(r.mineral_id)}</td>
@@ -307,6 +346,43 @@ export default function ProductionManagementPage() {
                 </tbody>
               </table>
             </div>
+            {filteredRows.length > 0 && (
+              <div
+                className={`flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 ${isRTL ? "sm:flex-row-reverse" : ""}`}
+                style={{ borderTop: `1px solid ${colors.border}` }}
+              >
+                <p className="text-xs sm:text-sm text-center sm:text-start" style={{ color: colors.muted }}>
+                  {t.pagination.showing(rangeFrom, rangeTo, filteredRows.length)}
+                </p>
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage <= 1}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
+                    style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }}
+                    aria-label={t.pagination.previous}
+                  >
+                    {isRTL ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                    <span className="hidden sm:inline">{t.pagination.previous}</span>
+                  </button>
+                  <span className="text-xs sm:text-sm font-medium px-2 min-w-[7rem] text-center" style={{ color: colors.ink }}>
+                    {t.pagination.pageOf(currentPage, totalPages)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage >= totalPages}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
+                    style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }}
+                    aria-label={t.pagination.next}
+                  >
+                    <span className="hidden sm:inline">{t.pagination.next}</span>
+                    {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

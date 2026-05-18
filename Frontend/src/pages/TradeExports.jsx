@@ -13,7 +13,9 @@ import { getCountries } from "../services/countryService";
 import { getMinerals } from "../services/mineralService";
 import { getYears } from "../services/yearService";
 import { getHSProducts } from "../services/hsProductService";
-import { Check, Edit, Plus, Search, Ship, Trash2, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Edit, Plus, Search, Ship, Trash2, X } from "lucide-react";
+
+const PAGE_SIZE = 15;
 
 const TRANSLATIONS = {
   ar: {
@@ -44,6 +46,12 @@ const TRANSLATIONS = {
       hs_product_code: "رمز HS (اختياري)",
       trade_value_usd: "القيمة بالدولار",
     },
+    pagination: {
+      previous: "السابق",
+      next: "التالي",
+      pageOf: (page, total) => `صفحة ${page} من ${total}`,
+      showing: (from, to, total) => `عرض ${from}–${to} من ${total}`,
+    },
   },
   fr: {
     pageTitle: "Gestion des exportations",
@@ -73,6 +81,12 @@ const TRANSLATIONS = {
       hs_product_code: "Code HS (optionnel)",
       trade_value_usd: "Valeur (USD)",
     },
+    pagination: {
+      previous: "Précédent",
+      next: "Suivant",
+      pageOf: (page, total) => `Page ${page} sur ${total}`,
+      showing: (from, to, total) => `Affichage ${from}–${to} sur ${total}`,
+    },
   },
   en: {
     pageTitle: "Exports management",
@@ -101,6 +115,12 @@ const TRANSLATIONS = {
       year: "Year",
       hs_product_code: "HS code (optional)",
       trade_value_usd: "Value (USD)",
+    },
+    pagination: {
+      previous: "Previous",
+      next: "Next",
+      pageOf: (page, total) => `Page ${page} of ${total}`,
+      showing: (from, to, total) => `Showing ${from}–${to} of ${total}`,
     },
   },
 };
@@ -150,6 +170,7 @@ export default function TradeExportsPage() {
 
   const [rows, setRows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [countries, setCountries] = useState([]);
   const [minerals, setMinerals] = useState([]);
@@ -234,6 +255,24 @@ export default function TradeExportsPage() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rows, searchTerm, language, countries, minerals]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
+
+  const paginatedRows = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredRows.slice(start, start + PAGE_SIZE);
+  }, [filteredRows, currentPage]);
+
+  const rangeFrom = filteredRows.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const rangeTo = Math.min(currentPage * PAGE_SIZE, filteredRows.length);
 
   const openCreate = () => {
     setCreating(true);
@@ -335,7 +374,10 @@ export default function TradeExportsPage() {
               type="text"
               placeholder={`${t.search}...`}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
               className={`w-full ${isRTL ? "pr-10" : "pl-10"} py-3 rounded-lg border text-sm sm:text-base`}
               style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }}
             />
@@ -378,7 +420,7 @@ export default function TradeExportsPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredRows.map((r) => {
+                  paginatedRows.map((r) => {
                     const updated = safeDate(r.updated_at);
                     return (
                       <tr key={r.id} className="transition-all duration-200 hover:opacity-90" style={{ borderBottom: `1px solid ${colors.border}` }}>
@@ -417,6 +459,43 @@ export default function TradeExportsPage() {
               </tbody>
             </table>
           </div>
+          {filteredRows.length > 0 && (
+            <div
+              className={`flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 ${isRTL ? "sm:flex-row-reverse" : ""}`}
+              style={{ borderTop: `1px solid ${colors.border}` }}
+            >
+              <p className="text-xs sm:text-sm text-center sm:text-start" style={{ color: colors.muted }}>
+                {t.pagination.showing(rangeFrom, rangeTo, filteredRows.length)}
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
+                  style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }}
+                  aria-label={t.pagination.previous}
+                >
+                  {isRTL ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                  <span className="hidden sm:inline">{t.pagination.previous}</span>
+                </button>
+                <span className="text-xs sm:text-sm font-medium px-2 min-w-[7rem] text-center" style={{ color: colors.ink }}>
+                  {t.pagination.pageOf(currentPage, totalPages)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02]"
+                  style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }}
+                  aria-label={t.pagination.next}
+                >
+                  <span className="hidden sm:inline">{t.pagination.next}</span>
+                  {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
