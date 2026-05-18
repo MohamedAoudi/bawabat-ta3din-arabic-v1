@@ -12,7 +12,6 @@ import {
 import { getCountries } from "../services/countryService";
 import { getMinerals } from "../services/mineralService";
 import { getYears } from "../services/yearService";
-import { getHSProducts } from "../services/hsProductService";
 import { Check, ChevronLeft, ChevronRight, Edit, Plus, Search, Ship, Trash2, X } from "lucide-react";
 
 const PAGE_SIZE = 15;
@@ -34,7 +33,6 @@ const TRANSLATIONS = {
       country: "الدولة",
       mineral: "المعدن",
       year: "السنة",
-      hs: "رمز HS",
       value: "القيمة (USD)",
       updatedAt: "آخر تحديث",
       actions: "الإجراءات",
@@ -43,7 +41,6 @@ const TRANSLATIONS = {
       country_id: "الدولة",
       mineral_id: "المعدن",
       year: "السنة",
-      hs_product_code: "رمز HS (اختياري)",
       trade_value_usd: "القيمة بالدولار",
     },
     pagination: {
@@ -69,7 +66,6 @@ const TRANSLATIONS = {
       country: "Pays",
       mineral: "Minéral",
       year: "Année",
-      hs: "Code HS",
       value: "Valeur (USD)",
       updatedAt: "Mis à jour",
       actions: "Actions",
@@ -78,7 +74,6 @@ const TRANSLATIONS = {
       country_id: "Pays",
       mineral_id: "Minéral",
       year: "Année",
-      hs_product_code: "Code HS (optionnel)",
       trade_value_usd: "Valeur (USD)",
     },
     pagination: {
@@ -104,7 +99,6 @@ const TRANSLATIONS = {
       country: "Country",
       mineral: "Mineral",
       year: "Year",
-      hs: "HS code",
       value: "Value (USD)",
       updatedAt: "Updated",
       actions: "Actions",
@@ -113,7 +107,6 @@ const TRANSLATIONS = {
       country_id: "Country",
       mineral_id: "Mineral",
       year: "Year",
-      hs_product_code: "HS code (optional)",
       trade_value_usd: "Value (USD)",
     },
     pagination: {
@@ -153,10 +146,6 @@ function TradeExportsMobileRow({ r, countryName, mineralName, colors, t, isRTL, 
         <div className="text-xs mt-1.5 tabular-nums">
           <span style={{ color: colors.muted }}>{t.columns.year}: </span>
           <span style={{ color: colors.ink }}>{r.year}</span>
-        </div>
-        <div className="text-xs mt-1 font-mono break-all">
-          <span style={{ color: colors.muted }}>{t.columns.hs}: </span>
-          <span style={{ color: colors.ink }}>{r.hs_product_code || "-"}</span>
         </div>
         <div className="text-xs mt-1 font-mono break-all">
           <span style={{ color: colors.muted }}>{t.columns.value}: </span>
@@ -234,7 +223,6 @@ export default function TradeExportsPage() {
   const [countries, setCountries] = useState([]);
   const [minerals, setMinerals] = useState([]);
   const [years, setYears] = useState([]);
-  const [hsProducts, setHsProducts] = useState([]);
 
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -243,7 +231,6 @@ export default function TradeExportsPage() {
     country_id: "",
     mineral_id: "",
     year: "",
-    hs_product_code: "",
     trade_value_usd: "",
   });
 
@@ -264,11 +251,10 @@ export default function TradeExportsPage() {
   }, [navigate]);
 
   const loadLookups = async () => {
-    const [c, m, y, hs] = await Promise.all([getCountries(), getMinerals(), getYears(), getHSProducts()]);
+    const [c, m, y] = await Promise.all([getCountries(), getMinerals(), getYears()]);
     setCountries(Array.isArray(c) ? c : []);
     setMinerals(Array.isArray(m) ? m : []);
     setYears(Array.isArray(y) ? y : []);
-    setHsProducts(Array.isArray(hs) ? hs : []);
   };
 
   const fetchRows = async () => {
@@ -304,7 +290,6 @@ export default function TradeExportsPage() {
         countryLabel(r.country_id),
         mineralLabel(r.mineral_id),
         r.year,
-        r.hs_product_code,
         r.trade_value_usd,
       ]
         .filter(Boolean)
@@ -336,7 +321,7 @@ export default function TradeExportsPage() {
   const openCreate = () => {
     setCreating(true);
     setEditing(null);
-    setForm({ country_id: "", mineral_id: "", year: "", hs_product_code: "", trade_value_usd: "" });
+    setForm({ country_id: "", mineral_id: "", year: "", trade_value_usd: "" });
   };
 
   const openEdit = (r) => {
@@ -346,7 +331,6 @@ export default function TradeExportsPage() {
       country_id: r.country_id ?? "",
       mineral_id: r.mineral_id ?? "",
       year: r.year ?? "",
-      hs_product_code: r.hs_product_code ?? "",
       trade_value_usd: r.trade_value_usd ?? "",
     });
   };
@@ -362,7 +346,6 @@ export default function TradeExportsPage() {
       mineral_id: Number(form.mineral_id),
       year: Number(form.year),
       trade_type: "export",
-      hs_product_code: form.hs_product_code?.trim() || null,
       trade_value_usd: form.trade_value_usd === "" ? 0 : Number(form.trade_value_usd),
     };
     if (!payload.country_id || !payload.mineral_id || !payload.year) return;
@@ -466,7 +449,7 @@ export default function TradeExportsPage() {
                 ))}
               </div>
               <div className="hidden md:block overflow-x-auto scrollbar-thin overscroll-x-contain">
-                <table className="w-full min-w-[880px]">
+                <table className="w-full min-w-[760px]">
                   <thead style={{ background: colors.goldPale }}>
                     <tr>
                       <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
@@ -477,9 +460,6 @@ export default function TradeExportsPage() {
                       </th>
                       <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
                         {t.columns.year}
-                      </th>
-                      <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
-                        {t.columns.hs}
                       </th>
                       <th className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
                         {t.columns.value}
@@ -505,9 +485,6 @@ export default function TradeExportsPage() {
                           </td>
                           <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm tabular-nums ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
                             {r.year}
-                          </td>
-                          <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm font-mono break-all max-w-[120px] ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
-                            {r.hs_product_code || "-"}
                           </td>
                           <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm font-mono break-all ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.ink }}>
                             {Number(r.trade_value_usd || 0).toLocaleString()}
@@ -612,13 +589,6 @@ export default function TradeExportsPage() {
                 options={years
                   .map((y) => ({ value: String(y.year ?? y.id ?? y), label: String(y.year ?? y.id ?? y) }))
                   .sort((a, b) => Number(b.value) - Number(a.value))}
-                colors={colors}
-              />
-              <SelectField
-                label={t.fields.hs_product_code}
-                value={form.hs_product_code}
-                onChange={(v) => setForm((p) => ({ ...p, hs_product_code: v }))}
-                options={[{ value: "", label: "-" }, ...hsProducts.map((h) => ({ value: String(h.code ?? h.id ?? ""), label: String(h.code ?? h.id ?? "") }))]}
                 colors={colors}
               />
               <TextField

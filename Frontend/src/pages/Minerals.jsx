@@ -28,10 +28,12 @@ const TRANSLATIONS = {
       category_name_ar: "الفئة (عربي)",
       category_name_en: "الفئة (English)",
       category_name_fr: "الفئة (Français)",
+      hs_code: "رمز HS (اختياري)",
     },
     columns: {
       mineral: "المعدن",
       category: "الفئة",
+      hs: "رمز HS",
       updatedAt: "آخر تحديث",
       actions: "الإجراءات",
     },
@@ -61,10 +63,12 @@ const TRANSLATIONS = {
       category_name_ar: "Catégorie (Arabe)",
       category_name_en: "Catégorie (English)",
       category_name_fr: "Catégorie (Français)",
+      hs_code: "Code HS (optionnel)",
     },
     columns: {
       mineral: "Minéral",
       category: "Catégorie",
+      hs: "Code HS",
       updatedAt: "Mis à jour",
       actions: "Actions",
     },
@@ -94,10 +98,12 @@ const TRANSLATIONS = {
       category_name_ar: "Category (Arabic)",
       category_name_en: "Category (English)",
       category_name_fr: "Category (French)",
+      hs_code: "HS code (optional)",
     },
     columns: {
       mineral: "Mineral",
       category: "Category",
+      hs: "HS code",
       updatedAt: "Updated",
       actions: "Actions",
     },
@@ -117,6 +123,7 @@ const emptyForm = {
   category_name_ar: "",
   category_name_en: "",
   category_name_fr: "",
+  hs_code: "",
 };
 
 function safeDate(v) {
@@ -149,6 +156,10 @@ function MineralsMobileRow({ m, language, colors, t, isRTL, onEdit, onDelete }) 
         <div className="text-xs mt-1.5">
           <span style={{ color: colors.muted }}>{t.columns.category}: </span>
           <span style={{ color: colors.ink }}>{categoryLabel}</span>
+        </div>
+        <div className="text-xs mt-1 font-mono">
+          <span style={{ color: colors.muted }}>{t.columns.hs}: </span>
+          <span style={{ color: colors.ink }}>{m.hs_code || "-"}</span>
         </div>
         <div className="text-xs mt-1" style={{ color: colors.muted }}>
           {t.columns.updatedAt}: {updated ? updated.toLocaleDateString() : "-"}
@@ -270,6 +281,7 @@ export default function MineralsPage() {
         m.category_name_ar,
         m.category_name_en,
         m.category_name_fr,
+        m.hs_code,
       ]
         .filter(Boolean)
         .join(" ")
@@ -312,6 +324,7 @@ export default function MineralsPage() {
       category_name_ar: row.category_name_ar || "",
       category_name_en: row.category_name_en || "",
       category_name_fr: row.category_name_fr || "",
+      hs_code: row.hs_code || "",
     });
   };
 
@@ -329,6 +342,7 @@ export default function MineralsPage() {
       category_name_ar: form.category_name_ar?.trim() || null,
       category_name_en: form.category_name_en?.trim() || null,
       category_name_fr: form.category_name_fr?.trim() || null,
+      hs_code: form.hs_code?.trim() || null,
     };
 
     if (!payload.name_ar || !payload.name_en || !payload.name_fr) return;
@@ -439,23 +453,29 @@ export default function MineralsPage() {
                 ))}
               </div>
               <div className="hidden md:block w-full overflow-x-auto scrollbar-thin overscroll-x-contain lg:overflow-x-visible">
-                <table className="w-full min-w-[640px] lg:min-w-0 lg:table-fixed xl:text-[15px]">
+                <table className="w-full min-w-[760px] lg:min-w-0 lg:table-fixed xl:text-[15px]">
                   <thead style={{ background: colors.goldPale }}>
                     <tr>
                       <th
-                        className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-xs font-semibold lg:w-[40%] xl:w-[38%] ${isRTL ? "text-right" : "text-left"}`}
+                        className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-xs font-semibold lg:w-[32%] xl:w-[30%] ${isRTL ? "text-right" : "text-left"}`}
                         style={{ color: colors.forest }}
                       >
                         {t.columns.mineral}
                       </th>
                       <th
-                        className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-xs font-semibold lg:w-[32%] xl:w-[34%] ${isRTL ? "text-right" : "text-left"}`}
+                        className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-xs font-semibold lg:w-[24%] xl:w-[24%] ${isRTL ? "text-right" : "text-left"}`}
                         style={{ color: colors.forest }}
                       >
                         {t.columns.category}
                       </th>
                       <th
-                        className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-xs font-semibold lg:w-[20%] xl:w-[20%] ${isRTL ? "text-right" : "text-left"}`}
+                        className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-xs font-semibold lg:w-[14%] xl:w-[14%] ${isRTL ? "text-right" : "text-left"}`}
+                        style={{ color: colors.forest }}
+                      >
+                        {t.columns.hs}
+                      </th>
+                      <th
+                        className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-xs font-semibold lg:w-[22%] xl:w-[24%] ${isRTL ? "text-right" : "text-left"}`}
                         style={{ color: colors.forest }}
                       >
                         {t.columns.updatedAt}
@@ -482,7 +502,7 @@ export default function MineralsPage() {
                       const updated = safeDate(m.updated_at);
                       return (
                         <tr key={m.id} className="transition-all duration-200 hover:opacity-90" style={{ borderBottom: `1px solid ${colors.border}` }}>
-                          <td className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-center ${isRTL ? "text-right" : "text-left"}`}>
+                          <td className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-start ${isRTL ? "text-right" : "text-left"}`}>
                             <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
                               <div className="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center lg:w-9 lg:h-9" style={{ background: colors.goldPale }}>
                                 <Gem size={18} style={{ color: colors.gold }} />
@@ -502,6 +522,12 @@ export default function MineralsPage() {
                             style={{ color: colors.muted }}
                           >
                             {categoryLabel}
+                          </td>
+                          <td
+                            className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm font-mono break-all ${isRTL ? "text-right" : "text-left"}`}
+                            style={{ color: colors.muted }}
+                          >
+                            {m.hs_code || "-"}
                           </td>
                           <td className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm whitespace-nowrap lg:whitespace-normal ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
                             {updated ? updated.toLocaleDateString() : "-"}
@@ -628,6 +654,12 @@ export default function MineralsPage() {
                   label={t.fields.category_name_fr}
                   value={form.category_name_fr}
                   onChange={(v) => setForm((p) => ({ ...p, category_name_fr: v }))}
+                  colors={colors}
+                />
+                <Field
+                  label={t.fields.hs_code}
+                  value={form.hs_code}
+                  onChange={(v) => setForm((p) => ({ ...p, hs_code: v }))}
                   colors={colors}
                 />
               </div>
