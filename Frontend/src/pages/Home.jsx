@@ -1820,7 +1820,7 @@ border-radius:13px !important;
 
             {/* Carousel — glissement horizontal automatique (pause au survol) */}
             <div
-              className="references-carousel-viewport"
+              className="references-carousel-viewport p-5"
               onMouseEnter={() => setSponsorPaused(true)}
               onMouseLeave={() => setSponsorPaused(false)}
               onFocusCapture={() => setSponsorPaused(true)}
