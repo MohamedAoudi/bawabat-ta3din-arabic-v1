@@ -1,8 +1,7 @@
 import { useState, useContext, useEffect, useRef } from "react";
 
-// Importer l'URL du backend depuis .env
-const API_URL = import.meta.env.VITE_API_URL;
 import { useNavigate } from "react-router-dom";
+import { env, resolveAssetUrl } from "../config/env";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, updateUser, refreshCurrentUser } from "../services/authService";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
@@ -231,7 +230,7 @@ export default function Settings() {
       formData.append('userId', user.id);
       
       // Upload to backend
-      const uploadResponse = await fetch(`${API_URL}/api/users/upload-photo`, {
+      const uploadResponse = await fetch(`${env.apiUrl}/users/upload-photo`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -353,7 +352,7 @@ export default function Settings() {
                         (user.photo
                           ? user.photo.startsWith("http")
                             ? user.photo
-                            : `${API_URL}${user.photo}`
+                            : resolveAssetUrl(user.photo)
                           : undefined)
                       }
                       alt="Profile"

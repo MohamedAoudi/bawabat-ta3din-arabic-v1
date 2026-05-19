@@ -10,7 +10,7 @@ import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { User, Users, TrendingUp, TrendingDown, BarChart3, PieChart, Activity, DollarSign } from "lucide-react";
 import Chart from "chart.js/auto";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { resolveAssetUrl } from "../config/env";
 
 const TRANSLATIONS = {
   ar: { dashboard: "لوحة التحكم", welcome: "مرحباً", profile: "الملف الشخصي", settings: "الإعدادات", logout: "تسجيل الخروج", adminPanel: "لوحة الإدارة", users: "المستخدمون", statistics: "الإحصائيات", reports: "التقارير", noAccess: "لا تملك صلاحيات الوصول لهذه الصفحة", role: "الدور", email: "البريد الإلكتروني", createdAt: "تاريخ الإنشاء", roles: { admin: "مدير", user: "مستخدم", editor: "محرر" }, totalExports: "إجمالي الصادرات", totalImports: "إجمالي الواردات", totalValue: "القيمة الإجمالية", topProducts: "أهم المنتجات", yearlyTrend: "الإنتاج السنوي", byFlowType: "حسب نوع التدفق", exports: "الصادرات", imports: "الواردات", annualProduction: "الإنتاج السنوي", annualNormalizedProduction: "الإنتاج المعياري السنوي", quickActions: "إجراءات سريعة", home: "الرئيسية", all: "الكل", fromYear: "من سنة", toYear: "إلى سنة", tradeType: "نوع التدفق", country: "الدولة", mineral: "الخامة", reset: "إعادة ضبط" },
@@ -461,7 +461,7 @@ export default function Dashboard() {
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
               {user.photo ? (
                 <img
-                  src={user.photo.startsWith("http") ? user.photo : `${API_URL}${user.photo}`}
+                  src={resolveAssetUrl(user.photo)}
                   alt="Profile"
                   referrerPolicy="no-referrer"
                   crossOrigin="anonymous"

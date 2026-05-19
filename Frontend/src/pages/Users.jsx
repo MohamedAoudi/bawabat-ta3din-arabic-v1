@@ -5,8 +5,7 @@ import { getCurrentUser, isAdmin, refreshCurrentUser } from "../services/authSer
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { User, Shield, Users, Edit, Trash2, X, Check, Search, CheckCircle, XCircle, ToggleLeft, ToggleRight, ChevronLeft, ChevronRight } from "lucide-react";
 
-// Importer l'URL du backend depuis .env
-const API_URL = import.meta.env.VITE_API_URL;
+import { env, resolveAssetUrl } from "../config/env";
 
 const PAGE_SIZE = 15;
 
@@ -248,7 +247,7 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/users`, {
+      const response = await fetch(`${env.apiUrl}/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -269,7 +268,7 @@ export default function UsersPage() {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/users/${editingUser.id}`, {
+      const response = await fetch(`${env.apiUrl}/users/${editingUser.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -299,7 +298,7 @@ export default function UsersPage() {
   const handleDelete = async (userId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/users/${userId}`, {
+      const response = await fetch(`${env.apiUrl}/users/${userId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -318,7 +317,7 @@ export default function UsersPage() {
   const handleAccept = async (userId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/users/${userId}/accept`, {
+      const response = await fetch(`${env.apiUrl}/users/${userId}/accept`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -337,7 +336,7 @@ export default function UsersPage() {
   const handleReject = async (userId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/users/${userId}/reject`, {
+      const response = await fetch(`${env.apiUrl}/users/${userId}/reject`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -360,7 +359,7 @@ export default function UsersPage() {
       const newIsAccepted = user.is_accepted === true ? false : true;
       console.log("Toggling user:", user.id, "from", user.is_accepted, "to", newIsAccepted, "type:", typeof newIsAccepted);
       
-      const response = await fetch(`${API_URL}/api/users/${user.id}`, {
+      const response = await fetch(`${env.apiUrl}/users/${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -526,7 +525,7 @@ export default function UsersPage() {
                                 user.photo
                                   ? user.photo.startsWith("http")
                                     ? user.photo
-                                    : `${API_URL}${user.photo}`
+                                    : resolveAssetUrl(user.photo)
                                   : undefined
                               } 
                               alt="Profile" 

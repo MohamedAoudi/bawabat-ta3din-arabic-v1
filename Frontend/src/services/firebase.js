@@ -1,15 +1,14 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 
-// Firebase configuration - Replace with your own config from Firebase Console
 const firebaseConfig = {
-  apiKey: "AIzaSyAtz8PNCAsDSTLbHdRoiZhE4HWiG82pwVI",
-  authDomain: "apip-378ea.firebaseapp.com",
-  projectId: "apip-378ea",
-  storageBucket: "apip-378ea.firebasestorage.app",
-  messagingSenderId: "111994294377",
-  appId: "1:111994294377:web:f2a5b4c1cd3fe0c61752f8",
-  measurementId: "G-7BX303Y8QE"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase

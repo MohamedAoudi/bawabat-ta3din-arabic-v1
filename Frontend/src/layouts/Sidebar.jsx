@@ -1,8 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 
-// Importer l'URL du backend depuis .env
-const API_URL = import.meta.env.VITE_API_URL;
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import { resolveAssetUrl } from "../config/env";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, logout, isAdmin, refreshCurrentUser } from "../services/authService";
 import { 
@@ -373,7 +372,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
                 src={
                   user.photo.startsWith("http")
                     ? user.photo
-                    : `${API_URL}${user.photo}`
+                    : resolveAssetUrl(user.photo)
                 }
                 alt="Profile"
                 referrerPolicy="no-referrer"

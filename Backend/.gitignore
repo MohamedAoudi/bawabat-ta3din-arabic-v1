@@ -28,3 +28,6 @@ uploads/
 
 
 node_modules/
+
+# Variables d'environnement (mots de passe, secrets)
+.env
