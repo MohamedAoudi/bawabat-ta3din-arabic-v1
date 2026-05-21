@@ -58,13 +58,19 @@ import { dataByMineral } from "./M1";
 
 const REFERENCES_AUTO_SLIDE_MS = 4500;
 
+const REFERENCE_SLIDE_BG_DARK = "linear-gradient(160deg,#0e4238 0%,#082c23 55%,#051a15 100%)";
+
 function ReferenceCarouselCard({ item }) {
+  const { isDarkMode } = useContext(ThemeContext);
+  const slideBg = isDarkMode ? REFERENCE_SLIDE_BG_DARK : "white";
+  const slideBorder = isDarkMode ? "rgba(201,168,76,0.22)" : "rgba(8,39,33,0.08)";
+
   return (
     <a
       href={item.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="sponsor-card"
+      className="sponsor-card reference-slide-card"
       style={{
         height: 170,
         borderRadius: 13,
@@ -74,6 +80,8 @@ function ReferenceCarouselCard({ item }) {
         overflow: "hidden",
         position: "relative",
         padding: 10,
+        background: slideBg,
+        border: `1px solid ${slideBorder}`,
       }}
     >
       {item.img ? (
@@ -84,7 +92,7 @@ function ReferenceCarouselCard({ item }) {
             style={{
               position: "absolute",
               inset: 0,
-              background: "rgba(255,255,255,0.97)",
+              background: isDarkMode ? "rgba(7,22,17,0.96)" : "rgba(255,255,255,0.97)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -95,18 +103,19 @@ function ReferenceCarouselCard({ item }) {
               textAlign: "center",
             }}
           >
-            <p style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--forest)", margin: "0 0 4px" }}>{item.title}</p>
-            <p style={{ fontSize: "0.72rem", color: "var(--muted)", margin: 0 }}>{item.subtitle}</p>
+            <p style={{ fontSize: "0.82rem", fontWeight: 800, color: isDarkMode ? "#efe8d4" : "var(--forest)", margin: "0 0 4px" }}>{item.title}</p>
+            <p style={{ fontSize: "0.72rem", color: isDarkMode ? "rgba(239,232,212,0.65)" : "var(--muted)", margin: 0 }}>{item.subtitle}</p>
           </div>
         </>
       ) : (
         <div
+          className="reference-slide-inner"
           style={{
             width: "100%",
             height: "100%",
-            border: "1px solid rgba(8,39,33,0.08)",
+            border: `1px solid ${slideBorder}`,
             borderRadius: 12,
-            background: "#fff",
+            background: slideBg,
             padding: 10,
             display: "flex",
             flexDirection: "column",
@@ -115,12 +124,20 @@ function ReferenceCarouselCard({ item }) {
           }}
         >
           <div>
-            <p style={{ margin: 0, fontSize: "0.72rem", color: "var(--muted)", fontWeight: 700 }}>{item.title}</p>
-            <p style={{ margin: "6px 0 0", fontSize: "0.78rem", color: "var(--forest)", fontWeight: 800, lineHeight: 1.45 }}>{item.subtitle}</p>
+            <p style={{ margin: 0, fontSize: "0.72rem", color: isDarkMode ? "rgba(239,232,212,0.55)" : "var(--muted)", fontWeight: 700 }}>{item.title}</p>
+            <p style={{ margin: "6px 0 0", fontSize: "0.78rem", color: isDarkMode ? "#efe8d4" : "var(--forest)", fontWeight: 800, lineHeight: 1.45 }}>{item.subtitle}</p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {(item.emails || []).slice(0, 2).map((email) => (
-              <span key={email} style={{ fontSize: "0.7rem", color: "var(--forest-mid)", textDecoration: "underline", wordBreak: "break-all" }}>
+              <span
+                key={email}
+                style={{
+                  fontSize: "0.7rem",
+                  color: isDarkMode ? "#c9a84c" : "var(--forest-mid)",
+                  textDecoration: "underline",
+                  wordBreak: "break-all",
+                }}
+              >
                 {email}
               </span>
             ))}
@@ -1426,14 +1443,32 @@ border-radius:13px !important;
 
         /* Dark mode overrides for light surfaces in this page */
         html.theme-dark .home-page .home-surface {
-          background: linear-gradient(145deg,#0a221c 0%,#0d2a23 100%) !important;
+          background: linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%) !important;
           border-color: rgba(201,168,76,0.22) !important;
           box-shadow: 0 24px 56px rgba(0,0,0,0.35) !important;
+        }
+        html.theme-dark .home-page .references-section-surface {
+          background: linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%) !important;
+        }
+        html.theme-dark .home-page .references-carousel-viewport {
+          background: rgba(8,39,33,0.45) !important;
+          border-radius: 13px;
         }
         html.theme-dark .home-page .reserve-card,
         html.theme-dark .home-page .sponsor-card {
           background: #0f3129 !important;
           border-color: rgba(201,168,76,0.2) !important;
+        }
+        html.theme-dark .home-page .reference-slide-card,
+        html.theme-dark .home-page .reference-slide-inner {
+          background: linear-gradient(160deg,#0e4238 0%,#082c23 55%,#051a15 100%) !important;
+          border-color: rgba(201,168,76,0.22) !important;
+        }
+        html.theme-dark .home-page .references-carousel-slide {
+          background: transparent;
+        }
+        html.theme-dark .home-page .reference-slide-card .sponsor-hover {
+          background: rgba(7,22,17,0.96) !important;
         }
         html.theme-dark .home-page .sponsor-hover {
           background: rgba(7,22,17,0.96) !important;
@@ -1808,19 +1843,31 @@ border-radius:13px !important;
 
         {/* ── SOURCES / SPONSORS ── */}
         <section className="reveal d4" style={{ marginTop:56 }}>
-          <div className="home-surface" style={{ background:"white", border:"1px solid rgba(8,39,33,0.08)", borderRadius:13, padding:32 }}>
+          <div
+            className="home-surface references-section-surface"
+            style={{
+              background: isDarkMode
+                ? "linear-gradient(145deg,#071e1a 0%,#082721 40%,#0a2f28 70%,#071e1a 100%)"
+                : "white",
+              border: isDarkMode ? "1px solid rgba(201,168,76,0.22)" : "1px solid rgba(8,39,33,0.08)",
+              borderRadius: 13,
+              padding: 32,
+              boxShadow: isDarkMode ? "0 24px 56px rgba(0,0,0,0.35)" : undefined,
+            }}
+          >
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12 }}>
               <div>
                 <span style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", background:"var(--forest)", color:"var(--gold)", borderRadius:13, fontSize:"0.8rem", fontWeight:700, letterSpacing:"0.08em" }}>
                   <AppIcon name="fa-books" size={14} strokeWidth={2.2} /> {labels.referencesTag}
                 </span>
-                <h2 style={{ fontSize:"1.2rem", fontWeight:900, color:"var(--forest)", margin:"10px 0 0" }}>{labels.referencesTitle}</h2>
+                <h2 style={{ fontSize:"1.2rem", fontWeight:900, color: isDarkMode ? "#efe8d4" : "var(--forest)", margin:"10px 0 0" }}>{labels.referencesTitle}</h2>
               </div>
             </div>
 
             {/* Carousel — glissement horizontal automatique (pause au survol) */}
             <div
               className="references-carousel-viewport p-5"
+              style={isDarkMode ? { background: "rgba(8,39,33,0.45)", borderRadius: 13 } : undefined}
               onMouseEnter={() => setSponsorPaused(true)}
               onMouseLeave={() => setSponsorPaused(false)}
               onFocusCapture={() => setSponsorPaused(true)}
