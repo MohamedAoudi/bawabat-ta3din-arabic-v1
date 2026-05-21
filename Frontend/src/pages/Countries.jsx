@@ -1134,9 +1134,9 @@ const SnapshotStatCard = ({
     className={`rounded-[18px] px-3 py-3 text-center sm:px-4 sm:py-4 ${className}`}
     style={{ backgroundColor: bgColor, border: noBorder ? "none" : `2px solid ${borderColor}`, boxShadow: "0 4px 12px rgba(15,23,42,0.06)" }}
   >
-    <p className="text-sm font-bold sm:text-[16px] leading-snug" style={{ color: "#d4a017" }}>{title}</p>
-    <p className={`mt-2 break-words text-lg font-black leading-tight sm:text-xl md:text-2xl ${dark ? "text-white" : "text-slate-900"} ${valueClassName}`}>{value}</p>
-    {note ? <p className="mt-1 text-xs font-semibold sm:text-[13px]" style={{ color: "#d4a017" }}>{note}</p> : null}
+    <p className="text-sm font-bold sm:text-[16px] leading-snug" style={{ color: dark ? "#d4a017" : "#000000" }}>{title}</p>
+    <p className={`mt-2 break-words text-lg font-black leading-tight sm:text-xl md:text-2xl ${dark ? "text-white" : "text-black"} ${valueClassName}`}>{value}</p>
+    {note ? <p className="mt-1 text-xs font-semibold sm:text-[13px]" style={{ color: dark ? "#d4a017" : "#000000" }}>{note}</p> : null}
   </div>
 );
 
@@ -1183,7 +1183,10 @@ const CountrySnapshotPanel = ({
   exportMarketsByYear,
   importMarketsByYear,
 }) => {
-  const { labels, language, locale } = useCountriesI18n();
+  const { labels, language, locale, isDarkMode } = useCountriesI18n();
+  const miningSubsectionBodyClass = isDarkMode
+    ? "rounded-2xl border border-[#C9A84C]/20 bg-gradient-to-br from-[#0e4238] via-[#082c23] to-[#051a15] p-3 sm:p-4"
+    : "";
   const summary = buildCountrySnapshot({
     country,
     countryCode,
@@ -1205,9 +1208,12 @@ const CountrySnapshotPanel = ({
         : "#94a3b8";
 
   return (
-    <section className="rounded-[24px] bg-[#f7f7f7] p-3 sm:p-5" style={{ border: "1px solid #d4d4d4" }}>
+    <section
+      className={`rounded-[24px] p-3 sm:p-5 ${isDarkMode ? "bg-[#0b221b]" : "bg-[#f7f7f7]"}`}
+      style={{ border: isDarkMode ? "1px solid rgba(201,168,76,0.15)" : "1px solid #d4d4d4" }}
+    >
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
-        <label className="flex w-full flex-col gap-2 text-sm font-bold text-slate-700 sm:w-auto sm:flex-row sm:items-center sm:text-[16px]">
+        <label className={`flex w-full flex-col gap-2 text-sm font-bold sm:w-auto sm:flex-row sm:items-center sm:text-[16px] ${isDarkMode ? "text-slate-300" : "text-black"}`}>
           <span className="shrink-0">{labels.selectYear}</span>
           <select
             value={year}
@@ -1222,47 +1228,47 @@ const CountrySnapshotPanel = ({
       </div>
 
       <SnapshotSectionHeader title={labels.miningProduction} featured />
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <SnapshotStatCard title={labels.totalMiningProduction} value={summary.production.totalText} borderColor="#a3a3a3 " />
-        <SnapshotStatCard title={labels.numberOfProducts} value={summary.production.countText} borderColor="#d4a017" />
-        <SnapshotStatCard title={labels.topMiningProduct} value={summary.production.topMineral} borderColor="#a0522d" />
-        <SnapshotStatCard title={labels.topMiningProductValue} value={summary.production.topValueText} borderColor="#16a34a" />
+      <div className={`grid gap-3 md:grid-cols-2 xl:grid-cols-4 ${miningSubsectionBodyClass}`}>
+        <SnapshotStatCard title={labels.totalMiningProduction} value={summary.production.totalText} borderColor="#a3a3a3 " dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+        <SnapshotStatCard title={labels.numberOfProducts} value={summary.production.countText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+        <SnapshotStatCard title={labels.topMiningProduct} value={summary.production.topMineral} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+        <SnapshotStatCard title={labels.topMiningProductValue} value={summary.production.topValueText} borderColor="#16a34a" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
       </div>
 
       <div className="mt-5">
         <SnapshotSectionHeader title={labels.miningTrade} featured />
         <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,180px)_minmax(0,1fr)]">
           <div className="rounded-[22px] bg-white px-3 py-5 text-center sm:px-4 sm:py-6" style={{ border: `2px solid ${balanceColor}` }}>
-            <p className="text-sm font-bold sm:text-[15px]" style={{ color: "#d4a017" }}>{labels.tradeBalance}</p>
-            <p className="text-sm font-bold sm:text-[16px]" style={{ color: "#d4a017" }}>{labels.surplusDeficit}</p>
+            <p className="text-sm font-bold sm:text-[15px]" style={{ color: isDarkMode ? "#d4a017" : "#000000" }}>{labels.tradeBalance}</p>
+            <p className="text-sm font-bold sm:text-[16px]" style={{ color: isDarkMode ? "#d4a017" : "#000000" }}>{labels.surplusDeficit}</p>
             <div className="mt-6 space-y-2 sm:mt-10 md:mt-16">
-              <p className="text-xl font-black text-slate-900 sm:text-2xl md:text-[28px]">{summary.tradeBalance.statusText}</p>
-              <p className="text-lg font-black leading-tight text-slate-900 break-words sm:text-2xl md:text-[32px]">{summary.tradeBalance.valueText}</p>
+              <p className={`text-xl font-black sm:text-2xl md:text-[28px] ${isDarkMode ? "text-white" : "text-black"}`}>{summary.tradeBalance.statusText}</p>
+              <p className={`text-lg font-black leading-tight break-words sm:text-2xl md:text-[32px] ${isDarkMode ? "text-white" : "text-black"}`}>{summary.tradeBalance.valueText}</p>
             </div>
           </div>
 
           <div className="space-y-4">
             <div>
-              <SnapshotSectionHeader title={labels.miningExports} />
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                <SnapshotStatCard title={labels.totalExports} value={summary.exports.totalText} borderColor="#a3a3a3" />
-                <SnapshotStatCard title={labels.numberOfExportedMinerals} value={summary.exports.countText} borderColor="#d4a017" />
-                <SnapshotStatCard title={labels.topExportedMineral} value={summary.exports.topMineral} borderColor="#a0522d" />
-                <SnapshotStatCard title={labels.exportGrowth} value={summary.exports.growthText} note={summary.exports.growthSubtext} borderColor="#a3a3a3" />
-                <SnapshotStatCard title={labels.exportMarkets} value={summary.exports.marketsText} borderColor="#d4a017" />
-                <SnapshotStatCard title={labels.exportConcentration} value={summary.exports.concentrationText} borderColor="#a0522d" />
+              <SnapshotSectionHeader title={labels.miningExports} featured />
+              <div className={`grid gap-3 md:grid-cols-2 xl:grid-cols-3 ${miningSubsectionBodyClass}`}>
+                <SnapshotStatCard title={labels.totalExports} value={summary.exports.totalText} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.numberOfExportedMinerals} value={summary.exports.countText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.topExportedMineral} value={summary.exports.topMineral} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.exportGrowth} value={summary.exports.growthText} note={summary.exports.growthSubtext} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.exportMarkets} value={summary.exports.marketsText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.exportConcentration} value={summary.exports.concentrationText} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
               </div>
             </div>
 
             <div>
-              <SnapshotSectionHeader title={labels.miningImports} />
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                <SnapshotStatCard title={labels.totalImports} value={summary.imports.totalText} borderColor="#a3a3a3" />
-                <SnapshotStatCard title={labels.numberOfImportedMinerals} value={summary.imports.countText} borderColor="#d4a017" />
-                <SnapshotStatCard title={labels.topImportedMineral} value={summary.imports.topMineral} borderColor="#a0522d" />
-                <SnapshotStatCard title={labels.importGrowth} value={summary.imports.growthText} note={summary.imports.growthSubtext} borderColor="#a3a3a3" />
-                <SnapshotStatCard title={labels.importMarkets} value={summary.imports.marketsText} borderColor="#d4a017" />
-                <SnapshotStatCard title={labels.importConcentration} value={summary.imports.concentrationText} borderColor="#a0522d" />
+              <SnapshotSectionHeader title={labels.miningImports} featured />
+              <div className={`grid gap-3 md:grid-cols-2 xl:grid-cols-3 ${miningSubsectionBodyClass}`}>
+                <SnapshotStatCard title={labels.totalImports} value={summary.imports.totalText} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.numberOfImportedMinerals} value={summary.imports.countText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.topImportedMineral} value={summary.imports.topMineral} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.importGrowth} value={summary.imports.growthText} note={summary.imports.growthSubtext} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.importMarkets} value={summary.imports.marketsText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.importConcentration} value={summary.imports.concentrationText} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
               </div>
             </div>
           </div>
