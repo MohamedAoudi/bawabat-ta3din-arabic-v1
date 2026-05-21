@@ -87,6 +87,7 @@ const PAGE_TRANSLATIONS = {
     shareOfArab: "من الإنتاج العربي",
     shareOfWorld: "من الإنتاج العالمي",
     topProducingCountries: "أكبر الدول إنتاجًا",
+    otherCountries: "أخرى",
     total: "الإجمالي",
     productionTrend: "تطوّر الإنتاج التعديني",
     productionTrendSubtitle: (country, mineralFilter) => `${country} — جميع السنوات${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
@@ -156,6 +157,7 @@ const PAGE_TRANSLATIONS = {
     shareOfArab: "de la production arabe",
     shareOfWorld: "de la production mondiale",
     topProducingCountries: "Principaux pays producteurs",
+    otherCountries: "Autres",
     total: "Total",
     productionTrend: "Évolution de la production minière",
     productionTrendSubtitle: (country, mineralFilter) => `${country} — toutes les années${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
@@ -224,6 +226,7 @@ const PAGE_TRANSLATIONS = {
     shareOfArab: "of Arab output",
     shareOfWorld: "of global output",
     topProducingCountries: "Top producing countries",
+    otherCountries: "Others",
     total: "Total",
     productionTrend: "Mining production trend",
     productionTrendSubtitle: (country, mineralFilter) => `${country} — all years${mineralFilter !== "all" ? ` — ${mineralFilter}` : ""}`,
@@ -895,24 +898,56 @@ const getMineralTreemapData = (country, year, unit = "ton") => {
   return rows.map((r) => ({ mineral: r.mineral, value: r.value, rawValue: r.value, unit: r.unit, pct: (r.value / total) * 100 }));
 };
 
-const getComparisonData = (selectedCountry, year, mineralFilter, unit, scope) => {
-  const minerals = Object.keys(runtimeDataByMineral).filter((m) =>
-    !mineralFilter || mineralFilter === "all" ? true : m === mineralFilter
+const getCountryKeyFromAnalyticsRow = (row) => {
+  const code = normalizeCountryCode(row?.country_code || "");
+  if (code) {
+    const match = COUNTRIES.find((c) => c.code === code);
+    if (match?.name) return match.name;
+  }
+  return canonicalCountryNameForData(
+    row?.country_name_ar || row?.country_name_en || row?.country_name_fr || ""
   );
+};
+
+const buildComparisonDataFromAnalyticsRows = (
+  rows,
+  selectedCountry,
+  year,
+  allowedMineralNames,
+  unit,
+  scope,
+  othersLabel
+) => {
+  const yearNum = Number(year);
   const countryTotals = {};
-  minerals.forEach((mineral) => {
-    const fromUnit = runtimeMineralUnits[mineral] || "";
-    (runtimeDataByMineral[mineral][year] || []).forEach((r) => {
-      if (!r.country || !r.value) return;
-      const rowCode = resolveCountryIso2(r.country);
-      if (scope === "arab" && (!rowCode || !ARAB_COUNTRY_CODES.has(rowCode))) return;
-      const converted = convertVolume(r.value, fromUnit, unit) || 0;
-      const key = canonicalCountryNameForData(r.country);
-      countryTotals[key] = (countryTotals[key] || 0) + converted;
-    });
+
+  (Array.isArray(rows) ? rows : []).forEach((row) => {
+    if (Number(row?.year) !== yearNum) return;
+
+    if (allowedMineralNames && allowedMineralNames.size > 0) {
+      const mineralName = getMineralRowLabel(row, "ar");
+      if (!allowedMineralNames.has(mineralName)) return;
+    }
+
+    const value = Number(row?.production_quantity);
+    if (!Number.isFinite(value) || value <= 0) return;
+
+    const rowCode = normalizeCountryCode(row?.country_code || "");
+    if (scope === "arab" && (!rowCode || !ARAB_COUNTRY_CODES.has(rowCode))) return;
+
+    const fromUnit =
+      row?.unit_name_ar || row?.unit_name_en || row?.unit_name_fr || row?.unit || "";
+    const converted = convertVolume(value, fromUnit, unit) || 0;
+    if (converted <= 0) return;
+
+    const key = getCountryKeyFromAnalyticsRow(row);
+    if (!key) return;
+    countryTotals[key] = (countryTotals[key] || 0) + converted;
   });
+
   const sorted = Object.entries(countryTotals).filter(([, v]) => v > 0).sort(([, a], [, b]) => b - a);
   if (sorted.length === 0) return null;
+
   const selectedKey = canonicalCountryNameForData(selectedCountry);
   const selectedValue = countryTotals[selectedKey] || 0;
   const selectedRank = sorted.findIndex(([name]) => name === selectedKey) + 1;
@@ -926,7 +961,7 @@ const getComparisonData = (selectedCountry, year, mineralFilter, unit, scope) =>
   const slices = [];
   if (selectedValue > 0) slices.push({ name: selectedKey, value: selectedValue, isSelected: true });
   topOthers.forEach(([name, value]) => slices.push({ name, value, isSelected: false }));
-  if (restValue > 0) slices.push({ name: "أخرى", value: restValue, isSelected: false });
+  if (restValue > 0) slices.push({ name: othersLabel, value: restValue, isSelected: false });
   const total = slices.reduce((s, d) => s + d.value, 0);
 
   return {
@@ -1471,19 +1506,55 @@ const CountryHeroBanner = ({ country, countryCode, theme }) => {
   );
 };
 
-// ── Donut ──────────────────────────────────────────────────────────────────────
-const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, onYearChange }) => {
+// ── Donut (DB only via /mineral-production/analytics/overview) ─────────────────
+const CountryComparisonDonut = ({ selectedCountry, year, onYearChange }) => {
   const { labels, language } = useCountriesI18n();
   const canvasRef = useRef(null);
   const chartRef  = useRef(null);
   const [scope, setScope] = useState("arab");
-  const [noData, setNoData] = useState(false);
+  const [analyticsRows, setAnalyticsRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const unit = "ton";
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    getMineralProductionAnalytics()
+      .then((rows) => {
+        if (!active) return;
+        setAnalyticsRows(Array.isArray(rows) ? rows : []);
+      })
+      .catch(() => {
+        if (!active) return;
+        setAnalyticsRows([]);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const result = useMemo(
+    () =>
+      buildComparisonDataFromAnalyticsRows(
+        analyticsRows,
+        selectedCountry,
+        year,
+        null,
+        unit,
+        scope,
+        labels.otherCountries
+      ),
+    [analyticsRows, selectedCountry, year, unit, scope, labels.otherCountries]
+  );
+
+  const noData = !loading && (!result || result.slices.length === 0);
 
   useEffect(() => {
     destroyChart(chartRef);
-    const result = getComparisonData(selectedCountry, year, mineralFilter, unit, scope);
-    if (!result || result.slices.length === 0) { setNoData(true); return; }
-    setNoData(false);
+    if (!result || result.slices.length === 0) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const colors      = result.slices.map((s,i) => s.isSelected ? "#C9A84C" : DONUT_PALETTE[i % DONUT_PALETTE.length]);
@@ -1497,9 +1568,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
           callbacks:{ label(c){ const val=c.parsed; const pct=result.total>0?((val/result.total)*100).toFixed(1):0; return ` ${fmtVal(val)} (${pct}%)`; } } } } },
     });
     return () => { destroyChart(chartRef); };
-  }, [selectedCountry, year, mineralFilter, unit, scope]);
-
-  const result = getComparisonData(selectedCountry, year, mineralFilter, unit, scope);
+  }, [result]);
   const selectedSlice = result?.slices.find(s=>s.isSelected);
   const selectedPct   = result && selectedSlice ? ((selectedSlice.value/result.total)*100).toFixed(1) : null;
   const leaderPct = result && result.leaderValue ? ((result.leaderValue / result.total) * 100).toFixed(1) : null;
@@ -1519,7 +1588,11 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
         <YearPills selectedYear={year} onYearChange={onYearChange} />
       </CardHeader>
 
-      {noData||!result ? (
+      {loading ? (
+        <div className="flex min-h-[220px] flex-col items-center justify-center gap-3 sm:min-h-[300px]">
+          <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.35)" }}>…</p>
+        </div>
+      ) : noData ? (
         <div className="flex min-h-[220px] flex-col items-center justify-center gap-3 sm:min-h-[300px]">
           <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.noDataForYear(year)}</p>
         </div>
@@ -1548,7 +1621,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
                 <div className="rounded-xl px-4 py-3" style={{ background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.25)" }}>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <span className="min-w-0 break-words text-[11px] font-black sm:text-[12px] flex items-center gap-2" style={{ color:"#C9A84C" }}>
-                      <span className="h-2.5 w-2.5 shrink-0 rounded-full inline-block" style={{ background:"#C9A84C" }} />{selectedSlice.name}
+                      <span className="h-2.5 w-2.5 shrink-0 rounded-full inline-block" style={{ background:"#C9A84C" }} />{getCountryDisplayName(selectedSlice.name, language)}
                     </span>
                     <span className="shrink-0 text-[15px] font-black" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
                   </div>
@@ -1562,7 +1635,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
                   {result.topCountries.map((c, i) => (
                     <div key={`${c.name}-${i}`} className="rounded-lg px-3 py-2" style={{ background:"rgba(255,255,255,0.025)" }}>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-[11px] font-bold truncate" style={{ color: i===0 ? "#C9A84C" : "rgba(255,255,255,0.8)" }}>{c.name}</span>
+                        <span className="text-[11px] font-bold truncate" style={{ color: i===0 ? "#C9A84C" : "rgba(255,255,255,0.8)" }}>{getCountryDisplayName(c.name, language)}</span>
                         <span className="text-[11px] font-bold" style={{ color:"rgba(255,255,255,0.55)" }}>{c.pct.toFixed(1)}%</span>
                       </div>
                       <div className="h-0.5 rounded-full overflow-hidden" style={{ background:"rgba(255,255,255,0.07)" }}>
@@ -1582,7 +1655,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, mineralFilter, unit, on
                     <div key={s.name} className="rounded-xl px-3 py-2" style={{ background:"rgba(255,255,255,0.025)" }}>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[11px] font-bold flex items-center gap-1.5 truncate" style={{ color }}>
-                          <span className="w-2 h-2 rounded-full inline-block flex-shrink-0" style={{ background:color }} />{s.name}
+                          <span className="w-2 h-2 rounded-full inline-block flex-shrink-0" style={{ background:color }} />{s.name === labels.otherCountries ? s.name : getCountryDisplayName(s.name, language)}
                         </span>
                         <span className="text-[11px] font-bold flex-shrink-0 ml-2" style={{ color:"rgba(255,255,255,0.45)" }}>{pct.toFixed(1)}%</span>
                       </div>
