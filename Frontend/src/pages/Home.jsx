@@ -944,6 +944,7 @@ const KpiCard = ({ k, labels }) => {
       role="button"
       tabIndex={0}
       aria-expanded={expanded}
+      className="kpi-card"
       style={{
         background:"var(--forest)",
         border:`1px solid ${(hovered || expanded)?"rgba(201,168,76,0.6)":"rgba(201,168,76,0.2)"}`,
@@ -1489,17 +1490,18 @@ border-radius:13px !important;
         }
 
         html.theme-dark .home-page .divf9 {
-          background: rgb(7, 22, 17) !important;
+          background: linear-gradient(145deg, #071e1a 0%, #082721 40%, #0a2f28 70%, #071e1a 100%) !important;
+          border: 1px solid rgba(201, 168, 76, 0.22) !important;
+          box-shadow: 0 24px 56px rgba(0, 0, 0, 0.35) !important;
         }
-          html.theme-dark section {
+        html.theme-dark .home-page .divf9 .kpi-card {
+          background: linear-gradient(135deg, #082721 0%, #0d3d34 100%) !important;
+        }
+        html.theme-dark section {
           background: none !important;
-          }
-           html.theme-dark main {
+        }
+        html.theme-dark main {
           background: none !important;
-          }
-          
-        html.theme-dark .d2 p {
-          color: rgb(7, 22, 17) !important;
         }
        
         /* Chatbot CTA */
@@ -1627,7 +1629,7 @@ border-radius:13px !important;
             
             {/* Couche 2 : Vague principale (solide) */}
             <path 
-              fill={isDarkMode ? "rgb(7, 22, 17)" : "#ffffff"} 
+              fill={isDarkMode ? "#082721" : "#ffffff"} 
               fillOpacity="1" 
               className="transition-colors duration-500"
               d="M0,128L48,149.3C96,171,192,213,288,229.3C384,245,480,256,576,234.7C672,213,768,160,864,144C960,128,1056,149,1152,165.3C1248,181,1344,181,1392,181.3L1440,181.3L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
