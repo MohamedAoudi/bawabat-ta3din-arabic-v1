@@ -1087,9 +1087,28 @@ const COUNTRY_THEME_BY_CODE = {
   ly: "coast",
 };
 
+const COUNTRY_DARK_SURFACE = "#0C231C";
+
 const getCountryTheme = (countryCode) => {
   const presetKey = COUNTRY_THEME_BY_CODE[countryCode] || "atlas";
   return COUNTRY_THEME_PRESETS[presetKey];
+};
+
+const getCountryProfileTheme = (theme, isDarkMode) => {
+  if (!isDarkMode) return theme;
+  const green = COUNTRY_THEME_PRESETS.atlas;
+  return {
+    ...theme,
+    shellBg: `radial-gradient(circle at top right, rgba(201,168,76,0.12), transparent 28%), linear-gradient(160deg, ${COUNTRY_DARK_SURFACE} 0%, ${COUNTRY_DARK_SURFACE} 45%, ${COUNTRY_DARK_SURFACE} 100%)`,
+    shellBorder: "rgba(201, 168, 76, 0.2)",
+    shellShadow: "0 24px 60px rgba(0,0,0,0.35)",
+    cardBg: `linear-gradient(160deg,#102a22 0%,${COUNTRY_DARK_SURFACE} 58%,#091a15 100%)`,
+    cardBorder: green.cardBorder,
+    cardShadow: green.cardShadow,
+    titleBg: `linear-gradient(145deg,${COUNTRY_DARK_SURFACE} 0%,#11463a 45%,#0d362d 100%)`,
+    heroBg: `linear-gradient(135deg,${COUNTRY_DARK_SURFACE} 0%,#1e5d44 42%,#123228 100%)`,
+    heroGlow: green.heroGlow,
+  };
 };
 
 
@@ -1272,7 +1291,7 @@ const CountrySnapshotPanel = ({
 }) => {
   const { labels, language, locale, isDarkMode } = useCountriesI18n();
   const miningSubsectionBodyClass = isDarkMode
-    ? "rounded-2xl border border-[#C9A84C]/20 bg-gradient-to-br from-[#0e4238] via-[#082c23] to-[#051a15] p-3 sm:p-4"
+    ? "rounded-2xl border border-[#C9A84C]/20 bg-[#0C231C] p-3 sm:p-4"
     : "";
   const summary = buildCountrySnapshot({
     country,
@@ -1296,7 +1315,7 @@ const CountrySnapshotPanel = ({
 
   return (
     <section
-      className={`rounded-[24px] p-3 sm:p-5 ${isDarkMode ? "bg-[#0b221b]" : "bg-[#f7f7f7]"}`}
+      className={`rounded-[24px] p-3 sm:p-5 ${isDarkMode ? "bg-[#0C231C]" : "bg-[#f7f7f7]"}`}
       style={{ border: isDarkMode ? "1px solid rgba(201,168,76,0.15)" : "1px solid #d4d4d4" }}
     >
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
@@ -1316,16 +1335,16 @@ const CountrySnapshotPanel = ({
 
       <SnapshotSectionHeader title={labels.miningProduction} featured />
       <div className={`grid gap-3 md:grid-cols-2 xl:grid-cols-4 ${miningSubsectionBodyClass}`}>
-        <SnapshotStatCard title={labels.totalMiningProduction} value={summary.production.totalText} borderColor="#a3a3a3 " dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-        <SnapshotStatCard title={labels.numberOfProducts} value={summary.production.countText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-        <SnapshotStatCard title={labels.topMiningProduct} value={summary.production.topMineral} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-        <SnapshotStatCard title={labels.topMiningProductValue} value={summary.production.topValueText} borderColor="#16a34a" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+        <SnapshotStatCard title={labels.totalMiningProduction} value={summary.production.totalText} borderColor="#a3a3a3 " dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+        <SnapshotStatCard title={labels.numberOfProducts} value={summary.production.countText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+        <SnapshotStatCard title={labels.topMiningProduct} value={summary.production.topMineral} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+        <SnapshotStatCard title={labels.topMiningProductValue} value={summary.production.topValueText} borderColor="#16a34a" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
       </div>
 
       <div className="mt-5">
         <SnapshotSectionHeader title={labels.miningTrade} featured />
         <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,180px)_minmax(0,1fr)]">
-          <div className="rounded-[22px] bg-white px-3 py-5 text-center sm:px-4 sm:py-6" style={{ border: `2px solid ${balanceColor}` }}>
+          <div className={`rounded-[22px] px-3 py-5 text-center sm:px-4 sm:py-6 ${isDarkMode ? "bg-[#0C231C]" : "bg-white"}`} style={{ border: `2px solid ${balanceColor}` }}>
             <p className="text-sm font-bold sm:text-[15px]" style={{ color: isDarkMode ? "#d4a017" : "#000000" }}>{labels.tradeBalance}</p>
             <p className="text-sm font-bold sm:text-[16px]" style={{ color: isDarkMode ? "#d4a017" : "#000000" }}>{labels.surplusDeficit}</p>
             <div className="mt-6 space-y-2 sm:mt-10 md:mt-16">
@@ -1338,24 +1357,24 @@ const CountrySnapshotPanel = ({
             <div>
               <SnapshotSectionHeader title={labels.miningExports} featured />
               <div className={`grid gap-3 md:grid-cols-2 xl:grid-cols-3 ${miningSubsectionBodyClass}`}>
-                <SnapshotStatCard title={labels.totalExports} value={summary.exports.totalText} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-                <SnapshotStatCard title={labels.numberOfExportedMinerals} value={summary.exports.countText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-                <SnapshotStatCard title={labels.topExportedMineral} value={summary.exports.topMineral} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-                <SnapshotStatCard title={labels.exportGrowth} value={summary.exports.growthText} note={summary.exports.growthSubtext} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-                <SnapshotStatCard title={labels.exportMarkets} value={summary.exports.marketsText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-                <SnapshotStatCard title={labels.exportConcentration} value={summary.exports.concentrationText} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.totalExports} value={summary.exports.totalText} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+                <SnapshotStatCard title={labels.numberOfExportedMinerals} value={summary.exports.countText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+                <SnapshotStatCard title={labels.topExportedMineral} value={summary.exports.topMineral} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+                <SnapshotStatCard title={labels.exportGrowth} value={summary.exports.growthText} note={summary.exports.growthSubtext} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+                <SnapshotStatCard title={labels.exportMarkets} value={summary.exports.marketsText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+                <SnapshotStatCard title={labels.exportConcentration} value={summary.exports.concentrationText} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
               </div>
             </div>
 
             <div>
               <SnapshotSectionHeader title={labels.miningImports} featured />
               <div className={`grid gap-3 md:grid-cols-2 xl:grid-cols-3 ${miningSubsectionBodyClass}`}>
-                <SnapshotStatCard title={labels.totalImports} value={summary.imports.totalText} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-                <SnapshotStatCard title={labels.numberOfImportedMinerals} value={summary.imports.countText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-                <SnapshotStatCard title={labels.topImportedMineral} value={summary.imports.topMineral} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-                <SnapshotStatCard title={labels.importGrowth} value={summary.imports.growthText} note={summary.imports.growthSubtext} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-                <SnapshotStatCard title={labels.importMarkets} value={summary.imports.marketsText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
-                <SnapshotStatCard title={labels.importConcentration} value={summary.imports.concentrationText} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? "#0f2a23" : "#ffffff"} />
+                <SnapshotStatCard title={labels.totalImports} value={summary.imports.totalText} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+                <SnapshotStatCard title={labels.numberOfImportedMinerals} value={summary.imports.countText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+                <SnapshotStatCard title={labels.topImportedMineral} value={summary.imports.topMineral} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+                <SnapshotStatCard title={labels.importGrowth} value={summary.imports.growthText} note={summary.imports.growthSubtext} borderColor="#a3a3a3" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+                <SnapshotStatCard title={labels.importMarkets} value={summary.imports.marketsText} borderColor="#d4a017" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
+                <SnapshotStatCard title={labels.importConcentration} value={summary.imports.concentrationText} borderColor="#a0522d" dark={isDarkMode} bgColor={isDarkMode ? COUNTRY_DARK_SURFACE : "#ffffff"} />
               </div>
             </div>
           </div>
@@ -2159,6 +2178,7 @@ const Countries = () => {
     (c) => countryNamesMatch(c.name, selected) || String(c.code).toLowerCase() === String(selected).trim().toLowerCase()
   );
   const selectedTheme = getCountryTheme(selectedCountryObj?.code);
+  const profileTheme = getCountryProfileTheme(selectedTheme, isDarkMode);
   runtimeDataByMineral = productionDataset.dataByMineral;
   runtimeMineralUnits = productionDataset.mineralUnits;
   runtimeYears = yearsFromDb.length ? yearsFromDb : productionDataset.allYears;
@@ -2416,7 +2436,7 @@ const Countries = () => {
       lang={language}
       className="min-h-screen font-['Cairo'] text-slate-800"
       style={{
-        background: isDarkMode ? "#071611" : "#F4F7F5",
+        background: isDarkMode ? COUNTRY_DARK_SURFACE : "#F4F7F5",
         fontFamily: "'Cairo',system-ui,sans-serif",
       }}
     >
@@ -2444,8 +2464,8 @@ const Countries = () => {
         </div>
         <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-20" style={{ transform: "translateY(2px)" }}>
           <svg className="relative block w-full h-[56px] md:h-[90px] lg:h-[120px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
-            <path fill={isDarkMode ? "#0b221b" : "#F4F7F5"} fillOpacity="0.4" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L0,320Z" />
-            <path fill={isDarkMode ? "#071611" : "#F4F7F5"} fillOpacity="1" d="M0,288L60,261.3C120,235,240,181,360,149.3C480,117,600,107,720,122.7C840,139,960,181,1080,186.7C1200,192,1320,160,1380,144L1440,128L1440,320L0,320Z" />
+            <path fill={isDarkMode ? COUNTRY_DARK_SURFACE : "#F4F7F5"} fillOpacity="0.4" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L0,320Z" />
+            <path fill={isDarkMode ? COUNTRY_DARK_SURFACE : "#F4F7F5"} fillOpacity="1" d="M0,288L60,261.3C120,235,240,181,360,149.3C480,117,600,107,720,122.7C840,139,960,181,1080,186.7C1200,192,1320,160,1380,144L1440,128L1440,320L0,320Z" />
           </svg>
         </div>
       </div>
@@ -2454,7 +2474,7 @@ const Countries = () => {
         <div className="mx-auto max-w-6xl space-y-5 px-2 sm:space-y-6 sm:px-4 md:px-6 lg:px-8">
 
         <section
-          className={`rounded-2xl border p-4 sm:p-6 md:p-7 ${isDarkMode ? "border-[#C9A84C]/20 bg-[#0f2a23] shadow-[0_4px_28px_rgba(0,0,0,0.35)]" : "border-black/[0.08] bg-white shadow-[0_2px_16px_rgba(0,0,0,0.06)]"}`}
+          className={`rounded-2xl border p-4 sm:p-6 md:p-7 ${isDarkMode ? "border-[#C9A84C]/20 bg-[#0C231C] shadow-[0_4px_28px_rgba(0,0,0,0.35)]" : "border-black/[0.08] bg-white shadow-[0_2px_16px_rgba(0,0,0,0.06)]"}`}
         >
           <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
             <div className="min-w-0 text-start sm:text-start">
@@ -2480,7 +2500,7 @@ const Countries = () => {
                       className="group flex min-w-0 flex-col items-center text-center transition-transform hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] rounded-lg">
                 <div className={`relative flex h-20 w-full items-center justify-center overflow-hidden rounded-lg transition-all sm:h-24 ${isDarkMode ? "bg-black/30" : "bg-slate-50"}`}
                   style={{ boxShadow:rowSelected?"0 0 0 2px #C9A84C,0 4px 12px rgba(201,168,76,0.25)":"0 1px 4px rgba(0,0,0,0.08)" }}>
-                  <img src={countryFlags[c.code]} alt={getCountryDisplayName(c.name, language)} loading="lazy" decoding="async" style={{ ...FLAG_IMAGE_STYLE, padding:"2px", background: isDarkMode ? "#0b1f1a" : "#f8fafc" }} />
+                  <img src={countryFlags[c.code]} alt={getCountryDisplayName(c.name, language)} loading="lazy" decoding="async" style={{ ...FLAG_IMAGE_STYLE, padding:"2px", background: isDarkMode ? COUNTRY_DARK_SURFACE : "#f8fafc" }} />
                   {rowSelected && <div className="absolute inset-0 rounded-lg" style={{ background:"rgba(201,168,76,0.08)" }} />}
                 </div>
                 <p className={`mt-1.5 line-clamp-2 min-h-[2.5rem] text-[10px] font-bold leading-tight transition-colors sm:min-h-0 sm:text-[11px] ${rowSelected?"text-[#C9A84C]":isDarkMode?"text-slate-300 group-hover:text-[#C9A84C]":"text-slate-600 group-hover:text-[#082721]"}`}>
@@ -2508,16 +2528,16 @@ const Countries = () => {
             id="country-profile"
             className="min-w-0 scroll-mt-24 space-y-5 overflow-x-hidden rounded-[28px] p-3 sm:p-5 lg:p-6"
             style={{
-              background: selectedTheme.shellBg,
-              border: `1px solid ${selectedTheme.shellBorder}`,
-              boxShadow: selectedTheme.shellShadow,
-              "--country-card-bg": selectedTheme.cardBg,
-              "--country-card-border": selectedTheme.cardBorder,
-              "--country-card-shadow": selectedTheme.cardShadow,
-              "--country-title-bg": selectedTheme.titleBg,
+              background: profileTheme.shellBg,
+              border: `1px solid ${profileTheme.shellBorder}`,
+              boxShadow: profileTheme.shellShadow,
+              "--country-card-bg": profileTheme.cardBg,
+              "--country-card-border": profileTheme.cardBorder,
+              "--country-card-shadow": profileTheme.cardShadow,
+              "--country-title-bg": profileTheme.titleBg,
             }}
           >
-            {selectedCountryObj&&<CountryHeroBanner country={selected} countryCode={selectedCountryObj.code} theme={selectedTheme} />}
+            {selectedCountryObj&&<CountryHeroBanner country={selected} countryCode={selectedCountryObj.code} theme={profileTheme} />}
 
             {selectedCountryObj && (
               <CountrySnapshotPanel
