@@ -1,13 +1,25 @@
 const express = require("express");
 const router = express.Router();
 const mineralProductionController = require("../Controllers/MineralProductionController");
+const { authenticateToken, authorizeRole } = require("../middleware/authMiddleware");
 
+// Public routes - get all mineral production records
 router.get("/", mineralProductionController.getAllMineralProduction);
-router.get("/trend", mineralProductionController.getMineralProductionTrend);
-router.get("/analytics/overview", mineralProductionController.getMineralProductionAnalytics);
+
+// Public route - get mineral production by ID
 router.get("/:id", mineralProductionController.getMineralProductionById);
-router.post("/", mineralProductionController.createMineralProduction);
-router.put("/:id", mineralProductionController.updateMineralProduction);
-router.delete("/:id", mineralProductionController.deleteMineralProduction);
+
+// Public route - get mineral production by country and year
+router.get("/country/:countryId/year/:year", mineralProductionController.getMineralProductionByCountryYear);
+
+// Protected routes - requires authentication
+// Create mineral production (admin only)
+router.post("/", authenticateToken, authorizeRole("admin"), mineralProductionController.createMineralProduction);
+
+// Update mineral production (admin only)
+router.put("/:id", authenticateToken, authorizeRole("admin"), mineralProductionController.updateMineralProduction);
+
+// Delete mineral production (admin only)
+router.delete("/:id", authenticateToken, authorizeRole("admin"), mineralProductionController.deleteMineralProduction);
 
 module.exports = router;

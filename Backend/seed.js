@@ -150,31 +150,7 @@ const countriesSeed = [
   },
 ];
 
-async function seedYears({ fromYear = 2000, toYear = new Date().getFullYear() } = {}) {
-  const years = [];
-  for (let y = fromYear; y <= toYear; y += 1) {
-    years.push({ year: y, decade: Math.floor(y / 10) * 10 });
-  }
 
-  await pool.query("BEGIN");
-  try {
-    for (const row of years) {
-      await pool.query(
-        `
-          INSERT INTO years (year, decade)
-          VALUES ($1, $2)
-          ON CONFLICT (year) DO UPDATE
-          SET decade = EXCLUDED.decade
-        `,
-        [row.year, row.decade]
-      );
-    }
-    await pool.query("COMMIT");
-  } catch (e) {
-    await pool.query("ROLLBACK");
-    throw e;
-  }
-}
 
 async function seedCountries() {
   await pool.query("BEGIN");
@@ -204,7 +180,6 @@ async function seedCountries() {
 }
 
 async function seedOnStartup() {
-  await seedYears({ fromYear: 2000, toYear: new Date().getFullYear() });
   await seedCountries();
 }
 
