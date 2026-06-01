@@ -6,6 +6,8 @@ import Footer from "../layouts/Footer";
 import { LanguageContext, ThemeContext } from "../App";
 
 import { getCountries } from "../services/countryService";
+import { getMinerals } from "../services/mineralService";
+import { getTradeTransactionsByType } from "../services/tradeTransactionService";
 
 const DEFAULT_COUNTRY = "ma";
 const ALL_COUNTRIES_VALUE = "all";
@@ -171,12 +173,44 @@ export default function M6Page() {
       setIsLoading(true);
       setLoadError("");
       try {
-        const [rows, countriesRows] = await Promise.all([
-          Promise.resolve([]),
+        const [importRows, countriesRows, mineralsRows] = await Promise.all([
+          getTradeTransactionsByType("import"),
           getCountries(),
+          getMinerals(),
         ]);
+
+        const countryById = Array.isArray(countriesRows)
+          ? countriesRows.reduce((acc, country) => {
+              acc[country.id] = country;
+              return acc;
+            }, {})
+          : {};
+
+        const mineralById = Array.isArray(mineralsRows)
+          ? mineralsRows.reduce((acc, mineral) => {
+              acc[mineral.id] = mineral;
+              return acc;
+            }, {})
+          : {};
+
+        const analyticsData = Array.isArray(importRows)
+          ? importRows.map((row) => {
+              const country = countryById[row.country_id] || {};
+              const mineral = mineralById[row.mineral_id] || {};
+              return {
+                country_code: String(country.iso_code || "").toLowerCase(),
+                country_name_ar: country.name_ar || "",
+                country_name_en: country.name_en || "",
+                country_name_fr: country.name_fr || "",
+                mineral_name: mineral.name_en || mineral.name_ar || mineral.name_fr || "",
+                year: row.year,
+                value_usd: row.trade_value_usd,
+              };
+            })
+          : [];
+
         if (isMounted) {
-          setAnalyticsRows(Array.isArray(rows) ? rows : []);
+          setAnalyticsRows(analyticsData);
           setCountries(Array.isArray(countriesRows) ? countriesRows : []);
         }
       } catch (error) {
