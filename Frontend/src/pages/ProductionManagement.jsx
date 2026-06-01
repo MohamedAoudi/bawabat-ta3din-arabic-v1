@@ -279,7 +279,15 @@ export default function ProductionManagementPage() {
     if (!m) return "-";
     return language === "ar" ? m.name_ar || "-" : language === "fr" ? m.name_fr || "-" : m.name_en || "-";
   };
-  const unitLabel = (r) => (language === "ar" ? r.unit_name_ar : language === "fr" ? r.unit_name_fr : r.unit_name_en) || "-";
+  const unitLabel = (r) => {
+    const activeLabel = language === "ar" ? r.unit_name_ar : language === "fr" ? r.unit_name_fr : r.unit_name_en;
+    if (activeLabel) return activeLabel;
+    const matchedUnit = UNITS.find(
+      (u) => u.key === r.unit_key || u.ar === r.unit_name_ar || u.en === r.unit_name_en || u.fr === r.unit_name_fr
+    );
+    if (matchedUnit) return language === "ar" ? matchedUnit.ar : language === "fr" ? matchedUnit.fr : matchedUnit.en;
+    return "-";
+  };
 
   const filteredRows = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
@@ -320,7 +328,9 @@ export default function ProductionManagementPage() {
   const openEdit = (r) => {
     setCreating(false);
     setEditing(r);
-    const existingUnit = UNITS.find((u) => u.ar === r.unit_name_ar || u.en === r.unit_name_en || u.fr === r.unit_name_fr);
+    const existingUnit = UNITS.find(
+      (u) => u.key === r.unit_key || u.ar === r.unit_name_ar || u.en === r.unit_name_en || u.fr === r.unit_name_fr
+    );
     setForm({
       country_id: r.country_id ?? "",
       mineral_id: r.mineral_id ?? "",
@@ -528,9 +538,9 @@ export default function ProductionManagementPage() {
                       return {
                         ...p,
                         unit_key: v,
-                        unit_name_ar: language === "ar" ? sel.ar : null,
-                        unit_name_en: language === "en" ? sel.en : null,
-                        unit_name_fr: language === "fr" ? sel.fr : null,
+                        unit_name_ar: sel.ar || null,
+                        unit_name_en: sel.en || null,
+                        unit_name_fr: sel.fr || null,
                       };
                     })
                   }
