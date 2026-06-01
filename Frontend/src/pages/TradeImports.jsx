@@ -658,7 +658,7 @@ export default function TradeImportsPage() {
 
 function TextField({ label, value, onChange, colors, inputMode }) {
   return (
-    <div className="sm:col-span-2">
+    <div>
       <label className="block text-sm font-medium mb-2" style={{ color: colors.muted }}>
         {label}
       </label>
