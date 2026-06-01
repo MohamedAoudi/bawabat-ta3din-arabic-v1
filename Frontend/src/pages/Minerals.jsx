@@ -22,13 +22,13 @@ const TRANSLATIONS = {
     confirmDeleteBody: "هل أنت متأكد من حذف هذا المعدن؟",
     empty: "لا توجد بيانات",
     fields: {
+      hs_minerals: "رمز HS Minerals",
       name_ar: "الاسم (عربي)",
       name_en: "الاسم (English)",
       name_fr: "الاسم (Français)",
       category_name_ar: "الفئة (عربي)",
       category_name_en: "الفئة (English)",
       category_name_fr: "الفئة (Français)",
-      hs_code: "رمز HS (اختياري)",
     },
     columns: {
       mineral: "المعدن",
@@ -57,13 +57,13 @@ const TRANSLATIONS = {
     confirmDeleteBody: "Êtes-vous sûr de vouloir supprimer ce minéral ?",
     empty: "Aucune donnée",
     fields: {
+      hs_minerals: "HS Minerals code",
       name_ar: "Nom (Arabe)",
       name_en: "Nom (English)",
       name_fr: "Nom (Français)",
       category_name_ar: "Catégorie (Arabe)",
       category_name_en: "Catégorie (English)",
       category_name_fr: "Catégorie (Français)",
-      hs_code: "Code HS (optionnel)",
     },
     columns: {
       mineral: "Minéral",
@@ -92,13 +92,13 @@ const TRANSLATIONS = {
     confirmDeleteBody: "Are you sure you want to delete this mineral?",
     empty: "No data",
     fields: {
+      hs_minerals: "HS Minerals code",
       name_ar: "Name (Arabic)",
       name_en: "Name (English)",
       name_fr: "Name (French)",
       category_name_ar: "Category (Arabic)",
       category_name_en: "Category (English)",
       category_name_fr: "Category (French)",
-      hs_code: "HS code (optional)",
     },
     columns: {
       mineral: "Mineral",
@@ -117,13 +117,13 @@ const TRANSLATIONS = {
 };
 
 const emptyForm = {
+  hs_minerals: "",
   name_ar: "",
   name_en: "",
   name_fr: "",
   category_name_ar: "",
   category_name_en: "",
   category_name_fr: "",
-  hs_code: "",
 };
 
 function safeDate(v) {
@@ -159,7 +159,7 @@ function MineralsMobileRow({ m, language, colors, t, isRTL, onEdit, onDelete }) 
         </div>
         <div className="text-xs mt-1 font-mono">
           <span style={{ color: colors.muted }}>{t.columns.hs}: </span>
-          <span style={{ color: colors.ink }}>{m.hs_code || "-"}</span>
+          <span style={{ color: colors.ink }}>{m.hs_minerals || "-"}</span>
         </div>
         <div className="text-xs mt-1" style={{ color: colors.muted }}>
           {t.columns.updatedAt}: {updated ? updated.toLocaleDateString() : "-"}
@@ -281,7 +281,7 @@ export default function MineralsPage() {
         m.category_name_ar,
         m.category_name_en,
         m.category_name_fr,
-        m.hs_code,
+        m.hs_minerals,
       ]
         .filter(Boolean)
         .join(" ")
@@ -318,13 +318,13 @@ export default function MineralsPage() {
     setEditing(row);
     setCreating(false);
     setForm({
+      hs_minerals: row.hs_minerals || "",
       name_ar: row.name_ar || "",
       name_en: row.name_en || "",
       name_fr: row.name_fr || "",
       category_name_ar: row.category_name_ar || "",
       category_name_en: row.category_name_en || "",
       category_name_fr: row.category_name_fr || "",
-      hs_code: row.hs_code || "",
     });
   };
 
@@ -336,13 +336,13 @@ export default function MineralsPage() {
 
   const onSave = async () => {
     const payload = {
+      hs_minerals: form.hs_minerals?.trim(),
       name_ar: form.name_ar?.trim(),
       name_en: form.name_en?.trim(),
       name_fr: form.name_fr?.trim(),
       category_name_ar: form.category_name_ar?.trim() || null,
       category_name_en: form.category_name_en?.trim() || null,
       category_name_fr: form.category_name_fr?.trim() || null,
-      hs_code: form.hs_code?.trim() || null,
     };
 
     if (!payload.name_ar || !payload.name_en || !payload.name_fr) return;
@@ -527,7 +527,7 @@ export default function MineralsPage() {
                             className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm font-mono break-all ${isRTL ? "text-right" : "text-left"}`}
                             style={{ color: colors.muted }}
                           >
-                            {m.hs_code || "-"}
+                            {m.hs_minerals || "-"}
                           </td>
                           <td className={`px-4 sm:px-6 lg:px-8 py-3 sm:py-4 text-sm whitespace-nowrap lg:whitespace-normal ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
                             {updated ? updated.toLocaleDateString() : "-"}
@@ -620,6 +620,12 @@ export default function MineralsPage() {
             <div className="p-4 sm:p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <Field
+                  label={t.fields.hs_minerals}
+                  value={form.hs_minerals}
+                  onChange={(v) => setForm((p) => ({ ...p, hs_minerals: v }))}
+                  colors={colors}
+                />
+                <Field
                   label={t.fields.name_ar}
                   value={form.name_ar}
                   onChange={(v) => setForm((p) => ({ ...p, name_ar: v }))}
@@ -637,7 +643,6 @@ export default function MineralsPage() {
                   onChange={(v) => setForm((p) => ({ ...p, name_fr: v }))}
                   colors={colors}
                 />
-                <div className="hidden sm:block" />
                 <Field
                   label={t.fields.category_name_ar}
                   value={form.category_name_ar}
@@ -654,12 +659,6 @@ export default function MineralsPage() {
                   label={t.fields.category_name_fr}
                   value={form.category_name_fr}
                   onChange={(v) => setForm((p) => ({ ...p, category_name_fr: v }))}
-                  colors={colors}
-                />
-                <Field
-                  label={t.fields.hs_code}
-                  value={form.hs_code}
-                  onChange={(v) => setForm((p) => ({ ...p, hs_code: v }))}
                   colors={colors}
                 />
               </div>

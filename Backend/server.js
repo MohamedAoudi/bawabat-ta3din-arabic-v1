@@ -2,6 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const pool = require("./db");
 const userRoutes = require("./Routes/userRoutes");
+const mineralsRoutes = require("./Routes/mineralsRoutes");
+const countriesRoutes = require("./Routes/countriesRoutes");
+const mineralProductionRoutes = require("./Routes/mineralProductionRoutes");
+const tradePartnersRoutes = require("./Routes/tradePartnersRoutes");
+const tradeTransactionsRoutes = require("./Routes/tradeTransactionsRoutes");
 
 const path = require("path");
 const { runMigrations } = require("./migrate");
@@ -21,6 +26,12 @@ app.get("/", (req, res) => {
 
 // User routes (multilingual)
 app.use("/api/users", userRoutes);
+// Other API routes
+app.use("/api/minerals", mineralsRoutes);
+app.use("/api/countries", countriesRoutes);
+app.use("/api/mineral-production", mineralProductionRoutes);
+app.use("/api/trade-partners", tradePartnersRoutes);
+app.use("/api/trade-transactions", tradeTransactionsRoutes);
 
 
 async function startServer() {
