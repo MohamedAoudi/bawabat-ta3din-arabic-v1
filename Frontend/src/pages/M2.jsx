@@ -3,6 +3,7 @@ import { Boxes, ChartLine, Flag } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
+import { getMineralProduction } from "../services/mineralProductionService";
 import { LanguageContext } from "../App";
 import { getCountries, getMinerals } from "../services";
 
@@ -212,11 +213,9 @@ export default function M2Page() {
   const sourceRows = useMemo(() => {
     const sourceSet = new Set();
     for (const row of trendRows || []) {
-      const list = Array.isArray(row?.data_sources) ? row.data_sources : [];
-      for (const source of list) {
-        if (source && String(source).trim()) {
-          sourceSet.add(String(source).trim());
-        }
+      const source = row?.data_source;
+      if (source && String(source).trim()) {
+        sourceSet.add(String(source).trim());
       }
     }
     return Array.from(sourceSet);
@@ -267,11 +266,21 @@ export default function M2Page() {
       setIsLoadingTrend(true);
       setTrendError("");
       try {
-        const rows = [];
+        let rows = await getMineralProduction();
+        if (cancelled) return;
+
+        if (countryId !== "all") {
+          rows = rows.filter((r) => String(r.country_id) === String(countryId));
+        }
+        if (mineralId !== "all") {
+          rows = rows.filter((r) => String(r.mineral_id) === String(mineralId));
+        }
+
         if (cancelled) return;
         setTrendRows(Array.isArray(rows) ? rows : []);
-      } catch {
+      } catch (error) {
         if (cancelled) return;
+        console.error("Error loading trend data:", error);
         setTrendRows([]);
         setTrendError(
           language === "fr"
@@ -289,7 +298,7 @@ export default function M2Page() {
     return () => {
       cancelled = true;
     };
-  }, [countryId, mineralId]);
+  }, [countryId, mineralId, language]);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
