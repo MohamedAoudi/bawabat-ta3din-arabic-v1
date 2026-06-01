@@ -4,11 +4,29 @@ const db = require("../db");
 const getAllMineralProduction = async (req, res) => {
   try {
     const query = `
-      SELECT id, country_id, mineral_id, year, production_quantity, normalized_quantity, 
-             unit_name_ar, unit_name_en, unit_name_fr, conversion_factor, data_source, 
-             created_at, updated_at
-      FROM mineral_production
-      ORDER BY year DESC, country_id ASC, mineral_id ASC
+      SELECT mp.id,
+             mp.country_id,
+             mp.mineral_id,
+             mp.year,
+             mp.production_quantity,
+             mp.normalized_quantity,
+             mp.unit_name_ar,
+             mp.unit_name_en,
+             mp.unit_name_fr,
+             mp.conversion_factor,
+             mp.data_source,
+             c.name_ar AS country_name_ar,
+             c.name_en AS country_name_en,
+             c.name_fr AS country_name_fr,
+             m.name_ar AS mineral_name_ar,
+             m.name_en AS mineral_name_en,
+             m.name_fr AS mineral_name_fr,
+             mp.created_at,
+             mp.updated_at
+      FROM mineral_production mp
+      LEFT JOIN countries c ON mp.country_id = c.id
+      LEFT JOIN minerals m ON mp.mineral_id = m.id
+      ORDER BY mp.year DESC, mp.country_id ASC, mp.mineral_id ASC
     `;
     const result = await db.query(query);
     res.json(result.rows);
@@ -22,11 +40,29 @@ const getMineralProductionById = async (req, res) => {
   try {
     const { id } = req.params;
     const query = `
-      SELECT id, country_id, mineral_id, year, production_quantity, normalized_quantity, 
-             unit_name_ar, unit_name_en, unit_name_fr, conversion_factor, data_source, 
-             created_at, updated_at
-      FROM mineral_production
-      WHERE id = $1
+      SELECT mp.id,
+             mp.country_id,
+             mp.mineral_id,
+             mp.year,
+             mp.production_quantity,
+             mp.normalized_quantity,
+             mp.unit_name_ar,
+             mp.unit_name_en,
+             mp.unit_name_fr,
+             mp.conversion_factor,
+             mp.data_source,
+             c.name_ar AS country_name_ar,
+             c.name_en AS country_name_en,
+             c.name_fr AS country_name_fr,
+             m.name_ar AS mineral_name_ar,
+             m.name_en AS mineral_name_en,
+             m.name_fr AS mineral_name_fr,
+             mp.created_at,
+             mp.updated_at
+      FROM mineral_production mp
+      LEFT JOIN countries c ON mp.country_id = c.id
+      LEFT JOIN minerals m ON mp.mineral_id = m.id
+      WHERE mp.id = $1
     `;
     const result = await db.query(query, [id]);
     if (result.rows.length === 0) {
@@ -43,12 +79,30 @@ const getMineralProductionByCountryYear = async (req, res) => {
   try {
     const { countryId, year } = req.params;
     const query = `
-      SELECT id, country_id, mineral_id, year, production_quantity, normalized_quantity, 
-             unit_name_ar, unit_name_en, unit_name_fr, conversion_factor, data_source, 
-             created_at, updated_at
-      FROM mineral_production
-      WHERE country_id = $1 AND year = $2
-      ORDER BY mineral_id ASC
+      SELECT mp.id,
+             mp.country_id,
+             mp.mineral_id,
+             mp.year,
+             mp.production_quantity,
+             mp.normalized_quantity,
+             mp.unit_name_ar,
+             mp.unit_name_en,
+             mp.unit_name_fr,
+             mp.conversion_factor,
+             mp.data_source,
+             c.name_ar AS country_name_ar,
+             c.name_en AS country_name_en,
+             c.name_fr AS country_name_fr,
+             m.name_ar AS mineral_name_ar,
+             m.name_en AS mineral_name_en,
+             m.name_fr AS mineral_name_fr,
+             mp.created_at,
+             mp.updated_at
+      FROM mineral_production mp
+      LEFT JOIN countries c ON mp.country_id = c.id
+      LEFT JOIN minerals m ON mp.mineral_id = m.id
+      WHERE mp.country_id = $1 AND mp.year = $2
+      ORDER BY mp.mineral_id ASC
     `;
     const result = await db.query(query, [countryId, year]);
     res.json(result.rows);

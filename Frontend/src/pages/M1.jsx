@@ -3,6 +3,7 @@ import { ArrowDownWideNarrow, CalendarDays, Search } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
+import { getMineralProduction } from "../services/mineralProductionService";
 import { LanguageContext } from "../App";
 
 
@@ -705,9 +706,10 @@ export default function M1Page() {
     let mounted = true;
     (async () => {
       try {
-        const rows = [];
+        const rows = await getMineralProduction();
         if (mounted) setDbRows(Array.isArray(rows) ? rows : []);
-      } catch (_) {
+      } catch (error) {
+        console.error("Error loading mineral production data:", error);
         if (mounted) setDbRows([]);
       } finally {
         if (mounted) setIsLoadingDb(false);
