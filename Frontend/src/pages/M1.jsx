@@ -4,7 +4,7 @@ import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { LanguageContext } from "../App";
-import { getMineralProductionAnalytics } from "../services/mineralProductionService";
+
 
 export const dataByMineral = {
   "الذهب": {
@@ -705,7 +705,7 @@ export default function M1Page() {
     let mounted = true;
     (async () => {
       try {
-        const rows = await getMineralProductionAnalytics();
+        const rows = [];
         if (mounted) setDbRows(Array.isArray(rows) ? rows : []);
       } catch (_) {
         if (mounted) setDbRows([]);

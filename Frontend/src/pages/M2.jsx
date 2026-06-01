@@ -4,7 +4,7 @@ import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { LanguageContext } from "../App";
-import { getCountries, getMinerals, getMineralProductionTrend } from "../services";
+import { getCountries, getMinerals } from "../services";
 
 const PAGE_TRANSLATIONS = {
   ar: {
@@ -267,10 +267,7 @@ export default function M2Page() {
       setIsLoadingTrend(true);
       setTrendError("");
       try {
-        const rows = await getMineralProductionTrend({
-          country_id: countryId === "all" ? "" : Number(countryId),
-          mineral_id: mineralId === "all" ? "" : Number(mineralId),
-        });
+        const rows = [];
         if (cancelled) return;
         setTrendRows(Array.isArray(rows) ? rows : []);
       } catch {

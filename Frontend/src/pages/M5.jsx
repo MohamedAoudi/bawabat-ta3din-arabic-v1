@@ -4,7 +4,7 @@ import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { LanguageContext, ThemeContext } from "../App";
-import { getCriticalMineralExportsAnalytics } from "../services/tradeTransactionService";
+
 import { getCountries } from "../services/countryService";
 
 const COUNTRIES = [
@@ -229,7 +229,7 @@ export default function M5Page() {
       setIsLoading(true);
       setLoadError("");
       try {
-        const [rows, countriesRows] = await Promise.all([getCriticalMineralExportsAnalytics(), getCountries()]);
+        const [rows, countriesRows] = await Promise.all([Promise.resolve([]), getCountries()]);
         if (isMounted) {
           setAnalyticsRows(Array.isArray(rows) ? rows : []);
           setCountries(Array.isArray(countriesRows) ? countriesRows : []);

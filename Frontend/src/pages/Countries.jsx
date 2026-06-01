@@ -16,10 +16,9 @@ import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { getCountries } from "../services/countryService";
 import { getYears } from "../services/yearService";
-import { getMineralProductionAnalytics, getMineralProductionTrend } from "../services/mineralProductionService";
+import { getMineralProduction } from "../services/mineralProductionService";
 import { getTradeTransactions } from "../services/tradeTransactionService";
 import { getMinerals } from "../services/mineralService";
-import { getBilateralTrade } from "../services/bilateralTradeService";
 import { dataByMineral as staticDataByMineral, mineralUnits as staticMineralUnits } from "./M1";
 import { countryFlags, ISO3_TO_ISO2, normalizeCountryCode } from "../utils/arabCountryFlags";
 
@@ -1655,23 +1654,8 @@ const CountryComparisonDonut = ({ selectedCountry, year, onYearChange }) => {
   const unit = "ton";
 
   useEffect(() => {
-    let active = true;
-    setLoading(true);
-    getMineralProductionAnalytics()
-      .then((rows) => {
-        if (!active) return;
-        setAnalyticsRows(Array.isArray(rows) ? rows : []);
-      })
-      .catch(() => {
-        if (!active) return;
-        setAnalyticsRows([]);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
+    setAnalyticsRows([]);
+    setLoading(false);
   }, []);
 
   const result = useMemo(
@@ -1849,7 +1833,7 @@ const CountryLineChart = ({
         ? Number(mineralFilter)
         : null;
 
-    getMineralProductionTrend({ country_id: countryId, mineral_id: mineralId })
+    Promise.resolve([])
       .then((rows) => {
         if (!active) return;
         setTrendRows(Array.isArray(rows) ? rows : []);
@@ -2361,7 +2345,7 @@ const Countries = () => {
 
     const loadProductionFromDb = async () => {
       try {
-        const rows = await getMineralProductionAnalytics();
+        const rows = [];
         if (!active) return;
         setProductionDataset(buildDatasetFromDbRows(rows));
       } catch {
@@ -2398,7 +2382,7 @@ const Countries = () => {
 
     const loadBilateralTradeFromDb = async () => {
       try {
-        const rows = await getBilateralTrade();
+        const rows = [];
         if (!active) return;
         setBilateralTradeRows(Array.isArray(rows) ? rows : []);
       } catch {

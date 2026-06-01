@@ -4,7 +4,7 @@ import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { LanguageContext, ThemeContext } from "../App";
-import { getCriticalMineralImportsAnalytics } from "../services/tradeTransactionService";
+
 import { getCountries } from "../services/countryService";
 
 const DEFAULT_COUNTRY = "ma";
@@ -172,7 +172,7 @@ export default function M6Page() {
       setLoadError("");
       try {
         const [rows, countriesRows] = await Promise.all([
-          getCriticalMineralImportsAnalytics(),
+          Promise.resolve([]),
           getCountries(),
         ]);
         if (isMounted) {

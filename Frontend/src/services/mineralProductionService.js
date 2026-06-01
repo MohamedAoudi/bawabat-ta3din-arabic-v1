@@ -1,35 +1,69 @@
-import { createCrudService } from "./crudService";
 import apiClient from "./apiClient";
 
-const mineralProductionService = createCrudService("/mineral-production");
+const API_URL = "/mineral-production";
 
-export const getMineralProduction = mineralProductionService.getAll;
-export const getMineralProductionById = mineralProductionService.getById;
-export const createMineralProduction = mineralProductionService.create;
-export const updateMineralProduction = mineralProductionService.update;
-export const deleteMineralProduction = mineralProductionService.remove;
-
-const normalizeUnitFromDb = (row) => {
-  const unit =
-    row?.unit ||
-    row?.unit_name_ar ||
-    row?.unit_name_en ||
-    row?.unit_name_fr ||
-    row?.unite ||
-    "";
-  return { ...row, unit };
+// Get all mineral production records
+export const getMineralProduction = async () => {
+  try {
+    const response = await apiClient.get(API_URL);
+    return response.data || [];
+  } catch (error) {
+    console.error("Error fetching mineral production:", error);
+    return [];
+  }
 };
 
-export const getMineralProductionAnalytics = async () => {
-  const response = await apiClient.get("/mineral-production/analytics/overview");
-  return (Array.isArray(response.data) ? response.data : []).map(normalizeUnitFromDb);
+// Get mineral production by ID
+export const getMineralProductionById = async (id) => {
+  try {
+    const response = await apiClient.get(`${API_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching mineral production ${id}:`, error);
+    return null;
+  }
 };
 
-export const getMineralProductionTrend = async ({ country_id, mineral_id }) => {
-  const response = await apiClient.get("/mineral-production/trend", {
-    params: { country_id, mineral_id },
-  });
-  return (Array.isArray(response.data) ? response.data : []).map(normalizeUnitFromDb);
+// Get mineral production by country and year
+export const getMineralProductionByCountryYear = async (countryId, year) => {
+  try {
+    const response = await apiClient.get(`${API_URL}/country/${countryId}/year/${year}`);
+    return response.data || [];
+  } catch (error) {
+    console.error(`Error fetching mineral production for country ${countryId}, year ${year}:`, error);
+    return [];
+  }
 };
 
-export default mineralProductionService;
+// Create new mineral production record (admin only)
+export const createMineralProduction = async (productionData) => {
+  try {
+    const response = await apiClient.post(API_URL, productionData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating mineral production:", error);
+    throw error;
+  }
+};
+
+// Update mineral production record (admin only)
+export const updateMineralProduction = async (id, productionData) => {
+  try {
+    const response = await apiClient.put(`${API_URL}/${id}`, productionData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating mineral production ${id}:`, error);
+    throw error;
+  }
+};
+
+// Delete mineral production record (admin only)
+export const deleteMineralProduction = async (id) => {
+  try {
+    const response = await apiClient.delete(`${API_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting mineral production ${id}:`, error);
+    throw error;
+  }
+};

@@ -1,11 +1,8 @@
 export * from "./authService";
 export * from "./countryService";
 export * from "./mineralService";
-export * from "./hsProductService";
-export * from "./tradePartnerService";
-export * from "./yearService";
 export * from "./mineralProductionService";
 export * from "./tradeTransactionService";
-export * from "./bilateralTradeService";
-export * from "./countryProductionSummaryService";
-export * from "./countryTradeSummaryService";
+export * from "./tradePartnerService";
+export * from "./yearService";
+
