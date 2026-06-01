@@ -37,7 +37,6 @@ const TRANSLATIONS = {
     tradeExports: "إدارة الصادرات",
     tradeImports: "إدارة الواردات",
     countriesManagement: "إدارة الدول",
-    yearsManagement: "إدارة السنوات",
     productionManagement: "إدارة الإنتاج",
     language: "اللغة",
     theme: "المظهر",
@@ -75,7 +74,6 @@ const TRANSLATIONS = {
     tradeExports: "Gestion des exportations",
     tradeImports: "Gestion des importations",
     countriesManagement: "Gestion des pays",
-    yearsManagement: "Gestion des années",
     productionManagement: "Gestion de la production",
     language: "Langue",
     theme: "Thème",
@@ -113,7 +111,6 @@ const TRANSLATIONS = {
     tradeExports: "Exports",
     tradeImports: "Imports",
     countriesManagement: "Countries",
-    yearsManagement: "Years",
     productionManagement: "Production",
     language: "Language",
     theme: "Theme",
@@ -194,12 +191,7 @@ const ADMIN_MENU_ITEMS = [
     href: "/countries-management",
     labelKey: "countriesManagement",
   },
-  {
-    key: "yearsManagement",
-    icon: BarChart3,
-    href: "/years-management",
-    labelKey: "yearsManagement",
-  },
+
   {
     key: "productionManagement",
     icon: BarChart3,

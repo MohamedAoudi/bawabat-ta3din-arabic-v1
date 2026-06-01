@@ -7,6 +7,7 @@ const countriesRoutes = require("./Routes/countriesRoutes");
 const mineralProductionRoutes = require("./Routes/mineralProductionRoutes");
 const tradePartnersRoutes = require("./Routes/tradePartnersRoutes");
 const tradeTransactionsRoutes = require("./Routes/tradeTransactionsRoutes");
+const yearsRoutes = require("./Routes/yearsRoutes");
 
 const path = require("path");
 const { runMigrations } = require("./migrate");
@@ -32,6 +33,7 @@ app.use("/api/countries", countriesRoutes);
 app.use("/api/mineral-production", mineralProductionRoutes);
 app.use("/api/trade-partners", tradePartnersRoutes);
 app.use("/api/trade-transactions", tradeTransactionsRoutes);
+app.use("/api/years", yearsRoutes);
 
 
 async function startServer() {

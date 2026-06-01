@@ -16,6 +16,12 @@ import { Check, ChevronLeft, ChevronRight, Edit, Factory, Plus, Search, Trash2, 
 
 const PAGE_SIZE = 15;
 
+const UNITS = [
+  { key: "tonne", ar: "طن", en: "tonne", fr: "tonne" },
+  { key: "kg", ar: "كيلوغرام", en: "kilogram", fr: "kilogramme" },
+  { key: "unit", ar: "وحدة", en: "unit", fr: "unité" },
+];
+
 const TRANSLATIONS = {
   ar: {
     pageTitle: "إدارة الإنتاج",
@@ -45,6 +51,7 @@ const TRANSLATIONS = {
       production_quantity: "كمية الإنتاج",
       normalized_quantity: "الكمية المعيارية",
       unit_name_ar: "الوحدة (عربي)",
+      unit: "الوحدة",
       unit_name_en: "الوحدة (English)",
       unit_name_fr: "الوحدة (Français)",
       conversion_factor: "معامل التحويل",
@@ -85,6 +92,7 @@ const TRANSLATIONS = {
       production_quantity: "Quantité produite",
       normalized_quantity: "Quantité normalisée",
       unit_name_ar: "Unité (Arabe)",
+      unit: "Unité",
       unit_name_en: "Unité (English)",
       unit_name_fr: "Unité (Français)",
       conversion_factor: "Facteur de conversion",
@@ -125,6 +133,7 @@ const TRANSLATIONS = {
       production_quantity: "Production quantity",
       normalized_quantity: "Normalized quantity",
       unit_name_ar: "Unit (Arabic)",
+      unit: "Unit",
       unit_name_en: "Unit (English)",
       unit_name_fr: "Unit (French)",
       conversion_factor: "Conversion factor",
@@ -226,11 +235,10 @@ export default function ProductionManagementPage() {
     mineral_id: "",
     year: "",
     production_quantity: "",
-    normalized_quantity: "",
+    unit_key: "",
     unit_name_ar: "",
     unit_name_en: "",
     unit_name_fr: "",
-    conversion_factor: "",
     data_source: "",
   });
 
@@ -307,21 +315,21 @@ export default function ProductionManagementPage() {
   const openCreate = () => {
     setCreating(true);
     setEditing(null);
-    setForm({ country_id: "", mineral_id: "", year: "", production_quantity: "", normalized_quantity: "", unit_name_ar: "", unit_name_en: "", unit_name_fr: "", conversion_factor: "", data_source: "" });
+    setForm({ country_id: "", mineral_id: "", year: "", production_quantity: "", unit_key: "", unit_name_ar: "", unit_name_en: "", unit_name_fr: "", data_source: "" });
   };
   const openEdit = (r) => {
     setCreating(false);
     setEditing(r);
+    const existingUnit = UNITS.find((u) => u.ar === r.unit_name_ar || u.en === r.unit_name_en || u.fr === r.unit_name_fr);
     setForm({
       country_id: r.country_id ?? "",
       mineral_id: r.mineral_id ?? "",
       year: r.year ?? "",
       production_quantity: r.production_quantity ?? "",
-      normalized_quantity: r.normalized_quantity ?? "",
+      unit_key: existingUnit?.key ?? "",
       unit_name_ar: r.unit_name_ar ?? "",
       unit_name_en: r.unit_name_en ?? "",
       unit_name_fr: r.unit_name_fr ?? "",
-      conversion_factor: r.conversion_factor ?? "",
       data_source: r.data_source ?? "",
     });
   };
@@ -336,11 +344,9 @@ export default function ProductionManagementPage() {
       mineral_id: Number(form.mineral_id),
       year: Number(form.year),
       production_quantity: form.production_quantity === "" ? null : Number(form.production_quantity),
-      normalized_quantity: form.normalized_quantity === "" ? null : Number(form.normalized_quantity),
       unit_name_ar: form.unit_name_ar?.trim() || null,
       unit_name_en: form.unit_name_en?.trim() || null,
       unit_name_fr: form.unit_name_fr?.trim() || null,
-      conversion_factor: form.conversion_factor === "" ? null : Number(form.conversion_factor),
       data_source: form.data_source?.trim() || null,
     };
     if (!payload.mineral_id || !payload.year) return;
@@ -508,15 +514,29 @@ export default function ProductionManagementPage() {
                 <button onClick={closeModal} className="p-2 rounded-lg transition-all duration-200 hover:scale-110" style={{ color: colors.muted }}><X size={20} /></button>
               </div>
               <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <SelectField label={t.fields.country_id} value={String(form.country_id)} onChange={(v) => setForm((p) => ({ ...p, country_id: v }))} options={[{ value: "", label: "-" }, ...countries.map((c) => ({ value: String(c.id), label: language === "ar" ? c.name_ar : language === "fr" ? c.name_fr : c.name_en }))]} colors={colors} />
+                <SelectField label={t.fields.country_id} value={String(form.country_id)} onChange={(v) => setForm((p) => ({ ...p, country_id: v }))} options={countries.map((c) => ({ value: String(c.id), label: language === "ar" ? c.name_ar : language === "fr" ? c.name_fr : c.name_en }))} colors={colors} />
                 <SelectField label={t.fields.mineral_id} value={String(form.mineral_id)} onChange={(v) => setForm((p) => ({ ...p, mineral_id: v }))} options={minerals.map((m) => ({ value: String(m.id), label: language === "ar" ? m.name_ar : language === "fr" ? m.name_fr : m.name_en }))} colors={colors} />
                 <SelectField label={t.fields.year} value={String(form.year)} onChange={(v) => setForm((p) => ({ ...p, year: v }))} options={years.map((y) => ({ value: String(y.year ?? y), label: String(y.year ?? y) }))} colors={colors} />
                 <TextField label={t.fields.production_quantity} value={String(form.production_quantity)} onChange={(v) => setForm((p) => ({ ...p, production_quantity: v }))} colors={colors} inputMode="decimal" />
-                <TextField label={t.fields.normalized_quantity} value={String(form.normalized_quantity)} onChange={(v) => setForm((p) => ({ ...p, normalized_quantity: v }))} colors={colors} inputMode="decimal" />
-                <TextField label={t.fields.conversion_factor} value={String(form.conversion_factor)} onChange={(v) => setForm((p) => ({ ...p, conversion_factor: v }))} colors={colors} inputMode="decimal" />
-                <TextField label={t.fields.unit_name_ar} value={String(form.unit_name_ar)} onChange={(v) => setForm((p) => ({ ...p, unit_name_ar: v }))} colors={colors} />
-                <TextField label={t.fields.unit_name_en} value={String(form.unit_name_en)} onChange={(v) => setForm((p) => ({ ...p, unit_name_en: v }))} colors={colors} />
-                <TextField label={t.fields.unit_name_fr} value={String(form.unit_name_fr)} onChange={(v) => setForm((p) => ({ ...p, unit_name_fr: v }))} colors={colors} />
+
+                <SelectField
+                  label={t.fields.unit}
+                  value={String(form.unit_key || "")}
+                  onChange={(v) =>
+                    setForm((p) => {
+                      const sel = UNITS.find((u) => u.key === v) || {};
+                      return {
+                        ...p,
+                        unit_key: v,
+                        unit_name_ar: language === "ar" ? sel.ar : null,
+                        unit_name_en: language === "en" ? sel.en : null,
+                        unit_name_fr: language === "fr" ? sel.fr : null,
+                      };
+                    })
+                  }
+                  options={[{ value: "", label: "-" }, ...UNITS.map((u) => ({ value: u.key, label: language === "ar" ? u.ar : language === "fr" ? u.fr : u.en }))]}
+                  colors={colors}
+                />
                 <TextField label={t.fields.data_source} value={String(form.data_source)} onChange={(v) => setForm((p) => ({ ...p, data_source: v }))} colors={colors} />
               </div>
               <div className="p-4 sm:p-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3" style={{ borderTop: `1px solid ${colors.border}` }}>
