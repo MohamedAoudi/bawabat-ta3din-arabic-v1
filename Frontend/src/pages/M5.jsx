@@ -6,6 +6,8 @@ import Footer from "../layouts/Footer";
 import { LanguageContext, ThemeContext } from "../App";
 
 import { getCountries } from "../services/countryService";
+import { getMinerals } from "../services/mineralService";
+import { getTradeTransactionsByType } from "../services/tradeTransactionService";
 
 const COUNTRIES = [
   { name: "المملكة الأردنية الهاشمية", code: "jo" },
@@ -90,6 +92,12 @@ const PAGE_TRANSLATIONS = {
     totalShare: "اجمالي الحصة",
     totalExports: "اجمالي الصادرات",
     allMinerals: "كل المعادن",
+    columnCountry: "الدولة",
+    columnMineral: "الخام",
+    columnYear: "السنة",
+    columnValue: "القيمة (USD)",
+    columnShare: "الحصة",
+    exportReport: "تنزيل تقرير الصادرات",
   },
   fr: {
     badge: "Donnees minieres arabes",
@@ -119,6 +127,12 @@ const PAGE_TRANSLATIONS = {
     totalShare: "Part totale",
     totalExports: "Exportations totales",
     allMinerals: "Tous les mineraux",
+    columnCountry: "Pays",
+    columnMineral: "Minerai",
+    columnYear: "Annee",
+    columnValue: "Valeur (USD)",
+    columnShare: "Part",
+    exportReport: "Telecharger le rapport d'export",
   },
   en: {
     badge: "Arab mining data",
@@ -148,6 +162,12 @@ const PAGE_TRANSLATIONS = {
     totalShare: "Total share",
     totalExports: "Total exports",
     allMinerals: "All minerals",
+    columnCountry: "Country",
+    columnMineral: "Mineral",
+    columnYear: "Year",
+    columnValue: "Value (USD)",
+    columnShare: "Share",
+    exportReport: "Download export report",
   },
 };
 
@@ -229,9 +249,44 @@ export default function M5Page() {
       setIsLoading(true);
       setLoadError("");
       try {
-        const [rows, countriesRows] = await Promise.all([Promise.resolve([]), getCountries()]);
+        const [exportRows, countriesRows, mineralsRows] = await Promise.all([
+          getTradeTransactionsByType("export"),
+          getCountries(),
+          getMinerals(),
+        ]);
+
+        const countryById = Array.isArray(countriesRows)
+          ? countriesRows.reduce((acc, country) => {
+              acc[country.id] = country;
+              return acc;
+            }, {})
+          : {};
+
+        const mineralById = Array.isArray(mineralsRows)
+          ? mineralsRows.reduce((acc, mineral) => {
+              acc[mineral.id] = mineral;
+              return acc;
+            }, {})
+          : {};
+
+        const analyticsData = Array.isArray(exportRows)
+          ? exportRows.map((row) => {
+              const country = countryById[row.country_id] || {};
+              const mineral = mineralById[row.mineral_id] || {};
+              return {
+                country_code: String(country.iso_code || "").toLowerCase(),
+                country_name_ar: country.name_ar || "",
+                country_name_en: country.name_en || "",
+                country_name_fr: country.name_fr || "",
+                mineral_name: mineral.name_en || mineral.name_ar || mineral.name_fr || "",
+                year: row.year,
+                value_usd: row.trade_value_usd,
+              };
+            })
+          : [];
+
         if (isMounted) {
-          setAnalyticsRows(Array.isArray(rows) ? rows : []);
+          setAnalyticsRows(analyticsData);
           setCountries(Array.isArray(countriesRows) ? countriesRows : []);
         }
       } catch (error) {
@@ -758,6 +813,7 @@ export default function M5Page() {
                     ))}
                   </div>
                 </div>
+
               </div>
             </div>
 
