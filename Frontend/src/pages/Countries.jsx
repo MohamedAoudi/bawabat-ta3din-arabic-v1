@@ -18,6 +18,7 @@ import { getCountries } from "../services/countryService";
 import { getYears } from "../services/yearService";
 import { getMineralProduction } from "../services/mineralProductionService";
 import { getTradeTransactions } from "../services/tradeTransactionService";
+import { getTradePartners } from "../services/tradePartnerService";
 import { getMinerals } from "../services/mineralService";
 import { dataByMineral as staticDataByMineral, mineralUnits as staticMineralUnits } from "./M1";
 import { countryFlags, ISO3_TO_ISO2, normalizeCountryCode } from "../utils/arabCountryFlags";
@@ -442,6 +443,14 @@ const detectUnitType = (rawUnit) => {
   return null;
 };
 
+const normalizeMineralKey = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^ال/, "")
+    .replace(/\s+/g, " ")
+    .replace(/[^\p{L}\p{N}\s]/gu, "");
+
 const buildMineralFilterOptions = (language) => {
   const labels = getLabelsForLanguage(language);
   return [
@@ -506,10 +515,17 @@ const buildDatasetFromDbRows = (rows) => {
   const byMineral = {};
   const units = {};
   const yearsSet = new Set();
+  const rawRows = Array.isArray(rows) ? rows : [];
 
-  (Array.isArray(rows) ? rows : []).forEach((row) => {
+  rawRows.forEach((row) => {
     const mineral = String(row?.mineral_name_ar || row?.mineral_name_en || row?.mineral_name_fr || "").trim();
-    const country = String(row?.country_name_ar || row?.country_name_en || row?.country_name_fr || "").trim();
+    const rowCountryCode = normalizeCountryCode(row?.country_code || row?.iso_code || row?.country_iso_code || "");
+    const country = String(
+      row?.country_name_ar ||
+      row?.country_name_en ||
+      row?.country_name_fr ||
+      rowCountryCode
+    ).trim();
     const year = Number(row?.year);
     const value = Number(row?.production_quantity);
     const unit = String(
@@ -533,7 +549,33 @@ const buildDatasetFromDbRows = (rows) => {
     dataByMineral: Object.keys(byMineral).length ? byMineral : staticDataByMineral,
     mineralUnits: Object.keys(units).length ? units : staticMineralUnits,
     allYears: years.length ? years : STATIC_YEARS,
+    rawRows,
   };
+};
+
+const buildAnalyticsRowsFromRuntimeDataset = (dataByMineral, mineralUnits) => {
+  const result = [];
+  Object.entries(dataByMineral || {}).forEach(([mineral, byYear]) => {
+    Object.entries(byYear || {}).forEach(([yearKey, rows]) => {
+      const year = Number(yearKey);
+      if (!Number.isFinite(year)) return;
+      (Array.isArray(rows) ? rows : []).forEach((entry) => {
+        const countryName = String(entry?.country || "").trim();
+        const value = Number(entry?.value);
+        if (!countryName || !Number.isFinite(value)) return;
+        const code = resolveCountryIso2(countryName);
+        result.push({
+          year,
+          mineral_name_ar: mineral,
+          country_name_ar: countryName,
+          country_code: code || "",
+          production_quantity: value,
+          unit_name_ar: mineralUnits?.[mineral] || "",
+        });
+      });
+    });
+  });
+  return result;
 };
 
 const getCountryDisplayName = (countryName, language) => {
@@ -940,7 +982,10 @@ const buildComparisonDataFromAnalyticsRows = (
     if (!Number.isFinite(value) || value <= 0) return;
 
     const rowCode = normalizeCountryCode(row?.country_code || "");
-    if (scope === "arab" && (!rowCode || !ARAB_COUNTRY_CODES.has(rowCode))) return;
+    const inferredCode = rowCode || resolveCountryIso2(
+      row?.country_name_ar || row?.country_name_en || row?.country_name_fr || ""
+    );
+    if (scope === "arab" && (!inferredCode || !ARAB_COUNTRY_CODES.has(inferredCode))) return;
 
     const fromUnit =
       row?.unit_name_ar || row?.unit_name_en || row?.unit_name_fr || row?.unit || "";
@@ -1571,9 +1616,9 @@ const CardHeader = ({ title, subtitle, children }) => (
   </div>
 );
 
-const YearPills = ({ selectedYear, onYearChange }) => (
+const YearPills = ({ selectedYear, onYearChange, years = runtimeYears }) => (
   <div className="flex flex-wrap gap-1.5">
-    {runtimeYears.map((yr) => (
+    {years.map((yr) => (
       <button key={yr} type="button" onClick={() => onYearChange?.(yr)}
         className="rounded-full px-3 py-1 text-[11px] font-bold transition-all duration-200"
         style={selectedYear === yr
@@ -1644,19 +1689,11 @@ const CountryHeroBanner = ({ country, countryCode, theme }) => {
 };
 
 // ── Donut (DB only via /mineral-production/analytics/overview) ─────────────────
-const CountryComparisonDonut = ({ selectedCountry, year, onYearChange }) => {
+const CountryComparisonDonut = ({ selectedCountry, year, onYearChange, analyticsRows = [] }) => {
   const { labels, language } = useCountriesI18n();
   const canvasRef = useRef(null);
   const chartRef  = useRef(null);
-  const [scope, setScope] = useState("arab");
-  const [analyticsRows, setAnalyticsRows] = useState([]);
-  const [loading, setLoading] = useState(false);
   const unit = "ton";
-
-  useEffect(() => {
-    setAnalyticsRows([]);
-    setLoading(false);
-  }, []);
 
   const result = useMemo(
     () =>
@@ -1666,13 +1703,13 @@ const CountryComparisonDonut = ({ selectedCountry, year, onYearChange }) => {
         year,
         null,
         unit,
-        scope,
+        "arab",
         labels.otherCountries
       ),
-    [analyticsRows, selectedCountry, year, unit, scope, labels.otherCountries]
+    [analyticsRows, selectedCountry, year, unit, labels.otherCountries]
   );
 
-  const noData = !loading && (!result || result.slices.length === 0);
+  const noData = !result || result.slices.length === 0;
 
   useEffect(() => {
     destroyChart(chartRef);
@@ -1698,23 +1735,10 @@ const CountryComparisonDonut = ({ selectedCountry, year, onYearChange }) => {
   return (
     <Card>
       <CardHeader title={labels.productionComparison} subtitle={labels.productionComparisonSubtitle(year)}>
-        <div className="flex w-full justify-stretch overflow-hidden rounded-full sm:w-auto sm:justify-start" style={{ border:"1px solid rgba(201,168,76,0.25)" }}>
-          {[{key:"arab",label:labels.arabCountries},{key:"world",label:labels.world}].map(({key,label})=>(
-            <button key={key} type="button" onClick={()=>setScope(key)}
-              className="min-w-0 flex-1 px-3 py-1.5 text-[10px] font-bold transition-all duration-200 sm:flex-none sm:px-4 sm:text-[11px]"
-              style={scope===key?{background:"linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",color:"#082721"}:{background:"transparent",color:"rgba(255,255,255,0.4)"}}>
-              {label}
-            </button>
-          ))}
-        </div>
         <YearPills selectedYear={year} onYearChange={onYearChange} />
       </CardHeader>
 
-      {loading ? (
-        <div className="flex min-h-[220px] flex-col items-center justify-center gap-3 sm:min-h-[300px]">
-          <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.35)" }}>…</p>
-        </div>
-      ) : noData ? (
+      {noData ? (
         <div className="flex min-h-[220px] flex-col items-center justify-center gap-3 sm:min-h-[300px]">
           <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.noDataForYear(year)}</p>
         </div>
@@ -1733,7 +1757,7 @@ const CountryComparisonDonut = ({ selectedCountry, year, onYearChange }) => {
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-2xl font-black leading-none sm:text-[30px]" style={{ color:"#C9A84C" }}>{selectedPct}%</span>
                   <span className="mt-1 max-w-[12rem] px-3 text-center text-[9px] font-bold leading-snug sm:text-[10px]" style={{ color:"rgba(255,255,255,0.35)" }}>
-                    {scope==="arab" ? labels.shareOfArab : labels.shareOfWorld}
+                    {labels.shareOfArab}
                   </span>
                 </div>
               )}
@@ -1803,21 +1827,83 @@ const CountryComparisonDonut = ({ selectedCountry, year, onYearChange }) => {
 const CountryLineChart = ({
   country,
   countryId,
+  countryCode,
   mineralsFromDb = [],
+  productionRows = [],
   mineralFilter = "all",
   onMineralFilterChange,
 }) => {
   const { labels, language } = useCountriesI18n();
-  const mineralOptions = useMemo(
-    () => buildDbMineralFilterOptions(mineralsFromDb, language),
-    [mineralsFromDb, language]
+  const countryRows = useMemo(
+    () =>
+      (Array.isArray(productionRows) ? productionRows : []).filter((row) => {
+        if (countryId != null && String(row?.country_id ?? "") === String(countryId)) return true;
+        const rowCode = normalizeCountryCode(row?.country_code || row?.iso_code || row?.country_iso_code || "");
+        if (countryCode && rowCode === countryCode) return true;
+        const rowCountryName = String(row?.country_name_ar || row?.country_name_en || row?.country_name_fr || "");
+        return countryNamesMatch(rowCountryName, country);
+      }),
+    [country, countryId, countryCode, productionRows]
   );
+  const mineralOptions = useMemo(
+    () => {
+      const labelsByValue = new Map();
+      const normalizedNameKeys = new Set();
+
+      countryRows.forEach((row) => {
+        const rawName = getMineralRowLabel(row, language) || getMineralRowLabel(row, "ar");
+        if (!rawName) return;
+        const id = row?.mineral_id != null ? String(row.mineral_id) : "";
+        if (id) {
+          labelsByValue.set(id, rawName);
+          return;
+        }
+        const nameKey = normalizeMineralKey(rawName);
+        if (!nameKey || normalizedNameKeys.has(nameKey)) return;
+        normalizedNameKeys.add(nameKey);
+        labelsByValue.set(`name:${nameKey}`, rawName);
+      });
+
+      const base = [{ value: "all", label: labels.allMinerals }];
+      const rowsOptions = Array.from(labelsByValue.entries()).map(([value, label]) => ({ value, label }));
+      return rowsOptions.length ? [...base, ...rowsOptions] : buildDbMineralFilterOptions(mineralsFromDb, language);
+    },
+    [countryRows, language, labels.allMinerals, mineralsFromDb]
+  );
+  const lineOptionValues = useMemo(() => new Set(mineralOptions.map((opt) => opt.value)), [mineralOptions]);
   const selectedMineralLabel = useMemo(() => {
     if (!mineralFilter || mineralFilter === "all") return null;
     return mineralOptions.find((opt) => opt.value === mineralFilter)?.label || null;
   }, [mineralFilter, mineralOptions]);
+  const selectedMineralNameSet = useMemo(() => {
+    if (!mineralFilter || mineralFilter === "all") return null;
+    const selectedId = Number(mineralFilter);
+    const selectedMineral = (Array.isArray(mineralsFromDb) ? mineralsFromDb : []).find(
+      (mineral) => String(mineral?.id) === String(mineralFilter)
+    );
+    const namesFromRowsById = (Array.isArray(productionRows) ? productionRows : [])
+      .filter((row) => Number.isFinite(selectedId) && Number(row?.mineral_id) === selectedId)
+      .flatMap((row) => [row?.mineral_name_ar, row?.mineral_name_en, row?.mineral_name_fr]);
+    if (!selectedMineral) {
+      const fallbackNames = [selectedMineralLabel, ...namesFromRowsById]
+        .filter(Boolean)
+        .map((name) => normalizeMineralKey(name));
+      return fallbackNames.length ? new Set(fallbackNames) : null;
+    }
+    return new Set(
+      [selectedMineral?.name_ar, selectedMineral?.name_en, selectedMineral?.name_fr, ...namesFromRowsById]
+        .filter(Boolean)
+        .map((name) => normalizeMineralKey(name))
+    );
+  }, [mineralFilter, mineralsFromDb, productionRows, selectedMineralLabel]);
   const [trendRows, setTrendRows] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!lineOptionValues.has(mineralFilter || "all")) {
+      onMineralFilterChange?.("all");
+    }
+  }, [lineOptionValues, mineralFilter, onMineralFilterChange]);
 
   useEffect(() => {
     if (!countryId) {
@@ -1828,15 +1914,43 @@ const CountryLineChart = ({
     let active = true;
     setLoading(true);
 
+    const isNameFilter = String(mineralFilter || "").startsWith("name:");
+    const selectedNameFilter = isNameFilter
+      ? String(mineralFilter || "").slice(5)
+      : null;
     const mineralId =
-      mineralFilter && mineralFilter !== "all" && Number.isFinite(Number(mineralFilter))
+      !isNameFilter && mineralFilter && mineralFilter !== "all" && Number.isFinite(Number(mineralFilter))
         ? Number(mineralFilter)
         : null;
 
-    Promise.resolve([])
+    Promise.resolve(countryRows)
       .then((rows) => {
         if (!active) return;
-        setTrendRows(Array.isArray(rows) ? rows : []);
+        const filteredRows = Array.isArray(rows) ? rows : [];
+
+        const mineralFilteredRows = mineralId == null && !selectedNameFilter
+          ? filteredRows
+          : filteredRows.filter((row) => {
+              if (Number(row?.mineral_id) === mineralId) return true;
+              if (!selectedMineralNameSet || selectedMineralNameSet.size === 0) return false;
+              const rowMineralNames = [
+                row?.mineral_name_ar,
+                row?.mineral_name_en,
+                row?.mineral_name_fr,
+              ]
+                .filter(Boolean)
+                .map((name) => normalizeMineralKey(name));
+              return rowMineralNames.some((name) =>
+                [...selectedMineralNameSet].some(
+                  (selectedName) =>
+                    name === selectedName ||
+                    name.includes(selectedName) ||
+                    selectedName.includes(name)
+                )
+              );
+            });
+
+        setTrendRows(mineralFilteredRows.length ? mineralFilteredRows : filteredRows);
       })
       .catch(() => {
         if (!active) return;
@@ -1849,7 +1963,7 @@ const CountryLineChart = ({
     return () => {
       active = false;
     };
-  }, [countryId, mineralFilter]);
+  }, [countryId, mineralFilter, countryRows, selectedMineralNameSet]);
 
   const chartPayload = useMemo(
     () => buildLineChartFromTrendRows(trendRows, language, selectedMineralLabel),
@@ -1911,31 +2025,18 @@ const CountryLineChart = ({
 
   const filterLabel =
     mineralFilter === "all" ? labels.allMinerals : selectedMineralLabel || mineralFilter;
+  useEffect(() => {
+    if (!loading && mineralFilter !== "all" && !hasChartData) {
+      onMineralFilterChange?.("all");
+    }
+  }, [hasChartData, loading, mineralFilter, onMineralFilterChange]);
 
   return (
     <Card>
       <CardHeader
         title={labels.productionTrend}
         subtitle={labels.productionTrendSubtitle(getCountryDisplayName(country, language), filterLabel)}
-      >
-        <select
-          value={mineralFilter || "all"}
-          onChange={(e) => onMineralFilterChange?.(e.target.value)}
-          className="w-full max-w-full rounded-full px-3 py-2 text-[11px] font-bold sm:w-auto sm:py-1.5"
-          style={{
-            background: "rgba(255,255,255,0.04)",
-            color: "rgba(255,255,255,0.85)",
-            border: "1px solid rgba(201,168,76,0.24)",
-            outline: "none",
-          }}
-        >
-          {mineralOptions.map((opt) => (
-            <option key={opt.value} value={opt.value} style={{ color: "#082721" }}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </CardHeader>
+      />
       {loading ? (
         <div className="flex min-h-[220px] items-center justify-center sm:min-h-[260px]">
           <p className="text-[13px] font-semibold" style={{ color: "rgba(255,255,255,0.35)" }}>
@@ -1960,17 +2061,71 @@ const CountryLineChart = ({
 // ── Bar chart ──────────────────────────────────────────────────────────────────
 const CountryBarChart = ({
   country,
+  countryId,
+  countryCode,
+  productionRows = [],
   mineralFilter = "all",
   selectedYear,
   onYearChange,
   onMineralFilterChange,
+  years = runtimeYears,
 }) => {
   const { labels, language } = useCountriesI18n();
-  const mineralOptions = buildMineralFilterOptions(language);
+  const countryRows = useMemo(
+    () =>
+      (Array.isArray(productionRows) ? productionRows : []).filter((row) => {
+        if (countryId != null && String(row?.country_id ?? "") === String(countryId)) return true;
+        const rowCode = normalizeCountryCode(row?.country_code || row?.iso_code || row?.country_iso_code || "");
+        if (countryCode && rowCode === countryCode) return true;
+        const rowCountryName = String(row?.country_name_ar || row?.country_name_en || row?.country_name_fr || "");
+        return countryNamesMatch(rowCountryName, country);
+      }),
+    [country, countryCode, countryId, productionRows]
+  );
   const [noData, setNoData] = useState(false);
   const unit = "ton";
-  const slices = getMineralShareForYear(country, selectedYear, mineralFilter, unit).sort((a,b)=>b.value-a.value);
+  const appliedMineralFilter = "all";
+  const totalsByYear = useMemo(() => {
+    const map = {};
+    countryRows.forEach((row) => {
+      const year = Number(row?.year);
+      const value = Number(row?.production_quantity);
+      if (!Number.isFinite(year) || !Number.isFinite(value) || value <= 0) return;
+      const mineral = getMineralRowLabel(row, language) || labels.none;
+      const fromUnit = row?.unit_name_ar || row?.unit_name_en || row?.unit_name_fr || row?.unit || "";
+      const converted = convertVolume(value, fromUnit, unit);
+      if (!Number.isFinite(converted) || converted <= 0) return;
+      if (!map[year]) map[year] = {};
+      map[year][mineral] = (map[year][mineral] || 0) + converted;
+    });
+    return map;
+  }, [countryRows, language, labels.none, unit]);
+  const effectiveYear = useMemo(() => {
+    const candidateYears = Object.keys(totalsByYear).map(Number).sort((a, b) => a - b);
+    if (!candidateYears.length) return selectedYear;
+    return candidateYears.includes(selectedYear) ? selectedYear : candidateYears[candidateYears.length - 1];
+  }, [selectedYear, totalsByYear]);
+  const slices = useMemo(() => {
+    const yearTotals = totalsByYear[effectiveYear] || {};
+    return Object.entries(yearTotals)
+      .map(([mineral, value]) => ({ mineral, value, unit }))
+      .sort((a, b) => b.value - a.value);
+  }, [effectiveYear, totalsByYear, unit]);
   const total  = slices.reduce((s,d)=>s+d.value, 0);
+
+  useEffect(() => {
+    if (mineralFilter !== "all") onMineralFilterChange?.("all");
+  }, [mineralFilter, onMineralFilterChange]);
+  useEffect(() => {
+    const yearsWithData = Object.keys(totalsByYear).map(Number).sort((a, b) => a - b);
+    if (!yearsWithData.length) return;
+    if (!yearsWithData.includes(selectedYear)) {
+      onYearChange?.(yearsWithData[yearsWithData.length - 1]);
+    }
+  }, [onYearChange, selectedYear, totalsByYear]);
+  useEffect(() => {
+    if (effectiveYear !== selectedYear) onYearChange?.(effectiveYear);
+  }, [effectiveYear, onYearChange, selectedYear]);
 
   const canvasRef = useChartInit((canvas) => {
     if (slices.length===0) { setNoData(true); return null; }
@@ -1978,41 +2133,22 @@ const CountryBarChart = ({
     const colors = slices.map((_,i)=>{ const t=i/Math.max(slices.length-1,1); return `rgb(${Math.round(201+(16-201)*t)},${Math.round(168+(185-168)*t)},${Math.round(76+(129-76)*t)})`; });
     return new Chart(canvas, {
       type:"bar",
-      data:{ labels:slices.map(d=>d.mineral), datasets:[{ label:`${labels.miningProduction} — ${selectedYear}`, data:slices.map(d=>d.value), backgroundColor:colors, borderColor:colors, borderWidth:0, borderRadius:6, borderSkipped:false }] },
+      data:{ labels:slices.map(d=>d.mineral), datasets:[{ label:`${labels.miningProduction} — ${effectiveYear}`, data:slices.map(d=>d.value), backgroundColor:colors, borderColor:colors, borderWidth:0, borderRadius:6, borderSkipped:false }] },
       options:{ indexAxis:"y", responsive:true, maintainAspectRatio:false,
         plugins:{ legend:{display:false}, tooltip:{rtl:true,bodyFont:{family:"Cairo"},callbacks:{label:(c)=>{ const e=slices[c.dataIndex]; const pct=total>0?((e.value/total)*100).toFixed(1):0; const fmt=e.value>=1e6?`${(e.value/1e6).toFixed(2)} M`:e.value>=1000?`${(e.value/1000).toFixed(1)} K`:e.value; return ` ${fmt} ${e.unit}  (${pct}%)`; }}} },
         scales:{ x:{beginAtZero:true,grid:{color:"rgba(255,255,255,0.05)"},border:{display:false},ticks:{color:"rgba(255,255,255,0.4)",font:{family:"Cairo",size:11},callback:(v)=>v>=1e6?`${v/1e6}M`:v>=1000?`${v/1000}K`:v}}, y:{grid:{display:false},border:{display:false},ticks:{color:"rgba(255,255,255,0.75)",font:{family:"Cairo",size:12,weight:"700"}}} },
       },
     });
-  }, [country, selectedYear, mineralFilter, unit]);
+  }, [country, effectiveYear, slices, unit]);
 
   const barH = Math.max(slices.length*44+40, 200);
 
   return (
     <Card>
-      <CardHeader title={labels.yearlyProduction} subtitle={labels.yearlyProductionSubtitle(getCountryDisplayName(country, language), selectedYear, mineralFilter)}>
-        <select
-          value={mineralFilter || "all"}
-          onChange={(e) => onMineralFilterChange?.(e.target.value)}
-          className="w-full max-w-full rounded-full px-3 py-2 text-[11px] font-bold sm:w-auto sm:py-1.5"
-          style={{
-            background: "rgba(255,255,255,0.04)",
-            color: "rgba(255,255,255,0.85)",
-            border: "1px solid rgba(201,168,76,0.24)",
-            outline: "none",
-          }}
-        >
-          {mineralOptions.map((opt) => (
-            <option key={opt.value} value={opt.value} style={{ color: "#082721" }}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-        <YearPills selectedYear={selectedYear} onYearChange={onYearChange} />
-      </CardHeader>
+      <CardHeader title={labels.yearlyProduction} subtitle={labels.yearlyProductionSubtitle(getCountryDisplayName(country, language), effectiveYear, appliedMineralFilter)} />
       {noData ? (
         <div className="flex min-h-[220px] items-center justify-center py-10 sm:min-h-[260px]">
-          <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.noDataForYear(selectedYear)}</p>
+          <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.noDataForYear(effectiveYear)}</p>
         </div>
       ) : (
         <div className="flex flex-col xl:flex-row gap-6">
@@ -2051,10 +2187,72 @@ const CountryBarChart = ({
 };
 
 // ── Treemap ────────────────────────────────────────────────────────────────────
-const MineralTreemap = ({ country, year, onYearChange }) => {
+const MineralTreemap = ({
+  country,
+  countryId,
+  countryCode,
+  productionRows = [],
+  year,
+  onYearChange,
+  years = runtimeYears,
+}) => {
   const { labels, language } = useCountriesI18n();
   const [noData, setNoData] = useState(false);
-  const treeData = getMineralTreemapData(country, year, "ton").sort((a, b) => b.value - a.value);
+  const countryRows = useMemo(
+    () =>
+      (Array.isArray(productionRows) ? productionRows : []).filter((row) => {
+        if (countryId != null && String(row?.country_id ?? "") === String(countryId)) return true;
+        const rowCode = normalizeCountryCode(row?.country_code || row?.iso_code || row?.country_iso_code || "");
+        if (countryCode && rowCode === countryCode) return true;
+        const rowCountryName = String(row?.country_name_ar || row?.country_name_en || row?.country_name_fr || "");
+        return countryNamesMatch(rowCountryName, country);
+      }),
+    [country, countryCode, countryId, productionRows]
+  );
+  const totalsByYear = useMemo(() => {
+    const map = {};
+    countryRows.forEach((row) => {
+      const rowYear = Number(row?.year);
+      const value = Number(row?.production_quantity);
+      if (!Number.isFinite(rowYear) || !Number.isFinite(value) || value <= 0) return;
+      const mineral = getMineralRowLabel(row, language) || labels.none;
+      const fromUnit = row?.unit_name_ar || row?.unit_name_en || row?.unit_name_fr || row?.unit || "";
+      const converted = convertVolume(value, fromUnit, "ton");
+      if (!Number.isFinite(converted) || converted <= 0) return;
+      if (!map[rowYear]) map[rowYear] = {};
+      map[rowYear][mineral] = (map[rowYear][mineral] || 0) + converted;
+    });
+    return map;
+  }, [countryRows, language, labels.none]);
+  const effectiveYear = useMemo(() => {
+    const candidateYears = Object.keys(totalsByYear).map(Number).sort((a, b) => a - b);
+    if (!candidateYears.length) return year;
+    return candidateYears.includes(year) ? year : candidateYears[candidateYears.length - 1];
+  }, [totalsByYear, year]);
+  const treeData = useMemo(() => {
+    const yearTotals = totalsByYear[effectiveYear] || {};
+    const rows = Object.entries(yearTotals).map(([mineral, value]) => ({
+      mineral,
+      value,
+      rawValue: value,
+      unit: "ton",
+    }));
+    const total = rows.reduce((sum, item) => sum + (item.value || 0), 0);
+    if (total <= 0) return [];
+    return rows
+      .map((item) => ({ ...item, pct: (item.value / total) * 100 }))
+      .sort((a, b) => b.value - a.value);
+  }, [effectiveYear, totalsByYear]);
+  useEffect(() => {
+    if (effectiveYear !== year) onYearChange?.(effectiveYear);
+  }, [effectiveYear, onYearChange, year]);
+  useEffect(() => {
+    if (treeData.length > 0) return;
+    const candidateYears = Object.keys(totalsByYear).map(Number).sort((a, b) => a - b);
+    if (!candidateYears.length) return;
+    const fallbackYear = candidateYears[candidateYears.length - 1];
+    if (fallbackYear !== year) onYearChange?.(fallbackYear);
+  }, [onYearChange, totalsByYear, treeData.length, year]);
 
   const canvasRef = useChartInit((canvas) => {
     if (treeData.length===0) { setNoData(true); return null; }
@@ -2094,9 +2292,7 @@ const MineralTreemap = ({ country, year, onYearChange }) => {
 
   return (
     <Card>
-      <CardHeader title={labels.mineralDistribution} subtitle={labels.mineralDistributionSubtitle(getCountryDisplayName(country, language), year)}>
-        <YearPills selectedYear={year} onYearChange={onYearChange} />
-      </CardHeader>
+      <CardHeader title={labels.mineralDistribution} subtitle={labels.mineralDistributionSubtitle(getCountryDisplayName(country, language), effectiveYear)} />
       {noData ? (
         <div className="flex h-[min(48vh,320px)] min-h-[200px] items-center justify-center">
           <p className="text-[13px] font-semibold" style={{ color:"rgba(255,255,255,0.25)" }}>{labels.noData}</p>
@@ -2284,7 +2480,15 @@ const Countries = () => {
   const profileTheme = getCountryProfileTheme(selectedTheme, isDarkMode);
   runtimeDataByMineral = productionDataset.dataByMineral;
   runtimeMineralUnits = productionDataset.mineralUnits;
-  runtimeYears = yearsFromDb.length ? yearsFromDb : productionDataset.allYears;
+  runtimeYears = productionDataset.allYears?.length ? productionDataset.allYears : yearsFromDb;
+  const productionRowsForCharts = useMemo(() => {
+    const dbRows = Array.isArray(productionDataset.rawRows) ? productionDataset.rawRows : [];
+    if (dbRows.length) return dbRows;
+    return buildAnalyticsRowsFromRuntimeDataset(
+      productionDataset.dataByMineral,
+      productionDataset.mineralUnits
+    );
+  }, [productionDataset]);
 
   useEffect(() => {
     let active = true;
@@ -2345,7 +2549,7 @@ const Countries = () => {
 
     const loadProductionFromDb = async () => {
       try {
-        const rows = [];
+        const rows = await getMineralProduction();
         if (!active) return;
         setProductionDataset(buildDatasetFromDbRows(rows));
       } catch {
@@ -2354,6 +2558,7 @@ const Countries = () => {
           dataByMineral: staticDataByMineral,
           mineralUnits: staticMineralUnits,
           allYears: STATIC_YEARS,
+          rawRows: [],
         });
       }
     };
@@ -2382,7 +2587,7 @@ const Countries = () => {
 
     const loadBilateralTradeFromDb = async () => {
       try {
-        const rows = [];
+        const rows = await getTradePartners();
         if (!active) return;
         setBilateralTradeRows(Array.isArray(rows) ? rows : []);
       } catch {
@@ -2411,6 +2616,7 @@ const Countries = () => {
 
   useEffect(() => {
     setLineMineralFilter("all");
+    setBarMineralFilter("all");
   }, [selectedCountryObj?.id]);
 
   useEffect(() => {
@@ -2430,14 +2636,49 @@ const Countries = () => {
 
   useEffect(() => {
     if (!runtimeYears.length) return;
-    const defaultYear = runtimeYears.includes( new Date().getFullYear() )
-      ? new Date().getFullYear()
-      : runtimeYears[runtimeYears.length - 1];
+    const defaultYear = runtimeYears[runtimeYears.length - 1];
     setSummaryYear(defaultYear);
     setDonutYear(defaultYear);
     setBarYear(defaultYear);
     setTreemapYear(defaultYear);
   }, [productionDataset]);
+
+  const selectedCountryAvailableYears = useMemo(() => {
+    if (!selectedCountryObj) return runtimeYears;
+    const selectedCountryId = selectedCountryObj?.id != null ? String(selectedCountryObj.id) : null;
+    const selectedCode = String(selectedCountryObj?.code || "").toLowerCase();
+    const yearsSet = new Set();
+
+    (productionRowsForCharts || []).forEach((row) => {
+      const year = Number(row?.year);
+      if (!Number.isFinite(year)) return;
+      if (selectedCountryId && String(row?.country_id ?? "") === selectedCountryId) {
+        yearsSet.add(year);
+        return;
+      }
+      const rowCode = normalizeCountryCode(row?.country_code || row?.iso_code || row?.country_iso_code || "");
+      if (selectedCode && rowCode === selectedCode) {
+        yearsSet.add(year);
+        return;
+      }
+      const rowCountryName = String(row?.country_name_ar || row?.country_name_en || row?.country_name_fr || "");
+      if (countryNamesMatch(rowCountryName, selectedCountryObj.name)) {
+        yearsSet.add(year);
+      }
+    });
+
+    const years = [...yearsSet].sort((a, b) => a - b);
+    return years.length ? years : runtimeYears;
+  }, [productionRowsForCharts, runtimeYears, selectedCountryObj]);
+
+  useEffect(() => {
+    if (!selectedCountryObj || !selectedCountryAvailableYears.length) return;
+    const latestAvailableYear = selectedCountryAvailableYears[selectedCountryAvailableYears.length - 1];
+    setSummaryYear(latestAvailableYear);
+    setDonutYear(latestAvailableYear);
+    setBarYear(latestAvailableYear);
+    setTreemapYear(latestAvailableYear);
+  }, [selectedCountryObj?.id, selectedCountryAvailableYears]);
 
   const mineralNameById = useMemo(
     () =>
@@ -2658,13 +2899,21 @@ const Countries = () => {
             )}
 
             <ChartSectionTitle title={labels.miningIndicators} />
-            <CountryComparisonDonut key={`donut-${selected}`} selectedCountry={selected} year={donutYear} onYearChange={setDonutYear} />
+            <CountryComparisonDonut
+              key={`donut-${selected}`}
+              selectedCountry={selected}
+              year={donutYear}
+              onYearChange={setDonutYear}
+              analyticsRows={productionRowsForCharts}
+            />
 
             <CountryLineChart
               key={`line-${selected}-${selectedCountryObj?.id ?? "none"}`}
               country={selected}
               countryId={selectedCountryObj?.id}
+              countryCode={selectedCountryObj?.code}
               mineralsFromDb={mineralsFromDb}
+              productionRows={productionRowsForCharts}
               mineralFilter={lineMineralFilter}
               onMineralFilterChange={setLineMineralFilter}
             />
@@ -2672,13 +2921,26 @@ const Countries = () => {
             <CountryBarChart
               key={`bar-${selected}`}
               country={selected}
+              countryId={selectedCountryObj?.id}
+              countryCode={selectedCountryObj?.code}
+              productionRows={productionRowsForCharts}
               selectedYear={barYear}
               onYearChange={setBarYear}
               mineralFilter={barMineralFilter}
               onMineralFilterChange={setBarMineralFilter}
+              years={selectedCountryAvailableYears}
             />
 
-            <MineralTreemap key={`tree-${selected}`} country={selected} year={treemapYear} onYearChange={setTreemapYear} />
+            <MineralTreemap
+              key={`tree-${selected}`}
+              country={selected}
+              countryId={selectedCountryObj?.id}
+              countryCode={selectedCountryObj?.code}
+              productionRows={productionRowsForCharts}
+              year={treemapYear}
+              onYearChange={setTreemapYear}
+              years={selectedCountryAvailableYears}
+            />
 
             <ChartSectionTitle title={labels.tradeIndicators} />
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
