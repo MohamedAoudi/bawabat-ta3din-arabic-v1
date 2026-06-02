@@ -799,8 +799,6 @@ const MiniDonut = ({ active, labels }) => (
 const INDICATOR_CARDS = [
   { icon:"fa-chart-column", altIcon:"fa-layer-group", tagColor:"#c9a84c", titleKey:"indicatorProductionVolumeTitle", descKey:"indicatorProductionVolumeDesc", href:"/m1", Chart:MiniBarChart },
   { icon:"fa-chart-line",   altIcon:"fa-chart-column", tagColor:"#7ee0c0", titleKey:"indicatorProductionTrendTitle", descKey:"indicatorProductionTrendDesc", href:"/m2", Chart:MiniLineChart },
-  { icon:"fa-layer-group",  altIcon:"fa-chart-line", tagColor:"#93c5fd", titleKey:"indicatorArabicProductionTrendTitle", descKey:"indicatorArabicProductionTrendDesc", href:"/m3", Chart:MiniGroupedBar },
-  { icon:"fa-circle-notch", altIcon:"fa-gem", tagColor:"#fbbf24", titleKey:"indicatorProductionComparisonTitle", descKey:"indicatorProductionComparisonDesc", href:"/m4", Chart:MiniDonut },
 ];
 
 /* ─────────────────────────────────────────────
