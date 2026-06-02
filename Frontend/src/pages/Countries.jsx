@@ -1899,8 +1899,7 @@ const CountryLineChart = ({
         .map((name) => normalizeMineralKey(name))
     );
   }, [mineralFilter, mineralsFromDb, productionRows, selectedMineralLabel]);
-  const [trendRows, setTrendRows] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const loading = false;
 
   useEffect(() => {
     if (mineralFilter !== "all") onMineralFilterChange?.("all");
@@ -1912,53 +1911,10 @@ const CountryLineChart = ({
     }
   }, [lineOptionValues, mineralFilter, onMineralFilterChange]);
 
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
-
-    const mineralId = null;
-
-    Promise.resolve(countryRows)
-      .then((rows) => {
-        if (!active) return;
-        const filteredRows = Array.isArray(rows) ? rows : [];
-
-        const mineralFilteredRows = mineralId == null
-          ? filteredRows
-          : filteredRows.filter((row) => {
-              if (Number(row?.mineral_id) === mineralId) return true;
-              if (!selectedMineralNameSet || selectedMineralNameSet.size === 0) return false;
-              const rowMineralNames = [
-                row?.mineral_name_ar,
-                row?.mineral_name_en,
-                row?.mineral_name_fr,
-              ]
-                .filter(Boolean)
-                .map((name) => normalizeMineralKey(name));
-              return rowMineralNames.some((name) =>
-                [...selectedMineralNameSet].some(
-                  (selectedName) =>
-                    name === selectedName ||
-                    name.includes(selectedName) ||
-                    selectedName.includes(name)
-                )
-              );
-            });
-
-        setTrendRows(mineralFilteredRows.length ? mineralFilteredRows : filteredRows);
-      })
-      .catch(() => {
-        if (!active) return;
-        setTrendRows([]);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [countryRows, selectedMineralNameSet]);
+  const trendRows = useMemo(() => {
+    const filteredRows = Array.isArray(countryRows) ? countryRows : [];
+    return filteredRows;
+  }, [countryRows]);
 
   const runtimeCountryPayload = useMemo(
     () => getCountryMineralData(country, "all", "ton"),
@@ -2466,7 +2422,7 @@ const Countries = () => {
 
   const selectCountry = (country) => {
     if (!country?.name || !country?.code) return;
-    setSelected(country.name);
+    setSelected(country.code);
     navigate(`/countries?country=${encodeURIComponent(country.code)}#country-profile`, { replace: true });
   };
 
@@ -2487,8 +2443,8 @@ const Countries = () => {
   const [summaryYear, setSummaryYear]         = useState(DEFAULT_SELECTED_YEAR);
 
   const selectedCountryObj = countries.find(
-    (c) => countryNamesMatch(c.name, selected) || String(c.code).toLowerCase() === String(selected).trim().toLowerCase()
-  );
+    (c) => String(c.code).toLowerCase() === String(selected).trim().toLowerCase()
+  ) || countries.find((c) => countryNamesMatch(c.name, selected));
   const selectedTheme = getCountryTheme(selectedCountryObj?.code);
   const profileTheme = getCountryProfileTheme(selectedTheme, isDarkMode);
   runtimeDataByMineral = productionDataset.dataByMineral;
@@ -2624,7 +2580,7 @@ const Countries = () => {
     if (!countries.length || !countryFromUrl) return;
     const normalized = normalizeCountryCode(countryFromUrl);
     const byCode = countries.find((c) => c.code === normalized);
-    if (byCode) setSelected(byCode.name);
+    if (byCode) setSelected(byCode.code);
   }, [countries, countryFromUrl]);
 
   useEffect(() => {
@@ -2675,7 +2631,7 @@ const Countries = () => {
         return;
       }
       const rowCountryName = String(row?.country_name_ar || row?.country_name_en || row?.country_name_fr || "");
-      if (countryNamesMatch(rowCountryName, selectedCountryObj.name)) {
+      if (countryNamesMatch(rowCountryName, selectedCountryObj.code)) {
         yearsSet.add(year);
       }
     });
@@ -2914,15 +2870,15 @@ const Countries = () => {
             <ChartSectionTitle title={labels.miningIndicators} />
             <CountryComparisonDonut
               key={`donut-${selected}`}
-              selectedCountry={selected}
+              selectedCountry={selectedCountryObj?.code || selected}
               year={donutYear}
               onYearChange={setDonutYear}
               analyticsRows={productionRowsForCharts}
             />
 
             <CountryLineChart
-              key={`line-${selected}-${selectedCountryObj?.id ?? "none"}`}
-              country={selected}
+              key={`line-${selected}-${selectedCountryObj?.id ?? "none"}-${productionRowsForCharts.length}-${selectedCountryAvailableYears.join("-")}`}
+              country={selectedCountryObj?.code || selected}
               countryId={selectedCountryObj?.id}
               countryCode={selectedCountryObj?.code}
               mineralsFromDb={mineralsFromDb}
@@ -2933,7 +2889,7 @@ const Countries = () => {
 
             <CountryBarChart
               key={`bar-${selected}-${selectedCountryObj?.id ?? "none"}-${productionRowsForCharts.length}-${selectedCountryAvailableYears.join("-")}`}
-              country={selected}
+              country={selectedCountryObj?.code || selected}
               countryId={selectedCountryObj?.id}
               countryCode={selectedCountryObj?.code}
               productionRows={productionRowsForCharts}
@@ -2946,7 +2902,7 @@ const Countries = () => {
 
             <MineralTreemap
               key={`tree-${selected}-${selectedCountryObj?.id ?? "none"}-${productionRowsForCharts.length}-${selectedCountryAvailableYears.join("-")}`}
-              country={selected}
+              country={selectedCountryObj?.code || selected}
               countryId={selectedCountryObj?.id}
               countryCode={selectedCountryObj?.code}
               productionRows={productionRowsForCharts}
@@ -2960,14 +2916,14 @@ const Countries = () => {
               <CountryTradeChart
                 key={`export-${selected}`}
                 title={labels.totalExportsTitle}
-                country={selected}
+                country={selectedCountryObj?.code || selected}
                 series={exportSeries}
                 color="#f59e0b"
               />
               <CountryTradeChart
                 key={`import-${selected}`}
                 title={labels.totalImportsTitle}
-                country={selected}
+                country={selectedCountryObj?.code || selected}
                 series={importSeries}
                 color="#3b82f6"
               />
