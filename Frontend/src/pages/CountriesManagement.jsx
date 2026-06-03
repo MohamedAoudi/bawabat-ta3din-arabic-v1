@@ -381,7 +381,7 @@ export default function CountriesManagementPage() {
     setImporting(true);
     setImportMessage(null);
     try {
-      const payloads = await parseCountriesExcelFile(file);
+      const payloads = await parseCountriesExcelFile(file, t);
       if (!payloads.length) {
         setImportMessage({ type: "error", text: t.importNoRows });
         return;

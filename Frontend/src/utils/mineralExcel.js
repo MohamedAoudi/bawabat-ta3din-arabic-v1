@@ -1,4 +1,4 @@
-import { XLSX, buildStyledSheet, downloadWorkbook, normalizeHeaderKey } from "./excelCommon";
+import { XLSX, buildColumnMap, buildStyledSheet, downloadWorkbook, readExcelRows, rowToRecord } from "./excelCommon";
 
 export const MINERAL_EXCEL_KEYS = [
   "hs_minerals",
@@ -29,15 +29,6 @@ const DEMO_ROW = {
   category_name_en: "Iron ores",
   category_name_fr: "Minerais de fer",
 };
-
-function resolveColumnKey(header) {
-  const normalized = normalizeHeaderKey(header);
-  for (const key of MINERAL_EXCEL_KEYS) {
-    const aliases = HEADER_ALIASES[key] || [key];
-    if (aliases.some((a) => normalizeHeaderKey(a) === normalized)) return key;
-  }
-  return null;
-}
 
 function buildHeaderRow(t) {
   return MINERAL_EXCEL_KEYS.map((key) => t.fields[key] || key);
@@ -76,35 +67,15 @@ export function exportMineralsTemplateExcel(t) {
   downloadWorkbook(wb, "minerals_template.xlsx");
 }
 
-export async function parseMineralsExcelFile(file) {
-  const buffer = await file.arrayBuffer();
-  const wb = XLSX.read(buffer, { type: "array" });
-  const sheetName = wb.SheetNames[0];
-  if (!sheetName) return [];
-  const sheet = wb.Sheets[sheetName];
-  const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+export async function parseMineralsExcelFile(file, t) {
+  const rawRows = await readExcelRows(file);
   if (!rawRows.length) return [];
 
-  const firstRow = rawRows[0];
-  const columnMap = {};
-  Object.keys(firstRow).forEach((header) => {
-    const key = resolveColumnKey(header);
-    if (key) columnMap[header] = key;
-  });
-
-  if (!Object.keys(columnMap).length) {
-    MINERAL_EXCEL_KEYS.forEach((key) => {
-      if (Object.prototype.hasOwnProperty.call(firstRow, key)) columnMap[key] = key;
-    });
-  }
+  const columnMap = buildColumnMap(Object.keys(rawRows[0]), MINERAL_EXCEL_KEYS, HEADER_ALIASES, t.fields);
 
   const payloads = [];
   for (const raw of rawRows) {
-    const item = {};
-    Object.entries(columnMap).forEach(([header, key]) => {
-      const val = raw[header];
-      item[key] = val != null ? String(val).trim() : "";
-    });
+    const item = rowToRecord(raw, columnMap);
     if (!item.hs_minerals && !item.name_ar && !item.name_en && !item.name_fr) continue;
     if (!item.name_ar || !item.name_en || !item.name_fr || !item.hs_minerals) continue;
     payloads.push({

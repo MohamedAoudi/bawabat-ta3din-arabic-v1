@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { LanguageContext, ThemeContext } from "../App";
@@ -12,7 +12,15 @@ import {
 import { getCountries } from "../services/countryService";
 import { getMinerals } from "../services/mineralService";
 import { getYears } from "../services/yearService";
-import { Check, ChevronLeft, ChevronRight, Edit, Factory, Plus, Search, Trash2, X } from "lucide-react";
+import {
+  dedupeProductionPayloads,
+  exportProductionExcel,
+  exportProductionTemplateExcel,
+  findMatchingProduction,
+  normalizeProductionPayload,
+  parseProductionExcelFile,
+} from "../utils/productionExcel";
+import { Check, ChevronLeft, ChevronRight, Download, Edit, Factory, FileSpreadsheet, Plus, Search, Trash2, Upload, X } from "lucide-react";
 
 const PAGE_SIZE = 15;
 
@@ -28,6 +36,15 @@ const TRANSLATIONS = {
     noAccess: "لا تملك صلاحيات الوصول لهذه الصفحة",
     search: "بحث",
     add: "إضافة",
+    downloadExcel: "تصدير Excel",
+    importExcel: "استيراد Excel",
+    downloadTemplate: "نموذج Excel",
+    importing: "جاري الاستيراد...",
+    importSuccess: (n) => `تم استيراد ${n} سجل إنتاج بنجاح`,
+    importPartial: (ok, fail) => `تم استيراد ${ok}، فشل ${fail}`,
+    importDuplicateHint: "السجلات الموجودة (نفس الدولة/المعدن/السنة) تم تحديثها تلقائياً",
+    importNoRows: "لا توجد صفوف صالحة في الملف",
+    importFileError: "تعذر قراءة ملف Excel",
     edit: "تعديل",
     delete: "حذف",
     cancel: "إلغاء",
@@ -57,6 +74,14 @@ const TRANSLATIONS = {
       conversion_factor: "معامل التحويل",
       data_source: "مصدر البيانات",
     },
+    excelFields: {
+      country_iso: "رمز الدولة (ISO)",
+      mineral_hs: "رمز HS للمعدن",
+      year: "السنة",
+      production_quantity: "كمية الإنتاج",
+      unit: "الوحدة (tonne / kg / unit)",
+      data_source: "مصدر البيانات",
+    },
     pagination: {
       previous: "السابق",
       next: "التالي",
@@ -69,6 +94,15 @@ const TRANSLATIONS = {
     noAccess: "Vous n'avez pas accès à cette page",
     search: "Rechercher",
     add: "Ajouter",
+    downloadExcel: "Exporter Excel",
+    importExcel: "Importer Excel",
+    downloadTemplate: "Modèle Excel",
+    importing: "Importation...",
+    importSuccess: (n) => `${n} enregistrement(s) importé(s) avec succès`,
+    importPartial: (ok, fail) => `${ok} importé(s), ${fail} échec(s)`,
+    importDuplicateHint: "Les enregistrements existants (même pays/minéral/année) ont été mis à jour",
+    importNoRows: "Aucune ligne valide dans le fichier",
+    importFileError: "Impossible de lire le fichier Excel",
     edit: "Modifier",
     delete: "Supprimer",
     cancel: "Annuler",
@@ -98,6 +132,14 @@ const TRANSLATIONS = {
       conversion_factor: "Facteur de conversion",
       data_source: "Source des données",
     },
+    excelFields: {
+      country_iso: "Code pays (ISO)",
+      mineral_hs: "Code HS du minéral",
+      year: "Année",
+      production_quantity: "Quantité produite",
+      unit: "Unité (tonne / kg / unit)",
+      data_source: "Source des données",
+    },
     pagination: {
       previous: "Précédent",
       next: "Suivant",
@@ -110,6 +152,15 @@ const TRANSLATIONS = {
     noAccess: "You don't have access to this page",
     search: "Search",
     add: "Add",
+    downloadExcel: "Export Excel",
+    importExcel: "Import Excel",
+    downloadTemplate: "Excel template",
+    importing: "Importing...",
+    importSuccess: (n) => `${n} production record(s) imported successfully`,
+    importPartial: (ok, fail) => `${ok} imported, ${fail} failed`,
+    importDuplicateHint: "Existing records (same country/mineral/year) were updated automatically",
+    importNoRows: "No valid rows in the file",
+    importFileError: "Could not read Excel file",
     edit: "Edit",
     delete: "Delete",
     cancel: "Cancel",
@@ -137,6 +188,14 @@ const TRANSLATIONS = {
       unit_name_en: "Unit (English)",
       unit_name_fr: "Unit (French)",
       conversion_factor: "Conversion factor",
+      data_source: "Data source",
+    },
+    excelFields: {
+      country_iso: "Country code (ISO)",
+      mineral_hs: "Mineral HS code",
+      year: "Year",
+      production_quantity: "Production quantity",
+      unit: "Unit (tonne / kg / unit)",
       data_source: "Data source",
     },
     pagination: {
@@ -241,6 +300,9 @@ export default function ProductionManagementPage() {
     unit_name_fr: "",
     data_source: "",
   });
+  const [importing, setImporting] = useState(false);
+  const [importMessage, setImportMessage] = useState(null);
+  const fileInputRef = useRef(null);
 
   const isAdmin = currentUser?.role === "admin";
 
@@ -372,6 +434,70 @@ export default function ProductionManagementPage() {
     setConfirmDelete(null);
   };
 
+  const handleDownloadExcel = () => {
+    exportProductionExcel(rows, countries, minerals, t);
+  };
+
+  const handleDownloadTemplate = () => {
+    exportProductionTemplateExcel(t, countries, minerals);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    setImporting(true);
+    setImportMessage(null);
+    try {
+      const payloads = await parseProductionExcelFile(file, countries, minerals, t);
+      if (!payloads.length) {
+        setImportMessage({ type: "error", text: t.importNoRows });
+        return;
+      }
+
+      const uniquePayloads = dedupeProductionPayloads(payloads);
+      let ok = 0;
+      let fail = 0;
+      let updated = 0;
+      let workingRows = [...rows];
+
+      for (const rawPayload of uniquePayloads) {
+        const payload = normalizeProductionPayload(rawPayload);
+        const existing = findMatchingProduction(workingRows, payload);
+        try {
+          if (existing?.id) {
+            const saved = await updateMineralProduction(existing.id, payload);
+            workingRows = workingRows.map((r) => (r.id === existing.id ? { ...r, ...saved } : r));
+            updated += 1;
+          } else {
+            const saved = await createMineralProduction(payload);
+            workingRows.push(saved);
+          }
+          ok += 1;
+        } catch {
+          fail += 1;
+        }
+      }
+
+      await fetchAll();
+      if (fail === 0) {
+        const hint = updated > 0 ? ` (${t.importDuplicateHint})` : "";
+        setImportMessage({ type: "success", text: `${t.importSuccess(ok)}${hint}` });
+      } else {
+        setImportMessage({ type: "warning", text: t.importPartial(ok, fail) });
+      }
+    } catch {
+      setImportMessage({ type: "error", text: t.importFileError });
+    } finally {
+      setImporting(false);
+    }
+  };
+
   if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: colors.bg }}><div className="animate-spin rounded-full h-12 w-12" style={{ borderBottom: `2px solid ${colors.gold}` }} /></div>;
   if (!isAdmin) return <div className="min-h-screen flex items-center justify-center" style={{ background: colors.bg }}><h2 className="text-xl font-bold" style={{ color: colors.ink }}>{t.noAccess}</h2></div>;
 
@@ -383,8 +509,67 @@ export default function ProductionManagementPage() {
         <div className="p-4 sm:p-6 lg:p-8" style={{ background: colors.bg, minHeight: "100vh" }}>
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-4 sm:mb-6">
             <div className="flex items-center gap-2"><Factory size={20} style={{ color: colors.gold }} /><h1 className="text-xl sm:text-2xl font-bold" style={{ color: colors.ink }}>{t.pageTitle}</h1></div>
-            <button onClick={openCreate} className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]" style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`, color: colors.forest }}><Plus size={18} /><span className="text-sm font-semibold">{t.add}</span></button>
+            <div className={`flex flex-wrap items-center gap-2 ${isRTL ? "justify-start sm:justify-end" : "justify-start sm:justify-end"}`}>
+              <button
+                type="button"
+                onClick={handleDownloadExcel}
+                className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+                style={{ background: colors.cardBg, color: colors.ink, border: `1px solid ${colors.border}` }}
+              >
+                <Download size={18} style={{ color: colors.gold }} />
+                <span className="text-sm font-semibold">{t.downloadExcel}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleImportClick}
+                disabled={importing}
+                className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ background: colors.cardBg, color: colors.ink, border: `1px solid ${colors.border}` }}
+              >
+                <Upload size={18} style={{ color: colors.gold }} />
+                <span className="text-sm font-semibold">{importing ? t.importing : t.importExcel}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadTemplate}
+                className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+                style={{ background: colors.cardBg, color: colors.ink, border: `1px solid ${colors.border}` }}
+              >
+                <FileSpreadsheet size={18} style={{ color: colors.gold }} />
+                <span className="text-sm font-semibold">{t.downloadTemplate}</span>
+              </button>
+              <button
+                type="button"
+                onClick={openCreate}
+                className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+                style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`, color: colors.forest }}
+              >
+                <Plus size={18} />
+                <span className="text-sm font-semibold">{t.add}</span>
+              </button>
+              <input ref={fileInputRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImportFile} />
+            </div>
           </div>
+
+          {importMessage && (
+            <div
+              className="mb-4 px-4 py-3 rounded-xl text-sm font-medium"
+              style={{
+                background:
+                  importMessage.type === "success"
+                    ? "rgba(34,197,94,0.12)"
+                    : importMessage.type === "warning"
+                      ? "rgba(234,179,8,0.12)"
+                      : "rgba(220,38,38,0.12)",
+                color:
+                  importMessage.type === "success" ? "#16a34a" : importMessage.type === "warning" ? "#ca8a04" : "#dc2626",
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              {importMessage.text}
+            </div>
+          )}
+
           <div className="mb-4 sm:mb-6 rounded-xl p-3 sm:p-4 shadow-sm" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
             <div className="relative"><Search className={`absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2`} size={20} style={{ color: colors.muted }} /><input type="text" placeholder={`${t.search}...`} value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} className={`w-full ${isRTL ? "pr-10" : "pl-10"} py-3 rounded-lg border text-sm sm:text-base`} style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }} /></div>
           </div>

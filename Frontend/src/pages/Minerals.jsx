@@ -411,7 +411,7 @@ export default function MineralsPage() {
     setImporting(true);
     setImportMessage(null);
     try {
-      const rows = await parseMineralsExcelFile(file);
+      const rows = await parseMineralsExcelFile(file, t);
       if (!rows.length) {
         setImportMessage({ type: "error", text: t.importNoRows });
         return;

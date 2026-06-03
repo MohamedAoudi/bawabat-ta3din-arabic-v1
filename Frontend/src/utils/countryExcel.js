@@ -1,4 +1,12 @@
-import { XLSX, buildStyledSheet, downloadWorkbook, normalizeHeaderKey } from "./excelCommon";
+import {
+  XLSX,
+  buildColumnMap,
+  buildStyledSheet,
+  downloadWorkbook,
+  parseIntegerCell,
+  readExcelRows,
+  rowToRecord,
+} from "./excelCommon";
 
 export const COUNTRY_EXCEL_KEYS = ["name_ar", "name_en", "name_fr", "iso_code", "display_order"];
 
@@ -6,7 +14,7 @@ const HEADER_ALIASES = {
   name_ar: ["name_ar", "name ar", "name (arabic)", "nom (arabe)", "الاسم (عربي)", "الاسم عربي"],
   name_en: ["name_en", "name en", "name (english)", "nom (english)", "الاسم (english)", "الاسم english"],
   name_fr: ["name_fr", "name fr", "name (french)", "nom (français)", "الاسم (français)", "الاسم français"],
-  iso_code: ["iso_code", "iso code", "iso", "code iso", "رمز الدولة", "رمز الدولة (iso)", "country code"],
+  iso_code: ["iso_code", "iso code", "iso", "code iso", "رمز الدولة", "رمز الدولة (iso)", "country code", "code pays"],
   display_order: ["display_order", "display order", "order", "ordre", "ترتيب العرض", "ordre d'affichage"],
 };
 
@@ -17,15 +25,6 @@ const DEMO_ROW = {
   iso_code: "SA",
   display_order: 1,
 };
-
-function resolveColumnKey(header) {
-  const normalized = normalizeHeaderKey(header);
-  for (const key of COUNTRY_EXCEL_KEYS) {
-    const aliases = HEADER_ALIASES[key] || [key];
-    if (aliases.some((a) => normalizeHeaderKey(a) === normalized)) return key;
-  }
-  return null;
-}
 
 function buildHeaderRow(t) {
   return COUNTRY_EXCEL_KEYS.map((key) => t.fields[key] || key);
@@ -64,39 +63,19 @@ export function exportCountriesTemplateExcel(t) {
   downloadWorkbook(wb, "countries_template.xlsx");
 }
 
-export async function parseCountriesExcelFile(file) {
-  const buffer = await file.arrayBuffer();
-  const wb = XLSX.read(buffer, { type: "array" });
-  const sheetName = wb.SheetNames[0];
-  if (!sheetName) return [];
-  const sheet = wb.Sheets[sheetName];
-  const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+export async function parseCountriesExcelFile(file, t) {
+  const rawRows = await readExcelRows(file);
   if (!rawRows.length) return [];
 
-  const firstRow = rawRows[0];
-  const columnMap = {};
-  Object.keys(firstRow).forEach((header) => {
-    const key = resolveColumnKey(header);
-    if (key) columnMap[header] = key;
-  });
-
-  if (!Object.keys(columnMap).length) {
-    COUNTRY_EXCEL_KEYS.forEach((key) => {
-      if (Object.prototype.hasOwnProperty.call(firstRow, key)) columnMap[key] = key;
-    });
-  }
+  const columnMap = buildColumnMap(Object.keys(rawRows[0]), COUNTRY_EXCEL_KEYS, HEADER_ALIASES, t.fields);
 
   const payloads = [];
   for (const raw of rawRows) {
-    const item = {};
-    Object.entries(columnMap).forEach(([header, key]) => {
-      const val = raw[header];
-      item[key] = val != null ? String(val).trim() : "";
-    });
+    const item = rowToRecord(raw, columnMap);
     if (!item.name_ar && !item.name_en && !item.name_fr && !item.iso_code) continue;
     if (!item.name_ar || !item.name_en || !item.name_fr || !item.iso_code) continue;
 
-    const order = Number.parseInt(item.display_order, 10);
+    const order = parseIntegerCell(item.display_order);
     payloads.push({
       name_ar: item.name_ar,
       name_en: item.name_en,
