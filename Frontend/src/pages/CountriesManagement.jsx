@@ -1,11 +1,12 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, refreshCurrentUser } from "../services/authService";
 import { createCountry, deleteCountry, getCountries, updateCountry } from "../services/countryService";
+import { exportCountriesExcel, exportCountriesTemplateExcel, parseCountriesExcelFile } from "../utils/countryExcel";
 import { getArabCountryFlagUrl } from "../utils/arabCountryFlags";
-import { Check, ChevronLeft, ChevronRight, Edit, Flag, Plus, Search, Trash2, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Download, Edit, FileSpreadsheet, Flag, Plus, Search, Trash2, Upload, X } from "lucide-react";
 
 const PAGE_SIZE = 15;
 
@@ -15,6 +16,14 @@ const TRANSLATIONS = {
     noAccess: "لا تملك صلاحيات الوصول لهذه الصفحة",
     search: "بحث",
     add: "إضافة",
+    downloadExcel: "تصدير Excel",
+    importExcel: "استيراد Excel",
+    downloadTemplate: "نموذج Excel",
+    importing: "جاري الاستيراد...",
+    importSuccess: (n) => `تم استيراد ${n} دولة بنجاح`,
+    importPartial: (ok, fail) => `تم استيراد ${ok}، فشل ${fail}`,
+    importNoRows: "لا توجد صفوف صالحة في الملف",
+    importFileError: "تعذر قراءة ملف Excel",
     edit: "تعديل",
     delete: "حذف",
     cancel: "إلغاء",
@@ -48,6 +57,14 @@ const TRANSLATIONS = {
     noAccess: "Vous n'avez pas accès à cette page",
     search: "Rechercher",
     add: "Ajouter",
+    downloadExcel: "Exporter Excel",
+    importExcel: "Importer Excel",
+    downloadTemplate: "Modèle Excel",
+    importing: "Importation...",
+    importSuccess: (n) => `${n} pays importé(s) avec succès`,
+    importPartial: (ok, fail) => `${ok} importé(s), ${fail} échec(s)`,
+    importNoRows: "Aucune ligne valide dans le fichier",
+    importFileError: "Impossible de lire le fichier Excel",
     edit: "Modifier",
     delete: "Supprimer",
     cancel: "Annuler",
@@ -81,6 +98,14 @@ const TRANSLATIONS = {
     noAccess: "You don't have access to this page",
     search: "Search",
     add: "Add",
+    downloadExcel: "Export Excel",
+    importExcel: "Import Excel",
+    downloadTemplate: "Excel template",
+    importing: "Importing...",
+    importSuccess: (n) => `${n} countr${n === 1 ? "y" : "ies"} imported successfully`,
+    importPartial: (ok, fail) => `${ok} imported, ${fail} failed`,
+    importNoRows: "No valid rows in the file",
+    importFileError: "Could not read Excel file",
     edit: "Edit",
     delete: "Delete",
     cancel: "Cancel",
@@ -231,6 +256,9 @@ export default function CountriesManagementPage() {
     iso_code: "",
     display_order: "0",
   });
+  const [importing, setImporting] = useState(false);
+  const [importMessage, setImportMessage] = useState(null);
+  const fileInputRef = useRef(null);
 
   const isAdmin = currentUser?.role === "admin";
 
@@ -333,6 +361,56 @@ export default function CountriesManagementPage() {
     setConfirmDelete(null);
   };
 
+  const handleDownloadExcel = () => {
+    exportCountriesExcel(rows, t);
+  };
+
+  const handleDownloadTemplate = () => {
+    exportCountriesTemplateExcel(t);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    setImporting(true);
+    setImportMessage(null);
+    try {
+      const payloads = await parseCountriesExcelFile(file);
+      if (!payloads.length) {
+        setImportMessage({ type: "error", text: t.importNoRows });
+        return;
+      }
+
+      let ok = 0;
+      let fail = 0;
+      for (const payload of payloads) {
+        try {
+          await createCountry(payload);
+          ok += 1;
+        } catch {
+          fail += 1;
+        }
+      }
+
+      await fetchRows();
+      if (fail === 0) {
+        setImportMessage({ type: "success", text: t.importSuccess(ok) });
+      } else {
+        setImportMessage({ type: "warning", text: t.importPartial(ok, fail) });
+      }
+    } catch {
+      setImportMessage({ type: "error", text: t.importFileError });
+    } finally {
+      setImporting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: colors.bg }}>
@@ -366,15 +444,72 @@ export default function CountriesManagementPage() {
               {t.pageTitle}
             </h1>
           </div>
-          <button
-            onClick={openCreate}
-            className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]"
-            style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`, color: colors.forest }}
-          >
-            <Plus size={18} />
-            <span className="text-sm font-semibold">{t.add}</span>
-          </button>
+          <div className={`flex flex-wrap items-center gap-2 ${isRTL ? "justify-start sm:justify-end" : "justify-start sm:justify-end"}`}>
+            <button
+              type="button"
+              onClick={handleDownloadExcel}
+              className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{ background: colors.cardBg, color: colors.ink, border: `1px solid ${colors.border}` }}
+            >
+              <Download size={18} style={{ color: colors.gold }} />
+              <span className="text-sm font-semibold">{t.downloadExcel}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleImportClick}
+              disabled={importing}
+              className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: colors.cardBg, color: colors.ink, border: `1px solid ${colors.border}` }}
+            >
+              <Upload size={18} style={{ color: colors.gold }} />
+              <span className="text-sm font-semibold">{importing ? t.importing : t.importExcel}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleDownloadTemplate}
+              className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{ background: colors.cardBg, color: colors.ink, border: `1px solid ${colors.border}` }}
+            >
+              <FileSpreadsheet size={18} style={{ color: colors.gold }} />
+              <span className="text-sm font-semibold">{t.downloadTemplate}</span>
+            </button>
+            <button
+              type="button"
+              onClick={openCreate}
+              className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{ background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`, color: colors.forest }}
+            >
+              <Plus size={18} />
+              <span className="text-sm font-semibold">{t.add}</span>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={handleImportFile}
+            />
+          </div>
         </div>
+
+        {importMessage && (
+          <div
+            className="mb-4 px-4 py-3 rounded-xl text-sm font-medium"
+            style={{
+              background:
+                importMessage.type === "success"
+                  ? "rgba(34,197,94,0.12)"
+                  : importMessage.type === "warning"
+                    ? "rgba(234,179,8,0.12)"
+                    : "rgba(220,38,38,0.12)",
+              color:
+                importMessage.type === "success" ? "#16a34a" : importMessage.type === "warning" ? "#ca8a04" : "#dc2626",
+              border: `1px solid ${colors.border}`,
+            }}
+          >
+            {importMessage.text}
+          </div>
+        )}
 
         <div className="mb-4 sm:mb-6 rounded-xl p-3 sm:p-4 shadow-sm" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div className="relative">

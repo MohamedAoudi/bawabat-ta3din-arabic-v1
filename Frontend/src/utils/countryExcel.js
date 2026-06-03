@@ -1,38 +1,26 @@
 import { XLSX, buildStyledSheet, downloadWorkbook, normalizeHeaderKey } from "./excelCommon";
 
-export const MINERAL_EXCEL_KEYS = [
-  "hs_minerals",
-  "name_ar",
-  "name_en",
-  "name_fr",
-  "category_name_ar",
-  "category_name_en",
-  "category_name_fr",
-];
+export const COUNTRY_EXCEL_KEYS = ["name_ar", "name_en", "name_fr", "iso_code", "display_order"];
 
 const HEADER_ALIASES = {
-  hs_minerals: ["hs_minerals", "hs minerals", "hs minerals code", "رمز hs minerals", "رمز hs", "code hs"],
   name_ar: ["name_ar", "name ar", "name (arabic)", "nom (arabe)", "الاسم (عربي)", "الاسم عربي"],
   name_en: ["name_en", "name en", "name (english)", "nom (english)", "الاسم (english)", "الاسم english"],
   name_fr: ["name_fr", "name fr", "name (french)", "nom (français)", "الاسم (français)", "الاسم français"],
-  category_name_ar: ["category_name_ar", "category ar", "category (arabic)", "catégorie (arabe)", "الفئة (عربي)"],
-  category_name_en: ["category_name_en", "category en", "category (english)", "catégorie (english)", "الفئة (english)"],
-  category_name_fr: ["category_name_fr", "category fr", "category (french)", "catégorie (français)", "الفئة (français)"],
+  iso_code: ["iso_code", "iso code", "iso", "code iso", "رمز الدولة", "رمز الدولة (iso)", "country code"],
+  display_order: ["display_order", "display order", "order", "ordre", "ترتيب العرض", "ordre d'affichage"],
 };
 
 const DEMO_ROW = {
-  hs_minerals: "260100",
-  name_ar: "حديد خام",
-  name_en: "Iron ore",
-  name_fr: "Minerai de fer",
-  category_name_ar: "معادن حديدية",
-  category_name_en: "Iron ores",
-  category_name_fr: "Minerais de fer",
+  name_ar: "المملكة العربية السعودية",
+  name_en: "Saudi Arabia",
+  name_fr: "Arabie saoudite",
+  iso_code: "SA",
+  display_order: 1,
 };
 
 function resolveColumnKey(header) {
   const normalized = normalizeHeaderKey(header);
-  for (const key of MINERAL_EXCEL_KEYS) {
+  for (const key of COUNTRY_EXCEL_KEYS) {
     const aliases = HEADER_ALIASES[key] || [key];
     if (aliases.some((a) => normalizeHeaderKey(a) === normalized)) return key;
   }
@@ -40,43 +28,43 @@ function resolveColumnKey(header) {
 }
 
 function buildHeaderRow(t) {
-  return MINERAL_EXCEL_KEYS.map((key) => t.fields[key] || key);
+  return COUNTRY_EXCEL_KEYS.map((key) => t.fields[key] || key);
 }
 
-function mineralToRow(m, t) {
+function countryToRow(c, t) {
   const headers = buildHeaderRow(t);
   const row = {};
-  MINERAL_EXCEL_KEYS.forEach((key, i) => {
-    row[headers[i]] = m[key] ?? "";
+  COUNTRY_EXCEL_KEYS.forEach((key, i) => {
+    row[headers[i]] = c[key] ?? "";
   });
   return row;
 }
 
-export function exportMineralsExcel(minerals, t) {
+export function exportCountriesExcel(countries, t) {
   const headers = buildHeaderRow(t);
   const rows =
-    minerals.length > 0
-      ? minerals.map((m) => mineralToRow(m, t))
+    countries.length > 0
+      ? countries.map((c) => countryToRow(c, t))
       : [Object.fromEntries(headers.map((h) => [h, ""]))];
   const ws = buildStyledSheet(rows, headers);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Minerals");
-  downloadWorkbook(wb, "minerals.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, "Countries");
+  downloadWorkbook(wb, "countries.xlsx");
 }
 
-export function exportMineralsTemplateExcel(t) {
+export function exportCountriesTemplateExcel(t) {
   const headers = buildHeaderRow(t);
   const row = {};
-  MINERAL_EXCEL_KEYS.forEach((key, i) => {
+  COUNTRY_EXCEL_KEYS.forEach((key, i) => {
     row[headers[i]] = DEMO_ROW[key] ?? "";
   });
   const ws = buildStyledSheet([row], headers);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Template");
-  downloadWorkbook(wb, "minerals_template.xlsx");
+  downloadWorkbook(wb, "countries_template.xlsx");
 }
 
-export async function parseMineralsExcelFile(file) {
+export async function parseCountriesExcelFile(file) {
   const buffer = await file.arrayBuffer();
   const wb = XLSX.read(buffer, { type: "array" });
   const sheetName = wb.SheetNames[0];
@@ -93,7 +81,7 @@ export async function parseMineralsExcelFile(file) {
   });
 
   if (!Object.keys(columnMap).length) {
-    MINERAL_EXCEL_KEYS.forEach((key) => {
+    COUNTRY_EXCEL_KEYS.forEach((key) => {
       if (Object.prototype.hasOwnProperty.call(firstRow, key)) columnMap[key] = key;
     });
   }
@@ -105,16 +93,16 @@ export async function parseMineralsExcelFile(file) {
       const val = raw[header];
       item[key] = val != null ? String(val).trim() : "";
     });
-    if (!item.hs_minerals && !item.name_ar && !item.name_en && !item.name_fr) continue;
-    if (!item.name_ar || !item.name_en || !item.name_fr || !item.hs_minerals) continue;
+    if (!item.name_ar && !item.name_en && !item.name_fr && !item.iso_code) continue;
+    if (!item.name_ar || !item.name_en || !item.name_fr || !item.iso_code) continue;
+
+    const order = Number.parseInt(item.display_order, 10);
     payloads.push({
-      hs_minerals: item.hs_minerals,
       name_ar: item.name_ar,
       name_en: item.name_en,
       name_fr: item.name_fr,
-      category_name_ar: item.category_name_ar || null,
-      category_name_en: item.category_name_en || null,
-      category_name_fr: item.category_name_fr || null,
+      iso_code: item.iso_code.toUpperCase(),
+      display_order: Number.isNaN(order) ? 0 : order,
     });
   }
   return payloads;
