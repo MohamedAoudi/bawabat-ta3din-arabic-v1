@@ -1,17 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db");
-const userRoutes = require("./Routes/userRoutes");
-const mineralsRoutes = require("./Routes/mineralsRoutes");
-const countriesRoutes = require("./Routes/countriesRoutes");
-const mineralProductionRoutes = require("./Routes/mineralProductionRoutes");
-const tradePartnersRoutes = require("./Routes/tradePartnersRoutes");
-const tradeTransactionsRoutes = require("./Routes/tradeTransactionsRoutes");
-const yearsRoutes = require("./Routes/yearsRoutes");
+
 
 const path = require("path");
 const { runMigrations } = require("./migrate");
-const { seedOnStartup } = require("./seed");
+const userRoutes = require("./Routes/userRoutes");
+const countriesRoutes = require("./Routes/countriesRoutes");
 
 const app = express();
 app.use(cors());
@@ -27,20 +22,14 @@ app.get("/", (req, res) => {
 
 // User routes (multilingual)
 app.use("/api/users", userRoutes);
-// Other API routes
-app.use("/api/minerals", mineralsRoutes);
 app.use("/api/countries", countriesRoutes);
-app.use("/api/mineral-production", mineralProductionRoutes);
-app.use("/api/trade-partners", tradePartnersRoutes);
-app.use("/api/trade-transactions", tradeTransactionsRoutes);
-app.use("/api/years", yearsRoutes);
+
 
 
 async function startServer() {
   try {
     await pool.query("SELECT 1");
     await runMigrations();
-    await seedOnStartup();
 
     app.listen(5000, () => {
       console.log("Server running on port 5000");

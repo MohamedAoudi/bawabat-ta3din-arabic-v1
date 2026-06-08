@@ -159,17 +159,38 @@ async function seedCountries() {
       const c = countriesSeed[i];
       const displayOrder = i + 1;
 
+      const countryResult = await pool.query(
+        `
+          INSERT INTO dim_countries (country_name_ar, country_name_en, country_name_fr, display_order, is_arab_country, source_file)
+          VALUES ($1, $2, $3, $4, TRUE, 'seed')
+          ON CONFLICT (country_name_ar) DO UPDATE
+          SET country_name_en = EXCLUDED.country_name_en,
+              country_name_fr = EXCLUDED.country_name_fr,
+              display_order = EXCLUDED.display_order,
+              updated_at = NOW()
+          RETURNING country_id
+        `,
+        [c.name_ar, c.name_en, c.name_fr, displayOrder]
+      );
+
+      const countryId = countryResult.rows[0].country_id;
+
       await pool.query(
         `
-          INSERT INTO countries (name_ar, name_en, name_fr, iso_code, display_order)
-          VALUES ($1, $2, $3, $4, $5)
-          ON CONFLICT (iso_code) DO UPDATE
-          SET name_ar = EXCLUDED.name_ar,
-              name_en = EXCLUDED.name_en,
-              name_fr = EXCLUDED.name_fr,
-              display_order = EXCLUDED.display_order
+          DELETE FROM dim_country_aliases
+          WHERE country_id = $1 AND alias_type = 'iso_code'
         `,
-        [c.name_ar, c.name_en, c.name_fr, c.iso_code, displayOrder]
+        [countryId]
+      );
+
+      await pool.query(
+        `
+          INSERT INTO dim_country_aliases (
+            country_id, alias_name, language_code, alias_type, source_system, is_primary
+          )
+          VALUES ($1, $2, 'en', 'iso_code', 'seed', TRUE)
+        `,
+        [countryId, c.iso_code]
       );
     }
     await pool.query("COMMIT");
