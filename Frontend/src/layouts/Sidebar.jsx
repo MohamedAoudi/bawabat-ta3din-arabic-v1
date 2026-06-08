@@ -124,47 +124,7 @@ const TRANSLATIONS = {
   },
 };
 
-// ─── Menu Items Configuration ───────────────────────────────────────────────
-const MENU_ITEMS = [
- 
-  {
-    key: "home",
-    icon: Home,
-    href: "/",
-    labelKey: "home",
-  },
-  {
-    key: "statistics",
-    icon: BarChart3,
-    labelKey: "statistics",
-    children: [
-      { key: "m1", href: "/m1", labelKey: "miningProduction" },
-      { key: "m2", href: "/m2", labelKey: "miningProduction" },
-      { key: "m3", href: "/m3", labelKey: "miningProduction" },
-      { key: "m4", href: "/m4", labelKey: "miningProduction" },
-      { key: "m5", href: "/m5", labelKey: "exports" },
-      { key: "m6", href: "/m6", labelKey: "imports" },
-    ],
-  },
-  {
-    key: "reports",
-    icon: FileText,
-    href: "/rapport",
-    labelKey: "reports",
-  },
-  {
-    key: "countries",
-    icon: PieChart,
-    href: "/countries",
-    labelKey: "countries",
-  },
-  {
-    key: "about",
-    icon: TrendingUp,
-    href: "/about",
-    labelKey: "about",
-  },
-];
+
 
 const ADMIN_MENU_ITEMS = [
    {
@@ -398,80 +358,7 @@ export default function Sidebar({ isOpen, onClose, children }) {
 
         {/* Navigation Menu */}
         <nav className="p-2 sm:p-4 space-y-1 sm:space-y-2">
-          {MENU_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isExpanded = expandedMenus[item.key];
-            const hasChildren = item.children && item.children.length > 0;
-            const isItemActive = hasChildren 
-              ? item.children.some(child => location.pathname === child.href)
-              : item.href && location.pathname === item.href;
-
-            return (
-              <div key={item.key}>
-                {hasChildren ? (
-                  // Menu with children (expandable)
-                  <>
-                    <button
-                      onClick={() => toggleMenu(item.key)}
-                      className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200"
-                      style={{ 
-                        background: isItemActive || isExpanded 
-                          ? `linear-gradient(135deg, ${colors.goldPale} 0%, ${isDarkMode ? 'rgba(201,168,76,0.15)' : 'rgba(201,168,76,0.25)'} 100%)`
-                          : 'transparent',
-                        color: isItemActive || isExpanded ? colors.forest : colors.ink,
-                        border: `1px solid ${isItemActive || isExpanded ? colors.gold : 'transparent'}`,
-                      }}
-                    >
-                      <Icon size={18} sm:size={20} style={{ color: isItemActive || isExpanded ? colors.gold : colors.muted }} />
-                      <span className="flex-1 text-start text-xs sm:text-sm font-medium">{t[item.labelKey]}</span>
-                      {hasChildren && (
-                        <svg 
-                          className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
-                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                          style={{ color: colors.muted }}
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      )}
-                    </button>
-                    
-                    {/* Submenu */}
-                    {isExpanded && (
-                      <div className="mt-1 ml-3 sm:ml-4 space-y-1 pl-2" style={{ borderLeft: `2px solid ${colors.gold}40` }}>
-                        {item.children.map((child) => (
-                          <Link
-                            key={child.key}
-                            to={child.href}
-                            className="block px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm transition-all duration-200"
-                            style={{ 
-                              background: location.pathname === child.href ? colors.goldPale : 'transparent',
-                              color: location.pathname === child.href ? colors.forest : colors.muted,
-                            }}
-                          >
-                            {t[child.labelKey]}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  // Simple menu item
-                  <Link
-                    to={item.href}
-                    className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200"
-                    style={{ 
-                      background: isItemActive ? colors.goldPale : 'transparent',
-                      color: isItemActive ? colors.forest : colors.ink,
-                      border: `1px solid ${isItemActive ? colors.gold : 'transparent'}`,
-                    }}
-                  >
-                    <Icon size={18} sm:size={20} style={{ color: isItemActive ? colors.gold : colors.muted }} />
-                    <span className="text-xs sm:text-sm font-medium">{t[item.labelKey]}</span>
-                  </Link>
-                )}
-              </div>
-            );
-          })}
+         
 
           {/* Admin Section */}
           {isUserAdmin && (
