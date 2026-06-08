@@ -30,7 +30,7 @@ export const createCountry = async (countryData) => {
     const response = await apiClient.post(API_URL, countryData);
     return response.data;
   } catch (error) {
-    console.error("Error creating country:", error);
+    console.error("Error creating country:", error.response?.data || error.message || error);
     throw error;
   }
 };

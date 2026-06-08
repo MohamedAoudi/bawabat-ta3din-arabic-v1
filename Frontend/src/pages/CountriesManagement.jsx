@@ -393,7 +393,8 @@ export default function CountriesManagementPage() {
         try {
           await createCountry(payload);
           ok += 1;
-        } catch {
+        } catch (err) {
+          console.error("Failed importing payload:", payload, err.response?.data || err.message || err);
           fail += 1;
         }
       }
