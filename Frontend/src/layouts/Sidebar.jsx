@@ -6,7 +6,7 @@ import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, logout, isAdmin, refreshCurrentUser } from "../services/authService";
 import { 
   User, LogOut, Settings, Users, BarChart3, 
-  Shield, Home, FileText, X, Menu, PieChart, TrendingUp, Globe, Sun, Moon, Gem
+  Shield, Home, FileText, X, Menu, PieChart, TrendingUp, Globe, Sun, Moon, Gem, Factory, ArrowUp, ArrowDown
 } from "lucide-react";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
@@ -38,6 +38,16 @@ const TRANSLATIONS = {
     tradeImports: "إدارة الواردات",
     countriesManagement: "إدارة الدول",
     productionManagement: "إدارة الإنتاج",
+    arabProduction: "الإنتاج العربي",
+    worldProduction: "الإنتاج العالمي",
+    productionMinerals: "معادن الإنتاج",
+    tradeHeading: "التجارة",
+    tradeWorldExports: "الصادرات مع العالم",
+    tradeWorldImports: "الواردات مع العالم",
+    tradePartnersExports: "الصادرات مع شركاء",
+    tradePartnersImports: "الواردات مع شركاء",
+    tradePartnersList: "الشركاء",
+    tradeMinerals: "معادن التجارة",
     language: "اللغة",
     theme: "المظهر",
     lightMode: "فاتح",
@@ -75,6 +85,16 @@ const TRANSLATIONS = {
     tradeImports: "Gestion des importations",
     countriesManagement: "Gestion des pays",
     productionManagement: "Gestion de la production",
+    arabProduction: "Production arabe",
+    worldProduction: "Production mondiale",
+    productionMinerals: "Minéraux de production",
+    tradeHeading: "Commerce",
+    tradeWorldExports: "Exportations avec le monde",
+    tradeWorldImports: "Importations avec le monde",
+    tradePartnersExports: "Exportations avec les partenaires",
+    tradePartnersImports: "Importations avec les partenaires",
+    tradePartnersList: "Partenaires",
+    tradeMinerals: "Minéraux du commerce",
     language: "Langue",
     theme: "Thème",
     lightMode: "Clair",
@@ -112,6 +132,16 @@ const TRANSLATIONS = {
     tradeImports: "Imports",
     countriesManagement: "Countries",
     productionManagement: "Production",
+    arabProduction: "Arab production",
+    worldProduction: "World production",
+    productionMinerals: "Production minerals",
+    tradeHeading: "Trade",
+    tradeWorldExports: "Exports with world",
+    tradeWorldImports: "Imports with world",
+    tradePartnersExports: "Exports with partners",
+    tradePartnersImports: "Imports with partners",
+    tradePartnersList: "Partners",
+    tradeMinerals: "Trade minerals",
     language: "Language",
     theme: "Theme",
     lightMode: "Light",
@@ -140,41 +170,10 @@ const ADMIN_MENU_ITEMS = [
     labelKey: "users",
   },
   {
-    key: "minerals",
-    icon: Gem,
-    href: "/minerals",
-    labelKey: "minerals",
-  },
-  {
     key: "countriesManagement",
     icon: PieChart,
     href: "/countries-management",
     labelKey: "countriesManagement",
-  },
-
-  {
-    key: "productionManagement",
-    icon: BarChart3,
-    href: "/production-management",
-    labelKey: "productionManagement",
-  },
-  {
-    key: "tradeExports",
-    icon: TrendingUp,
-    href: "/trade-exports",
-    labelKey: "tradeExports",
-  },
-  {
-    key: "tradeImports",
-    icon: TrendingUp,
-    href: "/trade-imports",
-    labelKey: "tradeImports",
-  },
-  {
-    key: "settings",
-    icon: Settings,
-    href: "/settings",
-    labelKey: "settings",
   },
 ];
 
@@ -308,6 +307,8 @@ export default function Sidebar({ isOpen, onClose, children }) {
               className="w-full h-full object-contain"
             />
           </div>
+
+          
           <h1 className="text-lg sm:text-xl font-bold" style={{ color: colors.gold }}>
             {t.dashboard}
           </h1>
@@ -384,6 +385,145 @@ export default function Sidebar({ isOpen, onClose, children }) {
                   </Link>
                 );
               })}
+            </div>
+          )}
+
+          {/* Production Heading with Subitems */}
+          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
+            <p className="px-3 sm:px-4 text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2" style={{ color: colors.gold }}>
+              {t.productionManagement}
+            </p>
+            <Link
+              to="/production/arab"
+              className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                background: colors.cardBg,
+                color: colors.ink,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <Factory size={18} sm:size={20} style={{ color: colors.gold }} />
+              <span className="text-xs sm:text-sm font-medium">{t.arabProduction}</span>
+            </Link>
+            <Link
+              to="/production/world"
+              className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                background: colors.cardBg,
+                color: colors.ink,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <Globe size={18} sm:size={20} style={{ color: colors.gold }} />
+              <span className="text-xs sm:text-sm font-medium">{t.worldProduction}</span>
+            </Link>
+            <Link
+              to="/production/minerals"
+              className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                background: colors.cardBg,
+                color: colors.ink,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <Gem size={18} sm:size={20} style={{ color: colors.gold }} />
+              <span className="text-xs sm:text-sm font-medium">{t.productionMinerals}</span>
+            </Link>
+          </div>
+
+          {/* Trade Heading with Subitems */}
+          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
+            <p className="px-3 sm:px-4 text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2" style={{ color: colors.gold }}>
+              {t.tradeHeading}
+            </p>
+            <Link
+              to="/trade/world/exports"
+              className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                background: colors.cardBg,
+                color: colors.ink,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <ArrowUp size={18} sm:size={20} style={{ color: colors.gold }} />
+              <span className="text-xs sm:text-sm font-medium">{t.tradeWorldExports}</span>
+            </Link>
+            <Link
+              to="/trade/world/imports"
+              className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                background: colors.cardBg,
+                color: colors.ink,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <ArrowDown size={18} sm:size={20} style={{ color: colors.gold }} />
+              <span className="text-xs sm:text-sm font-medium">{t.tradeWorldImports}</span>
+            </Link>
+            <Link
+              to="/trade/partners/exports"
+              className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                background: colors.cardBg,
+                color: colors.ink,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <ArrowUp size={18} sm:size={20} style={{ color: colors.gold }} />
+              <span className="text-xs sm:text-sm font-medium">{t.tradePartnersExports}</span>
+            </Link>
+            <Link
+              to="/trade/partners/imports"
+              className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                background: colors.cardBg,
+                color: colors.ink,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <ArrowDown size={18} sm:size={20} style={{ color: colors.gold }} />
+              <span className="text-xs sm:text-sm font-medium">{t.tradePartnersImports}</span>
+            </Link>
+            <Link
+              to="/trade/partners"
+              className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                background: colors.cardBg,
+                color: colors.ink,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <Users size={18} sm:size={20} style={{ color: colors.gold }} />
+              <span className="text-xs sm:text-sm font-medium">{t.tradePartnersList}</span>
+            </Link>
+            <Link
+              to="/trade/minerals"
+              className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                background: colors.cardBg,
+                color: colors.ink,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <Gem size={18} sm:size={20} style={{ color: colors.gold }} />
+              <span className="text-xs sm:text-sm font-medium">{t.tradeMinerals}</span>
+            </Link>
+          </div>
+
+          {isUserAdmin && (
+            <div className="mt-3 sm:mt-4 pt-3 sm:pt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
+              <Link
+                to="/settings"
+                className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02]"
+                style={{
+                  background: colors.cardBg,
+                  color: colors.ink,
+                  border: `1px solid ${colors.border}`,
+                }}
+              >
+                <Settings size={18} sm:size={20} style={{ color: colors.gold }} />
+                <span className="text-xs sm:text-sm font-medium">{t.settings}</span>
+              </Link>
             </div>
           )}
 
