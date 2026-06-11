@@ -14,10 +14,7 @@ const worldProductionRoutes = require("./Routes/worldProductionRoutes");
 const mineralTradeRoutes = require("./Routes/mineralTradeRoutes");
 const tradeWorldRoutes = require("./Routes/tradeWorldRoutes");
 const partnerTradeRoutes = require("./Routes/partnerTradeRoutes");
-const mineralPricesLiveRoutes = require("./Routes/mineralPricesLiveRoutes");
-const mineralPricesMonthlyRoutes = require("./Routes/mineralPricesMonthlyRoutes");
-const mineralPricesQuarterlyRoutes = require("./Routes/mineralPricesQuarterlyRoutes");
-const mineralPricesYearlyRoutes = require("./Routes/mineralPricesYearlyRoutes");
+
 
 const app = express();
 app.use(cors());
@@ -41,10 +38,7 @@ app.use("/api/world-production", worldProductionRoutes);
 app.use("/api/mineral-trade", mineralTradeRoutes);
 app.use("/api/trade-world", tradeWorldRoutes);
 app.use("/api/partner-trade", partnerTradeRoutes);
-app.use("/api/mineral-prices/live", mineralPricesLiveRoutes);
-app.use("/api/mineral-prices/monthly", mineralPricesMonthlyRoutes);
-app.use("/api/mineral-prices/quarterly", mineralPricesQuarterlyRoutes);
-app.use("/api/mineral-prices/yearly", mineralPricesYearlyRoutes);
+
 
 
 

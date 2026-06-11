@@ -104,70 +104,7 @@ CREATE TABLE IF NOT EXISTS partner_trade (
     FOREIGN KEY (mineral_trade_id) REFERENCES mineral_trade(id)
 );
 
-CREATE TABLE IF NOT EXISTS mineral_prices_live (
-    id BIGSERIAL PRIMARY KEY,
-    mineral_production_id BIGINT NOT NULL,
-    price NUMERIC(20,4),
-    change_percent NUMERIC(10,4),
-    value_change NUMERIC(20,4),
-    price_date DATE NOT NULL,
-    deleted_at TIMESTAMP NULL,
-    CONSTRAINT fk_live_price_mineral
-        FOREIGN KEY (mineral_production_id)
-        REFERENCES mineral_production(id)
-        ON DELETE CASCADE
-);
 
-CREATE TABLE IF NOT EXISTS mineral_prices_monthly (
-    id BIGSERIAL PRIMARY KEY,
-    mineral_production_id BIGINT NOT NULL,
-    price NUMERIC(20,4),
-    max_price NUMERIC(20,4),
-    min_price NUMERIC(20,4),
-    avg_price NUMERIC(20,4),
-    avg_change NUMERIC(10,4),
-    avg_value_change NUMERIC(20,4),
-    price_date DATE NOT NULL,
-    deleted_at TIMESTAMP NULL,
-    CONSTRAINT fk_monthly_price_mineral
-        FOREIGN KEY (mineral_production_id)
-        REFERENCES mineral_production(id)
-        ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS mineral_prices_quarterly (
-    id BIGSERIAL PRIMARY KEY,
-    mineral_production_id BIGINT NOT NULL,
-    price NUMERIC(20,4),
-    max_price NUMERIC(20,4),
-    min_price NUMERIC(20,4),
-    avg_price NUMERIC(20,4),
-    avg_change NUMERIC(10,4),
-    avg_value_change NUMERIC(20,4),
-    price_date DATE NOT NULL,
-    deleted_at TIMESTAMP NULL,
-    CONSTRAINT fk_quarterly_price_mineral
-        FOREIGN KEY (mineral_production_id)
-        REFERENCES mineral_production(id)
-        ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS mineral_prices_yearly (
-    id BIGSERIAL PRIMARY KEY,
-    mineral_production_id BIGINT NOT NULL,
-    price NUMERIC(20,4),
-    max_price NUMERIC(20,4),
-    min_price NUMERIC(20,4),
-    avg_price NUMERIC(20,4),
-    avg_change NUMERIC(10,4),
-    avg_value_change NUMERIC(20,4),
-    price_date DATE NOT NULL,
-    deleted_at TIMESTAMP NULL,
-    CONSTRAINT fk_yearly_price_mineral
-        FOREIGN KEY (mineral_production_id)
-        REFERENCES mineral_production(id)
-        ON DELETE CASCADE
-);
 
 CREATE INDEX IF NOT EXISTS idx_arab_production_country ON arab_production(country_id);
 CREATE INDEX IF NOT EXISTS idx_arab_production_mineral ON arab_production(mineral_production_id);
@@ -177,13 +114,3 @@ CREATE INDEX IF NOT EXISTS idx_world_production_mineral ON world_production(mine
 CREATE INDEX IF NOT EXISTS idx_trade_world_year ON trade_world(year);
 CREATE INDEX IF NOT EXISTS idx_trade_world_country ON trade_world(reporter_country_id);
 CREATE INDEX IF NOT EXISTS idx_trade_world_partner ON trade_world(partner_id);
-
-CREATE INDEX IF NOT EXISTS idx_live_price_date ON mineral_prices_live(price_date);
-CREATE INDEX IF NOT EXISTS idx_monthly_price_date ON mineral_prices_monthly(price_date);
-CREATE INDEX IF NOT EXISTS idx_quarterly_price_date ON mineral_prices_quarterly(price_date);
-CREATE INDEX IF NOT EXISTS idx_yearly_price_date ON mineral_prices_yearly(price_date);
-
-CREATE INDEX IF NOT EXISTS idx_live_price_mineral ON mineral_prices_live(mineral_production_id);
-CREATE INDEX IF NOT EXISTS idx_monthly_price_mineral ON mineral_prices_monthly(mineral_production_id);
-CREATE INDEX IF NOT EXISTS idx_quarterly_price_mineral ON mineral_prices_quarterly(mineral_production_id);
-CREATE INDEX IF NOT EXISTS idx_yearly_price_mineral ON mineral_prices_yearly(mineral_production_id);
