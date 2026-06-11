@@ -3,7 +3,8 @@ import { ArrowDownWideNarrow, CalendarDays, Search } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
-import { getMineralProduction } from "../services/mineralProductionService";
+// Service removed — stub local function to avoid external service usage in pages
+const getMineralProduction = async () => [];
 import { LanguageContext } from "../App";
 
 

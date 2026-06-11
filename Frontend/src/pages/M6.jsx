@@ -5,9 +5,10 @@ import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { LanguageContext, ThemeContext } from "../App";
 
-import { getCountries } from "../services/countryService";
-import { getMinerals } from "../services/mineralService";
-import { getTradeTransactionsByType } from "../services/tradeTransactionService";
+// Services removed — local stubs to avoid external service usage in pages
+const getCountries = async () => [];
+const getMinerals = async () => [];
+const getTradeTransactionsByType = async () => [];
 
 const DEFAULT_COUNTRY = "ma";
 const ALL_COUNTRIES_VALUE = "all";

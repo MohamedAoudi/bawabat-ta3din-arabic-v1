@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, refreshCurrentUser } from "../services/authService";
-import { createCountry, deleteCountry, getCountries, updateCountry } from "../services/countryService";
+
+// countryService removed — local stubs to avoid external service usage in pages
+const createCountry = async () => null;
+const deleteCountry = async () => null;
+const getCountries = async () => [];
+const updateCountry = async () => null;
 import { exportCountriesExcel, exportCountriesTemplateExcel, parseCountriesExcelFile } from "../utils/countryExcel";
 import { getArabCountryFlagUrl } from "../utils/arabCountryFlags";
 import { Check, ChevronLeft, ChevronRight, Download, Edit, FileSpreadsheet, Flag, Plus, Search, Trash2, Upload, X } from "lucide-react";

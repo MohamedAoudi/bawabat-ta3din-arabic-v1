@@ -27,7 +27,8 @@ import {
 import { LanguageContext, ThemeContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
-import { getCountries } from "../services/countryService";
+// countryService removed — local stub to avoid external service usage in pages
+const getCountries = async () => [];
 import i7 from "../assets/i-7.png";
 import im1 from "../assets/وزارة-الصناعة-والمعادن-دولة-ليبيا-removebg-preview.png";
 import im2 from "../assets/وزارة-الصناعة-والتجارة-الجمهورية-اليمنية-removebg-preview.png";

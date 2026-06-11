@@ -3,15 +3,14 @@ import { useNavigate } from "react-router-dom";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, refreshCurrentUser } from "../services/authService";
-import {
-  createMineralProduction,
-  deleteMineralProduction,
-  getMineralProduction,
-  updateMineralProduction,
-} from "../services/mineralProductionService";
-import { getCountries } from "../services/countryService";
-import { getMinerals } from "../services/mineralService";
-import { getYears } from "../services/yearService";
+// Services removed — local stubs to avoid external service usage in pages
+const createMineralProduction = async () => null;
+const deleteMineralProduction = async () => null;
+const getMineralProduction = async () => [];
+const updateMineralProduction = async () => null;
+const getCountries = async () => [];
+const getMinerals = async () => [];
+const getYears = async () => [];
 import {
   dedupeProductionPayloads,
   exportProductionExcel,

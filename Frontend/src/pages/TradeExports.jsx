@@ -3,15 +3,14 @@ import { useNavigate } from "react-router-dom";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, refreshCurrentUser } from "../services/authService";
-import {
-  createTradeTransaction,
-  deleteTradeTransaction,
-  getTradeTransactions,
-  updateTradeTransaction,
-} from "../services/tradeTransactionService";
-import { getCountries } from "../services/countryService";
-import { getMinerals } from "../services/mineralService";
-import { getYears } from "../services/yearService";
+// Services removed — local stubs to avoid external service usage in pages
+const createTradeTransaction = async () => null;
+const deleteTradeTransaction = async () => null;
+const getTradeTransactions = async () => [];
+const updateTradeTransaction = async () => null;
+const getCountries = async () => [];
+const getMinerals = async () => [];
+const getYears = async () => [];
 import { Check, ChevronLeft, ChevronRight, Edit, Plus, Search, Ship, Trash2, X } from "lucide-react";
 
 const PAGE_SIZE = 15;

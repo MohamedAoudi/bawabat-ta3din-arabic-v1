@@ -2,10 +2,12 @@
 import { useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
 import { getCurrentUser, isAdmin, refreshCurrentUser } from "../services/authService";
-import { getTradeTransactions } from "../services/tradeTransactionService";
-import { getMinerals } from "../services/mineralService";
-import { getMineralProduction } from "../services/mineralProductionService";
-import { getCountries } from "../services/countryService";
+
+// Service calls removed per request — replace with local stubs that return empty results.
+const getTradeTransactions = async () => [];
+const getMinerals = async () => [];
+const getMineralProduction = async () => [];
+const getCountries = async () => [];
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { User, Users, TrendingUp, TrendingDown, BarChart3, PieChart, Activity, DollarSign } from "lucide-react";
 import Chart from "chart.js/auto";

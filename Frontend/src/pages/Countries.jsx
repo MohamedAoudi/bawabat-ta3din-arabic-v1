@@ -14,12 +14,13 @@ import { TreemapController, TreemapElement } from "chartjs-chart-treemap";
 import { LanguageContext, ThemeContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
-import { getCountries } from "../services/countryService";
-import { getYears } from "../services/yearService";
-import { getMineralProduction } from "../services/mineralProductionService";
-import { getTradeTransactions } from "../services/tradeTransactionService";
-import { getTradePartners } from "../services/tradePartnerService";
-import { getMinerals } from "../services/mineralService";
+// Services removed — provide local stubs to avoid external service usage in pages
+const getCountries = async () => [];
+const getYears = async () => [];
+const getMineralProduction = async () => [];
+const getTradeTransactions = async () => [];
+const getTradePartners = async () => [];
+const getMinerals = async () => [];
 import { dataByMineral as staticDataByMineral, mineralUnits as staticMineralUnits } from "./M1";
 import { countryFlags, ISO3_TO_ISO2, normalizeCountryCode } from "../utils/arabCountryFlags";
 

@@ -3,9 +3,11 @@ import { Boxes, ChartLine, Flag } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
-import { getMineralProduction } from "../services/mineralProductionService";
+// Services removed — use local stubs to avoid external service usage in pages
+const getMineralProduction = async () => [];
+const getCountries = async () => [];
+const getMinerals = async () => [];
 import { LanguageContext } from "../App";
-import { getCountries, getMinerals } from "../services";
 
 const PAGE_TRANSLATIONS = {
   ar: {

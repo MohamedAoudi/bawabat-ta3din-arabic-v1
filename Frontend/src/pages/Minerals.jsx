@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { getCurrentUser, refreshCurrentUser } from "../services/authService";
-import { createMineral, deleteMineral, getMinerals, updateMineral } from "../services/mineralService";
+
+// mineralService removed — local stubs to avoid external service usage in pages
+const createMineral = async () => null;
+const deleteMineral = async () => null;
+const getMinerals = async () => [];
+const updateMineral = async () => null;
 import { exportMineralsExcel, exportMineralsTemplateExcel, parseMineralsExcelFile } from "../utils/mineralExcel";
 import { Check, ChevronLeft, ChevronRight, Download, Edit, FileSpreadsheet, Gem, Plus, Search, Trash2, Upload, X } from "lucide-react";
 
