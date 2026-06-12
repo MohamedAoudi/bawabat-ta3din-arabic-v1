@@ -5,6 +5,7 @@ const pool = require("./db");
 
 const path = require("path");
 const { runMigrations } = require("./migrate");
+const { seedOnStartup } = require("./seed");
 const userRoutes = require("./Routes/userRoutes");
 const countryRoutes = require("./Routes/countryRoutes");
 const mineralProductionRoutes = require("./Routes/mineralProductionRoutes");
@@ -46,6 +47,7 @@ async function startServer() {
   try {
     await pool.query("SELECT 1");
     await runMigrations();
+    await seedOnStartup();
 
     app.listen(5000, () => {
       console.log("Server running on port 5000");
