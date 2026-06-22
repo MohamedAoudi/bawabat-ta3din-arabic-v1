@@ -27,6 +27,7 @@ import {
 import { LanguageContext, ThemeContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
+import ChatbotModal from "../components/ChatbotModal";
 // countryService removed — local stub to avoid external service usage in pages
 const getCountries = async () => [];
 import i7 from "../assets/i-7.png";
@@ -1151,6 +1152,7 @@ const Home = () => {
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [heroSearchQuery, setHeroSearchQuery] = useState("");
   const [navCountriesForSearch, setNavCountriesForSearch] = useState([]);
+  const [chatbotOpen, setChatbotOpen] = useState(false);
   const modalSearchInputRef = useRef(null);
   const portalStats = useMemo(() => buildPortalStats(), []);
   const kpiData = useMemo(() => buildKpiData(labels), [labels]);
@@ -1285,7 +1287,7 @@ const Home = () => {
     return () => window.clearInterval(timer);
   }, [sponsorSlides.length, sponsorPaused]);
 
-  const handleChatbotClick = () => alert(labels.chatbotAlert);
+  const handleChatbotClick = () => setChatbotOpen(true);
 
   return (
     <div className="min-h-screen home-page" dir={isArabic ? "rtl" : "ltr"} lang={language}
@@ -2051,9 +2053,10 @@ border-radius:13px !important;
           [isArabic ? "right" : "left"]:24,
           zIndex:990,
           display:"flex",
+          flexDirection: isArabic ? "row-reverse" : "row",
           alignItems:"center",
           gap:12,
-          padding:"10px 16px 10px 12px",
+          padding: isArabic ? "10px 12px 10px 16px" : "10px 16px 10px 12px",
           borderRadius:13,
           cursor:"pointer",
           background:isDarkMode ? "#0b2922" : "var(--forest)",
@@ -2068,6 +2071,9 @@ border-radius:13px !important;
           <span style={{ fontSize:"0.7rem", color:isDarkMode ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.5)", marginTop:2 }}>{labels.floatingBotSubtitle}</span>
         </div>
       </button>
+
+      {/* Chatbot Modal */}
+      <ChatbotModal isOpen={chatbotOpen} onClose={() => setChatbotOpen(false)} />
 
     </div>
   );

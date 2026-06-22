@@ -6,11 +6,18 @@ from typing import AsyncGenerator
 
 import httpx
 
-from src.chatbot.config import LIGHTRAG_BASE_URL, LIGHTRAG_MODE, LIGHTRAG_TIMEOUT
+from src.chatbot.config import LIGHTRAG_BASE_URL, LIGHTRAG_MODE, LIGHTRAG_TIMEOUT, OPENAI_MODEL, get_openai_client
 from src.chatbot.core.events import TokenEvent
 from src.chatbot.i18n import t
 
 logger = logging.getLogger(__name__)
+
+_FALLBACK_SYSTEM = (
+    "You are a helpful assistant for AMIP, the Arab Mining Indicators Portal, "
+    "covering mining and minerals data for 21 Arab countries. "
+    "Answer the user's question clearly and concisely based on your knowledge. "
+    "If you don't know, say so honestly."
+)
 
 
 def _query_endpoint() -> str:
@@ -52,6 +59,24 @@ def _build_payload(
     return payload
 
 
+async def _openai_fallback(message: str, language: str, history: list[dict] | None) -> str:
+    lang_instruction = t("rag_lang_instruction", language)
+    messages = [{"role": "system", "content": f"{_FALLBACK_SYSTEM} {lang_instruction}"}]
+    if history:
+        for turn in history[-4:]:
+            if turn.get("content"):
+                messages.append({"role": turn["role"], "content": turn["content"]})
+    messages.append({"role": "user", "content": message})
+    client = get_openai_client()
+    response = await client.chat.completions.create(
+        model=OPENAI_MODEL,
+        temperature=0.3,
+        max_tokens=1024,
+        messages=messages,
+    )
+    return response.choices[0].message.content.strip()
+
+
 async def query_rag(message: str, language: str, history: list[dict] | None = None) -> str:
     payload = _build_payload(message, language, history)
     try:
@@ -66,11 +91,20 @@ async def query_rag(message: str, language: str, history: list[dict] | None = No
 
         return answer or t("rag_empty", language)
 
-    except httpx.TimeoutException:
-        return t("rag_unavailable", language)
+    except (httpx.TimeoutException, httpx.ConnectError):
+        logger.warning("[RAG] LightRAG unavailable, falling back to OpenAI")
+        try:
+            return await _openai_fallback(message, language, history)
+        except Exception as exc2:
+            logger.error("[RAG FALLBACK ERROR] %s", exc2)
+            return t("rag_unavailable", language)
     except Exception as exc:
         logger.error("[RAG ERROR] %s", exc)
-        return t("rag_unavailable", language)
+        try:
+            return await _openai_fallback(message, language, history)
+        except Exception as exc2:
+            logger.error("[RAG FALLBACK ERROR] %s", exc2)
+            return t("rag_unavailable", language)
 
 
 async def query_rag_stream(
@@ -115,10 +149,11 @@ async def query_rag_stream(
                             yield TokenEvent(line + " ")
 
     except Exception as exc:
-        logger.warning("[RAG STREAM] Falling back to non-streaming (%s: %s)", type(exc).__name__, exc)
+        logger.warning("[RAG STREAM] Falling back (%s: %s)", type(exc).__name__, exc)
         try:
             answer = await query_rag(message, language, history)
             if answer:
                 yield TokenEvent(answer)
         except Exception as exc2:
-            logger.warning("[RAG STREAM] Fallback also failed: %s", exc2, exc_info=True)
+            logger.warning("[RAG STREAM] All fallbacks failed: %s", exc2, exc_info=True)
+            yield TokenEvent(t("rag_unavailable", language))
