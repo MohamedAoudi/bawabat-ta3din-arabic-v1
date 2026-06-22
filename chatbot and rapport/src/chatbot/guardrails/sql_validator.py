@@ -3,68 +3,22 @@ from __future__ import annotations
 import re
 
 ALLOWED_TABLES: frozenset[str] = frozenset([
+    # New simplified AMIP schema (public namespace).
+    "countries",
+    "mineral_production",
+    "trade_partners",
+    "arab_production",
+    "world_production",
+    "mineral_trade",
+    "trade_world",
+    "partner_trade",
+    # Legacy warehouse schema support (for backwards compatibility).
     # Chatbot-facing V2 reporting views.
-    "v_arab_production",
-    "v_world_production",
-    "v_production_vs_world",
-    "v_trade_world",
-    "v_bilateral_trade",
-    "v_country_trade_summary",
-    "v_top_arab_producers",
-    "v_data_quality_summary",
-    "v_production_by_canonical_mineral",
-    "v_world_production_by_canonical_mineral",
-    "v_trade_by_canonical_mineral",
-    "v_bilateral_trade_partner_summary",
-    "v_price_ticks_by_canonical_mineral",
-    "v_price_daily_by_canonical_mineral",
-    "v_price_monthly_by_canonical_mineral",
-    "v_price_quarterly_by_canonical_mineral",
-    "v_price_yearly_by_canonical_mineral",
-    "v_reserves_by_canonical_mineral",
-    "v_country_mineral_year_summary",
-    "v_mineral_year_price_summary",
-    # Dimensions.
-    "dim_time",
-    "dim_countries",
-    "dim_country_aliases",
-    "dim_minerals",
-    "dim_canonical_minerals",
-    "dim_mineral_aliases",
-    "dim_trade_products",
-    "dim_hs_codes",
-    "dim_partners",
-    "dim_units",
-    "dim_sources",
-    "dim_price_assets",
-    # Facts.
-    "fact_arab_production",
-    "fact_world_production",
-    "fact_trade_world",
-    "fact_bilateral_trade",
-    "fact_mineral_price_ticks",
-    "fact_mineral_reserves",
-    # Aggregates and audit tables.
-    "agg_arab_production_by_country_mineral_year",
-    "agg_world_production_by_mineral_year",
-    "agg_trade_world_by_country_product_year_flow",
-    "agg_bilateral_trade_by_country_partner_year_flow",
-    "agg_country_year_trade_totals",
-    "agg_mineral_price_monthly",
-    "agg_mineral_price_quarterly",
-    "agg_mineral_price_yearly",
-    "agg_mineral_price_daily",
-    "agg_reserves_by_country_mineral_year",
-    # Canonical mapping bridges.
-    "bridge_dim_minerals_canonical",
-    "bridge_trade_products_canonical",
-    "bridge_hs_codes_canonical",
-    "bridge_price_assets_canonical",
-    "etl_load_runs",
-    "data_quality_issues",
+   
 ])
 
 ALLOWED_SCHEMAS: frozenset[str] = frozenset([
+    "public",  # New simplified AMIP schema
     "minerals",
     "mart_production",
     "mart_trade",

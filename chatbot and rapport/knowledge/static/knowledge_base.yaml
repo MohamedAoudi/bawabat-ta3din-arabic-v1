@@ -1,0 +1,93 @@
+entries:
+  - id: "what-is-amip"
+    keywords:
+      - "AMIP"
+      - "what is AMIP"
+      - "about AMIP"
+      - "Arab Minerals Intelligence Platform"
+      - "منصة الذكاء المعدني العربية"
+      - "ما هي AMIP"
+    answer:
+      en: "AMIP is the Arab Minerals Intelligence Platform, a comprehensive data warehouse and analytics system for tracking mineral production, trade, and economic indicators across Arab nations."
+      ar: "AMIP هي منصة الذكاء المعدني العربية، وهي نظام شامل لتخزين البيانات والتحليلات لتتبع إنتاج المعادن والتجارة والمؤشرات الاقتصادية عبر الدول العربية."
+      fr: "AMIP est la Plateforme d'Intelligence Minière Arabe, un système complet d'entrepôt de données et d'analyse pour suivre la production minière, le commerce et les indicateurs économiques dans les pays arabes."
+
+  - id: "minerals-covered"
+    keywords:
+      - "what minerals"
+      - "which minerals"
+      - "covered minerals"
+      - "available minerals"
+      - "phosphate"
+      - "copper"
+      - "gold"
+      - "oil"
+      - "natural gas"
+      - "المعادن المتوفرة"
+      - "أي معادن"
+    answer:
+      en: "AMIP covers major Arab minerals including phosphate, copper, gold, oil, natural gas, potash, sulfur, and rare earth elements."
+      ar: "تغطي منصة AMIP المعادن العربية الرئيسية بما في ذلك الفوسفات والنحاس والذهب والنفط والغاز الطبيعي والبوتاس والكبريت والعناصر الأرضية النادرة."
+      fr: "AMIP couvre les principaux minéraux arabes, notamment le phosphate, le cuivre, l'or, le pétrole, le gaz naturel, la potasse, le soufre et les terres rares."
+
+  - id: "data-sources"
+    keywords:
+      - "data source"
+      - "where data"
+      - "data from"
+      - "sources"
+      - "bilateral"
+      - "trade data"
+      - "production data"
+      - "مصادر البيانات"
+      - "من أين البيانات"
+    answer:
+      en: "AMIP integrates data from multiple sources including bilateral trade records, national statistics, commodity exchanges, and international trade organizations."
+      ar: "تدمج منصة AMIP البيانات من مصادر متعددة بما في ذلك سجلات التجارة الثنائية والإحصائيات الوطنية وبورصات السلع والمنظمات التجارية الدولية."
+      fr: "AMIP intègre les données de plusieurs sources, notamment les enregistrements du commerce bilatéral, les statistiques nationales, les bourses de marchandises et les organisations commerciales internationales."
+
+  - id: "time-period"
+    keywords:
+      - "time period"
+      - "year range"
+      - "years available"
+      - "historical data"
+      - "time frame"
+      - "when data"
+      - "الفترة الزمنية"
+      - "السنوات"
+    answer:
+      en: "AMIP contains historical data spanning multiple decades, with detailed records available from the 1990s onwards for most minerals and trade flows."
+      ar: "تحتوي منصة AMIP على بيانات تاريخية تمتد لعقود متعددة، مع وجود سجلات تفصيلية متاحة من التسعينيات فصاعدا لمعظم المعادن وتدفقات التجارة."
+      fr: "AMIP contient des données historiques couvrant plusieurs décennies, avec des enregistrements détaillés disponibles à partir des années 1990 pour la plupart des minéraux et flux commerciaux."
+
+  - id: "help-search"
+    keywords:
+      - "how to search"
+      - "how to query"
+      - "how to ask"
+      - "help"
+      - "guide"
+      - "tutorial"
+      - "كيفية البحث"
+      - "كيف أسأل"
+      - "مساعدة"
+    answer:
+      en: "You can ask questions about mineral production, trade flows, country comparisons, and trends. For example: 'What was Saudi Arabia's phosphate production in 2022?' or 'Compare copper exports between UAE and Egypt'."
+      ar: "يمكنك طرح أسئلة حول إنتاج المعادن وتدفقات التجارة ومقارنات الدول والاتجاهات. على سبيل المثال: 'ما كان إنتاج السعودية من الفوسفات في 2022؟' أو 'قارن صادرات النحاس بين الإمارات ومصر'."
+      fr: "Vous pouvez poser des questions sur la production minière, les flux commerciaux, les comparaisons entre pays et les tendances. Par exemple: 'Quelle était la production de phosphate de l'Arabie Saoudite en 2022?' ou 'Comparez les exportations de cuivre entre les Émirats et l'Égypte'."
+
+  - id: "countries-covered"
+    keywords:
+      - "which countries"
+      - "Arab countries"
+      - "Arab nations"
+      - "country list"
+      - "countries included"
+      - "الدول العربية"
+      - "أي دول"
+      - "قائمة الدول"
+    answer:
+      en: "AMIP covers all Arab League member states including Saudi Arabia, UAE, Egypt, Iraq, Kuwait, Qatar, Bahrain, Oman, Yemen, Syria, Lebanon, Palestine, Jordan, and others."
+      ar: "تغطي منصة AMIP جميع دول أعضاء جامعة الدول العربية بما في ذلك السعودية والإمارات ومصر والعراق والكويت وقطر والبحرين وعمان واليمن والشام ولبنان وفلسطين والأردن وغيرها."
+      fr: "AMIP couvre tous les États membres de la Ligue arabe, y compris l'Arabie Saoudite, les Émirats, l'Égypte, l'Irak, le Koweït, le Qatar, Bahreïn, Oman, le Yémen, la Syrie, le Liban, la Palestine, la Jordanie et d'autres."

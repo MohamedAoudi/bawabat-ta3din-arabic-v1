@@ -14,7 +14,7 @@ except ModuleNotFoundError:
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine, URL
 
-from src.db_config import load_database_settings
+from src.reports.db_config import load_database_settings
 
 if TYPE_CHECKING:
     from openai import AsyncOpenAI
