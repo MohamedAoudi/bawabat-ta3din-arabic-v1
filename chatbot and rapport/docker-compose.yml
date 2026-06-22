@@ -1,0 +1,94 @@
+# AMIP — Full Stack
+# Starts: chatbot API  •  Redis  •  LightRAG
+#
+# Usage:
+#   cp .env.example .env                                   # fill in main secrets
+#   cp lightrag-server-amip/.env.example lightrag-server-amip/.env   # fill in LightRAG secrets
+#   docker compose up -d
+#
+# Services:
+#   amip-app      → http://localhost:8000   (chatbot API + /health)
+#   amip-redis    → localhost:6380          (internal cache/session store)
+#   amip-lightrag → http://localhost:9622   (RAG server)
+
+services:
+
+  # ── Chatbot API ─────────────────────────────────────────────────────────────
+  amip-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: amip-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      REDIS_URL: redis://amip-redis:6379/0
+      LIGHTRAG_BASE_URL: http://amip-lightrag:9621
+    depends_on:
+      amip-redis:
+        condition: service_healthy
+      amip-lightrag:
+        condition: service_started
+    volumes:
+      - amip_logs:/home/amip/.amip-chatbot/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # ── Redis (session store + SQL cache) ───────────────────────────────────────
+  amip-redis:
+    image: redis:7-alpine
+    container_name: amip-redis
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly yes
+      - --maxmemory 256mb
+      - --maxmemory-policy allkeys-lru
+    volumes:
+      - amip_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Redis is internal — not exposed on host. Override in .env if needed.
+    # ports:
+    #   - "6380:6379"
+
+  # ── LightRAG (RAG knowledge server) ─────────────────────────────────────────
+  amip-lightrag:
+    image: ghcr.io/hkuds/lightrag:latest
+    container_name: amip-lightrag
+    restart: unless-stopped
+    ports:
+      - "9622:9621"
+    env_file:
+      - path: lightrag-server-amip/.env
+        required: false   # copy from lightrag-server-amip/.env.example before first run
+    environment:
+      WORKING_DIR: /app/data/rag_storage
+      INPUT_DIR: /app/data/inputs
+      HOST: 0.0.0.0
+      PORT: "9621"
+      # Fallback to the main .env OpenAI key if lightrag-server-amip/.env is not present
+      LLM_BINDING_API_KEY: ${OPENAI_API_KEY:-}
+      EMBEDDING_BINDING_API_KEY: ${OPENAI_API_KEY:-}
+    volumes:
+      - amip_rag_storage:/app/data/rag_storage
+      - amip_rag_inputs:/app/data/inputs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  amip_redis_data:
+  amip_rag_storage:
+  amip_rag_inputs:
+  amip_logs:

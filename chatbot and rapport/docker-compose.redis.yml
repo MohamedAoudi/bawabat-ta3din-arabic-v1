@@ -1,0 +1,13 @@
+services:
+  amip-redis:
+    image: redis:7-alpine
+    container_name: amip-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - amip_redis_data:/data
+
+volumes:
+  amip_redis_data:

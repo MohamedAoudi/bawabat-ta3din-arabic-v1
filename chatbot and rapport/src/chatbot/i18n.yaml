@@ -1,0 +1,69 @@
+no_sql:
+  ar: "لا يمكنني إنشاء استعلام SQL لهذا السؤال. يرجى إعادة الصياغة."
+  fr: "Je ne peux pas générer de requête SQL pour cette question. Veuillez reformuler."
+  en: "I could not generate a SQL query for this question. Please rephrase."
+
+sql_blocked:
+  ar: "تم رفض الاستعلام لأسباب أمنية: {reason}"
+  fr: "La requête a été rejetée pour des raisons de sécurité : {reason}"
+  en: "Query was rejected for security reasons: {reason}"
+
+query_timeout:
+  ar: "انتهت مهلة تنفيذ الاستعلام. يرجى تضييق نطاق السؤال."
+  fr: "La requête a expiré. Veuillez affiner votre question."
+  en: "The query timed out. Please narrow your question."
+
+empty_result:
+  ar: "لم يتم العثور على نتائج لهذا الاستعلام."
+  fr: "Aucun résultat trouvé pour cette requête."
+  en: "No results found for this query."
+
+unexpected_error:
+  ar: "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."
+  fr: "Une erreur inattendue s'est produite. Veuillez réessayer."
+  en: "An unexpected error occurred. Please try again."
+
+rag_empty:
+  ar: "لم يتم العثور على معلومات ذات صلة لسؤالك."
+  fr: "Aucune information pertinente n'a été trouvée pour votre question."
+  en: "No relevant information was found for your question."
+
+rag_unavailable:
+  ar: "خدمة المعرفة الوثائقية غير متاحة حالياً. يرجى المحاولة مرة أخرى بعد لحظة أو إعادة صياغة سؤالك."
+  fr: "Le service de connaissance documentaire est actuellement indisponible. Veuillez réessayer dans un moment ou reformuler votre question."
+  en: "The document knowledge service is currently unavailable. Please try again in a moment or rephrase your question."
+
+rag_lang_instruction:
+  ar: "أجب باللغة العربية فقط."
+  fr: "Réponds uniquement en français."
+  en: "Answer in English only."
+
+out_of_scope:
+  ar: "أعتذر، يمكنني فقط الإجابة عن الأسئلة المتعلقة بقطاع التعدين والمعادن في الدول العربية، وبيانات بوابة AMIP. هل لديك سؤال آخر في هذا المجال؟"
+  fr: "Je m'excuse, je ne peux répondre qu'aux questions relatives au secteur minier, aux minéraux et aux données commerciales des pays arabes couverts par le portail AMIP. Avez-vous une autre question dans ce domaine ?"
+  en: "I apologize, I can only answer questions related to mining, minerals, and trade data for Arab countries covered by the AMIP portal. Do you have another question in this area?"
+
+no_data:
+  ar: "لم يتم العثور على نتائج لهذا الاستعلام."
+  fr: "Aucun résultat trouvé pour cette requête."
+  en: "No results found for this query."
+
+truncation_note:
+  ar: "ملاحظة: تم اقتطاع النتائج إلى أول {n} صف."
+  fr: "Remarque : les résultats ont été limités aux {n} premières lignes."
+  en: "Note: results were truncated to the first {n} rows."
+
+chart_no_data:
+  ar: "لم يتم العثور على بيانات كافية لرسم هذا المخطط."
+  fr: "Aucune donnée disponible pour ce graphique."
+  en: "No data available for this chart."
+
+chart_answer:
+  ar: "إليك {title}. يعرض المخطط البيانات المتوفرة في بوابة AMIP."
+  fr: "Voici {title}. Le graphique utilise les données disponibles sur le portail AMIP."
+  en: "Here is {title}. The chart uses available data from the AMIP portal."
+
+rate_limit_exceeded:
+  ar: "عدد كبير من الطلبات. يرجى الانتظار قليلاً قبل المحاولة مرة أخرى."
+  fr: "Trop de requêtes. Veuillez patienter un instant avant de réessayer."
+  en: "Too many requests. Please wait a moment before trying again."

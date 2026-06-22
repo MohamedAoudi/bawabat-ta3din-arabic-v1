@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMIP Chatbot — Test UI</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3250;
+      --accent: #4f8ef7;
+      --accent2: #6ee7b7;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --user-bubble: #2d3a6b;
+      --bot-bubble: #1e2535;
+      --intent-sql: #3b82f6;
+      --intent-rag: #8b5cf6;
+      --intent-chart: #f59e0b;
+      --intent-list: #10b981;
+      --danger: #ef4444;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100dvh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .logo svg { width: 28px; height: 28px; }
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+    label { font-size: 0.78rem; color: var(--muted); }
+    select {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      outline: none;
+    }
+    select:focus { border-color: var(--accent); }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .status-dot.ok { background: var(--accent2); }
+    .status-dot.err { background: var(--danger); }
+    #status-text { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── Chat area ── */
+    #chat {
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      max-width: 820px;
+      width: 100%;
+    }
+    .message.user { align-self: flex-end; }
+    .message.bot  { align-self: flex-start; }
+
+    .bubble {
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      line-height: 1.65;
+      font-size: 0.93rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .message.user .bubble {
+      background: var(--user-bubble);
+      border-bottom-right-radius: 4px;
+    }
+    .message.bot .bubble {
+      background: var(--bot-bubble);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+    .bubble[dir="rtl"] { text-align: right; font-size: 1rem; }
+
+    /* ── Intent badge ── */
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .badge-sql   { background: #1d3a6e; color: var(--intent-sql); border: 1px solid var(--intent-sql); }
+    .badge-rag   { background: #2d1b5e; color: var(--intent-rag); border: 1px solid var(--intent-rag); }
+    .badge-chart { background: #3d2600; color: var(--intent-chart); border: 1px solid var(--intent-chart); }
+    .badge-list  { background: #052e16; color: var(--intent-list); border: 1px solid var(--intent-list); }
+    .row-count { font-size: 0.75rem; color: var(--muted); }
+
+    /* ── SQL block ── */
+    details.sql-block {
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    details.sql-block summary {
+      cursor: pointer;
+      padding: 7px 12px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      background: var(--surface2);
+      user-select: none;
+      list-style: none;
+    }
+    details.sql-block summary::-webkit-details-marker { display: none; }
+    details.sql-block summary::before {
+      content: '▶ ';
+      font-size: 0.65rem;
+    }
+    details[open].sql-block summary::before { content: '▼ '; }
+    pre.sql {
+      padding: 12px;
+      font-family: 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.8rem;
+      color: #93c5fd;
+      background: #0d1424;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    /* ── Chart card ── */
+    .chart-card {
+      margin-top: 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .chart-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent2);
+      margin-bottom: 12px;
+    }
+    .chart-card canvas { max-height: 320px; }
+    .chart-table-wrap { overflow-x: auto; }
+    .chart-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    .chart-table th,
+    .chart-table td {
+      border: 1px solid var(--border);
+      padding: 7px 9px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .chart-table th {
+      color: var(--accent2);
+      background: #1e2535;
+      font-weight: 700;
+    }
+    .chart-table td.negative { color: var(--danger); font-weight: 700; }
+
+    /* ── Typing indicator ── */
+    .typing {
+      display: flex;
+      gap: 5px;
+      padding: 14px 16px;
+      background: var(--bot-bubble);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+    }
+    .typing span {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); background: var(--accent); }
+    }
+
+    /* ── Error message ── */
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.85rem;
+      padding: 10px 14px;
+      background: #2a0f0f;
+      border: 1px solid #7f1d1d;
+      border-radius: 8px;
+    }
+
+    /* ── Input area ── */
+    #input-area {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    #msg-input {
+      flex: 1;
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      resize: none;
+      min-height: 44px;
+      max-height: 140px;
+      outline: none;
+      line-height: 1.5;
+      transition: border-color 0.2s;
+    }
+    #msg-input:focus { border-color: var(--accent); }
+    #msg-input::placeholder { color: var(--muted); }
+    #send-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+      height: 44px;
+    }
+    #send-btn:hover { opacity: 0.88; }
+    #send-btn:active { transform: scale(0.97); }
+    #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Empty state ── */
+    #empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 10px;
+      color: var(--muted);
+      text-align: center;
+    }
+    #empty-state svg { width: 48px; height: 48px; opacity: 0.3; }
+    .sample-questions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 16px;
+      max-width: 600px;
+    }
+    .sample-q {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .sample-q:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Scrollbar ── */
+    #chat::-webkit-scrollbar { width: 5px; }
+    #chat::-webkit-scrollbar-track { background: transparent; }
+    #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+      <path d="M2 17l10 5 10-5"/>
+      <path d="M2 12l10 5 10-5"/>
+    </svg>
+    AMIP Chatbot
+  </div>
+  <div class="controls">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">checking…</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <label for="lang-select">Language</label>
+      <select id="lang-select">
+        <option value="en">English</option>
+        <option value="ar">Arabic</option>
+        <option value="fr">French</option>
+      </select>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <label for="user-select">User type</label>
+      <select id="user-select">
+        <option value="anonymous">Anonymous</option>
+        <option value="identified">Identified</option>
+      </select>
+    </div>
+    <button id="clear-btn" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 12px;font-size:0.8rem;cursor:pointer;" onclick="clearChat()">
+      Clear
+    </button>
+  </div>
+</header>
+
+<!-- Chat messages -->
+<div id="chat">
+  <div id="empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    <p style="font-size:1rem;color:var(--text);font-weight:500;">Ask anything about Arab mining</p>
+    <p style="font-size:0.85rem;">Production data · Trade stats · Country profiles · Charts</p>
+    <div class="sample-questions" id="samples"></div>
+  </div>
+</div>
+
+<!-- Input area -->
+<div id="input-area">
+  <textarea id="msg-input" rows="1" placeholder="Ask about mineral production, trade, rankings…"></textarea>
+  <button id="send-btn" onclick="sendMessage()">Send ↩</button>
+</div>
+
+<script>
+const API = 'http://localhost:8000';
+let sessionId = null;
+let chartInstances = {};
+let msgCount = 0;
+
+const SAMPLES = [
+  "What was Morocco's phosphate production in 2022?",
+  "Top 5 Arab countries by iron ore production in 2023",
+  "Show a chart of gold production trends by year",
+  "Compare Algeria and Mauritania iron ore exports",
+  "Which Arab countries produce copper?",
+  "ما هو إنتاج الفوسفات في المغرب عام 2023؟",
+  "Quels pays arabes produisent du phosphate?",
+  "Show me a bar chart of phosphate production by country in 2022",
+];
+
+// ── Setup ──────────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  checkHealth();
+  setInterval(checkHealth, 15000);
+
+  const samplesEl = document.getElementById('samples');
+  SAMPLES.forEach(q => {
+    const btn = document.createElement('button');
+    btn.className = 'sample-q';
+    btn.textContent = q;
+    btn.onclick = () => { document.getElementById('msg-input').value = q; sendMessage(); };
+    samplesEl.appendChild(btn);
+  });
+
+  const input = document.getElementById('msg-input');
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+  });
+});
+
+async function checkHealth() {
+  const dot = document.getElementById('status-dot');
+  const txt = document.getElementById('status-text');
+  try {
+    const r = await fetch(`${API}/health`, { signal: AbortSignal.timeout(4000) });
+    const d = await r.json();
+    dot.className = 'status-dot ok';
+    txt.textContent = `Online · ${d.backend}`;
+  } catch {
+    dot.className = 'status-dot err';
+    txt.textContent = 'Server offline';
+  }
+}
+
+function clearChat() {
+  sessionId = null;
+  chartInstances = {};
+  msgCount = 0;
+  document.getElementById('chat').innerHTML = `
+    <div id="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <p style="font-size:1rem;color:var(--text);font-weight:500;">Ask anything about Arab mining</p>
+      <p style="font-size:0.85rem;">Production data · Trade stats · Country profiles · Charts</p>
+      <div class="sample-questions" id="samples"></div>
+    </div>`;
+  const samplesEl = document.getElementById('samples');
+  SAMPLES.forEach(q => {
+    const btn = document.createElement('button');
+    btn.className = 'sample-q';
+    btn.textContent = q;
+    btn.onclick = () => { document.getElementById('msg-input').value = q; sendMessage(); };
+    samplesEl.appendChild(btn);
+  });
+}
+
+// ── Send ───────────────────────────────────────────────────────────────────
+
+async function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const lang = document.getElementById('lang-select').value;
+  const userType = document.getElementById('user-select').value;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('send-btn').disabled = true;
+
+  const empty = document.getElementById('empty-state');
+  if (empty) empty.remove();
+
+  appendUserMsg(msg, lang);
+  const typingEl = appendTyping();
+
+  try {
+    const body = { message: msg, language: lang, user_type: userType };
+    if (sessionId) body.session_id = sessionId;
+
+    const res = await fetch(`${API}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(90000),
+    });
+
+    typingEl.remove();
+    const data = await res.json();
+
+    if (!res.ok) {
+      const detail = data.detail?.[0]?.msg || data.detail || res.statusText;
+      appendError(`API error: ${detail}`);
+    } else {
+      if (data.session_id) sessionId = data.session_id;
+      appendBotMsg(data, lang);
+    }
+  } catch (e) {
+    typingEl.remove();
+    appendError(e.name === 'TimeoutError' ? 'Request timed out (90s). Try a simpler query.' : `Network error: ${e.message}`);
+  } finally {
+    document.getElementById('send-btn').disabled = false;
+    input.focus();
+  }
+}
+
+// ── Rendering ──────────────────────────────────────────────────────────────
+
+function appendUserMsg(text, lang) {
+  const div = document.createElement('div');
+  div.className = 'message user';
+  const isRtl = lang === 'ar';
+  div.innerHTML = `<div class="bubble"${isRtl ? ' dir="rtl"' : ''}>${escHtml(text)}</div>`;
+  document.getElementById('chat').appendChild(div);
+  scrollDown();
+}
+
+function appendTyping() {
+  const div = document.createElement('div');
+  div.className = 'message bot';
+  div.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
+  document.getElementById('chat').appendChild(div);
+  scrollDown();
+  return div;
+}
+
+function appendError(msg) {
+  const div = document.createElement('div');
+  div.className = 'message bot';
+  div.innerHTML = `<div class="error-msg">⚠ ${escHtml(msg)}</div>`;
+  document.getElementById('chat').appendChild(div);
+  scrollDown();
+}
+
+function appendBotMsg(data, lang) {
+  const id = `msg-${++msgCount}`;
+  const isRtl = lang === 'ar';
+  const intent = (data.intent || '').toUpperCase();
+
+  // Badge
+  const badgeClass = {SQL:'badge-sql',RAG:'badge-rag',CHART:'badge-chart',LIST:'badge-list'}[intent] || 'badge-rag';
+  const badgeHtml = `<span class="badge ${badgeClass}">${intent || 'BOT'}</span>`;
+  const rowHtml = data.row_count != null ? `<span class="row-count">${data.row_count} row${data.row_count !== 1 ? 's' : ''}</span>` : '';
+  const cacheHtml = data.from_cache ? `<span class="row-count" style="color:#f59e0b">cached</span>` : '';
+
+  // Answer text — render basic markdown bold (**text**)
+  const answerText = renderMarkdown(data.answer || '');
+
+  // SQL block
+  let sqlHtml = '';
+  if (data.sql) {
+    sqlHtml = `
+      <details class="sql-block">
+        <summary>View generated SQL</summary>
+        <pre class="sql">${escHtml(data.sql)}</pre>
+      </details>`;
+  }
+
+  // Chart placeholder (canvas rendered after DOM insert)
+  let chartHtml = '';
+  if (data.chart_data && data.chart_data.length > 0) {
+    chartHtml = `
+      <div class="chart-card">
+        <div class="chart-title">${escHtml(data.chart_title || data.answer || 'Chart')}</div>
+        <div id="viz-${id}"></div>
+      </div>`;
+  }
+
+  const div = document.createElement('div');
+  div.className = 'message bot';
+  div.innerHTML = `
+    <div class="meta">${badgeHtml}${rowHtml}${cacheHtml}</div>
+    <div class="bubble"${isRtl ? ' dir="rtl"' : ''}>${answerText}</div>
+    ${sqlHtml}
+    ${chartHtml}`;
+
+  document.getElementById('chat').appendChild(div);
+
+  // Render chart after DOM insert
+  if (data.chart_data && data.chart_data.length > 0) {
+    renderVisualization(`viz-${id}`, data);
+  }
+
+  scrollDown();
+}
+
+// ── Chart rendering ────────────────────────────────────────────────────────
+
+function renderVisualization(containerId, data) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const chartType = data.chart_type || 'bar';
+  const items = Array.isArray(data.chart_data) ? data.chart_data : [];
+
+  if (chartType === 'table') {
+    renderDataTable(container, items, data);
+    return;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.id = `chart-${containerId}`;
+  container.appendChild(canvas);
+  renderChart(canvas.id, data);
+}
+
+function getCategoryValue(item, data) {
+  if ((data.x_axis === 'year' || data.chart_type === 'line') && item.year != null) return String(item.year);
+  return String(item.label ?? item.country ?? item.product ?? item.partner ?? item.year ?? '');
+}
+
+function getNumericKeys(items, data) {
+  if (!Array.isArray(items) || items.length === 0) return [];
+  if (items.some(item => item && item.value != null && Number.isFinite(Number(item.value)))) {
+    return ['value'];
+  }
+
+  const preferred = Array.isArray(data.series) ? data.series : [];
+  const keys = new Set();
+  const blocked = new Set(['year', 'label', 'series', 'country', 'product', 'unit', 'measurement_type']);
+
+  preferred.forEach(key => {
+    if (items.some(item => Number.isFinite(Number(item?.[key])))) keys.add(key);
+  });
+
+  items.forEach(item => {
+    Object.entries(item || {}).forEach(([key, value]) => {
+      if (!blocked.has(key) && Number.isFinite(Number(value))) keys.add(key);
+    });
+  });
+
+  return Array.from(keys);
+}
+
+function renderDataTable(container, items, data) {
+  const columns = Array.from(
+    items.reduce((set, row) => {
+      Object.keys(row || {}).forEach(key => set.add(key));
+      return set;
+    }, new Set())
+  );
+
+  const table = `
+    <div class="chart-table-wrap">
+      <table class="chart-table">
+        <thead>
+          <tr>${columns.map(col => `<th>${escHtml(col)}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+          ${items.map(row => `
+            <tr>
+              ${columns.map(col => {
+                const value = row?.[col];
+                const negative = Number(value) < 0 ? ' class="negative"' : '';
+                return `<td${negative}>${escHtml(formatNum(value))}</td>`;
+              }).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+
+  container.innerHTML = table;
+}
+
+function renderChart(canvasId, data) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+
+  const chartType = data.chart_type || 'bar';
+  const items = Array.isArray(data.chart_data) ? data.chart_data : [];
+  const unit = data.unit || '';
+
+  const palette = [
+    '#4f8ef7','#6ee7b7','#f59e0b','#ef4444','#a78bfa',
+    '#34d399','#fb923c','#60a5fa','#f472b6','#fbbf24',
+  ];
+
+  let labels = [...new Set(items.map(item => getCategoryValue(item, data)).filter(Boolean))];
+  let datasets = [];
+  const uniqueLineLabels = new Set(items.map(item => item.label).filter(Boolean));
+  const uniqueLineSeries = new Set(items.map(item => item.series).filter(Boolean));
+
+  function getSeriesValue(item) {
+    if (chartType === 'line') {
+      if (item.country) return item.country;
+      if (item.series && item.series === item.label) return item.series;
+      if (item.series && item.series === item.country) return item.series;
+      if (data.x_axis === 'year' && uniqueLineLabels.size > 1 && uniqueLineSeries.size <= 1) return item.label || 'Value';
+      if (uniqueLineLabels.size > 1 && uniqueLineSeries.size > 1) return `${item.label || 'Item'} · ${item.series || 'Value'}`;
+    }
+    return item.series || item.product || item.label || 'Value';
+  }
+
+  if (chartType === 'donut') {
+    const sums = {};
+    items.forEach(item => {
+      const label = getCategoryValue(item, data);
+      const value = Number(item.value ?? 0);
+      if (!label || !Number.isFinite(value)) return;
+      sums[label] = (sums[label] || 0) + value;
+    });
+    labels = Object.keys(sums);
+    datasets = [{
+      label: data.chart_title || 'Value',
+      data: labels.map(label => sums[label]),
+      backgroundColor: labels.map((_, idx) => palette[idx % palette.length] + 'cc'),
+      borderColor: '#1a1d27',
+      borderWidth: 2,
+    }];
+  } else if (items.some(item => item.value != null)) {
+    const seriesMap = {};
+    items.forEach(item => {
+      const series = getSeriesValue(item);
+      if (!seriesMap[series]) seriesMap[series] = {};
+      seriesMap[series][getCategoryValue(item, data)] = Number(item.value);
+    });
+
+    datasets = Object.keys(seriesMap).map((series, idx) => ({
+      label: series,
+      data: labels.map(label => Number.isFinite(seriesMap[series][label]) ? seriesMap[series][label] : null),
+      backgroundColor: palette[idx % palette.length] + (chartType === 'line' ? '33' : 'cc'),
+      borderColor: palette[idx % palette.length],
+      borderWidth: chartType === 'line' ? 2 : 0,
+      tension: 0.35,
+      fill: chartType === 'line',
+      pointBackgroundColor: palette[idx % palette.length],
+    }));
+  } else {
+    const numericKeys = getNumericKeys(items, data);
+    datasets = numericKeys.map((key, idx) => ({
+      label: key,
+      data: labels.map(label => {
+        const found = items.find(item => getCategoryValue(item, data) === label);
+        const value = Number(found?.[key]);
+        return Number.isFinite(value) ? value : null;
+      }),
+      backgroundColor: palette[idx % palette.length] + (chartType === 'line' ? '33' : 'cc'),
+      borderColor: palette[idx % palette.length],
+      borderWidth: chartType === 'line' ? 2 : 0,
+      tension: 0.35,
+      fill: chartType === 'line',
+    }));
+  }
+
+  const axisOptions = chartType === 'donut' ? {} : {
+    scales: {
+      x: {
+        ticks: { color: '#64748b', maxRotation: 30 },
+        grid: { color: '#1e2535' },
+      },
+      y: {
+        ticks: {
+          color: '#64748b',
+          callback: v => formatNum(v),
+        },
+        grid: { color: '#1e2535' },
+      },
+    },
+  };
+
+  const instance = new Chart(canvas, {
+    type: chartType === 'line' ? 'line' : chartType === 'donut' ? 'doughnut' : 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: datasets.length > 1 || chartType === 'donut',
+          labels: { color: '#94a3b8', font: { size: 11 } },
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const raw = chartType === 'donut' ? ctx.parsed : ctx.parsed.y;
+              return ` ${ctx.dataset.label}: ${formatNum(raw)}${unit ? ' ' + unit : ''}`;
+            },
+          },
+        },
+      },
+      ...axisOptions,
+    },
+  });
+
+  chartInstances[canvasId] = instance;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function scrollDown() {
+  const chat = document.getElementById('chat');
+  requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; });
+}
+
+function escHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function renderMarkdown(text) {
+  return escHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^#{1,3} (.+)$/gm, '<strong>$1</strong>')
+    .replace(/\[(\d+)\]/g, '<span style="color:var(--muted);font-size:0.8em">[$1]</span>')
+    .replace(/\n/g, '<br>');
+}
+
+function formatNum(n) {
+  if (n == null) return '';
+  if (Math.abs(n) >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+  if (Math.abs(n) >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+  if (Math.abs(n) >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+# AMIP Chatbot — Production runtime dependencies
+# These are the only packages needed to run the API server.
+# For local dev / data work, use requirements.txt instead.
+#
+# Install: pip install -r requirements-prod.txt
+
+# ── Core API framework ────────────────────────────────────────────────────────
+fastapi>=0.111
+uvicorn[standard]>=0.29
+gunicorn>=22.0
+pydantic>=2.0
+
+# ── Configuration ─────────────────────────────────────────────────────────────
+python-dotenv>=1.0
+pyyaml>=6.0
+
+# ── Database ──────────────────────────────────────────────────────────────────
+psycopg2-binary>=2.9
+sqlalchemy>=2.0
+
+# ── AI / LLM ─────────────────────────────────────────────────────────────────
+openai>=1.0
+httpx>=0.27
+
+# ── Session store + caching ───────────────────────────────────────────────────
+redis>=5.0
+
+# ── Rate limiting ─────────────────────────────────────────────────────────────
+slowapi>=0.1.9
+
+# ── Metrics ───────────────────────────────────────────────────────────────────
+prometheus-fastapi-instrumentator>=6.0
+prometheus-client>=0.19
+
+# ── Report generation (used by src/reports/) ─────────────────────────────────
+reportlab>=4.0
+arabic-reshaper>=3.0
+python-bidi>=0.4
+babel>=2.12
+
+# ── Fuzzy matching (mineral name resolution) ──────────────────────────────────
+thefuzz[speedup]>=0.22
+
+# ── Chart generation ──────────────────────────────────────────────────────────
+matplotlib>=3.8
+seaborn>=0.13
+plotly>=5.18

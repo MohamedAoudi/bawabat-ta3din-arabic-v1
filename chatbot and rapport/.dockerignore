@@ -1,0 +1,61 @@
+# ── Version control ───────────────────────────────────────────────────────────
+.git
+.gitignore
+
+# ── Python caches & virtualenvs ───────────────────────────────────────────────
+__pycache__/
+*.py[codz]
+*.so
+.venv/
+venv/
+env/
+
+# ── Test & coverage ───────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+tests/
+
+# ── Data (large, not needed in container) ────────────────────────────────────
+data/
+*.xlsx
+*.csv
+*.zip
+
+# ── Generated artifacts & reports ────────────────────────────────────────────
+artifacts/
+samples/
+*.pdf
+
+# ── Developer env files ───────────────────────────────────────────────────────
+ai/07_ai_layer_CANONICAL/.venv/
+ai/07_ai_layer_CANONICAL/.idea/
+ai/07_ai_layer_CANONICAL/.pytest_cache/
+_quarantine/
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ── Documentation ─────────────────────────────────────────────────────────────
+docs/
+*.md
+*.docx
+
+# ── LightRAG server (runs as its own container) ───────────────────────────────
+lightrag-server-amip/
+
+# ── Pipeline / warehouse scripts (not needed at runtime) ─────────────────────
+pipelines/
+warehouse/
+scripts/
+archive/
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+
+# ── Secrets — env is injected at runtime, never baked into the image ──────────
+.env
+.env.*
+!.env.example

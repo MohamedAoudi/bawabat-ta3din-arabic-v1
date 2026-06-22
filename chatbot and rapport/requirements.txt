@@ -1,0 +1,49 @@
+# Database
+psycopg2-binary>=2.9
+sqlalchemy>=2.0
+
+# Data processing
+pandas>=2.0
+openpyxl>=3.1        # .xlsx reading
+numpy>=1.26
+
+# Visualisation (for chart_generator)
+matplotlib>=3.8
+seaborn>=0.13
+plotly>=5.18
+
+# Environment & config
+python-dotenv>=1.0
+
+# AI layer
+openai>=1.0
+httpx>=0.27
+# lightrag-hku>=1.0
+
+# Fuzzy string matching
+thefuzz[speedup]>=0.22
+
+# Testing
+pytest>=8.0
+pytest-cov>=4.0
+
+# Notebooks
+jupyter>=1.0
+ipykernel>=6.0
+
+# Report generation
+reportlab>=4.0
+arabic-reshaper>=3.0   # Arabic glyph shaping for ReportLab
+python-bidi>=0.4       # bidi reordering for RTL text
+babel>=2.12            # locale-aware number formatting (EN/FR/AR)
+
+# API
+fastapi>=0.111
+uvicorn[standard]>=0.29
+gunicorn>=22.0
+pydantic>=2.0
+redis>=5.0
+slowapi>=0.1.9
+pyyaml>=6.0
+prometheus-fastapi-instrumentator>=6.0
+prometheus-client>=0.19
