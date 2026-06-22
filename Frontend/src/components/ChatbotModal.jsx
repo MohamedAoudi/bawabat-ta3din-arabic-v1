@@ -129,7 +129,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
   const bgColor = isDarkMode ? "#0a2f28" : "#f5f3ef";
   const borderColor = isDarkMode ? "rgba(201,168,76,0.3)" : "rgba(8,39,33,0.1)";
   const textColor = isDarkMode ? "#efe8d4" : "#082721";
-  const mutedColor = isDarkMode ? "rgba(255,255,255,0.5)" : "rgba(8,39,33,0.5)";
+  const mutedColor = isDarkMode ? "#C9A84C" : "#C9A84C";
 
   return (
     <div
@@ -173,7 +173,7 @@ const ChatbotModal = ({ isOpen, onClose }) => {
           }}
         >
           <div>
-            <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 900, color: textColor }}>
+            <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 900, color: mutedColor }}>
               {t.title}
             </h3>
             <p style={{ margin: "4px 0 0", fontSize: "0.8rem", color: mutedColor }}>
