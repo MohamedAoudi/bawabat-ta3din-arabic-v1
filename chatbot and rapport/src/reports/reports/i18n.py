@@ -250,6 +250,11 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "fr": "Aucune donnée commerciale bilatérale trouvée pour les paramètres sélectionnés.",
         "ar": "لا توجد بيانات تجارية ثنائية للمعايير المحددة.",
     },
+    "partner_country_level_note": {
+        "en": "Note: bilateral partner shares reflect {country}'s total mineral exports across all commodities; the dataset is not split by individual mineral.",
+        "fr": "Remarque : les parts des partenaires bilatéraux reflètent l'ensemble des exportations minières de {country}, tous produits confondus ; les données ne sont pas ventilées par minéral.",
+        "ar": "ملاحظة: تعكس حصص الشركاء الثنائيين إجمالي صادرات {country} المعدنية لجميع السلع؛ والبيانات غير مُقسَّمة حسب كل معدن على حدة.",
+    },
     "no_import": {
         "en": "No import partner data found for the selected parameters.",
         "fr": "Aucune donnée sur les partenaires d'importation trouvée pour les paramètres sélectionnés.",

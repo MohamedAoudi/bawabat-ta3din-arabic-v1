@@ -7,6 +7,18 @@ export const getAllMineralTrades = async () => {
   return response.data;
 };
 
+// Trade minerals shaped as { id, name_ar, name_en, name_fr } for the
+// dashboard pages (M5/M6) whose lookups expect generic `name_*` fields.
+export const getTradeMinerals = async () => {
+  const response = await apiClient.get(resource);
+  return (Array.isArray(response.data) ? response.data : []).map((m) => ({
+    id: m.id,
+    name_ar: m.mineral_name_ar,
+    name_en: m.mineral_name_en,
+    name_fr: m.mineral_name_fr,
+  }));
+};
+
 export const getMineralTradeById = async (id) => {
   const response = await apiClient.get(`${resource}/${id}`);
   return response.data;

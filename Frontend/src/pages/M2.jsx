@@ -3,10 +3,7 @@ import { Boxes, ChartLine, Flag } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
-// Services removed — use local stubs to avoid external service usage in pages
-const getMineralProduction = async () => [];
-const getCountries = async () => [];
-const getMinerals = async () => [];
+import { getProductionAnalytics } from "../services/analyticsService";
 import { LanguageContext } from "../App";
 
 const PAGE_TRANSLATIONS = {
@@ -240,11 +237,37 @@ export default function M2Page() {
 
     async function loadLookups() {
       try {
-        const [c, m] = await Promise.all([getCountries(), getMinerals()]);
+        // Derive the country / mineral dropdowns from the production data itself,
+        // so only entities that actually have data are offered.
+        const rows = await getProductionAnalytics();
         if (cancelled) return;
 
-        setCountries(Array.isArray(c) ? c : []);
-        setMinerals(Array.isArray(m) ? m : []);
+        const countryMap = new Map();
+        const mineralMap = new Map();
+        for (const r of Array.isArray(rows) ? rows : []) {
+          if (r.country_id != null && !countryMap.has(r.country_id)) {
+            countryMap.set(r.country_id, {
+              id: r.country_id,
+              name_ar: r.country_name_ar,
+              name_en: r.country_name_en,
+              name_fr: r.country_name_fr,
+            });
+          }
+          if (r.mineral_id != null && !mineralMap.has(r.mineral_id)) {
+            mineralMap.set(r.mineral_id, {
+              id: r.mineral_id,
+              name_ar: r.mineral_name_ar,
+              name_en: r.mineral_name_en,
+              name_fr: r.mineral_name_fr,
+            });
+          }
+        }
+
+        const byName = (a, b) =>
+          String(a.name_en || a.name_ar || "").localeCompare(String(b.name_en || b.name_ar || ""));
+
+        setCountries(Array.from(countryMap.values()).sort(byName));
+        setMinerals(Array.from(mineralMap.values()).sort(byName));
 
         setCountryId((prev) => prev || "all");
         setMineralId((prev) => prev || "all");
@@ -268,7 +291,7 @@ export default function M2Page() {
       setIsLoadingTrend(true);
       setTrendError("");
       try {
-        let rows = await getMineralProduction();
+        let rows = await getProductionAnalytics();
         if (cancelled) return;
 
         if (countryId !== "all") {

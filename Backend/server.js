@@ -15,9 +15,11 @@ const worldProductionRoutes = require("./Routes/worldProductionRoutes");
 const mineralTradeRoutes = require("./Routes/mineralTradeRoutes");
 const tradeWorldRoutes = require("./Routes/tradeWorldRoutes");
 const partnerTradeRoutes = require("./Routes/partnerTradeRoutes");
+const analyticsRoutes = require("./Routes/analyticsRoutes");
 
 
 const app = express();
+const PORT = Number(process.env.PORT) || 5000;
 app.use(cors());
 app.use(express.json());
 
@@ -39,6 +41,7 @@ app.use("/api/world-production", worldProductionRoutes);
 app.use("/api/mineral-trade", mineralTradeRoutes);
 app.use("/api/trade-world", tradeWorldRoutes);
 app.use("/api/partner-trade", partnerTradeRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 
 
@@ -49,8 +52,8 @@ async function startServer() {
     await runMigrations();
     await seedOnStartup();
 
-    app.listen(5000, () => {
-      console.log("Server running on port 5000");
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
     console.error("Impossible de demarrer le serveur:", error.message);

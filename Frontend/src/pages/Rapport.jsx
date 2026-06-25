@@ -1,8 +1,14 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { LanguageContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { countryFlags } from "../utils/arabCountryFlags";
+import {
+  reportService,
+  REPORT_COUNTRY_NAMES,
+  REPORT_YEAR_MIN,
+  REPORT_YEAR_MAX,
+} from "../services/reportService";
 
 /** Arab countries with trilingual labels (matches the rest of the portal). */
 const COUNTRIES = [
@@ -62,8 +68,10 @@ const RAPPORT_TRANSLATIONS = {
     country: "الدولة",
     allCountries: "كل الدول",
     period: "الفترة الزمنية",
-    fromDate: "من تاريخ",
-    toDate: "إلى تاريخ",
+    fromYear: "من سنة",
+    toYear: "إلى سنة",
+    selectCountryFirst: "اختر دولة أولاً",
+    selectMineralFirst: "اختر معدناً أولاً",
     mineral: "المعدن",
     allMinerals: "كل المعادن",
     preferredLanguage: "اللغة المفضّلة",
@@ -72,6 +80,16 @@ const RAPPORT_TRANSLATIONS = {
     summaryTitle: "ملخّص معايير التقرير",
     backHome: "العودة إلى الرئيسية",
     any: "الكل",
+    generating: "جارٍ إنشاء التقرير…",
+    previewTitle: "معاينة التقرير",
+    download: "تنزيل ملف PDF",
+    openNewTab: "فتح في تبويب جديد",
+    errCountry: "يرجى اختيار دولة محدّدة لإنشاء التقرير.",
+    errMineral: "يرجى اختيار معدن محدّد لإنشاء التقرير.",
+    errPeriod: "يرجى تحديد فترة زمنية صالحة (من/إلى).",
+    noData: "لا تتوفّر بيانات لهذا التحديد بعد. يرجى تجربة دولة أو معدن أو فترة أخرى.",
+    errNetwork: "تعذّر الاتصال بخدمة التقارير. تأكّد من تشغيلها على المنفذ 8001.",
+    errGeneric: "تعذّر إنشاء التقرير. يرجى المحاولة مرة أخرى.",
   },
   fr: {
     badge: "Rapports intelligents",
@@ -81,8 +99,10 @@ const RAPPORT_TRANSLATIONS = {
     country: "Pays",
     allCountries: "Tous les pays",
     period: "Période",
-    fromDate: "Date de début",
-    toDate: "Date de fin",
+    fromYear: "Année de début",
+    toYear: "Année de fin",
+    selectCountryFirst: "Choisissez d'abord un pays",
+    selectMineralFirst: "Choisissez d'abord un minéral",
     mineral: "Minéral",
     allMinerals: "Tous les minéraux",
     preferredLanguage: "Langue préférée",
@@ -91,6 +111,16 @@ const RAPPORT_TRANSLATIONS = {
     summaryTitle: "Récapitulatif des critères",
     backHome: "Retour à l'accueil",
     any: "Tous",
+    generating: "Génération du rapport…",
+    previewTitle: "Aperçu du rapport",
+    download: "Télécharger le PDF",
+    openNewTab: "Ouvrir dans un nouvel onglet",
+    errCountry: "Veuillez sélectionner un pays précis pour générer le rapport.",
+    errMineral: "Veuillez sélectionner un minéral précis pour générer le rapport.",
+    errPeriod: "Veuillez choisir une période valide (de / à).",
+    noData: "Aucune donnée disponible pour cette sélection. Essayez un autre pays, minéral ou période.",
+    errNetwork: "Impossible de joindre le service de rapports. Vérifiez qu'il tourne sur le port 8001.",
+    errGeneric: "Échec de la génération du rapport. Veuillez réessayer.",
   },
   en: {
     badge: "Smart Reports",
@@ -100,8 +130,10 @@ const RAPPORT_TRANSLATIONS = {
     country: "Country",
     allCountries: "All countries",
     period: "Period",
-    fromDate: "From date",
-    toDate: "To date",
+    fromYear: "From year",
+    toYear: "To year",
+    selectCountryFirst: "Select a country first",
+    selectMineralFirst: "Select a mineral first",
     mineral: "Mineral",
     allMinerals: "All minerals",
     preferredLanguage: "Preferred language",
@@ -110,13 +142,23 @@ const RAPPORT_TRANSLATIONS = {
     summaryTitle: "Report criteria summary",
     backHome: "Back to home",
     any: "All",
+    generating: "Generating report…",
+    previewTitle: "Report preview",
+    download: "Download PDF",
+    openNewTab: "Open in new tab",
+    errCountry: "Please select a specific country to generate the report.",
+    errMineral: "Please select a specific mineral to generate the report.",
+    errPeriod: "Please choose a valid period (from / to).",
+    noData: "No data available for this selection yet. Try a different country, mineral, or period.",
+    errNetwork: "Couldn't reach the report service. Make sure it's running on port 8001.",
+    errGeneric: "Failed to generate the report. Please try again.",
   },
 };
 
 const EMPTY_FILTERS = {
   country: "all",
-  fromDate: "",
-  toDate: "",
+  yearFrom: "",
+  yearTo: "",
   mineral: "all",
   reportLanguage: "ar",
 };
@@ -128,18 +170,199 @@ const Rapport = () => {
 
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [submitted, setSubmitted] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [pdf, setPdf] = useState(null); // { url, filename }
+  // { pairs: { countryEn: { mineralEn: [yMin, yMax] } }, year_min, year_max }
+  const [availability, setAvailability] = useState(null);
+  const [fallbackMinerals, setFallbackMinerals] = useState([]); // used only if /availability is down
+  const abortRef = useRef(null);
+
+  // Load the country→mineral→year availability map on mount. This is what lets
+  // us offer only parameter combinations that produce a non-empty report. If
+  // the endpoint isn't reachable (older backend), fall back to the flat
+  // /options mineral list and skip the constraints (graceful degradation).
+  useEffect(() => {
+    reportService.getAvailability().then((avail) => {
+      if (avail?.pairs && Object.keys(avail.pairs).length) {
+        setAvailability(avail);
+        return;
+      }
+      reportService.getOptions("en").then((opts) => {
+        if (opts?.minerals?.length) setFallbackMinerals(opts.minerals);
+      });
+    });
+  }, []);
+
+  const hasAvail = !!availability?.pairs;
+  const selectedCountryEn =
+    filters.country !== "all" ? REPORT_COUNTRY_NAMES[filters.country] : null;
+
+  // Countries we can actually report on (have data). In fallback mode, allow all.
+  const availableCountryCodes = useMemo(() => {
+    if (!hasAvail) return new Set(COUNTRIES.map((c) => c.code));
+    return new Set(
+      COUNTRIES.filter((c) => availability.pairs[REPORT_COUNTRY_NAMES[c.code]]).map(
+        (c) => c.code
+      )
+    );
+  }, [hasAvail, availability]);
+
+  // Minerals to offer: narrowed to the selected country, else the union of all
+  // minerals that have data anywhere (so the dropdown is never empty pre-pick).
+  const mineralOptions = useMemo(() => {
+    if (!hasAvail) return fallbackMinerals;
+    if (selectedCountryEn && availability.pairs[selectedCountryEn]) {
+      return Object.keys(availability.pairs[selectedCountryEn]).sort();
+    }
+    const all = new Set();
+    Object.values(availability.pairs).forEach((m) =>
+      Object.keys(m).forEach((k) => all.add(k))
+    );
+    return [...all].sort();
+  }, [hasAvail, availability, selectedCountryEn, fallbackMinerals]);
+
+  // Year span for the current (country, mineral) pair → bounds the year selects
+  // so only years that actually hold data can be picked.
+  const pairSpan =
+    hasAvail && selectedCountryEn && filters.mineral !== "all"
+      ? availability.pairs[selectedCountryEn]?.[filters.mineral]
+      : null;
+  const [yearLo, yearHi] = pairSpan || [
+    availability?.year_min ?? REPORT_YEAR_MIN,
+    availability?.year_max ?? REPORT_YEAR_MAX,
+  ];
+  const yearOptions = useMemo(() => {
+    const out = [];
+    for (let y = yearLo; y <= yearHi; y++) out.push(y);
+    return out;
+  }, [yearLo, yearHi]);
+  // Years are only meaningful once a specific mineral (hence a pair) is chosen.
+  const yearsEnabled = !hasAvail || (selectedCountryEn && filters.mineral !== "all");
+
+  // Revoke the blob URL on unmount and abort any in-flight generation.
+  useEffect(
+    () => () => {
+      if (pdf?.url) URL.revokeObjectURL(pdf.url);
+      if (abortRef.current) abortRef.current.abort();
+    },
+    [pdf]
+  );
 
   const setField = (field) => (e) =>
     setFilters((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  // Span helper: the [min, max] data years for a given country code + mineral.
+  const spanFor = (code, mineral) => {
+    if (!hasAvail || code === "all" || mineral === "all") return null;
+    return availability.pairs[REPORT_COUNTRY_NAMES[code]]?.[mineral] || null;
+  };
+
+  // Country change cascades: drop a now-invalid mineral, and (re)default the
+  // year range to the pair's full data span so the default is a complete report.
+  const handleCountryChange = (code) => {
+    setFilters((prev) => {
+      const span = spanFor(code, prev.mineral);
+      if (span) {
+        return { ...prev, country: code, yearFrom: String(span[0]), yearTo: String(span[1]) };
+      }
+      const mineralStillValid =
+        !hasAvail || code === "all" || (prev.mineral !== "all" && !!availability.pairs[REPORT_COUNTRY_NAMES[code]]?.[prev.mineral]);
+      return {
+        ...prev,
+        country: code,
+        mineral: mineralStillValid ? prev.mineral : "all",
+        yearFrom: "",
+        yearTo: "",
+      };
+    });
+  };
+
+  // Mineral change defaults the year range to that pair's full span.
+  const handleMineralChange = (e) => {
+    const mineral = e.target.value;
+    setFilters((prev) => {
+      const span = spanFor(prev.country, mineral);
+      return {
+        ...prev,
+        mineral,
+        yearFrom: span ? String(span[0]) : "",
+        yearTo: span ? String(span[1]) : "",
+      };
+    });
+  };
+
+  // Keep yearTo ≥ yearFrom when the start year moves.
+  const handleYearFromChange = (e) => {
+    const v = e.target.value;
+    setFilters((prev) => ({
+      ...prev,
+      yearFrom: v,
+      yearTo: prev.yearTo && Number(prev.yearTo) >= Number(v) ? prev.yearTo : v,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+
+    // Client-side validation against the API contract: the report endpoint needs a
+    // specific country + mineral + integer year range (it has no "all" mode).
+    if (filters.country === "all") return setError(t.errCountry);
+    if (filters.mineral === "all") return setError(t.errMineral);
+    if (!filters.yearFrom || !filters.yearTo) return setError(t.errPeriod);
+
+    let yearFrom = parseInt(filters.yearFrom, 10);
+    let yearTo = parseInt(filters.yearTo, 10);
+    if (Number.isNaN(yearFrom) || Number.isNaN(yearTo)) return setError(t.errPeriod);
+    if (yearFrom > yearTo) [yearFrom, yearTo] = [yearTo, yearFrom];
+
+    const countryName = REPORT_COUNTRY_NAMES[filters.country];
+    // filters.mineral is now the exact EN name returned by /options (e.g. "Phosphate rock")
+    const mineralName = filters.mineral;
+    if (!countryName) return setError(t.errGeneric);
+
+    // Drop any previous PDF before starting a fresh run.
+    if (pdf?.url) URL.revokeObjectURL(pdf.url);
+    setPdf(null);
     setSubmitted(filters);
+    setLoading(true);
+
+    abortRef.current = new AbortController();
+    const result = await reportService.generateReport(
+      {
+        country: countryName,
+        mineral: mineralName,
+        year_from: yearFrom,
+        year_to: yearTo,
+        lang: filters.reportLanguage,
+      },
+      { signal: abortRef.current.signal }
+    );
+    setLoading(false);
+
+    if (result.aborted) return; // superseded by reset or a newer request
+    if (result.ok) {
+      setPdf({ url: URL.createObjectURL(result.blob), filename: result.filename });
+    } else if (result.status === 404) {
+      setError(t.noData);
+    } else if (result.status === 422) {
+      setError(result.detail || t.errPeriod);
+    } else if (result.status === 0) {
+      setError(t.errNetwork);
+    } else {
+      setError(t.errGeneric);
+    }
   };
 
   const handleReset = () => {
+    if (abortRef.current) abortRef.current.abort();
+    if (pdf?.url) URL.revokeObjectURL(pdf.url);
     setFilters(EMPTY_FILTERS);
     setSubmitted(null);
+    setError(null);
+    setPdf(null);
+    setLoading(false);
   };
 
   const fieldStyle = {
@@ -156,16 +379,15 @@ const Rapport = () => {
       submitted.country === "all"
         ? t.allCountries
         : labelFor(COUNTRIES.find((c) => c.code === submitted.country));
+    // submitted.mineral is now the raw EN name from the API ("Phosphate rock", etc.)
     const mineralLabel =
-      submitted.mineral === "all"
-        ? t.allMinerals
-        : labelFor(MINERALS.find((m) => m.key === submitted.mineral));
+      submitted.mineral === "all" ? t.allMinerals : submitted.mineral;
     const langLabel = labelFor(
       LANGUAGE_OPTIONS.find((l) => l.value === submitted.reportLanguage)
     );
     const period =
-      submitted.fromDate || submitted.toDate
-        ? `${submitted.fromDate || "…"} → ${submitted.toDate || "…"}`
+      submitted.yearFrom || submitted.yearTo
+        ? `${submitted.yearFrom || "…"} → ${submitted.yearTo || "…"}`
         : t.any;
     return [
       { label: t.country, value: countryLabel },
@@ -232,42 +454,55 @@ const Rapport = () => {
               </label>
               <select
                 value={filters.country}
-                onChange={setField("country")}
+                onChange={(e) => handleCountryChange(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl text-[14px] outline-none"
                 style={fieldStyle}
               >
                 <option value="all" style={{ color: "#082721" }}>
                   {t.allCountries}
                 </option>
-                {COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code} style={{ color: "#082721" }}>
-                    {labelFor(c)}
-                  </option>
-                ))}
+                {COUNTRIES.map((c) => {
+                  const enabled = availableCountryCodes.has(c.code);
+                  return (
+                    <option
+                      key={c.code}
+                      value={c.code}
+                      disabled={!enabled}
+                      style={{ color: enabled ? "#082721" : "#9ca3af" }}
+                    >
+                      {labelFor(c)}
+                    </option>
+                  );
+                })}
               </select>
 
               {/* Flags grid — 21 countries laid out on three rows */}
               <div className="grid grid-cols-7 gap-1.5 mt-3">
                 {COUNTRIES.map((c) => {
                   const active = filters.country === c.code;
+                  const enabled = availableCountryCodes.has(c.code);
                   return (
                     <button
                       type="button"
                       key={c.code}
+                      disabled={!enabled}
                       onClick={() =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          country: prev.country === c.code ? "all" : c.code,
-                        }))
+                        handleCountryChange(filters.country === c.code ? "all" : c.code)
                       }
-                      title={labelFor(c)}
+                      title={enabled ? labelFor(c) : `${labelFor(c)} — ${t.noData}`}
                       className="w-full rounded overflow-hidden transition-all"
                       style={{
                         aspectRatio: "4 / 3",
+                        cursor: enabled ? "pointer" : "not-allowed",
                         border: active
                           ? "2px solid #C9A84C"
                           : "1px solid rgba(255,255,255,0.12)",
-                        opacity: active || filters.country === "all" ? 1 : 0.4,
+                        opacity: !enabled
+                          ? 0.2
+                          : active || filters.country === "all"
+                            ? 1
+                            : 0.4,
+                        filter: enabled ? "none" : "grayscale(1)",
                         transform: active ? "scale(1.12)" : "scale(1)",
                       }}
                     >
@@ -282,52 +517,72 @@ const Rapport = () => {
               </div>
             </div>
 
-            {/* From date */}
+            {/* From year — bounded to the selected pair's data span */}
             <div>
               <label className="block text-[13px] font-semibold text-[#C9A84C] mb-2">
-                {t.fromDate}
+                {t.fromYear}
               </label>
-              <input
-                type="date"
-                value={filters.fromDate}
-                onChange={setField("fromDate")}
-                className="w-full px-4 py-3 rounded-xl text-[14px] outline-none"
-                style={{ ...fieldStyle, colorScheme: "dark" }}
-              />
+              <select
+                value={filters.yearFrom}
+                onChange={handleYearFromChange}
+                disabled={!yearsEnabled}
+                className="w-full px-4 py-3 rounded-xl text-[14px] outline-none disabled:opacity-50"
+                style={fieldStyle}
+              >
+                <option value="" style={{ color: "#082721" }}>
+                  {yearsEnabled ? "—" : t.selectMineralFirst}
+                </option>
+                {yearOptions.map((y) => (
+                  <option key={y} value={y} style={{ color: "#082721" }}>
+                    {y}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            {/* To date */}
+            {/* To year — never earlier than From year */}
             <div>
               <label className="block text-[13px] font-semibold text-[#C9A84C] mb-2">
-                {t.toDate}
+                {t.toYear}
               </label>
-              <input
-                type="date"
-                value={filters.toDate}
-                min={filters.fromDate || undefined}
-                onChange={setField("toDate")}
-                className="w-full px-4 py-3 rounded-xl text-[14px] outline-none"
-                style={{ ...fieldStyle, colorScheme: "dark" }}
-              />
+              <select
+                value={filters.yearTo}
+                onChange={setField("yearTo")}
+                disabled={!yearsEnabled}
+                className="w-full px-4 py-3 rounded-xl text-[14px] outline-none disabled:opacity-50"
+                style={fieldStyle}
+              >
+                <option value="" style={{ color: "#082721" }}>
+                  {yearsEnabled ? "—" : t.selectMineralFirst}
+                </option>
+                {yearOptions
+                  .filter((y) => !filters.yearFrom || y >= Number(filters.yearFrom))
+                  .map((y) => (
+                    <option key={y} value={y} style={{ color: "#082721" }}>
+                      {y}
+                    </option>
+                  ))}
+              </select>
             </div>
 
-            {/* Mineral */}
+            {/* Mineral — only those with data for the selected country (GET /availability) */}
             <div>
               <label className="block text-[13px] font-semibold text-[#C9A84C] mb-2">
                 {t.mineral}
               </label>
               <select
                 value={filters.mineral}
-                onChange={setField("mineral")}
-                className="w-full px-4 py-3 rounded-xl text-[14px] outline-none"
+                onChange={handleMineralChange}
+                disabled={mineralOptions.length === 0}
+                className="w-full px-4 py-3 rounded-xl text-[14px] outline-none disabled:opacity-50"
                 style={fieldStyle}
               >
                 <option value="all" style={{ color: "#082721" }}>
-                  {t.allMinerals}
+                  {mineralOptions.length === 0 ? "…" : t.allMinerals}
                 </option>
-                {MINERALS.map((m) => (
-                  <option key={m.key} value={m.key} style={{ color: "#082721" }}>
-                    {labelFor(m)}
+                {mineralOptions.map((name) => (
+                  <option key={name} value={name} style={{ color: "#082721" }}>
+                    {name}
                   </option>
                 ))}
               </select>
@@ -357,13 +612,23 @@ const Rapport = () => {
           <div className="flex flex-col sm:flex-row gap-3 mt-8">
             <button
               type="submit"
-              className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[14px] font-bold text-[#082721] transition-all hover:brightness-110"
+              disabled={loading}
+              className="flex-1 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[14px] font-bold text-[#082721] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
               style={{
                 background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
                 boxShadow: "0 4px 16px rgba(201,168,76,0.35)",
               }}
             >
-              {t.generate}
+              {loading && (
+                <span
+                  className="inline-block w-4 h-4 rounded-full animate-spin"
+                  style={{
+                    border: "2px solid rgba(8,39,33,0.35)",
+                    borderTopColor: "#082721",
+                  }}
+                />
+              )}
+              {loading ? t.generating : t.generate}
             </button>
             <button
               type="button"
@@ -402,6 +667,69 @@ const Rapport = () => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Error / no-data banner */}
+        {error && !loading && (
+          <div
+            className="w-full max-w-3xl rounded-2xl p-5 mb-8 text-center"
+            style={{
+              background: "rgba(139,37,0,0.12)",
+              border: "1px solid rgba(139,37,0,0.4)",
+            }}
+          >
+            <span className="text-[14px] font-semibold text-[#f0c9b5]">
+              {error}
+            </span>
+          </div>
+        )}
+
+        {/* PDF preview + download */}
+        {pdf && !loading && (
+          <div
+            className="w-full max-w-3xl rounded-2xl p-5 mb-8"
+            style={{
+              background: "rgba(201,168,76,0.06)",
+              border: "1px solid rgba(201,168,76,0.2)",
+            }}
+          >
+            <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+              <h2 className="text-[15px] font-bold text-[#C9A84C]">
+                {t.previewTitle}
+              </h2>
+              <div className="flex items-center gap-2">
+                <a
+                  href={pdf.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-semibold text-white/80 transition-all hover:bg-white/5"
+                  style={{ border: "1px solid rgba(201,168,76,0.3)" }}
+                >
+                  {t.openNewTab}
+                </a>
+                <a
+                  href={pdf.url}
+                  download={pdf.filename}
+                  className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-[13px] font-bold text-[#082721] transition-all hover:brightness-110"
+                  style={{
+                    background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
+                  }}
+                >
+                  {t.download}
+                </a>
+              </div>
+            </div>
+            <iframe
+              title={t.previewTitle}
+              src={pdf.url}
+              className="w-full rounded-xl"
+              style={{
+                height: "70vh",
+                border: "1px solid rgba(255,255,255,0.1)",
+                background: "#fff",
+              }}
+            />
           </div>
         )}
 

@@ -6,10 +6,27 @@ Maps user topics to the new simplified database schema.
 
 from __future__ import annotations
 
+import logging
 from collections import OrderedDict
 from collections.abc import Iterable
+from functools import lru_cache
 
 SCHEMA_NAME = "public"
+
+logger = logging.getLogger(__name__)
+
+# Fallback canonical values, used only if the DB is unreachable at prompt-build
+# time so the module still imports and degrades gracefully on a fresh server.
+_FALLBACK_COUNTRIES = [
+    "Hashemite Kingdom of Jordan", "United Arab Emirates", "Kingdom of Bahrain",
+    "Republic of Tunisia", "People's Democratic Republic of Algeria",
+    "Republic of Djibouti", "Kingdom of Saudi Arabia", "Republic of the Sudan",
+    "Syrian Arab Republic", "Federal Republic of Somalia", "Republic of Iraq",
+    "Sultanate of Oman", "State of Palestine", "State of Qatar", "State of Kuwait",
+    "Lebanese Republic", "State of Libya", "Arab Republic of Egypt",
+    "Kingdom of Morocco", "Islamic Republic of Mauritania", "Republic of Yemen",
+]
+_FALLBACK_TYPE_TRADE = ["export", "import"]
 
 # ---------------------------------------------------------------------------
 # Tables for the chatbot
@@ -149,15 +166,72 @@ _RULES_NOTE = """
 --   2. For production: use arab_production + countries + mineral_production
 --   3. For world production: use world_production + mineral_production
 --   4. For trade: use trade_world or partner_trade + countries + trade_partners + mineral_trade
---   5. Filter type_trade = 'exports' or 'imports' for trade queries
+--   5. type_trade values are SINGULAR: 'export' and 'import'. Match case-insensitively,
+--      e.g.  WHERE type_trade ILIKE 'export'
 --   6. Use production_value_base for normalized aggregations
 --   7. Always include appropriate LIMIT clause (default: 100)
 --   8. Order by year DESC for time-based queries
+--   9. NAME MATCHING — never use '=' on a name column. Country, mineral, and partner
+--      names are stored as official long forms (e.g. 'Kingdom of Morocco',
+--      'Phosphate rock'). ALWAYS match with case-insensitive ILIKE on a distinctive
+--      token, e.g.  c.name_en ILIKE '%Morocco%'  and  mp.mineral_name_en ILIKE '%phosphate%'.
+--  10. UNITS — production_value_base is ALREADY normalised to a real unit:
+--      TONNES for mass minerals and CUBIC METRES (m³) for volume minerals. Trade
+--      values (value_usd) are in US dollars (USD). When stating figures to the user,
+--      use these real units (tonnes / m³ / USD). NEVER expose internal column
+--      names (e.g. "production_value_base") or the phrase "base unit" in the answer.
 """
 
-_COUNTRY_NAMES_NOTE = """
--- Available countries are in the countries table with name_ar, name_en, name_fr
-"""
+
+@lru_cache(maxsize=1)
+def _ground_truth() -> tuple[list[str], list[str]]:
+    """Return (country_names, type_trade_values) from the live DB, cached.
+
+    Grounds the prompt in the exact stored values so the model matches reality.
+    Falls back to canonical constants if the DB is unreachable.
+    """
+    try:
+        from sqlalchemy import text
+
+        from src.chatbot.config import get_engine
+
+        with get_engine().connect() as conn:
+            countries = [
+                r[0]
+                for r in conn.execute(
+                    text("SELECT name_en FROM countries ORDER BY display_order NULLS LAST, name_en")
+                )
+                if r[0]
+            ]
+            type_trade = [
+                r[0]
+                for r in conn.execute(
+                    text(
+                        "SELECT DISTINCT type_trade FROM trade_world "
+                        "UNION SELECT DISTINCT type_trade FROM partner_trade"
+                    )
+                )
+                if r[0]
+            ]
+        if countries:
+            return countries, (type_trade or _FALLBACK_TYPE_TRADE)
+    except Exception:  # pragma: no cover - defensive, keeps prompt building alive
+        logger.warning("schema_context: DB grounding unavailable, using fallback names")
+    return _FALLBACK_COUNTRIES, _FALLBACK_TYPE_TRADE
+
+
+def _grounding_note() -> str:
+    countries, type_trade = _ground_truth()
+    country_block = "\n".join(f"--   {name}" for name in countries)
+    return (
+        "-- GROUND TRUTH — exact values stored in the database.\n"
+        "-- Use these literal country names (or ILIKE on a distinctive token):\n"
+        f"{country_block}\n"
+        "--\n"
+        f"-- type_trade values: {', '.join(repr(v) for v in type_trade)}\n"
+        "-- Mineral names are official forms (e.g. 'Phosphate rock', 'Iron ore').\n"
+        "-- When unsure of the exact mineral spelling, match with ILIKE '%token%'.\n"
+    )
 
 
 def _detect_topic(question: str) -> str:
@@ -221,6 +295,6 @@ def get_schema_for_question(question: str) -> str:
     lines.append("")
     lines.extend(_RULES_NOTE.splitlines())
     lines.append("")
-    lines.extend(_COUNTRY_NAMES_NOTE.splitlines())
+    lines.extend(_grounding_note().splitlines())
 
     return "\n".join(lines)

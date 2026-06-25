@@ -102,19 +102,22 @@ CHART_LLM_ENABLED: bool = os.getenv("CHART_LLM_ENABLED", "true").lower() == "tru
 
 CLARIFY_LABELS: dict[str, dict[str, str]] = {
     "en": {
-        "SQL":  "Show me data (SQL query)",
-        "RAG":  "Explain this (search knowledge base)",
-        "LIST": "List matching items",
+        "SQL":   "Show me data (numbers & statistics)",
+        "RAG":   "Explain this (knowledge base)",
+        "LIST":  "List matching items",
+        "CHART": "Visualize it (chart or table)",
     },
     "ar": {
-        "SQL":  "عرض البيانات (استعلام SQL)",
-        "RAG":  "شرح هذا (البحث في قاعدة المعرفة)",
-        "LIST": "قائمة العناصر المطابقة",
+        "SQL":   "عرض البيانات (أرقام وإحصاءات)",
+        "RAG":   "شرح هذا (قاعدة المعرفة)",
+        "LIST":  "قائمة العناصر المطابقة",
+        "CHART": "عرض مرئي (مخطط أو جدول)",
     },
     "fr": {
-        "SQL":  "Afficher les données (requête SQL)",
-        "RAG":  "Expliquer ceci (recherche dans la base de connaissances)",
-        "LIST": "Lister les éléments correspondants",
+        "SQL":   "Afficher les données (chiffres et statistiques)",
+        "RAG":   "Expliquer ceci (base de connaissances)",
+        "LIST":  "Lister les éléments correspondants",
+        "CHART": "Visualiser (graphique ou tableau)",
     },
 }
 

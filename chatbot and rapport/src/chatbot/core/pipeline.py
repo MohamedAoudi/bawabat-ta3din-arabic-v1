@@ -15,17 +15,29 @@ _ARABIC_RANGE = re.compile(r"[؀-ۿ]")
 _FRENCH_KEYWORDS = frozenset([
     "le", "la", "les", "des", "est", "une", "un", "dans", "de", "du",
     "que", "qui", "quels", "combien",
+    "bonjour", "bonsoir", "salut", "merci", "oui", "non", "vous", "tu",
+    "je", "nous", "votre", "parlez", "parles", "parler", "parle",
+    "français", "francais", "comment", "pourquoi", "quand", "quoi",
+    "peux", "peut", "pouvez", "pouvoir", "aide", "aidez", "montre",
+    "montrez", "est-ce", "c'est",
 ])
 _VALID_LANGUAGES = frozenset(["ar", "fr", "en"])
+_NO_SQL_SENTINELS = frozenset(["CANNOT_GENERATE", "NO_SQL"])
 
 
 def detect_language(message: str) -> str:
     if _ARABIC_RANGE.search(message):
         return "ar"
+    if re.search(r"[éèêëàâäçôöîïûùü]", message.lower()):
+        return "fr"
     words = set(re.findall(r"\b\w+\b", message.lower()))
     if words & _FRENCH_KEYWORDS:
         return "fr"
     return "en"
+
+
+def _is_no_sql(sql: str) -> bool:
+    return sql.strip().upper() in _NO_SQL_SENTINELS
 
 
 async def run_pipeline_data(message: str, language: str | None = None) -> dict:
@@ -41,7 +53,7 @@ async def run_pipeline_data(message: str, language: str | None = None) -> dict:
     schema_context = get_schema_for_question(message)
     sql = await generate_sql(message, schema_context, language)
 
-    if sql == "CANNOT_GENERATE":
+    if _is_no_sql(sql):
         return {**base, "sql": sql, "error": "cannot_generate"}
 
     base["sql"] = sql
@@ -77,7 +89,7 @@ async def run_pipeline(message: str, language: str | None = None) -> dict:
     schema_context = get_schema_for_question(message)
     sql = await generate_sql(message, schema_context, language)
 
-    if sql == "CANNOT_GENERATE":
+    if _is_no_sql(sql):
         return {**base, "answer": t("no_sql", language), "sql": sql}
 
     base["sql"] = sql

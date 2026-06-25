@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import os
+import threading
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterable
 
 import psycopg2
 import psycopg2.extras
+import psycopg2.pool
 from psycopg2 import sql
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
@@ -62,6 +65,58 @@ def get_cursor(commit: bool = True, dbname: str | None = None):
         raise
     finally:
         conn.close()
+
+
+# ─── Read-only connection pool (hot read paths: report API) ───────────────────
+# The plain get_cursor() above opens a fresh psycopg2 connection per call and
+# closes it — fine for one-shot ETL scripts, but on a long-lived web service it
+# re-pays connection setup (≈5–100 ms, worse over TLS/remote) on *every* request.
+# get_pooled_cursor() reuses connections from a process-local pool instead.
+# Read-only / autocommit, so it must only be used for SELECT-only paths.
+_READ_POOL: psycopg2.pool.ThreadedConnectionPool | None = None
+_READ_POOL_LOCK = threading.Lock()
+_READ_POOL_MAXCONN = int(os.getenv("DB_READ_POOL_MAXCONN", "8"))
+
+
+def _read_pool() -> psycopg2.pool.ThreadedConnectionPool:
+    global _READ_POOL
+    if _READ_POOL is None:
+        with _READ_POOL_LOCK:
+            if _READ_POOL is None:
+                _READ_POOL = psycopg2.pool.ThreadedConnectionPool(
+                    1, _READ_POOL_MAXCONN, **DB
+                )
+    return _READ_POOL
+
+
+@contextmanager
+def get_pooled_cursor():
+    """Read-only cursor backed by a process-local connection pool.
+
+    For SELECT-only hot paths (e.g. the report API). Connections are autocommit;
+    a connection that raises is discarded (closed) rather than returned to the
+    pool, so a broken socket never poisons a later request.
+    """
+    pool = _read_pool()
+    conn = pool.getconn()
+    discard = False
+    try:
+        conn.autocommit = True
+        with conn.cursor() as cur:
+            yield cur
+    except Exception:
+        discard = True
+        raise
+    finally:
+        pool.putconn(conn, close=discard)
+
+
+def close_read_pool() -> None:
+    """Close all pooled connections (call on service shutdown)."""
+    global _READ_POOL
+    if _READ_POOL is not None:
+        _READ_POOL.closeall()
+        _READ_POOL = None
 
 
 def create_database_if_absent() -> bool:

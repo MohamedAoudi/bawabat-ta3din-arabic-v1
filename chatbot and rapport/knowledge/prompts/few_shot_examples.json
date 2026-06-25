@@ -2,12 +2,12 @@
   {
     "question_en": "What was the total phosphate production in Saudi Arabia in 2022?",
     "question_ar": "ما هو إجمالي إنتاج الفوسفات في المملكة العربية السعودية في عام 2022؟",
-    "sql": "SELECT SUM(ap.production_value_base) as total_production FROM arab_production ap JOIN countries c ON ap.country_id = c.id JOIN mineral_production mp ON ap.mineral_production_id = mp.id WHERE c.name_en = 'Saudi Arabia' AND mp.mineral_name_en = 'Phosphate' AND ap.year = 2022"
+    "sql": "SELECT SUM(ap.production_value_base) as total_production FROM arab_production ap JOIN countries c ON ap.country_id = c.id JOIN mineral_production mp ON ap.mineral_production_id = mp.id WHERE c.name_en ILIKE '%Saudi Arabia%' AND mp.mineral_name_en ILIKE '%phosphate%' AND ap.year = 2022"
   },
   {
     "question_en": "Compare copper exports between UAE and Egypt in 2023",
     "question_ar": "قارن صادرات النحاس بين الإمارات ومصر في عام 2023",
-    "sql": "SELECT c.name_en, SUM(tw.value_usd) as total_exports FROM trade_world tw JOIN countries c ON tw.reporter_country_id = c.id JOIN mineral_trade mt ON tw.mineral_trade_id = mt.id WHERE mt.mineral_name_en = 'Copper' AND tw.type_trade = 'exports' AND tw.year = 2023 AND c.name_en IN ('United Arab Emirates', 'Egypt') GROUP BY c.name_en ORDER BY total_exports DESC"
+    "sql": "SELECT c.name_en, SUM(tw.value_usd) as total_exports FROM trade_world tw JOIN countries c ON tw.reporter_country_id = c.id JOIN mineral_trade mt ON tw.mineral_trade_id = mt.id WHERE mt.mineral_name_en ILIKE '%copper%' AND tw.type_trade ILIKE 'export' AND tw.year = 2023 AND (c.name_en ILIKE '%Emirates%' OR c.name_en ILIKE '%Egypt%') GROUP BY c.name_en ORDER BY total_exports DESC"
   },
   {
     "question_en": "Which Arab country has the highest mineral production diversity?",
@@ -17,11 +17,11 @@
   {
     "question_en": "What is the trend of gold production in Arab countries over the last 5 years?",
     "question_ar": "ما هو اتجاه إنتاج الذهب في الدول العربية على مدى السنوات الخمس الماضية؟",
-    "sql": "SELECT ap.year, SUM(ap.production_value_base) as total_gold_production FROM arab_production ap JOIN mineral_production mp ON ap.mineral_production_id = mp.id WHERE mp.mineral_name_en = 'Gold' AND ap.year >= EXTRACT(YEAR FROM CURRENT_DATE) - 5 GROUP BY ap.year ORDER BY ap.year DESC"
+    "sql": "SELECT ap.year, SUM(ap.production_value_base) as total_gold_production FROM arab_production ap JOIN mineral_production mp ON ap.mineral_production_id = mp.id WHERE mp.mineral_name_en ILIKE '%gold%' AND ap.year >= EXTRACT(YEAR FROM CURRENT_DATE) - 5 GROUP BY ap.year ORDER BY ap.year DESC"
   },
   {
     "question_en": "List the top 5 trade partners for Iraq in 2023",
     "question_ar": "اسرد أفضل 5 شركاء تجاريين للعراق في عام 2023",
-    "sql": "SELECT tp.name_en, SUM(pt.value_usd) as total_trade FROM partner_trade pt JOIN countries c ON pt.reporter_country_id = c.id JOIN trade_partners tp ON pt.partner_id = tp.id WHERE c.name_en = 'Iraq' AND pt.year = 2023 GROUP BY tp.name_en ORDER BY total_trade DESC LIMIT 5"
+    "sql": "SELECT tp.name_en, SUM(pt.value_usd) as total_trade FROM partner_trade pt JOIN countries c ON pt.reporter_country_id = c.id JOIN trade_partners tp ON pt.partner_id = tp.id WHERE c.name_en ILIKE '%Iraq%' AND pt.type_trade ILIKE 'export' AND pt.year = 2023 GROUP BY tp.name_en ORDER BY total_trade DESC LIMIT 5"
   }
 ]

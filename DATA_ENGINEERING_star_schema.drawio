@@ -1,0 +1,79 @@
+<mxfile host="app.diagrams.net" agent="AMIP-data-engineering" version="24.0.0">
+  <diagram name="AMIP Star Schema" id="amip-star-schema">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1450" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ===================== TITLE ===================== -->
+        <mxCell id="title" value="AMIP — amip_db.public  ·  Star Schema (dimensions = blue, facts = amber)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="10" width="760" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== DIMENSIONS ===================== -->
+        <mxCell id="countries" value="&lt;b&gt;countries&lt;/b&gt;&lt;br&gt;&lt;br&gt;PK id&lt;br&gt;UK iso_code&lt;br&gt;name_en / name_fr / name_ar&lt;br&gt;display_order" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="60" width="240" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mineral_production" value="&lt;b&gt;mineral_production&lt;/b&gt;&lt;br&gt;&lt;i&gt;111 fine-grained minerals&lt;/i&gt;&lt;br&gt;&lt;br&gt;PK id&lt;br&gt;hs_codes&lt;br&gt;mineral_name_en / fr / ar" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="320" width="240" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mineral_trade" value="&lt;b&gt;mineral_trade&lt;/b&gt;&lt;br&gt;&lt;i&gt;25 commodity groups + sentinel&lt;/i&gt;&lt;br&gt;&lt;br&gt;PK id&lt;br&gt;hs_codes (TEXT)&lt;br&gt;mineral_name_en / fr / ar" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="320" width="240" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="trade_partners" value="&lt;b&gt;trade_partners&lt;/b&gt;&lt;br&gt;&lt;i&gt;195 partners (World + 194 countries)&lt;/i&gt;&lt;br&gt;&lt;br&gt;PK id&lt;br&gt;name_en / fr / ar&lt;br&gt;partner_category_en / fr / ar" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="600" width="240" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== FACTS ===================== -->
+        <mxCell id="arab_production" value="&lt;b&gt;arab_production&lt;/b&gt;  (FACT)&lt;br&gt;&lt;i&gt;2,881 · country × mineral × year&lt;/i&gt;&lt;br&gt;&lt;br&gt;PK id&lt;br&gt;FK country_id&lt;br&gt;FK mineral_production_id&lt;br&gt;year&lt;br&gt;production_value&lt;br&gt;production_value_base&lt;br&gt;unit_en / fr / ar" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="340" y="300" width="240" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="world_production" value="&lt;b&gt;world_production&lt;/b&gt;  (FACT)&lt;br&gt;&lt;i&gt;255 · mineral × year&lt;/i&gt;&lt;br&gt;&lt;br&gt;PK id&lt;br&gt;FK mineral_production_id&lt;br&gt;year&lt;br&gt;production_value&lt;br&gt;production_value_base&lt;br&gt;unit_en / fr / ar" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="340" y="560" width="240" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="trade_world" value="&lt;b&gt;trade_world&lt;/b&gt;  (FACT)&lt;br&gt;&lt;i&gt;6,050 · country × group × year × flow&lt;/i&gt;&lt;br&gt;&lt;br&gt;PK id&lt;br&gt;FK reporter_country_id&lt;br&gt;FK partner_id&lt;br&gt;FK mineral_trade_id&lt;br&gt;year&lt;br&gt;value_usd&lt;br&gt;value_share (NULL)&lt;br&gt;type_trade (export|import)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="860" y="300" width="260" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="partner_trade" value="&lt;b&gt;partner_trade&lt;/b&gt;  (FACT)&lt;br&gt;&lt;i&gt;16,740 · country × partner × year × flow&lt;/i&gt;&lt;br&gt;&lt;br&gt;PK id&lt;br&gt;FK reporter_country_id&lt;br&gt;FK partner_id&lt;br&gt;FK mineral_trade_id&lt;br&gt;year&lt;br&gt;value_usd&lt;br&gt;type_trade (export|import)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="860" y="560" width="260" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== RELATIONSHIPS (FK edges, 1..*) ===================== -->
+        <mxCell id="e1" value="1..*" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=ERmany;startArrow=ERone;fontSize=11;" edge="1" parent="1" source="countries" target="arab_production">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="1..*" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=ERmany;startArrow=ERone;fontSize=11;" edge="1" parent="1" source="countries" target="trade_world">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="1..*" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=ERmany;startArrow=ERone;fontSize=11;" edge="1" parent="1" source="countries" target="partner_trade">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="1..*" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=ERmany;startArrow=ERone;fontSize=11;" edge="1" parent="1" source="mineral_production" target="arab_production">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="1..*" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=ERmany;startArrow=ERone;fontSize=11;" edge="1" parent="1" source="mineral_production" target="world_production">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="1..*" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=ERmany;startArrow=ERone;fontSize=11;" edge="1" parent="1" source="mineral_trade" target="trade_world">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="1..*" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=ERmany;startArrow=ERone;fontSize=11;" edge="1" parent="1" source="mineral_trade" target="partner_trade">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="1..*" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=ERmany;startArrow=ERone;fontSize=11;" edge="1" parent="1" source="trade_partners" target="trade_world">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" value="1..*" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=ERmany;startArrow=ERone;fontSize=11;" edge="1" parent="1" source="trade_partners" target="partner_trade">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

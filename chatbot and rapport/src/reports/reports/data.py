@@ -24,7 +24,7 @@ from typing import Optional
 import numpy as np
 from pydantic import BaseModel, Field
 
-from pipelines.db import get_cursor
+from pipelines.db import get_pooled_cursor
 from src.reports.i18n import (
     fmt_delta, fmt_mt, fmt_pct, fmt_usd, t,
 )
@@ -95,6 +95,10 @@ class ReportData(BaseModel):
     data_version: str = ""   # hash of underlying fact table created_at — for cache keying
 
 
+class NoReportDataError(RuntimeError):
+    """The selected public-schema report has no production or trade rows."""
+
+
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 def _hhi(shares_pct: list[float]) -> Optional[float]:
     """Herfindahl-Hirschman Index from share percentages (0-100 scale)."""
@@ -124,23 +128,25 @@ def get_report_payload(country="Morocco", mineral="Phosphate",
     lang_idx = {"en": 0, "fr": 1, "ar": 2}[lang]
     mineral_pattern = f"%{mineral}%"
 
-    with get_cursor(commit=False) as cur:
+    with get_pooled_cursor() as cur:
 
         # Display names ───────────────────────────────────────────────────────
         cur.execute(
-            "SELECT country_name_en, country_name_fr, country_name_ar "
-            "FROM minerals.dim_countries WHERE country_name_en = %s",
+            "SELECT name_en, name_fr, name_ar "
+            "FROM public.countries WHERE name_en = %s",
             (country,),
         )
         row = cur.fetchone()
         country_display = (row[lang_idx] if row else None) or country
 
         cur.execute(
+            "SELECT mineral_name_en, mineral_name_fr, mineral_name_ar FROM ("
             "SELECT mineral_name_en, mineral_name_fr, mineral_name_ar "
-            "FROM minerals.dim_canonical_minerals "
+            "FROM public.mineral_production UNION ALL "
+            "SELECT mineral_name_en, mineral_name_fr, mineral_name_ar "
+            "FROM public.mineral_trade) minerals "
             "WHERE mineral_name_en = %s OR mineral_name_en ILIKE %s "
-            "ORDER BY (mineral_name_en = %s) DESC, mineral_name_en "
-            "LIMIT 1",
+            "ORDER BY (mineral_name_en = %s) DESC, mineral_name_en LIMIT 1",
             (mineral, mineral_pattern, mineral),
         )
         row = cur.fetchone()
@@ -149,14 +155,16 @@ def get_report_payload(country="Morocco", mineral="Phosphate",
         # Production by year ──────────────────────────────────────────────────
         cur.execute(
             """
-            SELECT   p.year,
-                     COALESCE(SUM(p.production_value_base), 0) / 1e6 AS production_mt
-            FROM     mart_production.v_production_by_canonical_mineral p
-            WHERE    p.country_name_en = %s
-              AND    p.canonical_mineral_name_en ILIKE %s
-              AND    p.year BETWEEN %s AND %s
-            GROUP BY p.year
-            ORDER BY p.year
+            SELECT ap.year,
+                   COALESCE(SUM(COALESCE(ap.production_value_base, ap.production_value)), 0) / 1e6
+            FROM public.arab_production ap
+            JOIN public.countries c ON c.id = ap.country_id
+            JOIN public.mineral_production mp ON mp.id = ap.mineral_production_id
+            WHERE c.name_en = %s
+              AND mp.mineral_name_en ILIKE %s
+              AND ap.year BETWEEN %s AND %s
+            GROUP BY ap.year
+            ORDER BY ap.year
             """,
             (country, mineral_pattern, year_from, year_to),
         )
@@ -167,11 +175,13 @@ def get_report_payload(country="Morocco", mineral="Phosphate",
         # Total production for KPI ───────────────────────────────────────────
         cur.execute(
             """
-            SELECT COALESCE(SUM(p.production_value_base), 0)
-            FROM   mart_production.v_production_by_canonical_mineral p
-            WHERE  p.country_name_en = %s
-              AND  p.canonical_mineral_name_en ILIKE %s
-              AND  p.year BETWEEN %s AND %s
+            SELECT COALESCE(SUM(COALESCE(ap.production_value_base, ap.production_value)), 0)
+            FROM public.arab_production ap
+            JOIN public.countries c ON c.id = ap.country_id
+            JOIN public.mineral_production mp ON mp.id = ap.mineral_production_id
+            WHERE c.name_en = %s
+              AND mp.mineral_name_en ILIKE %s
+              AND ap.year BETWEEN %s AND %s
             """,
             (country, mineral_pattern, year_from, year_to),
         )
@@ -181,13 +191,15 @@ def get_report_payload(country="Morocco", mineral="Phosphate",
         cur.execute(
             """
             WITH yearly AS (
-                SELECT p.country_name_en       AS cname,
-                       p.year,
-                       SUM(p.production_value_base) / 1e6 AS prod_mt
-                FROM   mart_production.v_production_by_canonical_mineral p
-                WHERE  p.canonical_mineral_name_en ILIKE %s
-                  AND  p.year IN (%s, %s)
-                GROUP BY p.country_name_en, p.year
+                SELECT c.name_en AS cname,
+                       ap.year,
+                       SUM(COALESCE(ap.production_value_base, ap.production_value)) / 1e6 AS prod_mt
+                FROM public.arab_production ap
+                JOIN public.countries c ON c.id = ap.country_id
+                JOIN public.mineral_production mp ON mp.id = ap.mineral_production_id
+                WHERE mp.mineral_name_en ILIKE %s
+                  AND ap.year IN (%s, %s)
+                GROUP BY c.name_en, ap.year
             ),
             yoy AS (
                 SELECT cname,
@@ -208,13 +220,14 @@ def get_report_payload(country="Morocco", mineral="Phosphate",
         # Export value (current + previous + previous-2) ─────────────────────
         cur.execute(
             """
-            SELECT   tw.year,
-                     COALESCE(SUM(tw.value_usd), 0) AS export_usd
-            FROM     mart_trade.v_trade_by_canonical_mineral tw
-            WHERE    tw.country_name_en = %s
-              AND    tw.canonical_mineral_name_en ILIKE %s
-              AND    tw.flow            = 'Export'
-              AND    tw.year IN (%s, %s, %s)
+            SELECT tw.year, COALESCE(SUM(tw.value_usd), 0) AS export_usd
+            FROM public.trade_world tw
+            JOIN public.countries c ON c.id = tw.reporter_country_id
+            JOIN public.mineral_trade mt ON mt.id = tw.mineral_trade_id
+            WHERE c.name_en = %s
+              AND mt.mineral_name_en ILIKE %s
+              AND LOWER(tw.type_trade) IN ('export', 'exports')
+              AND tw.year IN (%s, %s, %s)
             GROUP BY tw.year
             ORDER BY tw.year DESC
             """,
@@ -225,37 +238,43 @@ def get_report_payload(country="Morocco", mineral="Phosphate",
         export_value_prev = ev_rows.get(year_to - 1, 0.0)
         export_value_prev2 = ev_rows.get(year_to - 2, 0.0)
 
-        # Bilateral partner data is country-level (the warehouse has no per-mineral
-        # commodity split for it), so only surface partners when THIS mineral
-        # actually has export trade. Otherwise the "top partners" would be the
-        # country's overall export partners, misleadingly attributed to a mineral
-        # with no trade data of its own (e.g. phosphate, which is production-only).
+        # Bilateral partner data is country-level: every partner_trade row uses
+        # the 'All Minerals' commodity sentinel — the warehouse has no per-mineral
+        # bilateral split. So we (B1) aggregate the country's overall bilateral
+        # export partners WITHOUT a per-mineral filter (the old filter matched
+        # nothing, leaving the partner section permanently empty), but keep the
+        # `mineral_has_trade` gate so partners only appear for a mineral that the
+        # country actually exports (per trade_world) — never attributed to a
+        # production-only mineral like phosphate. The PDF labels the section as
+        # country-level so the all-commodity scope is explicit.
         mineral_has_trade = (
             export_value > 0 or export_value_prev > 0 or export_value_prev2 > 0
         )
 
-        # Top partners (current year, with YoY) ──────────────────────────────
+        # Top partners (current year, with YoY) — country-level (all commodities)
         cur.execute(
             """
             WITH curr AS (
-                SELECT   bt.partner_name_en                             AS partner_name,
-                         COALESCE(SUM(bt.value_usd_thousand), 0) * 1000 AS val
-                FROM     mart_trade.v_bilateral_trade_partner_summary bt
-                WHERE    bt.country_name_en = %s
-                  AND    bt.flow            = 'Export'
-                  AND    bt.year            = %s
-                  AND    bt.partner_type    = 'country'
-                GROUP BY bt.partner_name_en
+                SELECT tp.name_en AS partner_name,
+                       COALESCE(SUM(pt.value_usd), 0) AS val
+                FROM public.partner_trade pt
+                JOIN public.countries c ON c.id = pt.reporter_country_id
+                JOIN public.trade_partners tp ON tp.id = pt.partner_id
+                WHERE c.name_en = %s
+                  AND LOWER(pt.type_trade) IN ('export', 'exports')
+                  AND pt.year = %s
+                GROUP BY tp.name_en
             ),
             prev AS (
-                SELECT   bt.partner_name_en                             AS partner_name,
-                         COALESCE(SUM(bt.value_usd_thousand), 0) * 1000 AS val
-                FROM     mart_trade.v_bilateral_trade_partner_summary bt
-                WHERE    bt.country_name_en = %s
-                  AND    bt.flow            = 'Export'
-                  AND    bt.year            = %s
-                  AND    bt.partner_type    = 'country'
-                GROUP BY bt.partner_name_en
+                SELECT tp.name_en AS partner_name,
+                       COALESCE(SUM(pt.value_usd), 0) AS val
+                FROM public.partner_trade pt
+                JOIN public.countries c ON c.id = pt.reporter_country_id
+                JOIN public.trade_partners tp ON tp.id = pt.partner_id
+                WHERE c.name_en = %s
+                  AND LOWER(pt.type_trade) IN ('export', 'exports')
+                  AND pt.year = %s
+                GROUP BY tp.name_en
             ),
             totals AS (SELECT NULLIF(SUM(val), 0) AS tv FROM curr)
             SELECT curr.partner_name,
@@ -285,17 +304,17 @@ def get_report_payload(country="Morocco", mineral="Phosphate",
                     yoy_pct=float(yoy) if yoy is not None else None,
                 ))
 
-        # Top 6 partners last year (for emerging-partner flag) ───────────────
+        # Top 6 partners last year (for emerging-partner flag) — country-level
         cur.execute(
             """
-            SELECT bt.partner_name_en AS partner_name,
-                   SUM(bt.value_usd_thousand) AS v
-            FROM   mart_trade.v_bilateral_trade_partner_summary bt
-            WHERE  bt.country_name_en = %s
-              AND  bt.flow            = 'Export'
-              AND  bt.year            = %s
-              AND  bt.partner_type    = 'country'
-            GROUP BY bt.partner_name_en
+            SELECT tp.name_en AS partner_name, SUM(pt.value_usd) AS v
+            FROM public.partner_trade pt
+            JOIN public.countries c ON c.id = pt.reporter_country_id
+            JOIN public.trade_partners tp ON tp.id = pt.partner_id
+            WHERE c.name_en = %s
+              AND LOWER(pt.type_trade) IN ('export', 'exports')
+              AND pt.year = %s
+            GROUP BY tp.name_en
             ORDER BY v DESC NULLS LAST
             LIMIT 6
             """,
@@ -307,16 +326,18 @@ def get_report_payload(country="Morocco", mineral="Phosphate",
         cur.execute(
             """
             WITH agg AS (
-                SELECT   tw.hs_code,
-                         COALESCE(tw.hs_description_en, tw.hs_code) AS hs_description,
-                         SUM(tw.value_usd)                          AS export_value
-                FROM     mart_trade.v_trade_by_canonical_mineral tw
-                WHERE    tw.country_name_en = %s
-                  AND    tw.canonical_mineral_name_en ILIKE %s
-                  AND    tw.flow            = 'Export'
-                  AND    tw.year BETWEEN %s AND %s
-                  AND    tw.hs_code IS NOT NULL
-                GROUP BY tw.hs_code, tw.hs_description_en
+                SELECT mt.hs_codes AS hs_code,
+                       COALESCE(mt.mineral_name_en, mt.hs_codes) AS hs_description,
+                       SUM(tw.value_usd) AS export_value
+                FROM public.trade_world tw
+                JOIN public.countries c ON c.id = tw.reporter_country_id
+                JOIN public.mineral_trade mt ON mt.id = tw.mineral_trade_id
+                WHERE c.name_en = %s
+                  AND mt.mineral_name_en ILIKE %s
+                  AND LOWER(tw.type_trade) IN ('export', 'exports')
+                  AND tw.year BETWEEN %s AND %s
+                  AND mt.hs_codes IS NOT NULL
+                GROUP BY mt.hs_codes, mt.mineral_name_en
             ),
             total AS (SELECT NULLIF(SUM(export_value), 0) AS tv FROM agg)
             SELECT a.hs_code, a.hs_description,
@@ -345,9 +366,9 @@ def get_report_payload(country="Morocco", mineral="Phosphate",
             cur.execute(
                 """
                 SELECT GREATEST(
-                    COALESCE((SELECT MAX(created_at) FROM minerals.fact_arab_production), 'epoch'),
-                    COALESCE((SELECT MAX(created_at) FROM minerals.fact_trade_world), 'epoch'),
-                    COALESCE((SELECT MAX(created_at) FROM minerals.fact_bilateral_trade), 'epoch')
+                    COALESCE((SELECT MAX(created_at) FROM public.arab_production), 'epoch'),
+                    COALESCE((SELECT MAX(created_at) FROM public.trade_world), 'epoch'),
+                    COALESCE((SELECT MAX(created_at) FROM public.partner_trade), 'epoch')
                 )
                 """
             )
@@ -355,6 +376,12 @@ def get_report_payload(country="Morocco", mineral="Phosphate",
             data_version = mx.strftime("%Y%m%d%H%M%S") if mx else datetime.now().strftime("%Y%m%d")
         except Exception:
             data_version = datetime.now().strftime("%Y%m%d")
+
+    if not production_by_year and not export_value and not partners and not hs_products:
+        raise NoReportDataError(
+            f"No report data available for {country} / {mineral} "
+            f"between {year_from} and {year_to}."
+        )
 
     # ── KPIs ──────────────────────────────────────────────────────────────────
     yoy_growth_pct: Optional[float] = None

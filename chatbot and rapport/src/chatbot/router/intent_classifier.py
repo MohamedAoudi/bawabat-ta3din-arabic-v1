@@ -47,8 +47,19 @@ _CHART_SIGNALS: tuple[str, ...] = (
 _LIST_SIGNALS: tuple[str, ...] = (
     "which countries", "what countries", "what minerals", "what is amip",
     "how does it work", "what languages", "latest year", "data sources",
+    "who are you", "what are you", "your name", "what can you do",
+    "how can you help", "which languages you speak", "do you speak french",
+    "do you speak arabic", "do you speak english",
     "ما هي بوابة", "ما هي الدول", "ما هي المعادن", "أحدث سنة",
+    "من أنت", "من انت", "ما هذا المساعد", "ماذا يمكنك أن تفعل",
+    "ماذا يمكنك ان تفعل", "كيف تساعدني", "هل تتحدث العربية", "هل تتكلم",
     "quels pays", "quels minéraux", "qu'est-ce que amip", "sources de données",
+    "qui es-tu", "qui es tu", "qui êtes-vous", "qui êtes vous",
+    "qui etes-vous", "qui etes vous", "vous êtes qui", "vous etes qui",
+    "tu es quoi", "que peux-tu faire", "que peux tu faire",
+    "comment peux-tu m'aider", "comment peux tu m aider",
+    "tu parles français", "tu parles francais", "parlez-vous français",
+    "parlez-vous francais", "tu parles",
 )
 _SQL_SIGNALS: tuple[str, ...] = (
     "how many", "how much", "total", "top", "ranking", "most", "least",
@@ -58,6 +69,22 @@ _SQL_SIGNALS: tuple[str, ...] = (
     "إنتاج", "الصادرات", "الواردات", "تصدير", "استيراد", "قارن", "أكبر",
     "أعلى", "قيمة", "حصة", "نسبة", "كم", "quantité", "volume", "production",
     "exportation", "importation", "prix", "valeur", "classement",
+)
+_DESCRIPTIVE_COMPARISON_SIGNALS: tuple[str, ...] = (
+    "compare between", "comparison between", "difference between",
+    "compare mineral", "mineral comparison",
+    "مقارنة بين", "الفرق بين", "قارن بين معدن", "مقارنة معدن",
+    "comparaison entre", "différence entre", "difference entre",
+    "comparer deux minéraux", "comparer deux mineraux",
+)
+_MEASURED_COMPARISON_SIGNALS: tuple[str, ...] = (
+    "production", "produce", "produced", "output", "quantity", "volume",
+    "export", "exports", "import", "imports", "reserves", "price", "value",
+    "revenue", "share", "percentage", "ranking", "top", "trend",
+    "إنتاج", "انتاج", "الصادرات", "الواردات", "تصدير", "استيراد", "احتياطي",
+    "سعر", "قيمة", "حصة", "نسبة", "ترتيب", "أكبر", "أعلى",
+    "production", "exportation", "importation", "réserves", "reserves",
+    "prix", "valeur", "classement", "tendance",
 )
 
 # ---------------------------------------------------------------------------
@@ -83,22 +110,29 @@ Examples:
 - "ما مدى حداثة بيانات الإنتاج الخاصة بالسودان؟" → SQL
 
 ## LIST
-Use LIST when the question asks about portal features, coverage, or factual portal information.
-Keywords that signal LIST: "which countries", "what minerals", "what is amip", "how does it work", "what languages", "what data", "latest year", "data sources".
+Use LIST when the question asks about portal features, coverage, factual portal information, or the assistant itself (who are you, what can you do, which languages you speak).
+Keywords that signal LIST: "which countries", "what minerals", "what is amip", "how does it work", "what languages", "what data", "latest year", "data sources", "who are you", "what can you do", "do you speak French".
 Examples:
 - "Which countries does AMIP cover?" → LIST
 - "What minerals does the portal track?" → LIST
 - "What is the latest year of data available?" → LIST
 - "What is AMIP?" → LIST
 - "What languages does the portal support?" → LIST
+- "What can you do?" → LIST
 
 ## RAG
 Use RAG when the question asks for descriptions, explanations, or contextual knowledge about mining sectors or country profiles.
+Also use RAG for open-ended existence / presence / geology questions — "do any countries have X", "is X found in...", "which countries have deposits/reserves of X" — where the user is exploring whether a resource exists rather than asking for a measured quantity or ranking.
+Use RAG for descriptive comparisons between minerals when no metric is requested (for example differences, uses, properties, or general comparison between two minerals).
 Examples:
 - "Tell me about Morocco's mining sector" → RAG
 - "Explain phosphate mining in Jordan" → RAG
 - "What is the importance of iron ore for Mauritania's economy?" → RAG
 - "Describe gold mining in Sudan" → RAG
+- "Do any Arab countries have lithium deposits?" → RAG
+- "Is cobalt found anywhere in the region?" → RAG
+- "Compare feldspar and silver" → RAG
+- "اريد مقارنة بين معدن الفلسبار و الفضة" → RAG
 
 ## CHART
 Use CHART when the user explicitly asks for a visual graph, chart, diagram, or table of data.
@@ -113,9 +147,11 @@ Examples:
 ## Decision rules
 1. If the question contains chart/graph/plot keywords → always CHART (even if it also has count/number keywords)
 2. If asks for specific production/trade/reserves data → SQL
-3. If platform coverage question, portal info, or greeting → LIST
+3. If platform coverage question, portal info, questions about the assistant itself, or greeting → LIST
 4. If descriptive/explanatory about mining/minerals → RAG
 5. When unsure between SQL and CHART → SQL
+6. Existence/presence questions ("do any countries have X", "is X found in the region") → RAG; but a measured ask about the same mineral ("how much X is produced", "which countries produce/export X", "top X producers") stays SQL.
+7. "Compare X and Y" is SQL only when it asks for a measurable database metric such as production, exports, imports, reserves, price, value, trend, or ranking. A general/descriptive comparison between two minerals is RAG.
 
 Reply with exactly one word: SQL, LIST, RAG, or CHART.\
 """
@@ -158,6 +194,12 @@ def _heuristic_fallback(message: str) -> dict:
 
     if any(signal in lowered for signal in _LIST_SIGNALS):
         return {"intent": "LIST", "confidence": 0.9}
+
+    if (
+        any(signal in lowered for signal in _DESCRIPTIVE_COMPARISON_SIGNALS)
+        and not any(signal.lower() in lowered for signal in _MEASURED_COMPARISON_SIGNALS)
+    ):
+        return {"intent": "RAG", "confidence": 0.85}
 
     if any(signal.lower() in lowered for signal in _SQL_SIGNALS):
         return {"intent": "SQL", "confidence": 0.9}

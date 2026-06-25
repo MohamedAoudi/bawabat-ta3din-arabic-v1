@@ -2,20 +2,23 @@
 
 LightRAG provides document retrieval for AMIP RAG questions, especially platform explanations, methodology, data-source context, and mineral/country background that is not answered directly from SQL.
 
-The local demo expects an external service folder next to this repo:
+The LightRAG service is self-contained inside this project at:
 
 ```text
-../lightrag-server-amip/
+chatbot and repport/lightrag-server-amip/
 ```
+
+It carries its own `.env` (model + keys) and `data/` (the indexed knowledge graph),
+so nothing runs from outside the project.
 
 ## Start LightRAG
 
 ```bash
-cd ../lightrag-server-amip
+cd "chatbot and repport/lightrag-server-amip"
 docker compose up -d
 ```
 
-Set the chatbot endpoint in `.env`:
+The chatbot endpoint is set in `chatbot and repport/.env`:
 
 ```bash
 LIGHTRAG_BASE_URL=http://localhost:9622
@@ -25,7 +28,7 @@ LIGHTRAG_TIMEOUT=30
 
 ## Index AMIP Documents
 
-Run from `arab-minerals-dw/`:
+Run from `chatbot and repport/`:
 
 ```bash
 source .venv/bin/activate

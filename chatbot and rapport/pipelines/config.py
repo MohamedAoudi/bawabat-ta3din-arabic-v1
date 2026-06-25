@@ -33,6 +33,7 @@ DB = {
     "password": os.getenv("DB_PASSWORD", ""),
     "options": f"-c search_path={os.getenv('DB_SCHEMA', 'minerals')}",
 }
+DB_SCHEMA = os.getenv("DB_SCHEMA", "minerals")
 
 # Minimum fuzzy-match score (0–100) for _translate_term to accept a match.
 FUZZY_MATCH_THRESHOLD: int = 80

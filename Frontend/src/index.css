@@ -70,6 +70,130 @@ html.theme-dark [class*="border-"] {
     border-color: rgba(201, 168, 76, 0.25);
 }
 
+/* ── Chatbot Markdown answers ──────────────────────────────────────────────
+   Compact, chat-bubble-friendly rendering of the assistant's Markdown.
+   Theme + RTL aware via the CSS variables set on the wrapper by
+   MarkdownMessage.jsx. Sizing is tuned for the 0.9rem bubble it lives in. */
+.amip-md {
+    color: var(--md-text);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Collapse the outer margins so the bubble padding stays even. */
+.amip-md > *:first-child { margin-top: 0; }
+.amip-md > *:last-child { margin-bottom: 0; }
+
+.amip-md p { margin: 0.5em 0; }
+
+.amip-md h1,
+.amip-md h2,
+.amip-md h3,
+.amip-md h4 {
+    margin: 0.85em 0 0.4em;
+    line-height: 1.3;
+    font-weight: 800;
+    color: var(--md-text);
+}
+.amip-md h1 { font-size: 1.08rem; }
+.amip-md h2 {
+    font-size: 1rem;
+    padding-bottom: 0.25em;
+    border-bottom: 1px solid var(--md-border);
+}
+.amip-md h3 { font-size: 0.94rem; }
+.amip-md h4 { font-size: 0.9rem; }
+
+.amip-md strong { font-weight: 800; }
+.amip-md em { font-style: italic; }
+
+.amip-md a {
+    color: var(--md-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.amip-md ul,
+.amip-md ol {
+    margin: 0.5em 0;
+    padding-inline-start: 1.4em;
+}
+.amip-md li { margin: 0.25em 0; }
+.amip-md li > ul,
+.amip-md li > ol { margin: 0.2em 0; }
+
+.amip-md blockquote {
+    margin: 0.6em 0;
+    padding: 0.2em 0.9em;
+    border-inline-start: 3px solid var(--md-accent);
+    color: var(--md-muted);
+}
+
+.amip-md hr {
+    border: none;
+    border-top: 1px solid var(--md-border);
+    margin: 0.9em 0;
+}
+
+/* Code: override the global Cairo !important so it actually looks like code. */
+.amip-md code {
+    font-family: "SFMono-Regular", Menlo, Consolas, monospace !important;
+    font-size: 0.82em;
+    background: var(--md-code-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+}
+.amip-md pre {
+    margin: 0.6em 0;
+    padding: 0.7em 0.85em;
+    background: var(--md-code-bg);
+    border-radius: 8px;
+    overflow-x: auto;
+}
+.amip-md pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+/* Tables — the part that was unreadable. Scroll horizontally when too wide
+   rather than crushing columns; striped rows + a tinted header for scanning. */
+.amip-md-table-wrap {
+    overflow-x: auto;
+    margin: 0.7em 0;
+    border: 1px solid var(--md-border);
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch;
+}
+.amip-md table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+.amip-md th,
+.amip-md td {
+    padding: 0.5em 0.7em;
+    border-inline-end: 1px solid var(--md-border);
+    border-bottom: 1px solid var(--md-border);
+    text-align: start;
+    vertical-align: top;
+}
+.amip-md th:last-child,
+.amip-md td:last-child { border-inline-end: none; }
+.amip-md tbody tr:last-child td { border-bottom: none; }
+.amip-md thead th {
+    background: var(--md-table-head);
+    font-weight: 800;
+    white-space: nowrap;
+}
+.amip-md tbody tr:nth-child(even) { background: var(--md-table-stripe); }
+
+.amip-md img { max-width: 100%; border-radius: 8px; }
+
 /* Responsive Countries Grid */
 .countries-responsive-grid {
     display: grid;

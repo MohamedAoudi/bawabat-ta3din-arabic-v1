@@ -26,6 +26,8 @@ Rules:
     "Ce résultat indique", "يشير هذا", etc.
   - If the data is too limited to draw a meaningful insight, respond with
     exactly: NO_INSIGHT
+  - Use real units (tonnes, m³, USD); never write internal column names or the
+    phrase "base unit"
 
 Tailor the insight to the user type:
   - "identified" → focus on actionable intelligence for analysts and researchers

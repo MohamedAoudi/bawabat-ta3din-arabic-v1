@@ -27,7 +27,11 @@ def _build_messages(question: str, sql: str, result: dict, language: str) -> tup
         f"Summarise the SQL query result below into a clear, concise natural-language answer "
         f"for a minerals industry analyst. Be direct — do not repeat the SQL or column names unnecessarily. "
         f"If numbers are large, format them with thousands separators. "
-        f"Use bold for key figures and bullet points for lists of countries or minerals."
+        f"Use bold for key figures and bullet points for lists of countries or minerals. "
+        f"Express every quantity in a real-world unit the reader understands: production in "
+        f"tonnes (or m³ for volume minerals), trade values in USD. NEVER output an internal "
+        f"column name (such as 'production_value_base') or the phrase 'base unit' — these mean "
+        f"nothing to the reader; values are already in their real unit."
     )
     user_msg = f"Question: {question}\n\nQuery result:\n{data_block}"
     if truncation_note:

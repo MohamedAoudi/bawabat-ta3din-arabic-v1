@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import re
+from collections.abc import Iterable
+
 from src.chatbot.config import OPENAI_MODEL, get_openai_client
 from src.chatbot.i18n import t
 
@@ -22,6 +25,7 @@ _ON_TOPIC_FRAGMENTS: list[str] = [
     "export value", "revenue",
     # English — portal
     "amip", "portal", "arab mining", "mineral indicators",
+    "language", "languages", "multilingual", "trilingual",
     # English — countries
     "egypt", "somalia", "jordan", "mauritania", "bahrain", "morocco", "saudi", "algeria",
     "djibouti", "iraq", "lebanon", "sudan", "tunisia", "yemen", "kuwait", "libya",
@@ -37,6 +41,7 @@ _ON_TOPIC_FRAGMENTS: list[str] = [
     "exportation", "importation", "commerce", "flux commercial", "valeur des exportations",
     # French — portal
     "amip", "portail", "indicateurs miniers",
+    "langue", "langues", "multilingue", "trilingue",
     # French — countries
     "égypte", "somalie", "jordanie", "mauritanie", "bahreïn", "maroc", "arabie saoudite",
     "algérie", "irak", "liban", "soudan", "tunisie", "yémen", "koweït", "libye", "syrie", "émirats",
@@ -48,6 +53,7 @@ _ON_TOPIC_FRAGMENTS: list[str] = [
     "صادرات", "واردات", "تصدير", "استيراد", "تجارة", "تدفقات تجارية", "قيمة الصادرات",
     # Arabic — portal
     "amip", "بوابة", "بوابة amip", "مؤشرات تعدينية",
+    "لغة", "لغات", "اللغات", "اللغة",
     # Arabic — countries
     "مصر", "الصومال", "الأردن", "موريتانيا", "البحرين", "المغرب", "السعودية", "الجزائر",
     "جيبوتي", "العراق", "لبنان", "السودان", "تونس", "اليمن", "الكويت", "ليبيا",
@@ -66,6 +72,21 @@ _OFF_TOPIC_FRAGMENTS: list[str] = [
     "كرة القدم", "لعبة", "ترجم", "احكي لي",
 ]
 
+_META_FRAGMENTS: list[str] = [
+    "who are you", "what are you", "your name",
+    "qui es-tu", "qui es tu", "qui êtes-vous", "qui êtes vous",
+    "qui etes-vous", "qui etes vous", "vous êtes qui", "vous etes qui",
+    "tu es quoi", "من أنت", "من انت", "ما هذا المساعد",
+    "what can you do", "how can you help",
+    "que peux-tu faire", "que peux tu faire",
+    "comment peux-tu m'aider", "comment peux tu m aider",
+    "ماذا يمكنك أن تفعل", "ماذا يمكنك ان تفعل", "كيف تساعدني",
+    "do you speak french", "do you speak arabic", "do you speak english",
+    "tu parles français", "tu parles francais",
+    "parlez-vous français", "parlez-vous francais",
+    "tu parles", "هل تتحدث العربية", "هل تتكلم",
+]
+
 _FOLLOWUP_CHART_FRAGMENTS: tuple[str, ...] = (
     "chart", "graph", "plot", "line chart", "line graph", "table",
     "مخطط", "رسم بياني", "مبيان", "جدول", "منحنى",
@@ -74,6 +95,77 @@ _FOLLOWUP_REFERENCES: tuple[str, ...] = (
     " it", " this", " that", " those", " these", " them", "same", "above", "previous",
     " result", " results", " ذلك", " هذا", " هذه", " السابق", "النتيجة",
 )
+
+# --- Keyword matching -------------------------------------------------------
+# A fragment list is compiled into a (regex, substrings) matcher. ASCII fragments
+# are matched on word boundaries so short tokens like "or"/"ore"/"sel"/"hi" no
+# longer leak via substrings inside unrelated words ("world", "before", "which").
+# Non-ASCII (Arabic) fragments keep substring matching to preserve tolerance for
+# attached clitic prefixes (e.g. "الإنتاج" still matches the fragment "إنتاج").
+
+_Matcher = tuple["re.Pattern[str] | None", tuple[str, ...]]
+
+
+def _compile_fragments(fragments: Iterable[str]) -> _Matcher:
+    ascii_frags = sorted({f for f in fragments if f.isascii()}, key=len, reverse=True)
+    other = tuple(dict.fromkeys(f for f in fragments if not f.isascii()))
+    pattern = (
+        re.compile(r"\b(?:" + "|".join(re.escape(f) for f in ascii_frags) + r")\b")
+        if ascii_frags
+        else None
+    )
+    return pattern, other
+
+
+def _contains_fragment(text: str, matcher: _Matcher) -> bool:
+    """True if ``text`` (already lowercased) matches any fragment in ``matcher``."""
+    pattern, other = matcher
+    if pattern is not None and pattern.search(text):
+        return True
+    return any(fragment in text for fragment in other)
+
+
+_ON_TOPIC: _Matcher = _compile_fragments(_ON_TOPIC_FRAGMENTS)
+_OFF_TOPIC: _Matcher = _compile_fragments(_OFF_TOPIC_FRAGMENTS)
+_GREETING_MATCHER: _Matcher = _compile_fragments(_GREETINGS)
+_META: _Matcher = _compile_fragments(_META_FRAGMENTS)
+
+
+def _keyword_verdict(message: str) -> bool | None:
+    """Pure keyword-layer scope check (no I/O).
+
+    Returns ``True`` for an on-topic keyword hit, ``False`` for an off-topic hit,
+    and ``None`` when no keyword matches (the caller then defers to the LLM).
+    On-topic is checked first so mixed messages stay in scope.
+    """
+    lowered = message.lower()
+    if _contains_fragment(lowered, _ON_TOPIC):
+        return True
+    if _contains_fragment(lowered, _OFF_TOPIC):
+        return False
+    return None
+
+
+def is_greeting(message: str) -> bool:
+    """True when the whole message is essentially a greeting with no real query.
+
+    Pure greetings ("hello", "bonjour", "مرحبا", "hi there") are routed to a
+    deterministic greeting reply instead of the LLM intent classifier, which
+    otherwise answers them inconsistently. Mixed messages that also carry a
+    substantive query (e.g. "hello, what is AMIP?") are NOT greetings — they
+    have an on/off-topic keyword hit and fall through to normal routing.
+    """
+    stripped = message.lower().strip().rstrip("!.,؟? ")
+    if not stripped:
+        return False
+    if stripped in _GREETINGS:
+        return True
+    return (
+        len(stripped) <= 25
+        and _contains_fragment(stripped, _GREETING_MATCHER)
+        and _keyword_verdict(stripped) is None
+    )
+
 
 _SCOPE_SYSTEM_PROMPT = (
     "You are a strict topic classifier for AMIP, the Arab Mining Indicators Portal. "
@@ -121,13 +213,16 @@ async def is_in_scope(
         return True, None
 
     lowered_stripped = message.lower().strip().rstrip("!.,؟?")
-    if lowered_stripped in _GREETINGS or any(g in lowered_stripped for g in _GREETINGS):
+    if lowered_stripped in _GREETINGS or _contains_fragment(lowered_stripped, _GREETING_MATCHER):
         return True, None
 
-    if any(fragment in lowered for fragment in _ON_TOPIC_FRAGMENTS):
+    if _contains_fragment(lowered, _META):
         return True, None
 
-    if any(fragment in lowered for fragment in _OFF_TOPIC_FRAGMENTS):
+    verdict = _keyword_verdict(message)
+    if verdict is True:
+        return True, None
+    if verdict is False:
         out_msg = _OUT_OF_SCOPE_MESSAGES.get(language, _OUT_OF_SCOPE_MESSAGES["en"])
         return False, out_msg
 

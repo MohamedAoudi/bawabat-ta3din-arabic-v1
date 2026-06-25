@@ -189,8 +189,8 @@ class ChatRequest(BaseModel):
     )
     clarify_choice: Optional[str] = Field(
         None,
-        description="User-selected intent after a clarification prompt: 'SQL', 'RAG', or 'LIST'.",
-        pattern="^(SQL|RAG|LIST)$",
+        description="User-selected intent after a clarification prompt: 'SQL', 'RAG', 'LIST', or 'CHART'.",
+        pattern="^(SQL|RAG|LIST|CHART)$",
     )
 
 
@@ -214,6 +214,14 @@ class ChatResponse(BaseModel):
     source_view: Optional[str] = None
     filters_used: Optional[dict] = None
     clarification: Optional[dict] = None
+    follow_up_questions: Optional[list] = None
+    # Clarification flow: when the intent classifier is uncertain, the router
+    # returns intent="clarify" with a list of options for the user to choose.
+    # The frontend echoes original_message back with the chosen clarify_choice.
+    clarify_options: Optional[list] = None
+    original_message: Optional[str] = None
+    original_language: Optional[str] = None
+    confidence: Optional[float] = None
 
 
 class FeedbackRequest(BaseModel):
@@ -273,7 +281,10 @@ async def chat(request: Request, body: ChatRequest) -> ChatResponse:
             language=body.language or "en",
         )
         result = await hybrid_router.route(
-            message=body.message, session=session, clarify_choice=body.clarify_choice
+            message=body.message,
+            session=session,
+            clarify_choice=body.clarify_choice,
+            requested_language=body.language,
         )
         return ChatResponse(**result)
     except Exception as exc:
@@ -310,6 +321,7 @@ async def chat_stream(request: Request, body: ChatRequest) -> StreamingResponse:
                 message=body.message,
                 session=session,
                 clarify_choice=body.clarify_choice,
+                requested_language=body.language,
             ):
                 yield to_sse(event)
         except Exception as exc:

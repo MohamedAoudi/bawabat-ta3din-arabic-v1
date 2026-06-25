@@ -5,10 +5,9 @@ import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { LanguageContext, ThemeContext } from "../App";
 
-// Services removed — local stubs to avoid external service usage in pages
-const getCountries = async () => [];
-const getMinerals = async () => [];
-const getTradeTransactionsByType = async () => [];
+import { getCountries } from "../services/countryService";
+import { getTradeMinerals as getMinerals } from "../services/mineralTradeService";
+import { getTradeAnalytics as getTradeTransactionsByType } from "../services/analyticsService";
 
 const COUNTRIES = [
   { name: "المملكة الأردنية الهاشمية", code: "jo" },
@@ -36,7 +35,7 @@ const COUNTRIES = [
 
 const countryNameAr = Object.fromEntries(COUNTRIES.map((c) => [c.code, c.name]));
 
-const DEFAULT_COUNTRY = "ma";
+const DEFAULT_COUNTRY = "mar"; // matches DB iso_code (3-letter, lowercased)
 
 const AVAILABLE_COUNTRIES_FALLBACK = COUNTRIES.map((c) => c.code);
 

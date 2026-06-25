@@ -321,6 +321,13 @@ def _trade_section(p: ReportData, styles) -> list:
              t("th_value_usd", lang), t("th_share", lang), t("th_yoy", lang)],
             styles, lang,
         ))
+        # Bilateral data is all-commodity (country-level); state that explicitly
+        # so the shares aren't read as mineral-specific.
+        elements.append(Spacer(1, 2*mm))
+        elements.append(Paragraph(
+            f'<i>{localize(t("partner_country_level_note", lang, country=p.country), lang)}</i>',
+            styles["body_small"],
+        ))
     else:
         elements.append(_empty_note(t("no_bilateral", lang), styles, lang))
     # Forecast for export value

@@ -1,10 +1,9 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowDownWideNarrow, CalendarDays, Search } from "lucide-react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowDownWideNarrow, CalendarDays, Search, X } from "lucide-react";
 import Chart from "chart.js/auto";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
-// Service removed — stub local function to avoid external service usage in pages
-const getMineralProduction = async () => [];
+import { getProductionAnalytics } from "../services/analyticsService";
 import { LanguageContext } from "../App";
 
 
@@ -28,6 +27,9 @@ const PAGE_TRANSLATIONS = {
     arabEconomicReport: "التقرير الاقتصادي العربي الموحد",
     allMinerals: "كل المعادن",
     allCountries: "كل الدول",
+    seeMore: "عرض المزيد",
+    mineralSearchPlaceholder: "ابحث عن معدن...",
+    close: "إغلاق",
   },
   fr: {
     pageTitle: "Volume de la production miniere",
@@ -44,6 +46,9 @@ const PAGE_TRANSLATIONS = {
     arabEconomicReport: "Rapport economique arabe unifie",
     allMinerals: "Tous les mineraux",
     allCountries: "Tous les pays",
+    seeMore: "Voir plus",
+    mineralSearchPlaceholder: "Rechercher un mineral...",
+    close: "Fermer",
   },
   en: {
     pageTitle: "Mining production volume",
@@ -60,6 +65,9 @@ const PAGE_TRANSLATIONS = {
     arabEconomicReport: "Unified Arab Economic Report",
     allMinerals: "All minerals",
     allCountries: "All countries",
+    seeMore: "See more",
+    mineralSearchPlaceholder: "Search a mineral...",
+    close: "Close",
   },
 };
 
@@ -259,6 +267,7 @@ function LineChartPanel({
   language,
   annualEvolutionLabel,
   sourceData,
+  getMineralLabel,
   getMineralUnitLabel,
 }) {
   const canvasRef = useRef(null);
@@ -367,12 +376,12 @@ function LineChartPanel({
       instanceRef.current?.destroy();
       instanceRef.current = null;
     };
-  }, [hasMineralData, mineral, language, sourceData, isCompact]);
+  }, [hasMineralData, mineral, language, sourceData, isCompact, getMineralUnitLabel]);
 
   return (
     <div className="rounded-3xl bg-white/95 p-4 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200/70">
       <h3 className="mb-2 text-base font-extrabold text-slate-800">
-        {annualEvolutionLabel} - {getLocalizedMineral(mineral, language)}
+        {annualEvolutionLabel} - {getMineralLabel ? getMineralLabel(mineral) : getLocalizedMineral(mineral, language)}
       </h3>
       <div className="h-[260px] sm:h-[300px] lg:h-[340px]">
         {hasMineralData ? (
@@ -392,13 +401,13 @@ export default function M1Page() {
   const t = PAGE_TRANSLATIONS[language] || PAGE_TRANSLATIONS.ar;
 
   const [dbRows, setDbRows] = useState([]);
-  const [isLoadingDb, setIsLoadingDb] = useState(true);
+  const [, setIsLoadingDb] = useState(true);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const rows = await getMineralProduction();
+        const rows = await getProductionAnalytics();
         if (mounted) setDbRows(Array.isArray(rows) ? rows : []);
       } catch (error) {
         console.error("Error loading mineral production data:", error);
@@ -418,10 +427,13 @@ export default function M1Page() {
       const country = row.country_name_ar || row.country_name_en || row.country_code;
       const year = Number(row.year);
       const value = Number(row.production_quantity || 0);
+      // Normalized value (mass->tonnes / volume->m³); used only for the
+      // cross-mineral "All minerals" aggregate so we never add e.g. kg to tonnes.
+      const valueBase = Number(row.production_value_base ?? value);
       if (!mineral || !country || !Number.isFinite(year)) return acc;
       if (!acc[mineral]) acc[mineral] = {};
       if (!acc[mineral][year]) acc[mineral][year] = [];
-      acc[mineral][year].push({ country, value });
+      acc[mineral][year].push({ country, value, valueBase });
       return acc;
     }, {});
   }, [dbRows]);
@@ -443,9 +455,28 @@ export default function M1Page() {
     }, {});
   }, [dbRows]);
 
-  const getMineralUnitLabel = (mineralKey, language) => {
+  const dbMineralLabelsByName = useMemo(() => {
+    return dbRows.reduce((acc, row) => {
+      const mineralKey = row.mineral_name_ar || row.mineral_name_en;
+      if (!mineralKey) return acc;
+      if (!acc[mineralKey]) acc[mineralKey] = {};
+
+      if (row.mineral_name_ar) acc[mineralKey].ar = row.mineral_name_ar;
+      if (row.mineral_name_en) acc[mineralKey].en = row.mineral_name_en;
+      if (row.mineral_name_fr) acc[mineralKey].fr = row.mineral_name_fr;
+
+      return acc;
+    }, {});
+  }, [dbRows]);
+
+  const getMineralUnitLabel = useCallback((mineralKey, language) => {
     if (!mineralKey || mineralKey === ALL_MINERALS_KEY) return "";
     return dbMineralUnitsByName?.[mineralKey]?.[language] || getLocalizedMineralUnit(mineralKey, language) || "";
+  }, [dbMineralUnitsByName]);
+
+  const getMineralLabel = (mineralKey, targetLanguage = language) => {
+    if (mineralKey === ALL_MINERALS_KEY) return t.allMinerals;
+    return dbMineralLabelsByName?.[mineralKey]?.[targetLanguage] || getLocalizedMineral(mineralKey, targetLanguage);
   };
 
   const allCountries = useMemo(
@@ -480,7 +511,8 @@ export default function M1Page() {
       Object.entries(yearsMap).forEach(([year, rowsForYear]) => {
         if (!acc[year]) acc[year] = {};
         rowsForYear.forEach((row) => {
-          acc[year][row.country] = (acc[year][row.country] || 0) + row.value;
+          // Sum on the normalized base value — units differ across minerals.
+          acc[year][row.country] = (acc[year][row.country] || 0) + (row.valueBase ?? row.value);
         });
       });
       return acc;
@@ -501,6 +533,56 @@ export default function M1Page() {
     return ys[ys.length - 1];
   });
   const [search, setSearch] = useState("");
+  const [isMineralPanelOpen, setIsMineralPanelOpen] = useState(false);
+  const [mineralSearchQuery, setMineralSearchQuery] = useState("");
+  const mineralPanelRef = useRef(null);
+
+  const visibleMineralLimit = 10;
+
+  const compactMinerals = useMemo(() => {
+    const defaultVisible = minerals.slice(0, visibleMineralLimit + 1);
+    if (activeMineral && !defaultVisible.includes(activeMineral) && minerals.includes(activeMineral)) {
+      return [...defaultVisible, activeMineral];
+    }
+    return defaultVisible;
+  }, [activeMineral, minerals]);
+
+  const hasMoreMinerals = minerals.length > compactMinerals.length;
+
+  const filteredMinerals = useMemo(() => {
+    const query = mineralSearchQuery.trim().toLowerCase();
+    if (!query) return minerals;
+
+    return minerals.filter((mineralKey) => {
+      const labels = dbMineralLabelsByName[mineralKey] || {};
+      const haystack = [
+        mineralKey,
+        labels.ar,
+        labels.fr,
+        labels.en,
+        getLocalizedMineral(mineralKey, "ar"),
+        getLocalizedMineral(mineralKey, "fr"),
+        getLocalizedMineral(mineralKey, "en"),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return haystack.includes(query);
+    });
+  }, [dbMineralLabelsByName, mineralSearchQuery, minerals]);
+
+  useEffect(() => {
+    if (!isMineralPanelOpen) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (mineralPanelRef.current?.contains(event.target)) return;
+      setIsMineralPanelOpen(false);
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, [isMineralPanelOpen]);
 
   useEffect(() => {
     if (!minerals.length) return;
@@ -532,6 +614,8 @@ export default function M1Page() {
     const ys = mineralYears(sourceWithAllMinerals, m);
     setActiveYear(ys[ys.length - 1]);
     setSearch("");
+    setMineralSearchQuery("");
+    setIsMineralPanelOpen(false);
   };
 
   const baseRows = useMemo(() => {
@@ -623,7 +707,27 @@ export default function M1Page() {
       barInstanceRef.current?.destroy();
       barInstanceRef.current = null;
     };
-  }, [baseRows, activeMineral, language, t.production]);
+  }, [baseRows, activeMineral, language, t.production, getMineralUnitLabel]);
+
+  const renderMineralChip = (m, extraClasses = "") => (
+    <button
+      key={m}
+      type="button"
+      onClick={() => handleMineralChange(m)}
+      className={`inline-flex items-center rounded-2xl border px-4 py-1.5 text-sm font-extrabold transition ${
+        m === activeMineral
+          ? "border-[#082721] bg-[#082721] text-white shadow-sm"
+          : "border-slate-200 bg-white text-[#082721] hover:bg-slate-50"
+      } ${extraClasses}`}
+    >
+      {getMineralLabel(m)}
+      {m !== ALL_MINERALS_KEY ? (
+        <span className={`${language === "ar" ? "mr-2" : "ml-2"} text-[10px] opacity-60`}>
+          ({getMineralUnitLabel(m, language)})
+        </span>
+      ) : null}
+    </button>
+  );
 
   return (
     <div
@@ -664,15 +768,56 @@ export default function M1Page() {
                 ))}
               </select>
             </div>
-            <div className="mb-3 flex gap-2 flex-wrap">
-              {minerals.map((m) => (
-                <button key={m} type="button" onClick={() => handleMineralChange(m)} className={`inline-flex items-center rounded-2xl border px-4 py-1.5 text-sm font-extrabold transition ${m === activeMineral ? "border-[#082721] bg-[#082721] text-white shadow-sm" : "border-slate-200 bg-white text-[#082721] hover:bg-slate-50"}`}>
-                  {getLocalizedMineral(m, language)}
-                  {m !== ALL_MINERALS_KEY ? (
-                    <span className="mr-2 text-[10px] opacity-60">({getMineralUnitLabel(m, language)})</span>
-                  ) : null}
-                </button>
-              ))}
+            <div ref={mineralPanelRef} className="relative mb-3">
+              <div className="flex flex-wrap gap-2">
+                {compactMinerals.map((m) => renderMineralChip(m))}
+                {hasMoreMinerals ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsMineralPanelOpen((open) => !open)}
+                    className="inline-flex items-center rounded-2xl border border-[#ddbc6b]/70 bg-[#ddbc6b]/15 px-4 py-1.5 text-sm font-extrabold text-[#082721] transition hover:bg-[#ddbc6b]/25"
+                    aria-expanded={isMineralPanelOpen}
+                  >
+                    + {t.seeMore}
+                  </button>
+                ) : null}
+              </div>
+
+              {isMineralPanelOpen ? (
+                <div className="fixed inset-x-3 top-24 z-50 max-h-[78vh] overflow-hidden rounded-3xl border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-900/25 sm:absolute sm:inset-x-auto sm:top-full sm:mt-2 sm:max-h-[430px] sm:w-[min(720px,calc(100vw-4rem))] sm:shadow-xl">
+                  <div className="mb-3 flex items-center gap-2">
+                    <div className="flex min-w-0 flex-1 items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2">
+                      <Search size={15} strokeWidth={2.2} className="shrink-0 text-slate-400" />
+                      <input
+                        type="text"
+                        value={mineralSearchQuery}
+                        onChange={(e) => setMineralSearchQuery(e.target.value)}
+                        placeholder={t.mineralSearchPlaceholder}
+                        className="w-full border-none bg-transparent text-xs font-bold text-slate-700 outline-none focus:ring-0"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsMineralPanelOpen(false)}
+                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-[#082721] transition hover:bg-slate-50"
+                      aria-label={t.close}
+                    >
+                      <X size={16} strokeWidth={2.4} />
+                    </button>
+                  </div>
+                  <div className="max-h-[calc(78vh-86px)] overflow-y-auto rounded-2xl bg-slate-50 p-2 sm:max-h-[330px]">
+                    {filteredMinerals.length ? (
+                      <div className="flex flex-wrap gap-2">
+                        {filteredMinerals.map((m) => renderMineralChip(m, "justify-center"))}
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl bg-white px-4 py-6 text-center text-sm font-bold text-slate-400">
+                        {t.noResults}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : null}
             </div>
             <div className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-100 bg-slate-50 px-2 py-2 shadow-sm">
               {availableYears.map((y) => (
@@ -750,6 +895,7 @@ export default function M1Page() {
               language={language}
               annualEvolutionLabel={t.annualEvolution}
               sourceData={sourceWithAllMinerals}
+              getMineralLabel={getMineralLabel}
               getMineralUnitLabel={getMineralUnitLabel}
             />
           </section>

@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS world_production (
 
 CREATE TABLE IF NOT EXISTS mineral_trade (
     id BIGSERIAL PRIMARY KEY,
-    hs_codes VARCHAR(100),
+    hs_codes TEXT,
     mineral_name_ar VARCHAR(255) NOT NULL,
     mineral_name_en VARCHAR(255) NOT NULL,
     mineral_name_fr VARCHAR(255) NOT NULL,
@@ -114,3 +114,8 @@ CREATE INDEX IF NOT EXISTS idx_world_production_mineral ON world_production(mine
 CREATE INDEX IF NOT EXISTS idx_trade_world_year ON trade_world(year);
 CREATE INDEX IF NOT EXISTS idx_trade_world_country ON trade_world(reporter_country_id);
 CREATE INDEX IF NOT EXISTS idx_trade_world_partner ON trade_world(partner_id);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_trade_partners_en ON trade_partners(name_en);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_mineral_trade_en ON mineral_trade(mineral_name_en);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_trade_world_key
+ON trade_world(reporter_country_id, partner_id, mineral_trade_id, year, type_trade);

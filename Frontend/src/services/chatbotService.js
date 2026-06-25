@@ -7,9 +7,11 @@ export const chatbotService = {
    * @param {string} message - User message
    * @param {string} language - Language (ar, en, fr)
    * @param {string} sessionId - Session ID for continuity
+   * @param {string|null} clarifyChoice - Selected intent ("SQL"|"RAG"|"LIST"|"CHART")
+   *        after a clarification prompt; echoes the original message with the choice.
    * @returns {Promise<Object>} - Chat response with answer, sql, etc.
    */
-  async sendMessage(message, language = "ar", sessionId = "web-session") {
+  async sendMessage(message, language = "ar", sessionId = "web-session", clarifyChoice = null) {
     try {
       const response = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
@@ -21,6 +23,7 @@ export const chatbotService = {
           language,
           session_id: sessionId,
           user_type: "anonymous",
+          ...(clarifyChoice ? { clarify_choice: clarifyChoice } : {}),
         }),
       });
 

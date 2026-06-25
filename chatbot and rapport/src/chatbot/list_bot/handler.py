@@ -80,15 +80,56 @@ def _message_bucket(message: str) -> str:
     return "latin"
 
 
+# Confidence the scorer assigns to a single matched keyword, by how
+# distinctive (long) the keyword phrase is. A bare generic token such as
+# "gold" or "help" is a weak signal and stays below the answer threshold on
+# its own; a multi-word phrase such as "which countries" or "data sources" is
+# a strong signal that clears it.
+_SPECIFICITY_3PLUS: float = 0.75
+_SPECIFICITY_2WORD: float = 0.60
+_SPECIFICITY_1WORD: float = 0.30
+# Fragment matches are capped here so they can clear the answer threshold
+# (0.55) but never the precheck threshold (0.90) — only an exact whole-message
+# match (1.0) is allowed to bypass the LLM router.
+_FRAGMENT_CAP: float = 0.85
+
+
+def _keyword_specificity(keyword: str) -> float:
+    """How strong a signal a keyword phrase is, based on its word count."""
+    words = keyword.split()
+    if len(words) >= 3:
+        return _SPECIFICITY_3PLUS
+    if len(words) == 2:
+        return _SPECIFICITY_2WORD
+    return _SPECIFICITY_1WORD
+
+
+def _contains_phrase(padded_message: str, phrase: str) -> bool:
+    """Whole-phrase, word-boundary match (no mid-word substring hits).
+
+    Both sides are space-normalized, so padding with single spaces lets us
+    require the phrase to sit on word boundaries in either script — this stops
+    short tokens from matching inside longer words (e.g. "or" in "world").
+    """
+    if not phrase:
+        return False
+    return f" {phrase} " in padded_message
+
+
 def _score_entry(entry: dict, normalized_message: str, message_bucket: str) -> float:
     """
     Compute a match score between a KB entry and the user's message.
 
-    Score = number of keyword fragments found in message / total fragments.
+    Scoring:
+      - An exact whole-message match returns 1.0 (lets the router skip the LLM).
+      - Otherwise the score is the specificity of the strongest matched keyword
+        phrase, plus a small bonus per corroborating match, capped below the
+        precheck threshold so fragment matches never bypass the LLM router.
 
     Args:
-        entry:           A knowledge base entry dict with a "keywords" list.
+        entry:              A knowledge base entry dict with a "keywords" list.
         normalized_message: The user's normalized message.
+        message_bucket:     "ar" for Arabic-script messages, else "latin".
 
     Returns:
         Float in [0.0, 1.0].
@@ -100,15 +141,24 @@ def _score_entry(entry: dict, normalized_message: str, message_bucket: str) -> f
     if normalized_message in normalized_keywords and len(normalized_message.split()) > 1:
         return 1.0
 
+    # Match an Arabic message against Arabic keywords; match a Latin-script
+    # message against everything non-Arabic (so accented French keywords, which
+    # bucket as "fr", are not silently dropped).
     if message_bucket == "ar":
         candidates = [kw for kw in normalized_keywords if _keyword_bucket(kw) == "ar"]
     else:
-        candidates = [kw for kw in normalized_keywords if _keyword_bucket(kw) == "latin"]
+        candidates = [kw for kw in normalized_keywords if _keyword_bucket(kw) != "ar"]
     if not candidates:
         candidates = normalized_keywords
 
-    matched = sum(1 for kw in candidates if kw and kw in normalized_message)
-    return matched / len(candidates)
+    padded = f" {normalized_message} "
+    hits = [kw for kw in candidates if _contains_phrase(padded, kw)]
+    if not hits:
+        return 0.0
+
+    best = max(_keyword_specificity(kw) for kw in hits)
+    score = best + 0.10 * (len(hits) - 1)
+    return min(score, _FRAGMENT_CAP)
 
 
 def _best_match(message: str, language: str = "") -> tuple[Optional[dict], float]:

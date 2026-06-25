@@ -91,27 +91,58 @@ class RedisSessionStore:
         self._client = client
         self._prefix = prefix
         self._ttl = ttl
+        # If Redis becomes unreachable at request time (e.g. the container is
+        # stopped), degrade to an in-memory store instead of 500-ing every chat
+        # turn. Mirrors the silent-failure design of the SQL cache.
+        self._fallback = InMemorySessionStore()
+        self._degraded = False
 
     def _key(self, session_id: str) -> str:
         return f"{self._prefix}{session_id}"
 
+    def _degrade(self, exc: Exception) -> None:
+        if not self._degraded:
+            logger.warning(
+                "Redis session store unavailable (%s); using in-memory sessions "
+                "for this process", exc,
+            )
+            self._degraded = True
+
     def get_or_create(self, session_id: Optional[str]) -> Session:
-        if session_id:
-            raw = self._client.get(self._key(session_id))
-            if raw:
-                session = _deserialize(raw)
-                self._client.expire(self._key(session_id), self._ttl)
-                return session
-        new_id = session_id or str(uuid.uuid4())
-        session = Session(session_id=new_id, user=UserContext())
-        self.save(session)
-        return session
+        if self._degraded:
+            return self._fallback.get_or_create(session_id)
+        try:
+            if session_id:
+                raw = self._client.get(self._key(session_id))
+                if raw:
+                    session = _deserialize(raw)
+                    self._client.expire(self._key(session_id), self._ttl)
+                    return session
+            new_id = session_id or str(uuid.uuid4())
+            session = Session(session_id=new_id, user=UserContext())
+            self._client.set(self._key(new_id), _serialize(session), ex=self._ttl)
+            return session
+        except Exception as exc:
+            self._degrade(exc)
+            return self._fallback.get_or_create(session_id)
 
     def save(self, session: Session) -> None:
-        self._client.set(self._key(session.session_id), _serialize(session), ex=self._ttl)
+        if self._degraded:
+            self._fallback.save(session)
+            return
+        try:
+            self._client.set(self._key(session.session_id), _serialize(session), ex=self._ttl)
+        except Exception as exc:
+            self._degrade(exc)
+            self._fallback.save(session)
 
     def touch(self, session_id: str) -> None:
-        self._client.expire(self._key(session_id), self._ttl)
+        if self._degraded:
+            return
+        try:
+            self._client.expire(self._key(session_id), self._ttl)
+        except Exception as exc:
+            self._degrade(exc)
 
 
 def _redis_reachable() -> bool:

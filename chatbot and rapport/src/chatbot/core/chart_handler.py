@@ -21,6 +21,45 @@ _DEFAULT_TOP_N = 10
 _MAX_CHART_ROWS = 50
 _CHART_REQUESTS = frozenset(["line", "bar", "table", "donut"])
 
+# `production_value_base` is normalised to a single base unit per measurement
+# family (see pipelines/config.UNIT_DEFINITIONS and load_public_production):
+# mass minerals collapse to TONNES, volume minerals to CUBIC METRES (m³). The
+# DB keeps each row's *original* reported unit, so a production spec carries
+# this sentinel and the real, user-facing unit is resolved from the data right
+# before the response is built — internal teams never see "base unit" anymore.
+_BASE_PRODUCTION_UNIT = "base production unit"
+_DEFAULT_MEASUREMENT_TYPE = "mass"
+_BASE_UNIT_LABELS = {
+    "mass": {"en": "tonnes", "fr": "tonnes", "ar": "طن"},
+    "volume": {"en": "m³", "fr": "m³", "ar": "متر مكعب"},
+}
+# The exact `unit_en` strings the loader stores for volume measures.
+_VOLUME_UNITS_SQL = "('m³','thousand m³','million m³')"
+
+
+def _measurement_type_expr(unit_col: str) -> str:
+    """SQL fragment classifying a reported unit column into its base-unit family."""
+    return f"CASE WHEN {unit_col} IN {_VOLUME_UNITS_SQL} THEN 'volume' ELSE 'mass' END"
+
+
+def _resolve_base_unit(data: list[dict[str, Any]], language: str) -> str:
+    """Pick the real production unit (tonnes / m³) from the rows' measurement type.
+
+    Defaults to mass/tonnes when the type is unknown or rows mix families, since
+    mass dominates AMIP's solid-mineral data and tonnes is the safe label.
+    """
+    types = {row.get("measurement_type") for row in (data or []) if row.get("measurement_type")}
+    measurement = "volume" if types == {"volume"} else _DEFAULT_MEASUREMENT_TYPE
+    labels = _BASE_UNIT_LABELS[measurement]
+    return labels.get(language) or labels["en"]
+
+
+def _display_unit(spec: "ChartSpec", data: list[dict[str, Any]], language: str) -> str:
+    """Swap the internal base-unit sentinel for a user-facing real unit."""
+    if spec.unit == _BASE_PRODUCTION_UNIT:
+        return _resolve_base_unit(data, language)
+    return spec.unit
+
 _COUNTRIES = {
     "Morocco": {
         "en": ["morocco"],
@@ -146,8 +185,25 @@ def _label_expr(base: str, language: str) -> str:
     return "COALESCE(" + ", ".join(order) + ")"
 
 
+# Arabic attaches proclitics (و ف ل ب ك) — and the article ال — directly onto
+# the following word, so a literal word boundary never survives: "لشركاء"
+# ("for partners") would not match the signal "شركاء". For Arabic terms we
+# allow an optional run of leading proclitic letters (plus article) before the
+# term, anchored so it only fires at a word start. For ASCII we keep
+# word-boundary matching but tolerate a trailing plural "s" (French
+# "partenaires" vs the signal "partenaire", English "prices" vs "price").
+_ARABIC_CHAR = re.compile(r"[؀-ۿ]")
+_AR_PROCLITIC_PREFIX = r"(?<![؀-ۿ])[ولبكف]{0,3}(?:ال)?"
+
+
+def _term_pattern(term: str) -> str:
+    if _ARABIC_CHAR.search(term):
+        return _AR_PROCLITIC_PREFIX + re.escape(term)
+    return rf"(?<!\w){re.escape(term)}s?(?!\w)"
+
+
 def _contains_any(text: str, signals: list[str]) -> bool:
-    return any(re.search(rf"(?<!\w){re.escape(signal)}(?!\w)", text) for signal in signals)
+    return any(re.search(_term_pattern(signal), text) for signal in signals)
 
 
 def _detect_year(message: str) -> int | None:
@@ -277,7 +333,7 @@ def _detect_entities(message: str, catalogue: dict[str, dict[str, list[str]]]) -
         positions = []
         for aliases in languages.values():
             for alias in aliases:
-                match = re.search(rf"(?<!\w){re.escape(alias.lower())}(?!\w)", lowered)
+                match = re.search(_term_pattern(alias.lower()), lowered)
                 if match:
                     positions.append(match.start())
         if positions:
@@ -354,8 +410,23 @@ def _build_top_producers(message: str, language: str) -> ChartSpec:
                {mineral_label} AS series,
                year,
                total_production_base AS value,
+               measurement_type,
                production_rank
-        FROM minerals.v_top_arab_producers
+        FROM (
+            SELECT c.name_en AS country_name_en, c.name_fr AS country_name_fr, c.name_ar AS country_name_ar,
+                   mp.mineral_name_en, mp.mineral_name_fr, mp.mineral_name_ar,
+                   ap.year,
+                   SUM(ap.production_value_base) AS total_production_base,
+                   MAX({_measurement_type_expr('ap.unit_en')}) AS measurement_type,
+                   RANK() OVER (PARTITION BY ap.mineral_production_id, ap.year
+                                ORDER BY SUM(ap.production_value_base) DESC NULLS LAST) AS production_rank
+            FROM public.arab_production ap
+            JOIN public.countries c ON c.id = ap.country_id
+            JOIN public.mineral_production mp ON mp.id = ap.mineral_production_id
+            GROUP BY c.name_en, c.name_fr, c.name_ar,
+                     mp.mineral_name_en, mp.mineral_name_fr, mp.mineral_name_ar,
+                     ap.year, ap.mineral_production_id
+        ) AS v_top_arab_producers
         WHERE {where_sql}
         ORDER BY production_rank ASC, value DESC NULLS LAST
         LIMIT {limit}
@@ -363,10 +434,10 @@ def _build_top_producers(message: str, language: str) -> ChartSpec:
     return ChartSpec(
         intent="top_producers",
         chart_type="bar",
-        source_view="minerals.v_top_arab_producers",
+        source_view="public.arab_production",
         x_axis="country",
         y_axis="total_production_base",
-        unit="base production unit",
+        unit=_BASE_PRODUCTION_UNIT,
         sql=sql,
         filters_used=filters_used,
         series=["mineral"],
@@ -419,7 +490,18 @@ def _build_production_trend(message: str, language: str) -> ChartSpec:
                SUM(production_value_base) AS value,
                COALESCE(unit_{language}, unit_en, unit_ar, unit_fr) AS unit,
                measurement_type
-        FROM minerals.v_arab_production
+        FROM (
+            SELECT c.name_en AS country_name_en, c.name_fr AS country_name_fr, c.name_ar AS country_name_ar,
+                   mp.mineral_name_en, mp.mineral_name_fr, mp.mineral_name_ar,
+                   ap.year, ap.production_value_base,
+                   ap.unit_en, ap.unit_fr, ap.unit_ar,
+                   CASE WHEN ap.unit_en IN ('tonne','thousand tonnes','kg') THEN 'mass'
+                        WHEN ap.unit_en IN ('m³','thousand m³','million m³') THEN 'volume'
+                        ELSE 'other' END AS measurement_type
+            FROM public.arab_production ap
+            JOIN public.countries c ON c.id = ap.country_id
+            JOIN public.mineral_production mp ON mp.id = ap.mineral_production_id
+        ) AS v_arab_production
         {where_sql}
         GROUP BY year, label, country, mineral, series, unit, measurement_type
         ORDER BY year, country, mineral
@@ -428,10 +510,10 @@ def _build_production_trend(message: str, language: str) -> ChartSpec:
     return ChartSpec(
         intent="production_trend",
         chart_type="line",
-        source_view="minerals.v_arab_production",
+        source_view="public.arab_production",
         x_axis="year",
         y_axis="production_value_base",
-        unit="base production unit",
+        unit=_BASE_PRODUCTION_UNIT,
         sql=sql,
         filters_used=filters_used,
         series=series_fields,
@@ -457,8 +539,22 @@ def _build_production_vs_world(message: str, language: str) -> ChartSpec:
                {mineral_label} AS label,
                arab_total_base,
                world_production_base,
-               arab_share_pct
-        FROM minerals.v_production_vs_world
+               arab_share_pct,
+               measurement_type
+        FROM (
+            SELECT mp.mineral_name_en, mp.mineral_name_fr, mp.mineral_name_ar,
+                   ap.year, ap.arab_total_base, ap.measurement_type,
+                   wp.production_value_base AS world_production_base,
+                   CASE WHEN wp.production_value_base > 0
+                        THEN ROUND((ap.arab_total_base / wp.production_value_base * 100)::numeric, 2)
+                        END AS arab_share_pct
+            FROM ( SELECT mineral_production_id, year, SUM(production_value_base) AS arab_total_base,
+                          MAX({_measurement_type_expr('unit_en')}) AS measurement_type
+                   FROM public.arab_production GROUP BY mineral_production_id, year ) ap
+            JOIN public.world_production wp
+              ON wp.mineral_production_id = ap.mineral_production_id AND wp.year = ap.year
+            JOIN public.mineral_production mp ON mp.id = ap.mineral_production_id
+        ) AS v_production_vs_world
         {where_sql}
         ORDER BY year, label
         LIMIT {_MAX_CHART_ROWS}
@@ -466,10 +562,10 @@ def _build_production_vs_world(message: str, language: str) -> ChartSpec:
     return ChartSpec(
         intent="production_vs_world",
         chart_type="grouped_bar" if year else "line",
-        source_view="minerals.v_production_vs_world",
+        source_view="public.arab_production + public.world_production",
         x_axis="mineral" if year else "year",
         y_axis="production_value_base",
-        unit="base production unit",
+        unit=_BASE_PRODUCTION_UNIT,
         sql=sql,
         filters_used=filters_used,
         series=["arab_total_base", "world_production_base", "arab_share_pct"],
@@ -497,7 +593,17 @@ def _build_trade_trend(message: str, language: str) -> ChartSpec:
                flow AS series,
                {product_label} AS product,
                SUM(value_usd) AS value
-        FROM minerals.v_trade_world
+        FROM (
+            SELECT c.name_en AS country_name_en, c.name_fr AS country_name_fr, c.name_ar AS country_name_ar,
+                   mt.mineral_name_en AS product_name_en, mt.mineral_name_fr AS product_name_fr, mt.mineral_name_ar AS product_name_ar,
+                   tw.year,
+                   CASE WHEN tw.type_trade = 'export' THEN 'Export'
+                        WHEN tw.type_trade = 'import' THEN 'Import' END AS flow,
+                   tw.value_usd
+            FROM public.trade_world tw
+            JOIN public.countries c ON c.id = tw.reporter_country_id
+            JOIN public.mineral_trade mt ON mt.id = tw.mineral_trade_id
+        ) AS v_trade_world
         {where_sql}
         GROUP BY year, label, series, product
         ORDER BY year, label, series, product
@@ -506,7 +612,7 @@ def _build_trade_trend(message: str, language: str) -> ChartSpec:
     return ChartSpec(
         intent="trade_trend",
         chart_type="line",
-        source_view="minerals.v_trade_world",
+        source_view="public.trade_world",
         x_axis="year",
         y_axis="value_usd",
         unit="USD",
@@ -541,7 +647,17 @@ def _build_trade_by_product(message: str, language: str) -> ChartSpec:
                {country_label} AS country,
                year,
                SUM(value_usd) AS value
-        FROM minerals.v_trade_world
+        FROM (
+            SELECT c.name_en AS country_name_en, c.name_fr AS country_name_fr, c.name_ar AS country_name_ar,
+                   mt.mineral_name_en AS product_name_en, mt.mineral_name_fr AS product_name_fr, mt.mineral_name_ar AS product_name_ar,
+                   tw.year,
+                   CASE WHEN tw.type_trade = 'export' THEN 'Export'
+                        WHEN tw.type_trade = 'import' THEN 'Import' END AS flow,
+                   tw.value_usd
+            FROM public.trade_world tw
+            JOIN public.countries c ON c.id = tw.reporter_country_id
+            JOIN public.mineral_trade mt ON mt.id = tw.mineral_trade_id
+        ) AS v_trade_world
         WHERE {' AND '.join(filters)}
         GROUP BY label, series, country, year
         ORDER BY value DESC NULLS LAST
@@ -550,7 +666,7 @@ def _build_trade_by_product(message: str, language: str) -> ChartSpec:
     return ChartSpec(
         intent="trade_by_product",
         chart_type="grouped_bar" if not flow else "bar",
-        source_view="minerals.v_trade_world",
+        source_view="public.trade_world",
         x_axis="trade_product",
         y_axis="value_usd",
         unit="USD",
@@ -580,9 +696,21 @@ def _build_bilateral_partner_breakdown(message: str, language: str) -> ChartSpec
                flow AS series,
                {country_label} AS country,
                year,
-               SUM(value_usd_thousand) AS value,
+               SUM(value_usd) AS value,
                AVG(share_pct) AS share_pct
-        FROM minerals.v_bilateral_trade
+        FROM (
+            SELECT c.name_en AS country_name_en, c.name_fr AS country_name_fr, c.name_ar AS country_name_ar,
+                   tp.name_en AS partner_name_en, tp.name_fr AS partner_name_fr, tp.name_ar AS partner_name_ar,
+                   pt.year,
+                   CASE WHEN pt.type_trade = 'export' THEN 'Export'
+                        WHEN pt.type_trade = 'import' THEN 'Import' END AS flow,
+                   pt.value_usd,
+                   ROUND(100.0 * pt.value_usd
+                         / NULLIF(SUM(pt.value_usd) OVER (PARTITION BY pt.reporter_country_id, pt.year, pt.type_trade), 0), 2) AS share_pct
+            FROM public.partner_trade pt
+            JOIN public.countries c ON c.id = pt.reporter_country_id
+            JOIN public.trade_partners tp ON tp.id = pt.partner_id
+        ) AS v_bilateral_trade
         WHERE {' AND '.join(filters)}
         GROUP BY label, series, country, year
         ORDER BY value DESC NULLS LAST
@@ -591,10 +719,10 @@ def _build_bilateral_partner_breakdown(message: str, language: str) -> ChartSpec
     return ChartSpec(
         intent="bilateral_partner_breakdown",
         chart_type="donut" if flow else "grouped_bar",
-        source_view="minerals.v_bilateral_trade",
+        source_view="public.partner_trade",
         x_axis="partner",
-        y_axis="value_usd_thousand",
-        unit="US$ thousand",
+        y_axis="value_usd",
+        unit="USD",
         sql=sql,
         filters_used=filters_used,
         series=["flow"],
@@ -611,9 +739,21 @@ def _build_country_trade_summary(message: str, language: str) -> ChartSpec:
                year,
                export_value_usd,
                import_value_usd,
-               bilateral_export_usd_thousand,
-               bilateral_import_usd_thousand
-        FROM minerals.v_country_trade_summary
+               bilateral_export_usd,
+               bilateral_import_usd
+        FROM (
+            SELECT c.name_en AS country_name_en, c.name_fr AS country_name_fr, c.name_ar AS country_name_ar,
+                   tw.year,
+                   SUM(tw.value_usd) FILTER (WHERE tw.type_trade = 'export') AS export_value_usd,
+                   SUM(tw.value_usd) FILTER (WHERE tw.type_trade = 'import') AS import_value_usd,
+                   (SELECT SUM(pt.value_usd) FROM public.partner_trade pt
+                     WHERE pt.reporter_country_id = tw.reporter_country_id AND pt.year = tw.year AND pt.type_trade = 'export') AS bilateral_export_usd,
+                   (SELECT SUM(pt.value_usd) FROM public.partner_trade pt
+                     WHERE pt.reporter_country_id = tw.reporter_country_id AND pt.year = tw.year AND pt.type_trade = 'import') AS bilateral_import_usd
+            FROM public.trade_world tw
+            JOIN public.countries c ON c.id = tw.reporter_country_id
+            GROUP BY c.name_en, c.name_fr, c.name_ar, tw.year, tw.reporter_country_id
+        ) AS v_country_trade_summary
         {where_sql}
         ORDER BY year, label
         LIMIT {_MAX_CHART_ROWS}
@@ -621,64 +761,63 @@ def _build_country_trade_summary(message: str, language: str) -> ChartSpec:
     return ChartSpec(
         intent="country_trade_summary",
         chart_type="grouped_bar",
-        source_view="minerals.v_country_trade_summary",
+        source_view="public.trade_world + public.partner_trade",
         x_axis="year",
         y_axis="trade_values",
-        unit="USD / US$ thousand",
+        unit="USD",
         sql=sql,
         filters_used={"country": country} if country else {},
-        series=["export_value_usd", "import_value_usd", "bilateral_export_usd_thousand", "bilateral_import_usd_thousand"],
+        series=["export_value_usd", "import_value_usd", "bilateral_export_usd", "bilateral_import_usd"],
         clarification={"missing_filters": ["country"], "assumption": "showing all countries"} if not country else None,
     )
 
 
 def _build_data_quality_summary(message: str, language: str) -> ChartSpec:
     sql = """
-        SELECT issue_type AS label,
-               severity AS series,
-               entity_type,
-               SUM(issue_count) AS value
-        FROM minerals.v_data_quality_summary
-        GROUP BY issue_type, severity, entity_type
-        ORDER BY value DESC NULLS LAST
+        SELECT mineral_name_en AS label,
+               NULL::text AS series,
+               'mineral' AS entity_type,
+               NULL::bigint AS value
+        FROM public.mineral_production
+        WHERE 1 = 0
         LIMIT 30
     """
     return ChartSpec(
         intent="data_quality_summary",
         chart_type="bar",
-        source_view="minerals.v_data_quality_summary",
+        source_view="public (no data-quality diagnostics)",
         x_axis="issue_type",
         y_axis="issue_count",
         unit="issues",
         sql=sql,
         filters_used={},
         series=["severity", "entity_type"],
+        clarification={"note": "Data-quality diagnostics are not available for the current schema."},
     )
 
 
 def _build_price_trend(message: str, language: str) -> ChartSpec:
     # Price facts are part of Warehouse V2, but no chatbot-facing price view exists yet.
     sql = """
-        SELECT p.asset_name_en AS label,
-               y.year,
-               y.avg_price AS value,
-               p.quote_currency AS series
-        FROM minerals.agg_mineral_price_yearly y
-        JOIN minerals.dim_price_assets p ON p.price_asset_id = y.price_asset_id
-        ORDER BY y.year, label
+        SELECT mineral_name_en AS label,
+               NULL::int AS year,
+               NULL::numeric AS value,
+               NULL::text AS series
+        FROM public.mineral_production
+        WHERE 1 = 0
         LIMIT 50
     """
     return ChartSpec(
         intent="price_trend",
         chart_type="line",
-        source_view="minerals.agg_mineral_price_yearly",
+        source_view="public (no price data loaded)",
         x_axis="year",
         y_axis="avg_price",
         unit="price",
         sql=sql,
         filters_used={},
         series=["asset", "quote_currency"],
-        clarification={"note": "price data may be empty until the price loader is populated"},
+        clarification={"note": "Price data is not loaded in this database; price charts are unavailable."},
     )
 
 
@@ -731,7 +870,7 @@ def _json_value(value: Any) -> Any:
     return value
 
 
-def _insight(data: list[dict[str, Any]], spec: ChartSpec, language: str) -> str:
+def _insight(data: list[dict[str, Any]], spec: ChartSpec, language: str, unit: str | None = None) -> str:
     if not data:
         return t("chart_no_data", language)
     value_rows = [row for row in data if isinstance(row.get("value"), (int, float)) and row.get("value") is not None]
@@ -740,11 +879,12 @@ def _insight(data: list[dict[str, Any]], spec: ChartSpec, language: str) -> str:
     top = max(value_rows, key=lambda row: row["value"])
     label = top.get("country") or top.get("series") or top.get("label") or "top item"
     value = top.get("value")
+    suffix = f" {unit}" if unit else ""
     if language == "ar":
-        return f"أعلى قيمة في النتائج هي {value} لـ {label}."
+        return f"أعلى قيمة في النتائج هي {value}{suffix} لـ {label}."
     if language == "fr":
-        return f"La valeur la plus élevée dans les résultats est {value} pour {label}."
-    return f"The highest value in the result is {value} for {label}."
+        return f"La valeur la plus élevée dans les résultats est {value}{suffix} pour {label}."
+    return f"The highest value in the result is {value}{suffix} for {label}."
 
 
 def _no_data_response(spec: ChartSpec, language: str) -> dict[str, Any]:
@@ -753,10 +893,11 @@ def _no_data_response(spec: ChartSpec, language: str) -> dict[str, Any]:
         "answer": t("chart_no_data", language),
         "chart_type": "table",
         "chart_title": title,
+        "chart_intent": spec.intent,
         "x_axis": spec.x_axis,
         "y_axis": spec.y_axis,
         "series": spec.series,
-        "unit": spec.unit,
+        "unit": _display_unit(spec, [], language),
         "data": [],
         "chart_data": [],
         "insight": t("chart_no_data", language),
@@ -780,15 +921,17 @@ async def handle_chart(message: str, language: str) -> dict[str, Any]:
 
         chart_type = spec.chart_type if spec.x_axis else "table"
 
-        insight = _insight(data, spec, language)
+        display_unit = _display_unit(spec, data, language)
+        insight = _insight(data, spec, language, display_unit)
         return {
             "answer": t("chart_answer", language, title=title),
             "chart_type": chart_type,
             "chart_title": title,
+            "chart_intent": spec.intent,
             "x_axis": spec.x_axis,
             "y_axis": spec.y_axis,
             "series": spec.series,
-            "unit": spec.unit,
+            "unit": display_unit,
             "data": data,
             "chart_data": data,
             "insight": insight,
@@ -804,6 +947,7 @@ async def handle_chart(message: str, language: str) -> dict[str, Any]:
             "answer": "An internal error occurred. Please try again.",
             "chart_type": None,
             "chart_title": None,
+            "chart_intent": spec.intent,
             "x_axis": None,
             "y_axis": None,
             "series": [],

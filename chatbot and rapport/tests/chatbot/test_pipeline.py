@@ -1,4 +1,6 @@
-import pytest
+import asyncio
+from unittest.mock import AsyncMock, patch
+
 from src.chatbot.core.pipeline import detect_language
 
 
@@ -21,3 +23,19 @@ def test_arabic_takes_priority_over_french_keywords():
 
 def test_defaults_to_english():
     assert detect_language("xyz unknown language tokens 123") == "en"
+
+
+def test_no_sql_sentinel_does_not_surface_validator_error():
+    from src.chatbot.core import pipeline
+
+    async def _run():
+        with patch.object(pipeline, "get_schema_for_question", return_value="schema"), \
+             patch.object(pipeline, "generate_sql", new=AsyncMock(return_value="NO_SQL")):
+            return await pipeline.run_pipeline("اريد مقارنة بين معدن الدهي و الفضة", "ar")
+
+    result = asyncio.run(_run())
+
+    assert result["sql"] == "NO_SQL"
+    assert result["error"] is None
+    assert "Only SELECT statements are allowed" not in result["answer"]
+    assert result["answer"] == "لا يمكنني إنشاء استعلام SQL لهذا السؤال. يرجى إعادة الصياغة."

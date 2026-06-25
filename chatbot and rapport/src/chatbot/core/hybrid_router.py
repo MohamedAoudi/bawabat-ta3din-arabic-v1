@@ -11,8 +11,9 @@ from src.chatbot.core.eval_logger import log_turn
 from src.chatbot.core.events import DoneEvent, ErrorEvent, Event, StageEvent, TokenEvent
 from src.chatbot.core.narrator import narrate_stream
 from src.chatbot.core.context_rewriter import rewrite_if_needed
-from src.chatbot.core.pipeline import detect_language, run_pipeline
-from src.chatbot.core.scope_guard import is_in_scope
+from src.chatbot.core.follow_ups import suggest_follow_ups
+from src.chatbot.core.pipeline import _ARABIC_RANGE, _VALID_LANGUAGES, detect_language, run_pipeline
+from src.chatbot.core.scope_guard import is_greeting, is_in_scope
 from src.chatbot.core.session import Session, save_turn
 from src.chatbot.core.sql_executor import execute_sql
 from src.chatbot.core.chart_handler import handle_chart
@@ -34,6 +35,7 @@ def _build_response(
     sql: Optional[str] = None,
     row_count: Optional[int] = None,
     error: Optional[str] = None,
+    follow_up_questions: Optional[list] = None,
 ) -> dict:
     return {
         "answer": answer,
@@ -47,6 +49,7 @@ def _build_response(
         "chart_data": None,
         "chart_title": None,
         "unit": None,
+        "follow_up_questions": follow_up_questions or [],
     }
 
 
@@ -68,15 +71,39 @@ def _rag_empty(language: str) -> str:
     return _MSGS.get(language, _MSGS["en"])
 
 
+def _clarify_prompt(language: str) -> str:
+    _MSGS = {
+        "en": "I want to make sure I answer correctly. What would you like me to do?",
+        "fr": "Je veux être sûr de bien répondre. Que souhaitez-vous que je fasse ?",
+        "ar": "أريد التأكد من الإجابة بشكل صحيح. ماذا تريد أن أفعل؟",
+    }
+    return _MSGS.get(language, _MSGS["en"])
+
+
+def _greeting_message(language: str) -> str:
+    _MSGS = {
+        "en": "Hello! How can I help you today with mining, minerals, and trade data for Arab countries?",
+        "fr": "Bonjour ! Comment puis-je vous aider aujourd'hui concernant les données minières, minérales et commerciales des pays arabes ?",
+        "ar": "مرحباً! كيف يمكنني مساعدتك اليوم في بيانات التعدين والمعادن والتجارة الخاصة بالدول العربية؟",
+    }
+    return _MSGS.get(language, _MSGS["en"])
+
+
 async def route_stream(
     message: str,
     session: Session,
     clarify_choice: Optional[str] = None,
+    requested_language: Optional[str] = None,
 ) -> AsyncIterator[Event]:
     turn_id = str(uuid.uuid4())
 
     # Step 1: Language detection
-    language = detect_language(message)
+    if _ARABIC_RANGE.search(message):
+        language = "ar"
+    elif requested_language in _VALID_LANGUAGES:
+        language = requested_language
+    else:
+        language = detect_language(message)
     session.user.language = language
 
     # Step 1.5: Context rewriting
@@ -125,6 +152,35 @@ async def route_stream(
         )
         return
 
+    # Step 2.5: Greeting short-circuit
+    # Pure greetings get a deterministic reply instead of unreliable LLM routing
+    # (which previously answered "hello" and "hi" inconsistently).
+    if not clarify_choice and is_greeting(message):
+        greeting_text = _greeting_message(language)
+        await log_turn(
+            session_id=session.session_id,
+            message=message,
+            intent="GREETING",
+            answer=greeting_text,
+            language=language,
+            turn_id=turn_id,
+            user_type=session.user.user_type,
+            sector_interest=session.user.sector_interest,
+            country=session.user.country,
+        )
+        save_turn(session, "user", message, "GREETING")
+        save_turn(session, "assistant", greeting_text, "GREETING")
+        yield DoneEvent(
+            {**_build_response(
+                answer=greeting_text,
+                language=language,
+                session_id=session.session_id,
+                intent="GREETING",
+                follow_up_questions=suggest_follow_ups(intent="GREETING", language=language),
+            ), "turn_id": turn_id, "cache_key": None}
+        )
+        return
+
     # Step 3: User type detection
     detect_user_type(message, session)
 
@@ -159,12 +215,13 @@ async def route_stream(
                 yield StageEvent("intent_uncertain", {"confidence": round(confidence, 3)})
                 lang_labels = CLARIFY_LABELS.get(language, CLARIFY_LABELS["en"])
                 clarify_options = [
-                    {"intent": "SQL",  "label": lang_labels["SQL"]},
-                    {"intent": "RAG",  "label": lang_labels["RAG"]},
-                    {"intent": "LIST", "label": lang_labels["LIST"]},
+                    {"intent": "SQL",   "label": lang_labels["SQL"]},
+                    {"intent": "CHART", "label": lang_labels["CHART"]},
+                    {"intent": "RAG",   "label": lang_labels["RAG"]},
+                    {"intent": "LIST",  "label": lang_labels["LIST"]},
                 ]
                 yield DoneEvent({
-                    "answer": "",
+                    "answer": _clarify_prompt(language),
                     "intent": "clarify",
                     "clarify_options": clarify_options,
                     "original_message": message,
@@ -180,6 +237,7 @@ async def route_stream(
                     "chart_data": None,
                     "chart_title": None,
                     "unit": None,
+                    "follow_up_questions": [],
                     "turn_id": turn_id,
                     "cache_key": None,
                 })
@@ -195,6 +253,7 @@ async def route_stream(
     from_cache: bool = False
     cache_key: Optional[str] = None
     chart_type: Optional[str] = None
+    chart_intent: Optional[str] = None
     chart_data: Optional[list] = None
     chart_title: Optional[str] = None
     unit: Optional[str] = None
@@ -215,6 +274,7 @@ async def route_stream(
             chart_result = await handle_chart(message, language)
             answer = chart_result["answer"]
             chart_type = chart_result["chart_type"]
+            chart_intent = chart_result.get("chart_intent")
             chart_data = chart_result["chart_data"]
             chart_title = chart_result["chart_title"]
             unit = chart_result["unit"]
@@ -345,6 +405,19 @@ async def route_stream(
         error = str(exc)
         answer = _error_message(language)
 
+    # Step 7.5: Follow-up suggestions (deterministic; clickable in the UI).
+    # Skipped on error so we never invite a click into a broken state.
+    follow_up_questions: list = []
+    if not error:
+        follow_up_questions = suggest_follow_ups(
+            intent=intent,
+            language=language,
+            message=message,
+            filters_used=filters_used,
+            chart_type=chart_type,
+            chart_intent=chart_intent,
+        )
+
     # Step 8: Memory write
     save_turn(session, "user", message, intent)
     chart_extra = {"chart_type": chart_type, "chart_title": chart_title} if chart_type else None
@@ -387,6 +460,7 @@ async def route_stream(
         "filters_used": filters_used,
         "clarification": clarification,
         "from_cache": from_cache,
+        "follow_up_questions": follow_up_questions,
         "turn_id": turn_id,
         "cache_key": cache_key,
     }
@@ -401,8 +475,14 @@ async def route(
     message: str,
     session: Session,
     clarify_choice: Optional[str] = None,
+    requested_language: Optional[str] = None,
 ) -> dict:
-    async for event in route_stream(message, session, clarify_choice=clarify_choice):
+    async for event in route_stream(
+        message,
+        session,
+        clarify_choice=clarify_choice,
+        requested_language=requested_language,
+    ):
         if isinstance(event, DoneEvent):
             return event.payload
 
