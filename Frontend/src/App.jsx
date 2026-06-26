@@ -25,6 +25,7 @@ import TradeImportsPage from "./pages/TradeImports";
 import CountriesManagementPage from "./pages/CountriesManagement";
 
 import ProductionManagementPage from "./pages/ProductionManagement";
+import ArabProductionManagementPage from "./pages/ArabProductionManagement";
 import WorldProductionManagementPage from "./pages/WorldProductionManagement";
 
 export const LanguageContext = createContext();
@@ -126,6 +127,7 @@ export default function App() {
             <Route path="/trade-imports" element={<RequireAdmin><TradeImportsPage /></RequireAdmin>} />
             <Route path="/countries-management" element={<RequireAdmin><CountriesManagementPage /></RequireAdmin>} />
             <Route path="/production-management" element={<RequireAdmin><ProductionManagementPage /></RequireAdmin>} />
+            <Route path="/production/arab" element={<RequireAdmin><ArabProductionManagementPage /></RequireAdmin>} />
             <Route path="/production/world" element={<RequireAdmin><WorldProductionManagementPage /></RequireAdmin>} />
           </Routes>
         </BrowserRouter>
