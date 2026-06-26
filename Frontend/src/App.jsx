@@ -22,6 +22,7 @@ import Settings from "./pages/Settings";
 import MineralsPage from "./pages/Minerals";
 import TradeExportsPage from "./pages/TradeExports";
 import TradeImportsPage from "./pages/TradeImports";
+import PartnerTradeManagementPage from "./pages/PartnerTradeManagement";
 import CountriesManagementPage from "./pages/CountriesManagement";
 
 import ProductionManagementPage from "./pages/ProductionManagement";
@@ -125,6 +126,9 @@ export default function App() {
             <Route path="/trade/minerals" element={<RequireAdmin><MineralsPage variant="trade" /></RequireAdmin>} />
             <Route path="/trade-exports" element={<RequireAdmin><TradeExportsPage /></RequireAdmin>} />
             <Route path="/trade-imports" element={<RequireAdmin><TradeImportsPage /></RequireAdmin>} />
+            <Route path="/trade/partners" element={<RequireAdmin><PartnerTradeManagementPage /></RequireAdmin>} />
+            <Route path="/trade/partners/exports" element={<RequireAdmin><PartnerTradeManagementPage /></RequireAdmin>} />
+            <Route path="/trade/partners/imports" element={<RequireAdmin><PartnerTradeManagementPage /></RequireAdmin>} />
             <Route path="/countries-management" element={<RequireAdmin><CountriesManagementPage /></RequireAdmin>} />
             <Route path="/production-management" element={<RequireAdmin><ProductionManagementPage /></RequireAdmin>} />
             <Route path="/production/arab" element={<RequireAdmin><ArabProductionManagementPage /></RequireAdmin>} />
