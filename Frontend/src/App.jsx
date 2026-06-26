@@ -119,6 +119,8 @@ export default function App() {
             <Route path="/rapport" element={<RequireAuth><Rapport /></RequireAuth>} />
             <Route path="/settings" element={<RequireAdmin><Settings /></RequireAdmin>} />
             <Route path="/minerals" element={<RequireAdmin><MineralsPage /></RequireAdmin>} />
+            <Route path="/production/minerals" element={<RequireAdmin><MineralsPage /></RequireAdmin>} />
+            <Route path="/trade/minerals" element={<RequireAdmin><MineralsPage variant="trade" /></RequireAdmin>} />
             <Route path="/trade-exports" element={<RequireAdmin><TradeExportsPage /></RequireAdmin>} />
             <Route path="/trade-imports" element={<RequireAdmin><TradeImportsPage /></RequireAdmin>} />
             <Route path="/countries-management" element={<RequireAdmin><CountriesManagementPage /></RequireAdmin>} />

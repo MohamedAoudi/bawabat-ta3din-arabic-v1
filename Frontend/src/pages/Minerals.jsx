@@ -3,12 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { LanguageContext, ThemeContext } from "../App";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { getCurrentUser, refreshCurrentUser } from "../services/authService";
+import {
+  createMineralProduction,
+  deleteMineralProduction,
+  getMineralProduction,
+  updateMineralProduction,
+} from "../services/mineralProductionService";
+import {
+  createMineralTrade,
+  deleteMineralTrade,
+  getAllMineralTrades,
+  updateMineralTrade,
+} from "../services/mineralTradeService";
 
-// mineralService removed — local stubs to avoid external service usage in pages
-const createMineral = async () => null;
-const deleteMineral = async () => null;
-const getMinerals = async () => [];
-const updateMineral = async () => null;
 import { exportMineralsExcel, exportMineralsTemplateExcel, parseMineralsExcelFile } from "../utils/mineralExcel";
 import { Check, ChevronLeft, ChevronRight, Download, Edit, FileSpreadsheet, Gem, Plus, Search, Trash2, Upload, X } from "lucide-react";
 
@@ -17,6 +24,7 @@ const PAGE_SIZE = 15;
 const TRANSLATIONS = {
   ar: {
     pageTitle: "إدارة المعادن",
+    tradePageTitle: "إدارة معادن التجارة",
     noAccess: "لا تملك صلاحيات الوصول لهذه الصفحة",
     search: "بحث",
     add: "إضافة",
@@ -40,13 +48,13 @@ const TRANSLATIONS = {
       name_ar: "الاسم (عربي)",
       name_en: "الاسم (English)",
       name_fr: "الاسم (Français)",
-      category_name_ar: "الفئة (عربي)",
-      category_name_en: "الفئة (English)",
-      category_name_fr: "الفئة (Français)",
+      category_name_ar: "مصدر البيانات",
+      category_name_en: "مصدر البيانات",
+      category_name_fr: "مصدر البيانات",
     },
     columns: {
       mineral: "المعدن",
-      category: "الفئة",
+      category: "المصدر",
       hs: "رمز HS",
       updatedAt: "آخر تحديث",
       actions: "الإجراءات",
@@ -60,6 +68,7 @@ const TRANSLATIONS = {
   },
   fr: {
     pageTitle: "Gestion des minéraux",
+    tradePageTitle: "Gestion des minéraux du commerce",
     noAccess: "Vous n'avez pas accès à cette page",
     search: "Rechercher",
     add: "Ajouter",
@@ -83,13 +92,13 @@ const TRANSLATIONS = {
       name_ar: "Nom (Arabe)",
       name_en: "Nom (English)",
       name_fr: "Nom (Français)",
-      category_name_ar: "Catégorie (Arabe)",
-      category_name_en: "Catégorie (English)",
-      category_name_fr: "Catégorie (Français)",
+      category_name_ar: "Source des données",
+      category_name_en: "Source des données",
+      category_name_fr: "Source des données",
     },
     columns: {
       mineral: "Minéral",
-      category: "Catégorie",
+      category: "Source",
       hs: "Code HS",
       updatedAt: "Mis à jour",
       actions: "Actions",
@@ -103,6 +112,7 @@ const TRANSLATIONS = {
   },
   en: {
     pageTitle: "Minerals management",
+    tradePageTitle: "Trade minerals management",
     noAccess: "You don't have access to this page",
     search: "Search",
     add: "Add",
@@ -126,13 +136,13 @@ const TRANSLATIONS = {
       name_ar: "Name (Arabic)",
       name_en: "Name (English)",
       name_fr: "Name (French)",
-      category_name_ar: "Category (Arabic)",
-      category_name_en: "Category (English)",
-      category_name_fr: "Category (French)",
+      category_name_ar: "Data source",
+      category_name_en: "Data source",
+      category_name_fr: "Data source",
     },
     columns: {
       mineral: "Mineral",
-      category: "Category",
+      category: "Source",
       hs: "HS code",
       updatedAt: "Updated",
       actions: "Actions",
@@ -219,13 +229,28 @@ function MineralsMobileRow({ m, language, colors, t, isRTL, onEdit, onDelete }) 
   );
 }
 
-export default function MineralsPage() {
+export default function MineralsPage({ variant = "production" }) {
   const navigate = useNavigate();
   const { language } = useContext(LanguageContext);
   const { isDarkMode } = useContext(ThemeContext);
 
   const t = TRANSLATIONS[language] || TRANSLATIONS.ar;
+  const pageTitle = variant === "trade" ? t.tradePageTitle : t.pageTitle;
   const isRTL = language === "ar";
+  const mineralApi =
+    variant === "trade"
+      ? {
+          list: getAllMineralTrades,
+          create: createMineralTrade,
+          update: updateMineralTrade,
+          remove: deleteMineralTrade,
+        }
+      : {
+          list: getMineralProduction,
+          create: createMineralProduction,
+          update: updateMineralProduction,
+          remove: deleteMineralProduction,
+        };
 
   const colors = isDarkMode
     ? {
@@ -292,8 +317,21 @@ export default function MineralsPage() {
   }, [navigate]);
 
   const fetchMinerals = async () => {
-    const rows = await getMinerals();
-    setMinerals(Array.isArray(rows) ? rows : []);
+    const rows = await mineralApi.list();
+    setMinerals(
+      Array.isArray(rows)
+        ? rows.map((m) => ({
+            ...m,
+            hs_minerals: m.hs_codes ?? m.hs_minerals ?? "",
+            name_ar: m.mineral_name_ar ?? m.name_ar ?? "",
+            name_en: m.mineral_name_en ?? m.name_en ?? "",
+            name_fr: m.mineral_name_fr ?? m.name_fr ?? "",
+            category_name_ar: m.source_system ?? m.category_name_ar ?? "",
+            category_name_en: m.source_system ?? m.category_name_en ?? "",
+            category_name_fr: m.source_system ?? m.category_name_fr ?? "",
+          }))
+        : []
+    );
   };
 
   useEffect(() => {
@@ -380,10 +418,18 @@ export default function MineralsPage() {
 
     if (!payload.name_ar || !payload.name_en || !payload.name_fr) return;
 
+    const servicePayload = {
+      hs_codes: payload.hs_minerals || null,
+      mineral_name_ar: payload.name_ar,
+      mineral_name_en: payload.name_en,
+      mineral_name_fr: payload.name_fr,
+      source_system: payload.category_name_ar || payload.category_name_en || payload.category_name_fr || null,
+    };
+
     if (creating) {
-      await createMineral(payload);
+      await mineralApi.create(servicePayload);
     } else if (editing?.id) {
-      await updateMineral(editing.id, payload);
+      await mineralApi.update(editing.id, servicePayload);
     }
     await fetchMinerals();
     closeModal();
@@ -391,7 +437,7 @@ export default function MineralsPage() {
 
   const onDelete = async (row) => {
     if (!row?.id) return;
-    await deleteMineral(row.id);
+    await mineralApi.remove(row.id);
     await fetchMinerals();
     setConfirmDelete(null);
   };
@@ -426,7 +472,13 @@ export default function MineralsPage() {
       let fail = 0;
       for (const payload of rows) {
         try {
-          await createMineral(payload);
+          await mineralApi.create({
+            hs_codes: payload.hs_minerals || null,
+            mineral_name_ar: payload.name_ar,
+            mineral_name_en: payload.name_en,
+            mineral_name_fr: payload.name_fr,
+            source_system: payload.category_name_ar || payload.category_name_en || payload.category_name_fr || null,
+          });
           ok += 1;
         } catch {
           fail += 1;
@@ -470,7 +522,7 @@ export default function MineralsPage() {
 
   const pageContent = (
     <>
-      <MobileHeader onMenuClick={() => setSidebarOpen(true)} title={t.pageTitle} />
+      <MobileHeader onMenuClick={() => setSidebarOpen(true)} title={pageTitle} />
 
       <div
         className="p-4 sm:p-6 lg:p-8 xl:px-10 2xl:px-12 max-w-[1600px] mx-auto w-full box-border"
@@ -480,7 +532,7 @@ export default function MineralsPage() {
           <div className="flex items-center gap-2">
             <Gem size={20} style={{ color: colors.gold }} />
             <h1 className="text-xl sm:text-2xl font-bold" style={{ color: colors.ink }}>
-              {t.pageTitle}
+              {pageTitle}
             </h1>
           </div>
 
@@ -789,18 +841,6 @@ export default function MineralsPage() {
                   onChange={(v) => setForm((p) => ({ ...p, category_name_ar: v }))}
                   colors={colors}
                 />
-                <Field
-                  label={t.fields.category_name_en}
-                  value={form.category_name_en}
-                  onChange={(v) => setForm((p) => ({ ...p, category_name_en: v }))}
-                  colors={colors}
-                />
-                <Field
-                  label={t.fields.category_name_fr}
-                  value={form.category_name_fr}
-                  onChange={(v) => setForm((p) => ({ ...p, category_name_fr: v }))}
-                  colors={colors}
-                />
               </div>
             </div>
 
@@ -890,4 +930,3 @@ function Field({ label, value, onChange, colors }) {
     </div>
   );
 }
-

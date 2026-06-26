@@ -6,8 +6,6 @@ export const MINERAL_EXCEL_KEYS = [
   "name_en",
   "name_fr",
   "category_name_ar",
-  "category_name_en",
-  "category_name_fr",
 ];
 
 const HEADER_ALIASES = {
@@ -77,15 +75,13 @@ export async function parseMineralsExcelFile(file, t) {
   for (const raw of rawRows) {
     const item = rowToRecord(raw, columnMap);
     if (!item.hs_minerals && !item.name_ar && !item.name_en && !item.name_fr) continue;
-    if (!item.name_ar || !item.name_en || !item.name_fr || !item.hs_minerals) continue;
+    if (!item.name_ar || !item.name_en || !item.name_fr) continue;
     payloads.push({
       hs_minerals: item.hs_minerals,
       name_ar: item.name_ar,
       name_en: item.name_en,
       name_fr: item.name_fr,
       category_name_ar: item.category_name_ar || null,
-      category_name_en: item.category_name_en || null,
-      category_name_fr: item.category_name_fr || null,
     });
   }
   return payloads;
