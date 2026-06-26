@@ -126,9 +126,11 @@ export default function App() {
             <Route path="/trade/minerals" element={<RequireAdmin><MineralsPage variant="trade" /></RequireAdmin>} />
             <Route path="/trade-exports" element={<RequireAdmin><TradeExportsPage /></RequireAdmin>} />
             <Route path="/trade-imports" element={<RequireAdmin><TradeImportsPage /></RequireAdmin>} />
-            <Route path="/trade/partners" element={<RequireAdmin><PartnerTradeManagementPage /></RequireAdmin>} />
-            <Route path="/trade/partners/exports" element={<RequireAdmin><PartnerTradeManagementPage /></RequireAdmin>} />
-            <Route path="/trade/partners/imports" element={<RequireAdmin><PartnerTradeManagementPage /></RequireAdmin>} />
+            <Route path="/trade/world/exports" element={<RequireAdmin><PartnerTradeManagementPage scope="world" typeFilter="export" /></RequireAdmin>} />
+            <Route path="/trade/world/imports" element={<RequireAdmin><PartnerTradeManagementPage scope="world" typeFilter="import" /></RequireAdmin>} />
+            <Route path="/trade/partners" element={<RequireAdmin><PartnerTradeManagementPage scope="partners" /></RequireAdmin>} />
+            <Route path="/trade/partners/exports" element={<RequireAdmin><PartnerTradeManagementPage scope="partners" typeFilter="export" /></RequireAdmin>} />
+            <Route path="/trade/partners/imports" element={<RequireAdmin><PartnerTradeManagementPage scope="partners" typeFilter="import" /></RequireAdmin>} />
             <Route path="/countries-management" element={<RequireAdmin><CountriesManagementPage /></RequireAdmin>} />
             <Route path="/production-management" element={<RequireAdmin><ProductionManagementPage /></RequireAdmin>} />
             <Route path="/production/arab" element={<RequireAdmin><ArabProductionManagementPage /></RequireAdmin>} />

@@ -13,12 +13,23 @@ import {
   updatePartnerTrade,
 } from "../services/partnerTradeService";
 import { getTradePartners } from "../services/tradePartnerService";
+import {
+  createTradeWorld,
+  deleteTradeWorld,
+  getAllTradeWorld,
+  updateTradeWorld,
+} from "../services/tradeWorldService";
 
 const PAGE_SIZE = 15;
 
 const TRANSLATIONS = {
   ar: {
     pageTitle: "إدارة التجارة مع الشركاء",
+    worldPageTitle: "إدارة التجارة مع العالم",
+    exportPartnersTitle: "الصادرات مع شركاء",
+    importPartnersTitle: "الواردات مع شركاء",
+    exportWorldTitle: "الصادرات مع العالم",
+    importWorldTitle: "الواردات مع العالم",
     noAccess: "لا تملك صلاحيات الوصول لهذه الصفحة",
     search: "بحث",
     add: "إضافة",
@@ -37,6 +48,7 @@ const TRANSLATIONS = {
       mineral: "المعدن",
       year: "السنة",
       value: "القيمة (USD)",
+      share: "النسبة",
       type: "النوع",
       updatedAt: "آخر تحديث",
       actions: "الإجراءات",
@@ -47,6 +59,7 @@ const TRANSLATIONS = {
       mineral_trade_id: "المعدن",
       year: "السنة",
       value_usd: "القيمة بالدولار",
+      value_share: "النسبة",
       type_trade: "نوع التجارة",
     },
     pagination: {
@@ -58,6 +71,11 @@ const TRANSLATIONS = {
   },
   fr: {
     pageTitle: "Gestion du commerce avec les partenaires",
+    worldPageTitle: "Gestion du commerce avec le monde",
+    exportPartnersTitle: "Exportations avec partenaires",
+    importPartnersTitle: "Importations avec partenaires",
+    exportWorldTitle: "Exportations avec le monde",
+    importWorldTitle: "Importations avec le monde",
     noAccess: "Vous n'avez pas accès à cette page",
     search: "Rechercher",
     add: "Ajouter",
@@ -76,6 +94,7 @@ const TRANSLATIONS = {
       mineral: "Minéral",
       year: "Année",
       value: "Valeur (USD)",
+      share: "Part",
       type: "Type",
       updatedAt: "Mis à jour",
       actions: "Actions",
@@ -86,6 +105,7 @@ const TRANSLATIONS = {
       mineral_trade_id: "Minéral",
       year: "Année",
       value_usd: "Valeur (USD)",
+      value_share: "Part",
       type_trade: "Type de commerce",
     },
     pagination: {
@@ -97,6 +117,11 @@ const TRANSLATIONS = {
   },
   en: {
     pageTitle: "Partner trade management",
+    worldPageTitle: "World trade management",
+    exportPartnersTitle: "Exports with partners",
+    importPartnersTitle: "Imports with partners",
+    exportWorldTitle: "Exports with world",
+    importWorldTitle: "Imports with world",
     noAccess: "You don't have access to this page",
     search: "Search",
     add: "Add",
@@ -115,6 +140,7 @@ const TRANSLATIONS = {
       mineral: "Mineral",
       year: "Year",
       value: "Value (USD)",
+      share: "Share",
       type: "Type",
       updatedAt: "Updated",
       actions: "Actions",
@@ -125,6 +151,7 @@ const TRANSLATIONS = {
       mineral_trade_id: "Mineral",
       year: "Year",
       value_usd: "Value (USD)",
+      value_share: "Share",
       type_trade: "Trade type",
     },
     pagination: {
@@ -142,6 +169,7 @@ const emptyForm = {
   mineral_trade_id: "",
   year: "",
   value_usd: "",
+  value_share: "",
   type_trade: "export",
 };
 
@@ -157,12 +185,24 @@ function toNullableNumber(value) {
   return Number.isNaN(n) ? null : n;
 }
 
-export default function PartnerTradeManagementPage() {
+export default function PartnerTradeManagementPage({ scope = "partners", typeFilter = null }) {
   const navigate = useNavigate();
   const { language } = useContext(LanguageContext);
   const { isDarkMode } = useContext(ThemeContext);
   const t = TRANSLATIONS[language] || TRANSLATIONS.ar;
   const isRTL = language === "ar";
+  const isWorld = scope === "world";
+  const pageTitle = isWorld
+    ? typeFilter === "export"
+      ? t.exportWorldTitle
+      : typeFilter === "import"
+        ? t.importWorldTitle
+        : t.worldPageTitle
+    : typeFilter === "export"
+      ? t.exportPartnersTitle
+      : typeFilter === "import"
+        ? t.importPartnersTitle
+        : t.pageTitle;
 
   const colors = isDarkMode
     ? {
@@ -220,7 +260,7 @@ export default function PartnerTradeManagementPage() {
 
   const fetchAll = async () => {
     const [tradeRows, countryRows, partnerRows, mineralRows] = await Promise.all([
-      getAllPartnerTrades(),
+      isWorld ? getAllTradeWorld() : getAllPartnerTrades(),
       getCountries(),
       getTradePartners(),
       getAllMineralTrades(),
@@ -265,14 +305,16 @@ export default function PartnerTradeManagementPage() {
 
   const filteredRows = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((row) =>
+    const typedRows = typeFilter ? rows.filter((row) => row.type_trade === typeFilter) : rows;
+    if (!q) return typedRows;
+    return typedRows.filter((row) =>
       [
         countryLabel(row.reporter_country_id),
         partnerLabel(row.partner_id),
         mineralLabel(row.mineral_trade_id),
         row.year,
         row.value_usd,
+        row.value_share,
         tradeTypeLabel(row.type_trade),
       ]
         .filter(Boolean)
@@ -281,7 +323,7 @@ export default function PartnerTradeManagementPage() {
         .includes(q)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows, searchTerm, language, countries, partners, minerals]);
+  }, [rows, searchTerm, language, countries, partners, minerals, typeFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
 
@@ -304,7 +346,7 @@ export default function PartnerTradeManagementPage() {
   const openCreate = () => {
     setCreating(true);
     setEditing(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, type_trade: typeFilter || "export" });
   };
 
   const openEdit = (row) => {
@@ -316,6 +358,7 @@ export default function PartnerTradeManagementPage() {
       mineral_trade_id: row.mineral_trade_id ?? "",
       year: row.year ?? "",
       value_usd: row.value_usd ?? "",
+      value_share: row.value_share ?? "",
       type_trade: row.type_trade || "export",
     });
   };
@@ -333,13 +376,19 @@ export default function PartnerTradeManagementPage() {
       mineral_trade_id: Number(form.mineral_trade_id),
       year: Number(form.year),
       value_usd: toNullableNumber(form.value_usd),
-      type_trade: form.type_trade,
+      value_share: isWorld ? toNullableNumber(form.value_share) : undefined,
+      type_trade: typeFilter || form.type_trade,
     };
 
     if (!payload.reporter_country_id || !payload.partner_id || !payload.mineral_trade_id || !payload.year || !payload.type_trade) return;
 
-    if (creating) await createPartnerTrade(payload);
-    else if (editing?.id) await updatePartnerTrade(editing.id, payload);
+    if (creating) {
+      if (isWorld) await createTradeWorld(payload);
+      else await createPartnerTrade(payload);
+    } else if (editing?.id) {
+      if (isWorld) await updateTradeWorld(editing.id, payload);
+      else await updatePartnerTrade(editing.id, payload);
+    }
 
     await fetchAll();
     closeModal();
@@ -347,7 +396,8 @@ export default function PartnerTradeManagementPage() {
 
   const onDelete = async (row) => {
     if (!row?.id) return;
-    await deletePartnerTrade(row.id);
+    if (isWorld) await deleteTradeWorld(row.id);
+    else await deletePartnerTrade(row.id);
     await fetchAll();
     setConfirmDelete(null);
   };
@@ -375,13 +425,13 @@ export default function PartnerTradeManagementPage() {
   return (
     <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}>
       <>
-        <MobileHeader onMenuClick={() => setSidebarOpen(true)} title={t.pageTitle} />
+        <MobileHeader onMenuClick={() => setSidebarOpen(true)} title={pageTitle} />
         <div className="p-4 sm:p-6 lg:p-8" style={{ background: colors.bg, minHeight: "100vh" }}>
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-4 sm:mb-6">
             <div className="flex items-center gap-2">
               <Handshake size={20} style={{ color: colors.gold }} />
               <h1 className="text-xl sm:text-2xl font-bold" style={{ color: colors.ink }}>
-                {t.pageTitle}
+                {pageTitle}
               </h1>
             </div>
             <button
@@ -437,7 +487,7 @@ export default function PartnerTradeManagementPage() {
                   <table className="w-full min-w-[1120px]">
                     <thead style={{ background: colors.goldPale }}>
                       <tr>
-                        {[t.columns.reporter, t.columns.partner, t.columns.mineral, t.columns.year, t.columns.value, t.columns.type, t.columns.updatedAt].map((header) => (
+                        {[t.columns.reporter, t.columns.partner, t.columns.mineral, t.columns.year, t.columns.value, ...(isWorld ? [t.columns.share] : []), t.columns.type, t.columns.updatedAt].map((header) => (
                           <th key={header} className={`px-4 sm:px-6 py-3 sm:py-4 text-xs font-semibold ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.forest }}>
                             {header}
                           </th>
@@ -467,6 +517,11 @@ export default function PartnerTradeManagementPage() {
                             <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm font-mono break-all ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.ink }}>
                               {row.value_usd == null ? "-" : Number(row.value_usd).toLocaleString()}
                             </td>
+                            {isWorld && (
+                              <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm font-mono break-all ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
+                                {row.value_share == null ? "-" : Number(row.value_share).toLocaleString()}
+                              </td>
+                            )}
                             <td className={`px-4 sm:px-6 py-3 sm:py-4 text-sm ${isRTL ? "text-right" : "text-left"}`} style={{ color: colors.muted }}>
                               {tradeTypeLabel(row.type_trade)}
                             </td>
@@ -526,18 +581,21 @@ export default function PartnerTradeManagementPage() {
                 <SelectField label={t.fields.reporter_country_id} value={String(form.reporter_country_id)} onChange={(v) => setForm((p) => ({ ...p, reporter_country_id: v }))} options={countries.map((country) => ({ value: String(country.id), label: countryLabel(country.id) }))} colors={colors} />
                 <SelectField label={t.fields.partner_id} value={String(form.partner_id)} onChange={(v) => setForm((p) => ({ ...p, partner_id: v }))} options={partners.map((partner) => ({ value: String(partner.id), label: partnerLabel(partner.id) }))} colors={colors} />
                 <SelectField label={t.fields.mineral_trade_id} value={String(form.mineral_trade_id)} onChange={(v) => setForm((p) => ({ ...p, mineral_trade_id: v }))} options={minerals.map((mineral) => ({ value: String(mineral.id), label: mineralLabel(mineral.id) }))} colors={colors} />
-                <SelectField
-                  label={t.fields.type_trade}
-                  value={String(form.type_trade)}
-                  onChange={(v) => setForm((p) => ({ ...p, type_trade: v }))}
-                  options={[
-                    { value: "export", label: t.export },
-                    { value: "import", label: t.import },
-                  ]}
-                  colors={colors}
-                />
+                {!typeFilter && (
+                  <SelectField
+                    label={t.fields.type_trade}
+                    value={String(form.type_trade)}
+                    onChange={(v) => setForm((p) => ({ ...p, type_trade: v }))}
+                    options={[
+                      { value: "export", label: t.export },
+                      { value: "import", label: t.import },
+                    ]}
+                    colors={colors}
+                  />
+                )}
                 <TextField label={t.fields.year} value={String(form.year)} onChange={(v) => setForm((p) => ({ ...p, year: v }))} colors={colors} inputMode="numeric" />
                 <TextField label={t.fields.value_usd} value={String(form.value_usd)} onChange={(v) => setForm((p) => ({ ...p, value_usd: v }))} colors={colors} inputMode="decimal" />
+                {isWorld && <TextField label={t.fields.value_share} value={String(form.value_share)} onChange={(v) => setForm((p) => ({ ...p, value_share: v }))} colors={colors} inputMode="decimal" />}
               </div>
               <div className="p-4 sm:p-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3" style={{ borderTop: `1px solid ${colors.border}` }}>
                 <button onClick={closeModal} className="px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 text-sm sm:text-base" style={{ background: colors.bg, color: colors.ink, border: `1px solid ${colors.border}` }}>
@@ -549,8 +607,8 @@ export default function PartnerTradeManagementPage() {
                   style={{
                     background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`,
                     color: colors.forest,
-                    opacity: form.reporter_country_id && form.partner_id && form.mineral_trade_id && form.year && form.type_trade ? 1 : 0.6,
-                    pointerEvents: form.reporter_country_id && form.partner_id && form.mineral_trade_id && form.year && form.type_trade ? "auto" : "none",
+                    opacity: form.reporter_country_id && form.partner_id && form.mineral_trade_id && form.year && (typeFilter || form.type_trade) ? 1 : 0.6,
+                    pointerEvents: form.reporter_country_id && form.partner_id && form.mineral_trade_id && form.year && (typeFilter || form.type_trade) ? "auto" : "none",
                   }}
                 >
                   <Check size={18} />
