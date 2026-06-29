@@ -288,10 +288,12 @@ const PAGE_TRANSLATIONS = {
   },
 };
 
+const DISPLAY_NUMBER_LOCALE = "fr-FR";
+
 const NUMBER_LOCALES = {
-  ar: "ar-SA",
-  fr: "fr-FR",
-  en: "en-US",
+  ar: DISPLAY_NUMBER_LOCALE,
+  fr: DISPLAY_NUMBER_LOCALE,
+  en: DISPLAY_NUMBER_LOCALE,
 };
 
 const COUNTRY_AR_TO_CSV_NAME = {
@@ -1076,7 +1078,7 @@ const destroyChart = (ref) => { if (ref.current) { ref.current.destroy(); ref.cu
 
 const fmtVal = (v) => {
   if (!Number.isFinite(Number(v))) return "0";
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(DISPLAY_NUMBER_LOCALE, {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(Number(v));
@@ -1090,7 +1092,7 @@ const formatLargeTonValue = (value, labels, locale, unit = "") => {
 
 const formatDollarValue = (value, labels, locale) => {
   if (value == null) return labels.none;
-  if (value >= 1_000_000) return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(value / 1_000_000)} ${labels.millionDollar}`;
+  if (value >= 1_000_000) return `${fmtVal(value / 1_000_000)} ${labels.millionDollar}`;
   return `${fmtVal(value)} ${labels.dollar}`;
 };
 
@@ -1233,7 +1235,16 @@ const buildCountrySnapshot = ({
   const exportsMap = new Map((exportSeries || []).map((row) => [Number(row?.year), Number(row?.value) || 0]));
   const importsMap = new Map((importSeries || []).map((row) => [Number(row?.year), Number(row?.value) || 0]));
   const selectedYearNumber = Number(year);
-  const effectiveTradeYear = selectedYearNumber;
+  const tradeYears = [
+    ...new Set([
+      ...(exportSeries || []).map((row) => Number(row?.year)).filter(Number.isFinite),
+      ...(importSeries || []).map((row) => Number(row?.year)).filter(Number.isFinite),
+    ]),
+  ].sort((a, b) => a - b);
+  const effectiveTradeYear =
+    exportsMap.has(selectedYearNumber) || importsMap.has(selectedYearNumber)
+      ? selectedYearNumber
+      : tradeYears[tradeYears.length - 1] ?? selectedYearNumber;
 
   const exportValue = exportsMap.get(effectiveTradeYear);
   const importValue = importsMap.get(effectiveTradeYear);
@@ -1444,6 +1455,7 @@ const CountrySnapshotPanel = ({
   importBreakdownByYear,
   exportMarketsByYear,
   importMarketsByYear,
+  years = runtimeYears,
 }) => {
   const { labels, language, locale, isDarkMode } = useCountriesI18n();
   const miningSubsectionBodyClass = isDarkMode
@@ -1492,7 +1504,7 @@ const CountrySnapshotPanel = ({
         <label className="flex w-full items-center gap-2 sm:w-auto">
           <Calendar size={16} className="shrink-0" style={{ color: "#C9A84C" }} aria-hidden />
           <select value={year} onChange={(e) => onYearChange?.(Number(e.target.value))} className={`w-full min-w-[120px] sm:w-auto ${yearSelectClass}`}>
-            {runtimeYears.map((yr) => (
+            {(Array.isArray(years) && years.length ? years : runtimeYears).map((yr) => (
               <option key={yr} value={yr}>{yr}</option>
             ))}
           </select>
@@ -2369,7 +2381,7 @@ const CountryTradeChart = ({ title, country, series, color }) => {
             callbacks: {
               label(context) {
                 const v = context.parsed.y || 0;
-                return ` ${v.toLocaleString(locale, { maximumFractionDigits: 0 })} ${labels.dollar}`;
+                return ` ${fmtVal(v)} ${labels.dollar}`;
               },
             },
           },
@@ -2657,7 +2669,6 @@ const Countries = () => {
   useEffect(() => {
     if (!selectedCountryObj || !selectedCountryAvailableYears.length) return;
     const latestAvailableYear = selectedCountryAvailableYears[selectedCountryAvailableYears.length - 1];
-    setSummaryYear(latestAvailableYear);
     setDonutYear(latestAvailableYear);
     setBarYear(latestAvailableYear);
     setTreemapYear(latestAvailableYear);
@@ -2756,6 +2767,24 @@ const Countries = () => {
       importMarketsByYear: Object.fromEntries(Object.entries(importSets).map(([year, set]) => [year, set.size])),
     };
   }, [bilateralTradeRows, selectedCountryObj]);
+
+  const selectedCountrySummaryYears = useMemo(() => {
+    const years = new Set(selectedCountryAvailableYears || []);
+    exportSeries.forEach((row) => {
+      const year = Number(row?.year);
+      if (Number.isFinite(year)) years.add(year);
+    });
+    importSeries.forEach((row) => {
+      const year = Number(row?.year);
+      if (Number.isFinite(year)) years.add(year);
+    });
+    return [...years].sort((a, b) => a - b);
+  }, [selectedCountryAvailableYears, exportSeries, importSeries]);
+
+  useEffect(() => {
+    if (!selectedCountryObj || !selectedCountrySummaryYears.length) return;
+    setSummaryYear(selectedCountrySummaryYears[selectedCountrySummaryYears.length - 1]);
+  }, [selectedCountryObj?.id, selectedCountrySummaryYears]);
 
   return (
     <div
@@ -2878,6 +2907,7 @@ const Countries = () => {
                 importBreakdownByYear={importBreakdownByYear}
                 exportMarketsByYear={exportMarketsByYear}
                 importMarketsByYear={importMarketsByYear}
+                years={selectedCountrySummaryYears}
               />
             )}
 
