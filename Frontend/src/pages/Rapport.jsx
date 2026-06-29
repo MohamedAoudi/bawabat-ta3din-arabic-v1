@@ -3,6 +3,7 @@ import { LanguageContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
 import { countryFlags } from "../utils/arabCountryFlags";
+import generalSmartReportPdf from "../assets/التقارير الذكية-1.pdf";
 import {
   reportService,
   REPORT_COUNTRY_NAMES,
@@ -76,6 +77,7 @@ const RAPPORT_TRANSLATIONS = {
     allMinerals: "كل المعادن",
     preferredLanguage: "اللغة المفضّلة",
     generate: "إنشاء التقرير",
+    generateGeneral: "إنشاء تقرير عام",
     reset: "إعادة التعيين",
     summaryTitle: "ملخّص معايير التقرير",
     backHome: "العودة إلى الرئيسية",
@@ -107,6 +109,7 @@ const RAPPORT_TRANSLATIONS = {
     allMinerals: "Tous les minéraux",
     preferredLanguage: "Langue préférée",
     generate: "Générer le rapport",
+    generateGeneral: "Générer un rapport général",
     reset: "Réinitialiser",
     summaryTitle: "Récapitulatif des critères",
     backHome: "Retour à l'accueil",
@@ -138,6 +141,7 @@ const RAPPORT_TRANSLATIONS = {
     allMinerals: "All minerals",
     preferredLanguage: "Preferred language",
     generate: "Generate report",
+    generateGeneral: "Generate general report",
     reset: "Reset",
     summaryTitle: "Report criteria summary",
     backHome: "Back to home",
@@ -167,8 +171,27 @@ const Rapport = () => {
   const { language } = useContext(LanguageContext);
   const t = RAPPORT_TRANSLATIONS[language] || RAPPORT_TRANSLATIONS.ar;
   const isArabic = language === "ar";
+  const reportModeLabels =
+    language === "fr"
+      ? { general: "Rapport general", custom: "Rapport personnalise" }
+      : language === "en"
+        ? { general: "General report", custom: "Custom report" }
+        : { general: "تقرير عام", custom: "تقرير خاص" };
 
   const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const [reportMode, setReportMode] = useState("general");
+  const reportModeTitle =
+    language === "fr"
+      ? reportMode === "general"
+        ? "Generer un rapport general"
+        : "Generer un rapport personnalise"
+      : language === "en"
+        ? reportMode === "general"
+          ? "Generate a general report"
+          : "Generate a custom report"
+        : reportMode === "general"
+          ? "إنشاء تقرير عام"
+          : "إنشاء تقرير خاص";
   const [submitted, setSubmitted] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -430,16 +453,61 @@ const Rapport = () => {
 
         {/* Title + subtitle */}
         <h1 className="text-3xl sm:text-4xl font-black text-white text-center mb-3 leading-tight">
-          {t.title}
+          {reportModeTitle}
         </h1>
         <p className="text-white/50 text-[15px] text-center max-w-xl mb-10 leading-relaxed">
           {t.subtitle}
         </p>
 
+        <div
+          className="mb-8 grid w-full max-w-md grid-cols-2 rounded-full p-1"
+          style={{
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(201,168,76,0.22)",
+          }}
+        >
+          {[
+            { key: "general", label: reportModeLabels.general },
+            { key: "custom", label: reportModeLabels.custom },
+          ].map((mode) => {
+            const active = reportMode === mode.key;
+            return (
+              <button
+                key={mode.key}
+                type="button"
+                onClick={() => {
+                  setReportMode(mode.key);
+                  if (mode.key === "general") handleReset();
+                }}
+                className="rounded-full px-4 py-2.5 text-sm font-black transition-all"
+                style={{
+                  background: active ? "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)" : "transparent",
+                  color: active ? "#082721" : "rgba(255,255,255,0.74)",
+                  boxShadow: active ? "0 6px 18px rgba(201,168,76,0.28)" : "none",
+                }}
+              >
+                {mode.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <a
+          href={generalSmartReportPdf}
+          download="التقارير الذكية-1.pdf"
+          className={`${reportMode === "general" ? "inline-flex" : "hidden"} mb-8 items-center justify-center rounded-full px-8 py-3 text-[15px] font-black text-[#082721] transition-all hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]/60`}
+          style={{
+            background: "linear-gradient(135deg,#d4b35a,#C9A84C,#b8932e)",
+            boxShadow: "0 8px 24px rgba(201,168,76,0.35)",
+          }}
+        >
+          {t.generateGeneral}
+        </a>
+
         {/* Filter card */}
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-3xl rounded-3xl p-6 sm:p-8 mb-8"
+          className={`${reportMode === "custom" ? "block" : "hidden"} w-full max-w-3xl rounded-3xl p-6 sm:p-8 mb-8`}
           style={{
             background: "rgba(255,255,255,0.04)",
             border: "1px solid rgba(201,168,76,0.18)",
@@ -642,7 +710,7 @@ const Rapport = () => {
         </form>
 
         {/* Summary of selected filters */}
-        {submitted && (
+        {reportMode === "custom" && submitted && (
           <div
             className="w-full max-w-3xl rounded-2xl p-6 mb-8"
             style={{
@@ -671,7 +739,7 @@ const Rapport = () => {
         )}
 
         {/* Error / no-data banner */}
-        {error && !loading && (
+        {reportMode === "custom" && error && !loading && (
           <div
             className="w-full max-w-3xl rounded-2xl p-5 mb-8 text-center"
             style={{
@@ -686,7 +754,7 @@ const Rapport = () => {
         )}
 
         {/* PDF preview + download */}
-        {pdf && !loading && (
+        {reportMode === "custom" && pdf && !loading && (
           <div
             className="w-full max-w-3xl rounded-2xl p-5 mb-8"
             style={{
