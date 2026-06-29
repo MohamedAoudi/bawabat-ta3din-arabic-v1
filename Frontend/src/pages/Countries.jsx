@@ -14,13 +14,9 @@ import { TreemapController, TreemapElement } from "chartjs-chart-treemap";
 import { LanguageContext, ThemeContext } from "../App";
 import Menu from "../layouts/Menu";
 import Footer from "../layouts/Footer";
-// Services removed — provide local stubs to avoid external service usage in pages
-const getCountries = async () => [];
-const getYears = async () => [];
-const getMineralProduction = async () => [];
-const getTradeTransactions = async () => [];
-const getTradePartners = async () => [];
-const getMinerals = async () => [];
+import { getCountries } from "../services/countryService";
+import { getProductionAnalytics, getTradeAnalytics } from "../services/analyticsService";
+import { getAllPartnerTrades } from "../services/partnerTradeService";
 import { dataByMineral as staticDataByMineral, mineralUnits as staticMineralUnits } from "./M1";
 import { countryFlags, ISO3_TO_ISO2, normalizeCountryCode } from "../utils/arabCountryFlags";
 
@@ -465,6 +461,46 @@ const getMineralRowLabel = (row, language) => {
   if (language === "en") return row?.mineral_name_en || row?.mineral_name_fr || row?.mineral_name_ar || "";
   return row?.mineral_name_ar || row?.mineral_name_en || row?.mineral_name_fr || "";
 };
+
+const extractMineralsFromRows = (rows) => {
+  const byId = new Map();
+  (Array.isArray(rows) ? rows : []).forEach((row) => {
+    const id = row?.mineral_id ?? row?.mineral_trade_id ?? row?.mineral_production_id;
+    if (id == null || id === "") return;
+    const key = String(id);
+    const current = byId.get(key) || { id };
+    byId.set(key, {
+      ...current,
+      name_ar: current.name_ar || row?.mineral_name_ar || row?.name_ar || "",
+      name_en: current.name_en || row?.mineral_name_en || row?.name_en || "",
+      name_fr: current.name_fr || row?.mineral_name_fr || row?.name_fr || "",
+    });
+  });
+  return [...byId.values()];
+};
+
+const mergeMineralLists = (...lists) => {
+  const byId = new Map();
+  lists.flat().forEach((row) => {
+    const id = row?.id ?? row?.mineral_id ?? row?.mineral_trade_id ?? row?.mineral_production_id;
+    if (id == null || id === "") return;
+    const key = String(id);
+    const current = byId.get(key) || { id };
+    byId.set(key, {
+      ...current,
+      name_ar: current.name_ar || row?.name_ar || row?.mineral_name_ar || "",
+      name_en: current.name_en || row?.name_en || row?.mineral_name_en || "",
+      name_fr: current.name_fr || row?.name_fr || row?.mineral_name_fr || "",
+    });
+  });
+  return [...byId.values()];
+};
+
+const getTradeRowType = (row) => String(row?.type_trade || row?.trade_type || "").toLowerCase();
+const getTradeRowCountryId = (row) => row?.country_id ?? row?.reporter_country_id;
+const getTradeRowCountryCode = (row) => row?.country_code || row?.iso_code || row?.country_iso_code || "";
+const getTradeRowMineralId = (row) => row?.mineral_id ?? row?.mineral_trade_id;
+const getTradeRowValue = (row) => Number(row?.trade_value_usd ?? row?.value_usd ?? 0);
 
 const buildDbMineralFilterOptions = (mineralsFromDb, language) => {
   const labels = getLabelsForLanguage(language);
@@ -2501,27 +2537,15 @@ const Countries = () => {
   useEffect(() => {
     let active = true;
 
-    const loadYearsFromDb = async () => {
-      try {
-        const rows = await getYears();
-        if (!active) return;
-        const years = (Array.isArray(rows) ? rows : [])
-          .map((row) => Number(row?.year))
-          .filter(Number.isFinite)
-          .sort((a, b) => a - b);
-        if (years.length) {
-          setYearsFromDb(years);
-        }
-      } catch {
-        // Fallback to production-derived/static years.
-      }
-    };
-
     const loadProductionFromDb = async () => {
       try {
-        const rows = await getMineralProduction();
+        const rows = await getProductionAnalytics();
         if (!active) return;
-        setProductionDataset(buildDatasetFromDbRows(rows));
+        const safeRows = Array.isArray(rows) ? rows : [];
+        setProductionDataset(buildDatasetFromDbRows(safeRows));
+        const productionYears = [...new Set(safeRows.map((row) => Number(row?.year)).filter(Number.isFinite))].sort((a, b) => a - b);
+        if (productionYears.length) setYearsFromDb(productionYears);
+        setMineralsFromDb((current) => mergeMineralLists(current, extractMineralsFromRows(safeRows)));
       } catch {
         if (!active) return;
         setProductionDataset({
@@ -2533,22 +2557,13 @@ const Countries = () => {
       }
     };
 
-    const loadMineralsFromDb = async () => {
-      try {
-        const rows = await getMinerals();
-        if (!active) return;
-        setMineralsFromDb(Array.isArray(rows) ? rows : []);
-      } catch {
-        if (!active) return;
-        setMineralsFromDb([]);
-      }
-    };
-
     const loadTradeTransactionsFromDb = async () => {
       try {
-        const rows = await getTradeTransactions();
+        const rows = await getTradeAnalytics();
         if (!active) return;
-        setTradeTransactions(Array.isArray(rows) ? rows : []);
+        const safeRows = Array.isArray(rows) ? rows : [];
+        setTradeTransactions(safeRows);
+        setMineralsFromDb((current) => mergeMineralLists(current, extractMineralsFromRows(safeRows)));
       } catch {
         if (!active) return;
         setTradeTransactions([]);
@@ -2557,7 +2572,7 @@ const Countries = () => {
 
     const loadBilateralTradeFromDb = async () => {
       try {
-        const rows = await getTradePartners();
+        const rows = await getAllPartnerTrades();
         if (!active) return;
         setBilateralTradeRows(Array.isArray(rows) ? rows : []);
       } catch {
@@ -2566,9 +2581,7 @@ const Countries = () => {
       }
     };
 
-    loadYearsFromDb();
     loadProductionFromDb();
-    loadMineralsFromDb();
     loadTradeTransactionsFromDb();
     loadBilateralTradeFromDb();
 
@@ -2671,10 +2684,10 @@ const Countries = () => {
     const selectedCountryId = selectedCountryObj?.id != null ? String(selectedCountryObj.id) : null;
     const selectedCode = String(selectedCountryObj?.code || "").toLowerCase();
     return (tradeTransactions || []).filter((row) => {
-      const rowType = String(row?.trade_type || "").toLowerCase();
+      const rowType = getTradeRowType(row);
       if (rowType !== "export" && rowType !== "import") return false;
-      if (selectedCountryId && String(row?.country_id) === selectedCountryId) return true;
-      const rowCode = normalizeCountryCode(row?.country_code || row?.iso_code || row?.country_iso_code || "");
+      if (selectedCountryId && String(getTradeRowCountryId(row)) === selectedCountryId) return true;
+      const rowCode = normalizeCountryCode(getTradeRowCountryCode(row));
       return rowCode && rowCode === selectedCode;
     });
   }, [tradeTransactions, selectedCountryObj]);
@@ -2688,10 +2701,10 @@ const Countries = () => {
     selectedCountryTradeRows.forEach((row) => {
       const year = Number(row?.year);
       if (!Number.isFinite(year)) return;
-      const value = Number(row?.trade_value_usd || 0);
-      const tradeType = String(row?.trade_type || "").toLowerCase();
-      const mineralKey = String(row?.mineral_id ?? "");
-      const mineralLabel = mineralNameById[mineralKey] || labels.none;
+      const value = getTradeRowValue(row);
+      const tradeType = getTradeRowType(row);
+      const mineralKey = String(getTradeRowMineralId(row) ?? "");
+      const mineralLabel = mineralNameById[mineralKey] || getMineralRowLabel(row, language) || labels.none;
 
       if (tradeType === "export") {
         exportTotals[year] = (exportTotals[year] || 0) + value;
@@ -2714,7 +2727,7 @@ const Countries = () => {
       exportBreakdownByYear: exportBreakdown,
       importBreakdownByYear: importBreakdown,
     };
-  }, [selectedCountryTradeRows, mineralNameById, labels.none]);
+  }, [selectedCountryTradeRows, mineralNameById, language, labels.none]);
 
   const { exportMarketsByYear, importMarketsByYear } = useMemo(() => {
     if (!selectedCountryObj?.id) return { exportMarketsByYear: {}, importMarketsByYear: {} };
@@ -2723,12 +2736,12 @@ const Countries = () => {
     const importSets = {};
 
     (bilateralTradeRows || []).forEach((row) => {
-      if (String(row?.country_id) !== selectedCountryId) return;
+      if (String(getTradeRowCountryId(row)) !== selectedCountryId) return;
       const year = Number(row?.year);
       if (!Number.isFinite(year)) return;
       const partnerKey = String(row?.partner_id ?? row?.partner_code ?? "");
       if (!partnerKey) return;
-      const tradeType = String(row?.trade_type || "").toLowerCase();
+      const tradeType = getTradeRowType(row);
       if (tradeType === "export") {
         if (!exportSets[year]) exportSets[year] = new Set();
         exportSets[year].add(partnerKey);
