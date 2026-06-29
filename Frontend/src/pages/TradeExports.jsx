@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar, { MobileHeader } from "../layouts/Sidebar";
 import { LanguageContext, ThemeContext } from "../App";
@@ -11,7 +11,15 @@ const updateTradeTransaction = async () => null;
 const getCountries = async () => [];
 const getMinerals = async () => [];
 const getYears = async () => [];
-import { Check, ChevronLeft, ChevronRight, Edit, Plus, Search, Ship, Trash2, X } from "lucide-react";
+import {
+  dedupeTradeTransactionPayloads,
+  exportTradeTransactionExcel,
+  exportTradeTransactionTemplateExcel,
+  findMatchingTradeTransaction,
+  normalizeTradeTransactionPayload,
+  parseTradeTransactionExcelFile,
+} from "../utils/tradeTransactionExcel";
+import { Check, ChevronLeft, ChevronRight, Download, Edit, FileSpreadsheet, Plus, Search, Ship, Trash2, Upload, X } from "lucide-react";
 
 const PAGE_SIZE = 15;
 
@@ -183,6 +191,17 @@ export default function TradeExportsPage() {
   const { language } = useContext(LanguageContext);
   const { isDarkMode } = useContext(ThemeContext);
   const t = TRANSLATIONS[language] || TRANSLATIONS.ar;
+  const excelT = {
+    downloadExcel: language === "fr" ? "Exporter Excel" : "Export Excel",
+    importExcel: language === "fr" ? "Importer Excel" : "Import Excel",
+    downloadTemplate: language === "fr" ? "Modele Excel" : "Excel template",
+    importing: language === "fr" ? "Importation..." : "Importing...",
+    importSuccess: (n) => (language === "fr" ? `${n} enregistrement(s) importe(s)` : `${n} export record(s) imported`),
+    importPartial: (ok, fail) => (language === "fr" ? `${ok} importe(s), ${fail} echec(s)` : `${ok} imported, ${fail} failed`),
+    importDuplicateHint: language === "fr" ? "Les enregistrements existants ont ete mis a jour" : "Existing records were updated",
+    importNoRows: language === "fr" ? "Aucune ligne valide dans le fichier" : "No valid rows in the file",
+    importFileError: language === "fr" ? "Impossible de lire le fichier Excel" : "Could not read Excel file",
+  };
   const isRTL = language === "ar";
 
   const colors = isDarkMode
@@ -232,6 +251,9 @@ export default function TradeExportsPage() {
     year: "",
     trade_value_usd: "",
   });
+  const [importing, setImporting] = useState(false);
+  const [importMessage, setImportMessage] = useState(null);
+  const fileInputRef = useRef(null);
 
   const isAdmin = currentUser?.role === "admin";
 
@@ -362,6 +384,70 @@ export default function TradeExportsPage() {
     setConfirmDelete(null);
   };
 
+  const handleDownloadExcel = () => {
+    exportTradeTransactionExcel(rows, countries, minerals, t, "trade_exports.xlsx");
+  };
+
+  const handleDownloadTemplate = () => {
+    exportTradeTransactionTemplateExcel(t, countries, minerals, "trade_exports_template.xlsx");
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    setImporting(true);
+    setImportMessage(null);
+    try {
+      const payloads = await parseTradeTransactionExcelFile(file, countries, minerals, t, "export");
+      if (!payloads.length) {
+        setImportMessage({ type: "error", text: excelT.importNoRows });
+        return;
+      }
+
+      const uniquePayloads = dedupeTradeTransactionPayloads(payloads, "export");
+      let ok = 0;
+      let fail = 0;
+      let updated = 0;
+      let workingRows = [...rows];
+
+      for (const rawPayload of uniquePayloads) {
+        const payload = normalizeTradeTransactionPayload(rawPayload, "export");
+        const existing = findMatchingTradeTransaction(workingRows, payload, "export");
+        try {
+          if (existing?.id) {
+            const saved = await updateTradeTransaction(existing.id, payload);
+            workingRows = workingRows.map((r) => (r.id === existing.id ? { ...r, ...(saved || payload) } : r));
+            updated += 1;
+          } else {
+            const saved = await createTradeTransaction(payload);
+            workingRows.push(saved || payload);
+          }
+          ok += 1;
+        } catch {
+          fail += 1;
+        }
+      }
+
+      await fetchRows();
+      if (fail === 0) {
+        const hint = updated > 0 ? ` (${excelT.importDuplicateHint})` : "";
+        setImportMessage({ type: "success", text: `${excelT.importSuccess(ok)}${hint}` });
+      } else {
+        setImportMessage({ type: "warning", text: excelT.importPartial(ok, fail) });
+      }
+    } catch {
+      setImportMessage({ type: "error", text: excelT.importFileError });
+    } finally {
+      setImporting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: colors.bg }}>
@@ -395,18 +481,69 @@ export default function TradeExportsPage() {
               {t.pageTitle}
             </h1>
           </div>
-          <button
-            onClick={openCreate}
-            className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+          <div className="flex flex-wrap items-center gap-2 justify-start sm:justify-end">
+            <button
+              type="button"
+              onClick={handleDownloadExcel}
+              className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{ background: colors.cardBg, color: colors.ink, border: `1px solid ${colors.border}` }}
+            >
+              <Download size={18} style={{ color: colors.gold }} />
+              <span className="text-sm font-semibold">{excelT.downloadExcel}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleImportClick}
+              disabled={importing}
+              className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: colors.cardBg, color: colors.ink, border: `1px solid ${colors.border}` }}
+            >
+              <Upload size={18} style={{ color: colors.gold }} />
+              <span className="text-sm font-semibold">{importing ? excelT.importing : excelT.importExcel}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleDownloadTemplate}
+              className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{ background: colors.cardBg, color: colors.ink, border: `1px solid ${colors.border}` }}
+            >
+              <FileSpreadsheet size={18} style={{ color: colors.gold }} />
+              <span className="text-sm font-semibold">{excelT.downloadTemplate}</span>
+            </button>
+            <button
+              type="button"
+              onClick={openCreate}
+              className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`,
+                color: colors.forest,
+              }}
+            >
+              <Plus size={18} />
+              <span className="text-sm font-semibold">{t.add}</span>
+            </button>
+            <input ref={fileInputRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImportFile} />
+          </div>
+        </div>
+
+        {importMessage && (
+          <div
+            className="mb-4 px-4 py-3 rounded-xl text-sm font-medium"
             style={{
-              background: `linear-gradient(135deg, ${colors.gold} 0%, ${colors.goldLight} 100%)`,
-              color: colors.forest,
+              background:
+                importMessage.type === "success"
+                  ? "rgba(34,197,94,0.12)"
+                  : importMessage.type === "warning"
+                    ? "rgba(234,179,8,0.12)"
+                    : "rgba(220,38,38,0.12)",
+              color:
+                importMessage.type === "success" ? "#16a34a" : importMessage.type === "warning" ? "#ca8a04" : "#dc2626",
+              border: `1px solid ${colors.border}`,
             }}
           >
-            <Plus size={18} />
-            <span className="text-sm font-semibold">{t.add}</span>
-          </button>
-        </div>
+            {importMessage.text}
+          </div>
+        )}
 
         <div className="mb-4 sm:mb-6 rounded-xl p-3 sm:p-4 shadow-sm" style={{ background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div className="relative">
@@ -695,4 +832,3 @@ function SelectField({ label, value, onChange, options, colors }) {
     </div>
   );
 }
-
